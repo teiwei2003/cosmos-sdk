@@ -111,27 +111,33 @@ We need to be able to process transactions and roll-back state updates if a tran
 We identified use-cases, where modules will need to save an object commitment without storing an object itself. Sometimes clients are receiving complex objects, and they have no way to prove a correctness of that object without knowing the storage layout. For those use cases it would be easier to commit to the object without storing it directly.
 
 
-### Low-Level Interface
+### Low Level Interface
 
-Modules should be able to commit a value fully managed by the module itself. For example, a module can manage its own special database and commit its state by setting a value only to `SC`. Currently the store is exposed only through `sdk.Context` through `MultiStore`. We are deprecating the "multistore" concept, however the root store interface will be the same. We should extend the root store interface with the following function:
+Modules should be able to commit a value fully managed by the module itself. For example, a module can manage its own special database and commit its state by setting a value only to `SC`.
+Similarly, a module can save a value without committing it - this is useful for ORM module or secondary indexes (eg x/staking `UnbondingDelegationKey` and `UnbondingDelegationByValIndexKey`).
 
-```
-    GetSCStore(key []byte) BasicKVStore
-```
-
-And the interface for `BasicKVStore` is:
+Currently, a module can access a store only through `sdk.Context`. We add the following methods to the `sdk.Context`:
 
 ```
-type BasicKVStore interface {
-	Get(key []byte) []byte
-	Has(key []byte) bool
-	Set(key, value []byte)
+type StoreAccess inteface {
+    KVStore(key []byte) KVStore  // reads and writes to combined store (SS & SC)
+    InternalSCStore(key []byte) KVStore  // reads and writes only to the SC
+    InternalSSStore(key []byte) KVStore  // reads and writes only to the SS
 }
 ```
 
-For `SC` store, the `BasicKVStore` provides access to the `SC` implementation without exposing its specific behavior. That means that `sc.Get(key)` will pass the query to the SC store which will search for `hash(key)`. To keep the interface as minimal as possible, we don't provide a `Delete` method. If needed, it can be added in the future as a non-breaking change.
+The `KVStore(key)` will provide an access to the combined `SS` and `SC` store:
+* `Get` will return `SS` value
+* `Has` will return true if value key is present in both `SS` and `SC`
+* `Set` will store a value in both `SS` and `SC`. It should panic when key or value are nil
+* `Delete` will delete key both from `SS` and `SC`
+* `Iterator` will iterate over `SS`
+* `ReverseIterator` will iterate over `SS`
 
-TODO: describe race condition.
+Naive implementation could cause race conditions: if `KVStore` and `SCStore` will return a different cache instances in the same transaction session, then we essentially create a race condition when someone will write to the combined KCStore and later read from `SSStore` in the same transaction.
+`StoreAccess` must use the same cache layer for `KVStore()` and `InternalSSStore()`.
+
+CAUTION: the low level stores (SS and SC) should be used with caution to avoid integrity errors and race condition. When someone will write to a key in the combined store (`ctx.KVStore`) in one place, and in another he will write to the `SC` only.
 
 
 ## Consequences
