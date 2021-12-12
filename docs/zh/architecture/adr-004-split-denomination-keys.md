@@ -1,54 +1,54 @@
-# ADR 004: Split Denomination Keys
+# ADR 004：拆分面额密钥
 
-## Changelog
+## 变更日志
 
-- 2020-01-08: Initial version
-- 2020-01-09: Alterations to handle vesting accounts
-- 2020-01-14: Updates from review feedback
-- 2020-01-30: Updates from implementation
+- 2020-01-08：初始版本
+- 2020-01-09：更改归属账户的处理
+- 2020-01-14：评论反馈更新
+- 2020-01-30：实施更新
 
-### Glossary
+### 词汇表
 
-* denom / denomination key -- unique token identifier.
+* 面额/面额密钥——唯一的令牌标识符。
 
-## Context
+## 语境
 
-With permissionless IBC, anyone will be able to send arbitrary denominations to any other account. Currently, all non-zero balances are stored along with the account in an `sdk.Coins` struct, which creates a potential denial-of-service concern, as too many denominations will become expensive to load & store each time the account is modified. See issues [5467](https://github.com/cosmos/cosmos-sdk/issues/5467) and [4982](https://github.com/cosmos/cosmos-sdk/issues/4982) for additional context.
+使用无需许可的 IBC，任何人都可以将任意面额发送到任何其他帐户。目前，所有非零余额都与帐户一起存储在“sdk.Coins”结构中，这会产生潜在的拒绝服务问题，因为每次修改帐户时加载和存储过多面额都会变得昂贵.有关其他上下文，请参阅问题 [5467](https://github.com/cosmos/cosmos-sdk/issues/5467) 和 [4982](https://github.com/cosmos/cosmos-sdk/issues/4982) .
 
-Simply rejecting incoming deposits after a denomination count limit doesn't work, since it opens up a griefing vector: someone could send a user lots of nonsensical coins over IBC, and then prevent the user from receiving real denominations (such as staking rewards).
+在面额计数限制后简单地拒绝入金是行不通的，因为它打开了一个悲痛的向量：有人可以通过 IBC 向用户发送大量无意义的硬币，然后阻止用户收到真实的面额（例如赌注奖励）。
 
-## Decision
+## 决定
 
-Balances shall be stored per-account & per-denomination under a denomination- and account-unique key, thus enabling O(1) read & write access to the balance of a particular account in a particular denomination.
+余额应按账户和面额存储在面额和账户唯一的密钥下，从而实现对特定面额的特定账户余额的 O(1) 读写访问。
 
-### Account interface (x/auth)
+### 账户接口（x/auth）
 
-`GetCoins()` and `SetCoins()` will be removed from the account interface, since coin balances will
-now be stored in & managed by the bank module.
+`GetCoins()` 和 `SetCoins()` 将从账户界面中删除，因为硬币余额将
+现在存储在银行模块中并由银行模块管理。
 
-The vesting account interface will replace `SpendableCoins` in favor of `LockedCoins` which does
-not require the account balance anymore. In addition, `TrackDelegation()`  will now accept the
-account balance of all tokens denominated in the vesting balance instead of loading the entire
-account balance.
+归属账户界面将取代“SpendableCoins”以支持“LockedCoins”
+不再需要帐户余额。此外，`TrackDelegation()` 现在将接受
+以归属余额计价的所有代币的账户余额，而不是加载整个
+账户余额。
 
-Vesting accounts will continue to store original vesting, delegated free, and delegated
-vesting coins (which is safe since these cannot contain arbitrary denominations).
+归属账户将继续存储原始归属、免费委托和委托
+归属硬币（这是安全的，因为它们不能包含任意面额）。
 
-### Bank keeper (x/bank)
+### 银行管理员 (x/bank)
 
-The following APIs will be added to the `x/bank` keeper:
+以下 API 将被添加到 `x/bank` keeper：
 
-- `GetAllBalances(ctx Context, addr AccAddress) Coins`
-- `GetBalance(ctx Context, addr AccAddress, denom string) Coin`
+-`GetAllBalances(ctx Context, addr AccAddress) Coins`
+-`GetBalance(ctx Context, addr AccAddress, denom string) Coin`
 - `SetBalance(ctx Context, addr AccAddress, coin Coin)`
 - `LockedCoins(ctx Context, addr AccAddress) Coins`
 - `SpendableCoins(ctx Context, addr AccAddress) Coins`
 
-Additional APIs may be added to facilitate iteration and auxiliary functionality not essential to
-core functionality or persistence.
+可能会添加额外的 API 以促进迭代和辅助功能
+核心功能或持久性。
 
-Balances will be stored first by the address, then by the denomination (the reverse is also possible,
-but retrieval of all balances for a single account is presumed to be more frequent):
+余额将首先按地址存储，然后按面额存储（反之亦然，
+但假定检索单个帐户的所有余额的频率更高）：
 
 ```golang
 var BalancesPrefix = []byte("balances")
@@ -69,51 +69,51 @@ func (k Keeper) SetBalance(ctx Context, addr AccAddress, balance Coin) error {
 }
 ```
 
-This will result in the balances being indexed by the byte representation of
-`balances/{address}/{denom}`.
+这将导致余额由的字节表示索引
+`余额/{地址}/{denom}`。
 
-`DelegateCoins()` and `UndelegateCoins()` will be altered to only load each individual
-account balance by denomination found in the (un)delegation amount. As a result,
-any mutations to the account balance by will made by denomination.
+`DelegateCoins()` 和 `UndelegateCoins()` 将被更改为仅加载每个人
+在（非）委托金额中找到的按面额划分的帐户余额。因此，
+账户余额的任何变化将由面额进行。
 
-`SubtractCoins()` and `AddCoins()` will be altered to read & write the balances
-directly instead of calling `GetCoins()` / `SetCoins()` (which no longer exist).
+`SubtractCoins()` 和 `AddCoins()` 将被更改以读取和写入余额
+直接而不是调用`GetCoins()`/`SetCoins()`（不再存在）。
 
-`trackDelegation()` and `trackUndelegation()` will be altered to no longer update
-account balances.
+`trackDelegation()` 和 `trackUndelegation()` 将被更改为不再更新
+账户余额。
 
-External APIs will need to scan all balances under an account to retain backwards-compatibility. It
-is advised that these APIs use `GetBalance` and `SetBalance` instead of `GetAllBalances` when
-possible as to not load the entire account balance.
+外部 API 将需要扫描帐户下的所有余额以保持向后兼容性。它
+建议这些 API 在以下情况下使用 `GetBalance` 和 `SetBalance` 而不是 `GetAllBalances`
+可能不加载整个帐户余额。
 
-### Supply module
+### 供应模块
 
-The supply module, in order to implement the total supply invariant, will now need
-to scan all accounts & call `GetAllBalances` using the `x/bank` Keeper, then sum
-the balances and check that they match the expected total supply.
+供应模块，为了实现总供应不变量，现在需要
+扫描所有账户并使用 `x/bank` Keeper 调用 `GetAllBalances`，然后求和
+余额并检查它们是否与预期的总供应量相匹配。
 
-## Status
+## 地位
 
-Accepted.
+公认。
 
-## Consequences
+## 结果
 
-### Positive
+### 积极的
 
-- O(1) reads & writes of balances (with respect to the number of denominations for
-which an account has non-zero balances). Note, this does not relate to the actual
-I/O cost, rather the total number of direct reads needed.
+- O(1) 读取和写入余额（关于面额数量）
+其中一个帐户具有非零余额）。请注意，这与实际情况无关
+I/O 成本，而不是所需的直接读取总数。
 
-### Negative
+### 消极的
 
-- Slightly less efficient reads/writes when reading & writing all balances of a
-single account in a transaction.
+- 读取和写入所有余额时的读取/写入效率略低
+交易中的单个帐户。
 
-### Neutral
+### 中性的
 
-None in particular.
+没有特别的。
 
-## References
+## 参考
 
 - Ref: https://github.com/cosmos/cosmos-sdk/issues/4982
 - Ref: https://github.com/cosmos/cosmos-sdk/issues/5467

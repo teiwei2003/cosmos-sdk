@@ -1,51 +1,51 @@
-# ADR 3: Dynamic Capability Store
+# ADR 3：动态能力存储
 
-## Changelog
+## 变更日志
 
-- 12 December 2019: Initial version
-- 02 April 2020: Memory Store Revisions
+- 2019 年 12 月 12 日：初始版本
+- 2020 年 4 月 2 日：内存存储修订
 
-## Context
+## 语境
 
-Full implementation of the [IBC specification](https://github.com/cosmos/ibs) requires the ability to create and authenticate object-capability keys at runtime (i.e., during transaction execution),
-as described in [ICS 5](https://github.com/cosmos/ibc/tree/master/spec/core/ics-005-port-allocation#technical-specification). In the IBC specification, capability keys are created for each newly initialised
-port & channel, and are used to authenticate future usage of the port or channel. Since channels and potentially ports can be initialised during transaction execution, the state machine must be able to create
-object-capability keys at this time.
+[IBC 规范](https://github.com/cosmos/ibs) 的完整实现需要能够在运行时（即在事务执行期间）创建和验证对象能力密钥，
+如 [ICS 5](https://github.com/cosmos/ibc/tree/master/spec/core/ics-005-port-allocation#technical-specification) 中所述。在 IBC 规范中，为每个新初始化的
+端口和通道，用于验证端口或通道的未来使用情况。由于通道和潜在的端口可以在事务执行期间初始化，状态机必须能够创建
+此时的对象功能键。
 
-At present, the Cosmos SDK does not have the ability to do this. Object-capability keys are currently pointers (memory addresses) of `StoreKey` structs created at application initialisation in `app.go` ([example](https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app.go#L132))
-and passed to Keepers as fixed arguments ([example](https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app.go#L160)). Keepers cannot create or store capability keys during transaction execution — although they could call `NewKVStoreKey` and take the memory address
-of the returned struct, storing this in the Merklised store would result in a consensus fault, since the memory address will be different on each machine (this is intentional — were this not the case, the keys would be predictable and couldn't serve as object capabilities).
+目前，Cosmos SDK 没有能力做到这一点。对象功能键当前是在应用程序初始化时在 `app.go` 中创建的 `StoreKey` 结构的指针（内存地址）（[示例]（https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app .go#L132))
+并作为固定参数传递给 Keepers（[示例]（https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app.go#L160））。 Keepers 无法在交易执行期间创建或存储功能密钥——尽管他们可以调用 `NewKVStoreKey` 并获取内存地址
+对于返回的结构，将其存储在 Merklised 存储中会导致共识错误，因为每台机器上的内存地址将不同（这是故意的 - 如果不是这种情况，密钥将是可预测的，并且不能用作对象能力）。
 
-Keepers need a way to keep a private map of store keys which can be altered during transaction execution, along with a suitable mechanism for regenerating the unique memory addresses (capability keys) in this map whenever the application is started or restarted, along with a mechanism to revert capability creation on tx failure.
-This ADR proposes such an interface & mechanism.
+Keepers 需要一种方法来保存可以在事务执行期间更改的存储密钥的私有映射，以及在应用程序启动或重新启动时重新生成此映射中唯一内存地址（功能密钥）的合适机制，以及一种机制在 tx 失败时恢复能力创建。
+本 ADR 提出了这样的接口和机制。
 
-## Decision
+## 决定
 
-The Cosmos SDK will include a new `CapabilityKeeper` abstraction, which is responsible for provisioning,
-tracking, and authenticating capabilities at runtime. During application initialisation in `app.go`,
-the `CapabilityKeeper` will be hooked up to modules through unique function references
-(by calling `ScopeToModule`, defined below) so that it can identify the calling module when later
-invoked.
+Cosmos SDK 将包含一个新的“CapabilityKeeper”抽象，它负责供应、
+在运行时跟踪和验证功能。在 app.go 中的应用程序初始化期间，
+`CapabilityKeeper` 将通过唯一的函数引用连接到模块
+（通过调用`ScopeToModule`，定义如下）以便稍后识别调用模块
+调用。
 
-When the initial state is loaded from disk, the `CapabilityKeeper`'s `Initialise` function will create
-new capability keys for all previously allocated capability identifiers (allocated during execution of
-past transactions and assigned to particular modes), and keep them in a memory-only store while the
-chain is running.
+当从磁盘加载初始状态时，`CapabilityKeeper` 的 `Initialise` 函数将创建
+所有先前分配的能力标识符的新能力密钥（在执行过程中分配）
+过去的事务并分配给特定模式），并将它们保存在仅内存存储中，而
+链正在运行。
 
-The `CapabilityKeeper` will include a persistent `KVStore`, a `MemoryStore`, and an in-memory map.
-The persistent `KVStore` tracks which capability is owned by which modules.
-The `MemoryStore` stores a forward mapping that map from module name, capability tuples to capability names and
-a reverse mapping that map from module name, capability name to the capability index.
-Since we cannot marshal the capability into a `KVStore` and unmarshal without changing the memory location of the capability,
-the reverse mapping in the KVStore will simply map to an index. This index can then be used as a key in the ephemeral
-go-map to retrieve the capability at the original memory location.
+`CapabilityKeeper` 将包括一个持久化的 `KVStore`、一个 `MemoryStore` 和一个内存映射。
+持久性“KVStore”跟踪哪些功能由哪些模块拥有。
+`MemoryStore` 存储从模块名称、能力元组到能力名称和
+从模块名称、功能名称映射到功能索引的反向映射。
+由于我们不能在不改变能力的内存位置的情况下将能力编组到`KVStore`中并解组，
+KVStore 中的反向映射将简单地映射到索引。然后可以将此索引用作临时文件中的键
+go-map 在原始内存位置检索功能。
 
-The `CapabilityKeeper` will define the following types & functions:
+`CapabilityKeeper` 将定义以下类型和功能：
 
-The `Capability` is similar to `StoreKey`, but has a globally unique `Index()` instead of
-a name. A `String()` method is provided for debugging.
+`Capability` 类似于 `StoreKey`，但有一个全局唯一的 `Index()` 而不是
+一个名字。提供了一个 `String()` 方法用于调试。
 
-A `Capability` is simply a struct, the address of which is taken for the actual capability.
+`Capability` 只是一个结构体，它的地址被用于实际的能力。
 
 ```golang
 type Capability struct {
@@ -53,7 +53,7 @@ type Capability struct {
 }
 ```
 
-A `CapabilityKeeper` contains a persistent store key, memory store key, and mapping of allocated module names.
+“CapabilityKeeper”包含一个持久存储键、内存存储键和已分配模块名称的映射。
 
 ```golang
 type CapabilityKeeper struct {
@@ -65,11 +65,11 @@ type CapabilityKeeper struct {
 }
 ```
 
-The `CapabilityKeeper` provides the ability to create *scoped* sub-keepers which are tied to a
-particular module name. These `ScopedCapabilityKeeper`s must be created at application initialisation
-and passed to modules, which can then use them to claim capabilities they receive and retrieve
-capabilities which they own by name, in addition to creating new capabilities & authenticating capabilities
-passed by other modules.
+`CapabilityKeeper` 提供了创建 *scoped* 子管理器的能力，这些子管理器绑定到一个
+特定的模块名称。 这些`ScopedCapabilityKeeper`s 必须在应用程序初始化时创建
+并传递给模块，然后模块可以使用它们来声明它们接收和检索的功能
+除了创建新功能和身份验证功能之外，他们按名称拥有的功能
+通过其他模块。
 
 ```golang
 type ScopedCapabilityKeeper struct {
@@ -80,8 +80,8 @@ type ScopedCapabilityKeeper struct {
 }
 ```
 
-`ScopeToModule` is used to create a scoped sub-keeper with a particular name, which must be unique.
-It MUST be called before `InitialiseAndSeal`.
+`ScopeToModule` 用于创建具有特定名称的作用域子管理器，该名称必须是唯一的。
+它必须在 `InitialiseAndSeal` 之前调用。
 
 ```golang
 func (ck CapabilityKeeper) ScopeToModule(moduleName string) ScopedCapabilityKeeper {
@@ -105,10 +105,10 @@ func (ck CapabilityKeeper) ScopeToModule(moduleName string) ScopedCapabilityKeep
 }
 ```
 
-`InitialiseAndSeal` MUST be called exactly once, after loading the initial state and creating all
-necessary `ScopedCapabilityKeeper`s, in order to populate the memory store with newly-created
-capability keys in accordance with the keys previously claimed by particular modules and prevent the
-creation of any new `ScopedCapabilityKeeper`s.
+`InitialiseAndSeal` 必须在加载初始状态并创建所有
+必要的“ScopedCapabilityKeeper”，以便用新创建的内存填充
+根据特定模块先前声明的密钥的能力密钥，并防止
+创建任何新的“ScopedCapabilityKeeper”。
 
 ```golang
 func (ck CapabilityKeeper) InitialiseAndSeal(ctx Context) {
@@ -136,9 +136,9 @@ func (ck CapabilityKeeper) InitialiseAndSeal(ctx Context) {
 }
 ```
 
-`NewCapability` can be called by any module to create a new unique, unforgeable object-capability
-reference. The newly created capability is automatically persisted; the calling module need not
-call `ClaimCapability`.
+任何模块都可以调用“NewCapability”来创建一个新的独特的、不可伪造的对象能力
+参考。 新创建的能力会自动持久化； 调用模块不需要
+调用`ClaimCapability`。
 
 ```golang
 func (sck ScopedCapabilityKeeper) NewCapability(ctx Context, name string) (Capability, error) {
@@ -174,9 +174,9 @@ func (sck ScopedCapabilityKeeper) NewCapability(ctx Context, name string) (Capab
 }
 ```
 
-`AuthenticateCapability` can be called by any module to check that a capability
-does in fact correspond to a particular name (the name can be untrusted user input)
-with which the calling module previously associated it.
+任何模块都可以调用 AuthenticateCapability 来检查能力
+实际上确实对应于特定名称（该名称可以是不受信任的用户输入）
+调用模块之前与之关联的。
 
 ```golang
 func (sck ScopedCapabilityKeeper) AuthenticateCapability(name string, capability Capability) bool {
@@ -185,12 +185,12 @@ func (sck ScopedCapabilityKeeper) AuthenticateCapability(name string, capability
 }
 ```
 
-`ClaimCapability` allows a module to claim a capability key which it has received from another module
-so that future `GetCapability` calls will succeed.
+`ClaimCapability` 允许一个模块声明它从另一个模块收到的能力密钥
+这样未来的`GetCapability` 调用就会成功。
 
-`ClaimCapability` MUST be called if a module which receives a capability wishes to access it by name
-in the future. Capabilities are multi-owner, so if multiple modules have a single `Capability` reference,
-they will all own it.
+如果接收能力的模块希望通过名称访问它，则必须调用`ClaimCapability`
+将来。 能力是多所有者的，所以如果多个模块有一个单一的“能力”引用，
+他们都会拥有它。
 
 ```golang
 func (sck ScopedCapabilityKeeper) ClaimCapability(ctx Context, capability Capability, name string) error {
@@ -209,8 +209,8 @@ func (sck ScopedCapabilityKeeper) ClaimCapability(ctx Context, capability Capabi
 }
 ```
 
-`GetCapability` allows a module to fetch a capability which it has previously claimed by name.
-The module is not allowed to retrieve capabilities which it does not own.
+`GetCapability` 允许模块获取它之前通过名称声明的能力。
+不允许模块检索不属于它的功能。
 
 ```golang
 func (sck ScopedCapabilityKeeper) GetCapability(ctx Context, name string) (Capability, error) {
@@ -225,8 +225,8 @@ func (sck ScopedCapabilityKeeper) GetCapability(ctx Context, name string) (Capab
 }
 ```
 
-`ReleaseCapability` allows a module to release a capability which it had previously claimed. If no
-more owners exist, the capability will be deleted globally.
+`ReleaseCapability` 允许模块释放它之前声明的能力。 如果不
+存在更多所有者，该能力将被全局删除。
 
 ```golang
 func (sck ScopedCapabilityKeeper) ReleaseCapability(ctx Context, capability Capability) err {
@@ -257,11 +257,11 @@ func (sck ScopedCapabilityKeeper) ReleaseCapability(ctx Context, capability Capa
 }
 ```
 
-### Usage patterns
+### 使用模式
 
-#### Initialisation
+#### 初始化
 
-Any modules which use dynamic capabilities must be provided a `ScopedCapabilityKeeper` in `app.go`:
+任何使用动态功能的模块都必须在 `app.go` 中提供一个 `ScopedCapabilityKeeper`：
 
 ```golang
 ck := NewCapabilityKeeper(persistentKey, memoryKey)
@@ -275,18 +275,18 @@ mod2Keeper := NewMod2Keeper(ck.ScopeToModule("mod2"), ....)
 ck.InitialiseAndSeal(initialContext)
 ```
 
-#### Creating, passing, claiming and using capabilities
+#### 创建、传递、声明和使用功能
 
-Consider the case where `mod1` wants to create a capability, associate it with a resource (e.g. an IBC channel) by name, then pass it to `mod2` which will use it later:
+考虑这样一种情况，“mod1”想要创建一个能力，通过名称将其与资源（例如 IBC 通道）相关联，然后将其传递给“mod2”，后者将在稍后使用它：
 
-Module 1 would have the following code:
+模块 1 将具有以下代码：
 
 ```golang
 capability := scopedCapabilityKeeper.NewCapability(ctx, "resourceABC")
 mod2Keeper.SomeFunction(ctx, capability, args...)
 ```
 
-`SomeFunction`, running in module 2, could then claim the capability:
+`SomeFunction`，在模块 2 中运行，然后可以声明该功能：
 
 ```golang
 func (k Mod2Keeper) SomeFunction(ctx Context, capability Capability) {
@@ -295,7 +295,7 @@ func (k Mod2Keeper) SomeFunction(ctx Context, capability Capability) {
 }
 ```
 
-Later on, module 2 can retrieve that capability by name and pass it to module 1, which will authenticate it against the resource:
+稍后，模块 2 可以通过名称检索该功能并将其传递给模块 1，模块 1 将根据资源对其进行身份验证：
 
 ```golang
 func (k Mod2Keeper) SomeOtherFunction(ctx Context, name string) {
@@ -304,7 +304,7 @@ func (k Mod2Keeper) SomeOtherFunction(ctx Context, name string) {
 }
 ```
 
-Module 1 will then check that this capability key is authenticated to use the resource before allowing module 2 to use it:
+在允许模块 2 使用资源之前，模块 1 将检查此功能密钥是否经过身份验证以使用资源：
 
 ```golang
 func (k Mod1Keeper) UseResource(ctx Context, capability Capability, resource string) {
@@ -315,30 +315,30 @@ func (k Mod1Keeper) UseResource(ctx Context, capability Capability, resource str
 }
 ```
 
-If module 2 passed the capability key to module 3, module 3 could then claim it and call module 1 just like module 2 did
-(in which case module 1, module 2, and module 3 would all be able to use this capability).
+如果模块 2 将功能密钥传递给模块 3，则模块 3 可以声明它并像模块 2 一样调用模块 1
+（在这种情况下，模块 1、模块 2 和模块 3 都可以使用此功能）。
 
-## Status
+## 地位
 
-Proposed.
+建议的。
 
-## Consequences
+## 结果
 
-### Positive
+### 积极的
 
-- Dynamic capability support.
-- Allows CapabilityKeeper to return same capability pointer from go-map while reverting any writes to the persistent `KVStore` and in-memory `MemoryStore` on tx failure.
+- 动态能力支持。
+- 允许 CapabilityKeeper 从 go-map 返回相同的能力指针，同时在 tx 失败时恢复对持久性“KVStore”和内存中“MemoryStore”的任何写入。
 
-### Negative
+### 消极的
 
-- Requires an additional keeper.
-- Some overlap with existing `StoreKey` system (in the future they could be combined, since this is a superset functionality-wise).
-- Requires an extra level of indirection in the reverse mapping, since MemoryStore must map to index which must then be used as key in a go map to retrieve the actual capability
+- 需要额外的守门员。
+- 与现有的“StoreKey”系统有些重叠（将来它们可以合并，因为这是一个超集功能）。
+- 在反向映射中需要额外的间接级别，因为 MemoryStore 必须映射到索引，然后必须将其用作 go map 中的键以检索实际功能
 
-### Neutral
+### 中性的
 
-(none known)
+（无人知晓）
 
-## References
+## 参考
 
-- [Original discussion](https://github.com/cosmos/cosmos-sdk/pull/5230#discussion_r343978513)
+- [原创讨论](https://github.com/cosmos/cosmos-sdk/pull/5230#discussion_r343978513)
