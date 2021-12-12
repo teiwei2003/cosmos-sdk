@@ -4,6 +4,7 @@
   "description": "Cosmos SDK Documentation",
   "main": "index.js",
   "scripts": {
+    "dev": "vuepress dev .",
     "preserve": "./pre.sh",
     "serve": "trap 'exit 0' SIGINT; vuepress dev --no-cache",
     "postserve": "./post.sh",
