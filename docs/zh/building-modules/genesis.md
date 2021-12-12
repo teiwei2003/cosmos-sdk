@@ -2,59 +2,59 @@
 order: 9
 -->
 
-# Module Genesis
+# 模块创世纪
 
-Modules generally handle a subset of the state and, as such, they need to define the related subset of the genesis file as well as methods to initialize, verify and export it. {synopsis}
+模块通常处理状态的一个子集，因此，它们需要定义创世文件的相关子集以及初始化、验证和导出它的方法。 {概要}
 
-## Pre-requisite Readings
+## 先决条件阅读
 
-- [Module Manager](./module-manager.md) {prereq}
+- [模块管理器](./module-manager.md) {prereq}
 - [Keepers](./keeper.md) {prereq}
 
-## Type Definition
+## 类型定义
 
-The subset of the genesis state defined from a given module is generally defined in a `genesis.proto` file ([more info](../core/encoding.md#gogoproto) on how to define protobuf messages). The struct defining the module's subset of the genesis state is usually called `GenesisState` and contains all the module-related values that need to be initialized during the genesis process.
+从给定模块定义的创世状态的子集通常在 `genesis.proto` 文件中定义([更多信息](../core/encoding.md#gogoproto)关于如何定义 protobuf 消息)。定义模块的创世状态子集的结构通常称为“GenesisState”，它包含所有需要在创世过程中初始化的模块相关值。
 
-See an example of `GenesisState` protobuf message definition from the `auth` module:
+查看来自 `auth` 模块的 `GenesisState` protobuf 消息定义示例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/a9547b54ffac9729fe1393651126ddfc0d236cff/proto/cosmos/auth/v1beta1/genesis.proto
 
-Next we present the main genesis-related methods that need to be implemented by module developers in order for their module to be used in Cosmos SDK applications.
+接下来，我们将介绍模块开发人员需要实现的主要与创世相关的方法，以便他们的模块在 Cosmos SDK 应用程序中使用。
 
 ### `DefaultGenesis`
 
-The `DefaultGenesis()` method is a simple method that calls the constructor function for `GenesisState` with the default value for each parameter. See an example from the `auth` module:
+`DefaultGenesis()` 方法是一个简单的方法，它使用每个参数的默认值调用 `GenesisState` 的构造函数。查看来自 `auth` 模块的示例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/module.go#L48-L52
 
 ### `ValidateGenesis`
 
-The `ValidateGenesis(genesisState GenesisState)` method is called to verify that the provided `genesisState` is correct. It should perform validity checks on each of the parameters listed in `GenesisState`. See an example from the `auth` module:
+调用 `ValidateGenesis(genesisState GenesisState)` 方法来验证提供的 `genesisState` 是否正确。它应该对“GenesisState”中列出的每个参数执行有效性检查。查看来自 `auth` 模块的示例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/types/genesis.go#L57-L70
 
-## Other Genesis Methods
+## 其他创世方法
 
-Other than the methods related directly to `GenesisState`, module developers are expected to implement two other methods as part of the [`AppModuleGenesis` interface](./module-manager.md#appmodulegenesis) (only if the module needs to initialize a subset of state in genesis). These methods are [`InitGenesis`](#initgenesis) and [`ExportGenesis`](#exportgenesis).
+除了与 `GenesisState` 直接相关的方法，模块开发者需要实现另外两个方法作为 [`AppModuleGenesis` 接口](./module-manager.md#appmodulegenesis) 的一部分(仅当模块需要初始化一个创世中状态的子集)。这些方法是 [`InitGenesis`](#initgenesis) 和 [`ExportGenesis`](#exportgenesis)。
 
-### `InitGenesis`
+###`InitGenesis`
 
-The `InitGenesis` method is executed during [`InitChain`](../core/baseapp.md#initchain) when the application is first started. Given a `GenesisState`, it initializes the subset of the state managed by the module by using the module's [`keeper`](./keeper.md) setter function on each parameter within the `GenesisState`.
+`InitGenesis` 方法在应用程序第一次启动时在 [`InitChain`](../core/baseapp.md#initchain) 期间执行。给定一个 `GenesisState`，它通过对 `GenesisState` 中的每个参数使用模块的 [`keeper`](./keeper.md) setter 函数来初始化模块管理的状态子集。
 
-The [module manager](./module-manager.md#manager) of the application is responsible for calling the `InitGenesis` method of each of the application's modules in order. This order is set by the application developer via the manager's `SetOrderGenesisMethod`, which is called in the [application's constructor function](../basics/app-anatomy.md#constructor-function).
+应用的[模块管理器](./module-manager.md#manager)负责依次调用应用的各个模块的`InitGenesis`方法。此顺序由应用程序开发人员通过管理器的`SetOrderGenesisMethod` 设置，该方法在[应用程序的构造函数](../basics/app-anatomy.md#constructor-function) 中调用。
 
-See an example of `InitGenesis` from the `auth` module:
+请参阅“auth”模块中的“InitGenesis”示例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/genesis.go#L13-L28
 
-### `ExportGenesis`
+###`ExportGenesis`
 
-The `ExportGenesis` method is executed whenever an export of the state is made. It takes the latest known version of the subset of the state managed by the module and creates a new `GenesisState` out of it. This is mainly used when the chain needs to be upgraded via a hard fork.
+每当进行状态导出时，都会执行“ExportGenesis”方法。它采用模块管理的状态子集的最新已知版本，并从中创建一个新的“GenesisState”。这主要用于需要通过硬分叉升级链时。
 
-See an example of `ExportGenesis` from the `auth` module.
+请参阅“auth”模块中的“ExportGenesis”示例。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/genesis.go#L31-L42
 
-## Next {hide}
+## 下一个{hide}
 
-Learn about [modules interfaces](module-interfaces.md) {hide}
+了解 [模块接口](module-interfaces.md) {hide} 

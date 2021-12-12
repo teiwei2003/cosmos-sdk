@@ -47,26 +47,26 @@ aside: false
 
 ## 开始
 
-- **[Cosmos SDK Intro](./intro/overview.md)**：Cosmos SDK 的高级概述。
-- **[Starport](https://docs.starport.network/)**：Cosmos SDK 的开发人员友好界面，用于在主权和安全的区块链上搭建、启动和维护任何加密应用程序。
-- **[SDK 教程](https://tutorials.cosmos.network/)**：展示如何从头开始构建基于 Cosmos SDK 的区块链的教程，并解释了该过程中的基本 Cosmos SDK 原理。
+- **[Cosmos SDK Intro](./intro/overview.md)**:Cosmos SDK 的高级概述。
+- **[Starport](https://docs.starport.network/)**:Cosmos SDK 的开发人员友好界面，用于在主权和安全的区块链上搭建、启动和维护任何加密应用程序。
+- **[SDK 教程](https://tutorials.cosmos.network/)**:展示如何从头开始构建基于 Cosmos SDK 的区块链的教程，并解释了该过程中的基本 Cosmos SDK 原理。
 
 ## 参考文档
 
-- **[Basics](./basics/)**：Cosmos SDK 的基本概念，包括应用的标准剖析、交易生命周期和账户管理。
-- **[Core](./core/)**：Cosmos SDK 的核心概念，包括`baseapp`、`store` 或`server`。
-- **[Building Modules](./building-modules/)**：模块开发人员的重要概念，如`message`、`keeper`和`querier`。
-- **[IBC](./ibc/)**：IBC 协议集成和概念。
-- **[运行节点、API、CLI](./run-node/)**：如何使用 CLI 和 API 运行节点并与节点交互。
-- **[Migrations](./migrations/)**：更新到新版本 Cosmos SDK 的迁移指南。
+- **[Basics](./basics/)**:Cosmos SDK 的基本概念，包括应用的标准剖析、交易生命周期和账户管理。
+- **[Core](./core/)**:Cosmos SDK 的核心概念，包括`baseapp`、`store` 或`server`。
+- **[Building Modules](./building-modules/)**:模块开发人员的重要概念，如`message`、`keeper`和`querier`。
+- **[IBC](./ibc/)**:IBC 协议集成和概念。
+- **[运行节点、API、CLI](./run-node/)**:如何使用 CLI 和 API 运行节点并与节点交互。
+- **[Migrations](./migrations/)**:更新到新版本 Cosmos SDK 的迁移指南。
 
 ## 其他资源
 
-- **[模块目录](../x/)**：Cosmos SDK 模块实现及其各自的文档。
-- **[Specifications](./spec/)**：Cosmos SDK 的模块和其他部分的规范。
-- **[Cosmos SDK API 参考](https://godoc.org/github.com/cosmos/cosmos-sdk)**：Cosmos SDK 的 Godocs。
-- **[REST 和 RPC 端点](https://cosmos.network/rpc/)**：与`gaia` 全节点交互的端点列表。
-- **[Rosetta API](./run-node/rosetta.md)**：Rosetta API 集成。
+- **[模块目录](../x/)**:Cosmos SDK 模块实现及其各自的文档。
+- **[Specifications](./spec/)**:Cosmos SDK 的模块和其他部分的规范。
+- **[Cosmos SDK API 参考](https://godoc.org/github.com/cosmos/cosmos-sdk)**:Cosmos SDK 的 Godocs。
+- **[REST 和 RPC 端点](https://cosmos.network/rpc/)**:与`gaia` 全节点交互的端点列表。
+- **[Rosetta API](./run-node/rosetta.md)**:Rosetta API 集成。
 
 ## Cosmos Hub
 

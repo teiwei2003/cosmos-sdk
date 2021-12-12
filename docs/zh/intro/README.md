@@ -4,13 +4,13 @@ parent:
   order: 1
 -->
 
-# Introduction
+# 介绍
 
-This introduction gives a quick start on the Cosmos SDK.
+本介绍提供了 Cosmos SDK 的快速入门。
 
-1. [Overview](./overview.md)
-2. [Application-Specific Blockchains](./why-app-specific.md)
-3. [Architecture of a Cosmos SDK Application](./sdk-app-architecture.md)
-4. [Cosmos SDK Design Overview](./sdk-design.md)
+1. [概述](./overview.md)
+2. [特定应用区块链](./why-app-specific.md)
+3.【Cosmos SDK 应用架构】(./sdk-app-architecture.md)
+4.【Cosmos SDK 设计概述】(./sdk-design.md)
 
-After reading the introduction material, head over to the [basics](../basics/README.md) to learn more.
+阅读介绍材料后，请前往 [basics](../basics/README.md) 了解更多信息。 

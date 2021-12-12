@@ -2,59 +2,59 @@
 order: 1
 -->
 
-# Chain Upgrade Guide to v0.44
+# 链升级指南到 v0.44
 
-This document provides guidelines for a chain upgrade from v0.42 to v0.44 and an example of the upgrade process using `simapp`. {synopsis}
+本文档提供了从 v0.42 到 v0.44 的链式升级指南以及使用“simapp”的升级过程示例。 {概要}
 
-::: tip
-You must upgrade to Stargate v0.42 before upgrading to v0.44. If you have not done so, please see [Chain Upgrade Guide to v0.42](/v0.42/migrations/chain-upgrade-guide-040.html). Please note, v0.43 was discontinued shortly after being released and all chains should upgrade directly to v0.44 from v0.42.
+::: 小费
+在升级到 v0.44 之前，您必须升级到 Stargate v0.42。如果您还没有这样做，请参阅【链升级指南到 v0.42】(/v0.42/migrations/chain-upgrade-guide-040.html)。请注意，v0.43 发布后不久就停产了，所有链应直接从 v0.42 升级到 v0.44。
 :::
 
-## Prerequisite Readings
+## 先决条件阅读
 
-- [Upgrading Modules](../building-modules/upgrade.html) {prereq}
-- [In-Place Store Migrations](../core/upgrade.html) {prereq}
+- [升级模块](../building-modules/upgrade.html) {prereq}
+- [就地存储迁移](../core/upgrade.html) {prereq}
 - [Cosmovisor](../run-node/cosmovisor.html) {prereq}
 
-Cosmos SDK v0.44 introduces a new way of handling chain upgrades that no longer requires exporting state to JSON, making the necesssary changes, and then creating a new chain with the modified JSON as the new genesis file.
+Cosmos SDK v0.44 引入了一种处理链升级的新方法，不再需要将状态导出到 JSON，进行必要的更改，然后使用修改后的 JSON 作为新的创世文件创建新链。
 
-The IBC module for the Cosmos SDK has moved to its [own repository](https://github.com/cosmos/ibc-go) for v0.42 and later versions. If you are using IBC, make sure to also go through the [IBC migration docs](https://github.com/cosmos/ibc-go/blob/main/docs/migrations/ibc-migration-043.md).
+Cosmos SDK 的 IBC 模块已移至 v0.42 及更高版本的[自己的存储库](https://github.com/cosmos/ibc-go)。如果您正在使用 IBC，请确保还通过 [IBC 迁移文档](https://github.com/cosmos/ibc-go/blob/main/docs/migrations/ibc-migration-043.md)。
 
-Instead of starting a new chain, the upgrade binary will read the existing database and perform in-place store migrations. This new way of handling chain upgrades can be used alongside [Cosmovisor](../run-node/cosmovisor.html) to make the upgrade process seamless.
+升级二进制文件将读取现有数据库并执行就地存储迁移，而不是启动新链。这种处理链升级的新方法可以与 [Cosmovisor](../run-node/cosmovisor.html) 一起使用，使升级过程无缝。
 
-## In-Place Store Migrations
+## 就地存储迁移
 
-We recommend using [In-Place Store Migrations](../core/upgrade.html) to upgrade your chain from v0.42 to v0.44. The first step is to make sure all your modules follow the [Module Upgrade Guide](../building-modules/upgrade.html). The second step is to add an [upgrade handler](../core/upgrade.html#running-migrations) to `app.go`.
+我们建议使用 [In-Place Store Migrations](../core/upgrade.html) 将您的链从 v0.42 升级到 v0.44。第一步是确保您的所有模块都遵循 [模块升级指南](../building-modules/upgrade.html)。第二步是向`app.go`添加一个[升级处理程序](../core/upgrade.html#running-migrations)。
 
-In this document, we'll provide an example of what the upgrade handler looks like for a chain upgrading module versions for the first time. It's critical to note that the initial consensus version of each module must be set to `1` rather than `0` or else the upgrade handler will re-initialize each module.
+在本文档中，我们将首次提供一个示例，说明链升级模块版本的升级处理程序的样子。需要注意的是，每个模块的初始共识版本必须设置为“1”而不是“0”，否则升级处理程序将重新初始化每个模块。
 
-In addition to migrating existing modules, the upgrade handler also performs store upgrades for new modules. In the example below, we'll be adding store migrations for two new modules made available in v0.44: `x/authz` and `x/feegrant`.
+除了迁移现有模块之外，升级处理程序还为新模块执行存储升级。在下面的示例中，我们将为 v0.44 中提供的两个新模块添加商店迁移:`x/authz` 和 `x/feegrant`。
 
-## Using Cosmovisor
+## 使用 Cosmovisor
 
-We recommend validators use [Cosmovisor](../run-node/cosmovisor.html), which is a process manager for running application binaries. For security reasons, we recommend validators build their own upgrade binaries rather than enabling the auto-download option. Validators may still choose to use the auto-download option if the necessary security guarantees are in place (i.e. the URL provided in the upgrade proposal for the downloadable upgrade binary includes a proper checksum).
+我们建议验证器使用 [Cosmovisor](../run-node/cosmovisor.html)，这是一个用于运行应用程序二进制文件的进程管理器。出于安全原因，我们建议验证器构建自己的升级二进制文件，而不是启用自动下载选项。如果必要的安全保证到位(即，可下载升级二进制文件的升级建议中提供的 URL 包括正确的校验和)，验证者仍然可以选择使用自动下载选项。
 
-::: tip
-If validators would like to enable the auto-download option, and they are currently running an application using Cosmos SDK `v0.42`, they will need to use Cosmovisor [`v0.1`](https://github.com/cosmos/cosmos-sdk/releases/tag/cosmovisor%2Fv0.1.0). Later versions of Cosmovisor do not support Cosmos SDK `v0.42` or earlier if the auto-download option is enabled.
+::: 小费
+如果验证者想要启用自动下载选项，并且他们当前正在使用 Cosmos SDK `v0.42` 运行应用程序，他们将需要使用 Cosmovisor [`v0.1`](https://github.com/ cosmos/cosmos-sdk/releases/tag/cosmovisor%2Fv0.1.0)。如果启用了自动下载选项，更高版本的 Cosmovisor 不支持 Cosmos SDK `v0.42` 或更早版本。 
 :::
 
-Validators can use the auto-restart option to prevent unnecessary downtime during the upgrade process. The auto-restart option will automatically restart the chain with the upgrade binary once the chain has halted at the proposed upgrade height. With the auto-restart option, validators can prepare the upgrade binary in advance and then relax at the time of the upgrade.
+验证者可以使用自动重启选项来防止升级过程中出现不必要的停机。一旦链在建议的升级高度停止，自动重启选项将使用升级二进制文件自动重启链。使用自动重启选项，验证者可以提前准备升级二进制文件，然后在升级时放松。
 
-## Migrating app.toml
+## 迁移 app.toml
 
-With the update to `v0.44`, new server configuration options have been added to `app.toml`. The updates include new configuration sections for Rosetta and gRPC Web as well as a new configuration option for State Sync. Check out the default [`app.toml`](https://github.com/cosmos/cosmos-sdk/blob/release/v0.44.x/server/config/toml.go) file in the latest version of `v0.44` for more information.
+随着对 `v0.44` 的更新，新的服务器配置选项已添加到 `app.toml`。更新包括 Rosetta 和 gRPC Web 的新配置部分以及状态同步的新配置选项。查看最新版本的默认 [`app.toml`](https://github.com/cosmos/cosmos-sdk/blob/release/v0.44.x/server/config/toml.go) 文件`v0.44` 了解更多信息。
 
-## Example: Simapp Upgrade
+## 示例:Simapp 升级
 
-The following example will walk through the upgrade process using `simapp` as our blockchain application. We will be upgrading `simapp` from v0.42 to v0.44. We will be building the upgrade binary ourselves and enabling the auto-restart option.
+以下示例将使用“simapp”作为我们的区块链应用程序来完成升级过程。我们将把 `simapp` 从 v0.42 升级到 v0.44。我们将自己构建升级二进制文件并启用自动重启选项。
 
-::: tip
-In the following example, we start a new chain from `v0.42`. The binary for this version will be the genesis binary. For validators using Cosmovisor for the first time on an existing chain, either the binary for the current version of the chain should be used as the genesis binary (i.e. the starting binary) or validators should update the `current` symbolic link to point to the upgrade directory. For more information, see [Cosmovisor](../run-node/cosmovisor.html).
+::: 小费
+在下面的例子中，我们从 `v0.42` 开始一个新链。此版本的二进制文件将是创世二进制文件。对于第一次在现有链上使用 Cosmovisor 的验证者，要么将链当前版本的二进制文件用作创世二进制文件(即起始二进制文件)，要么验证器应更新“当前”符号链接以指向升级目录。有关详细信息，请参阅 [Cosmovisor](../run-node/cosmovisor.html)。
 :::
 
-### Initial Setup
+### 初始设置
 
-From within the `cosmos-sdk` repository, check out the latest `v0.42.x` release:
+从 `cosmos-sdk` 存储库中，查看最新的 `v0.42.x` 版本: 
 
 ```
 git checkout release/v0.42.x
@@ -112,21 +112,21 @@ Create a new key for the validator, then add a genesis account and transaction:
 ./build/simd collect-gentxs
 ```
 
-Now that our node is initialized and we are ready to start a new `simapp` chain, let's set up `cosmovisor` and the genesis binary.
+现在我们的节点已经初始化，我们准备开始一个新的 `simapp` 链，让我们设置 `cosmovisor` 和 genesis 二进制文件。
 
-### Cosmovisor Setup
+### Cosmovisor 设置
 
-Install the `cosmovisor` binary:
+安装 `cosmovisor` 二进制文件: 
 
 ```
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v0.1.0
 ```
 
-::: tip
-If you are using go `v1.15` or earlier, you will need to change out of the `cosmos-sdk` directory, run `go get` instead of `go install`, and then change back into the `cosmos-sdk` repository.
+::: 小费
+如果你使用的是 go `v1.15` 或更早版本，你需要把 `cosmos-sdk` 目录改出，运行 `go get` 而不是 `go install`，然后再改回 `cosmos-sdk ` 存储库。
 :::
 
-Set the required environment variables:
+设置所需的环境变量: 
 
 ```
 export DAEMON_NAME=simd
@@ -139,14 +139,14 @@ Set the optional environment variable to trigger an automatic restart:
 export DAEMON_RESTART_AFTER_UPGRADE=true
 ```
 
-Create the folder for the genesis binary and copy the `v0.42.x` binary:
+为 genesis 二进制文件创建文件夹并复制 `v0.42.x` 二进制文件:
 
 ```
 mkdir -p $DAEMON_HOME/cosmovisor/genesis/bin
 cp ./build/simd $DAEMON_HOME/cosmovisor/genesis/bin
 ```
 
-Now that `cosmovisor` is installed and the genesis binary has been added, let's add the upgrade handler to `simapp/app.go` and prepare the upgrade binary.
+现在已经安装了 `cosmovisor` 并添加了 genesis 二进制文件，让我们将升级处理程序添加到 `simapp/app.go` 并准备升级二进制文件。
 
 ### Chain Upgrade
 
@@ -164,7 +164,7 @@ Add the following to `simapp/app.go` inside `NewSimApp` and after `app.UpgradeKe
 	app.registerUpgradeHandlers()
 ```
 
-Add the following to `simapp/app.go` after `NewSimApp` (to learn more about the upgrade handler, see the [In-Place Store Migrations](../core/upgrade.html)):
+将以下内容添加到 `NewSimApp` 之后的 `simapp/app.go`(要了解有关升级处理程序的更多信息，请参阅 [In-Place Store Migrations](../core/upgrade.html)): 
 
 ```go
 func (app *SimApp) registerUpgradeHandlers() {
@@ -221,15 +221,14 @@ Build the `simd` binary for `v0.44.x` (the upgrade binary):
 make build
 ```
 
-Create the folder for the upgrade binary and copy the `v0.44.x` binary:
+为升级二进制文件创建文件夹并复制 `v0.44.x` 二进制文件: 
 
 ```
 mkdir -p $DAEMON_HOME/cosmovisor/upgrades/v0.44/bin
 cp ./build/simd $DAEMON_HOME/cosmovisor/upgrades/v0.44/bin
 ```
 
-Now that we have added the upgrade handler and prepared the upgrade binary, we are ready to start `cosmovisor` and simulate the upgrade proposal process.
-
+现在我们已经添加了升级处理程序并准备了升级二进制文件，我们准备启动 `cosmovisor` 并模拟升级建议过程。
 ### Upgrade Proposal
 
 Start the node using `cosmovisor`:
@@ -238,7 +237,7 @@ Start the node using `cosmovisor`:
 cosmovisor start
 ```
 
-Open a new terminal window and submit an upgrade proposal along with a deposit and a vote (these commands must be run within 20 seconds of each other):
+打开一个新的终端窗口并提交升级建议以及存款和投票(这些命令必须在 20 秒内运行): 
 
 ```
 ./build/simd tx gov submit-proposal software-upgrade v0.44 --title upgrade --description upgrade --upgrade-height 20 --from validator --yes
@@ -246,4 +245,4 @@ Open a new terminal window and submit an upgrade proposal along with a deposit a
 ./build/simd tx gov vote 1 yes --from validator --yes
 ```
 
-Confirm the chain automatically upgrades at height 20.
+确认链在高度 20 自动升级。 
