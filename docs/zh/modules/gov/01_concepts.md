@@ -1,196 +1,192 @@
-<!--
-order: 1
--->
+# 概念
 
-# Concepts
+_免责声明:这是正在进行中的工作。机制容易改变。_
 
-_Disclaimer: This is work in progress. Mechanisms are susceptible to change._
+治理过程分为几个步骤，概述如下:
 
-The governance process is divided in a few steps that are outlined below:
+- **提案提交:** 提案提交到区块链
+  订金。
+- **投票:** 一旦存款达到一定值(`MinDeposit`)，建议是
+  确认并投票开始。保税原子持有者然后可以发送`TxGovVote`
+  交易对提案进行投票。
+- **执行** 一段时间后，统计票数并视情况而定
+  根据结果​​，提案中的消息将被执行。
 
-- **Proposal submission:** Proposal is submitted to the blockchain with a
-  deposit.
-- **Vote:** Once deposit reaches a certain value (`MinDeposit`), proposal is
-  confirmed and vote opens. Bonded Atom holders can then send `TxGovVote`
-  transactions to vote on the proposal.
-- **Execution** After a period of time, the votes are tallied and depending
-  on the result, the messages in the proposal will be executed.
+## 提案提交
 
-## Proposal submission
+### 提交提案的权利
 
-### Right to submit a proposal
+每个帐户都可以通过发送“MsgSubmitProposal”交易来提交提案。
+提交提案后，将通过其唯一的“proposalID”进行标识。
 
-Every account can submit proposals by sending a `MsgSubmitProposal` transaction.
-Once a proposal is submitted, it is identified by its unique `proposalID`.
+### 提案消息
 
-### Proposal Messages
+提案包含一组 `sdk.Msg`，如果
+提案通过。消息由治理“ModuleAccount”本身执行。模块
+例如`x/upgrade`，希望允许某些消息被治理执行
+只应在相应的 msg 服务器中添加白名单，授予治理
+一旦达到法定人数，模块有权执行消息。治理
+模块使用 `MsgServiceRouter` 来检查这些消息是否正确构造
+并有各自的执行路径，但不执行完整的有效性检查。
 
-A proposal includes an array of `sdk.Msg`s which are executed automatically if the
-proposal passes. The messages are executed by the governance `ModuleAccount` itself. Modules
-such as `x/upgrade`, that want to allow certain messages to be executed by governance
-only should add a whitelist within the respective msg server, granting the governance
-module the right to execute the message once a quorum has been reached. The governance
-module uses the `MsgServiceRouter` to check that these messages are correctly constructed
-and have a respective path to execute on but do not perform a full validity check.
+## 订金
 
-## Deposit
+为防止垃圾邮件，提交的提案必须以定义的硬币形式存入保证金
+`MinDeposit` 参数。
 
-To prevent spam, proposals must be submitted with a deposit in the coins defined by
-the `MinDeposit` param.
+提交提案时，必须附有定金
+严格为正，但可能不如“MinDeposit”。提交者不需要
+自行支付全部押金。新创建的提案存储在
+一个 _inactive 提案队列_ 并保持在那里，直到它的存款通过 `MinDeposit`。
+其他代币持有者可以通过发送“存款”来增加提案的存款
+交易。如果提案在存款结束时间之前没有通过 `MinDeposit`
+(不再接受存款的时间)，提案将被销毁:
+提案将从州中删除，押金将被烧毁(请参阅 x/gov `EndBlocker`)。
+当提案存款超过“MinDeposit”阈值时(即使在提案期间
+提交)在存款结束时间之前，提案将被移入
+_active 提案队列_，投票期将开始。
 
-When a proposal is submitted, it has to be accompanied with a deposit that must be
-strictly positive, but can be inferior to `MinDeposit`. The submitter doesn't need
-to pay for the entire deposit on their own. The newly created proposal is stored in
-an _inactive proposal queue_ and stays there until its deposit passes the `MinDeposit`.
-Other token holders can increase the proposal's deposit by sending a `Deposit`
-transaction. If a proposal doesn't pass the `MinDeposit` before the deposit end time
-(the time when deposits are no longer accepted), the proposal will be destroyed: the
-proposal will be removed from state and the deposit will be burned (see x/gov `EndBlocker`).
-When a proposal deposit passes the `MinDeposit` threshold (even during the proposal
-submission) before the deposit end time, the proposal will be moved into the
-_active proposal queue_ and the voting period will begin.
+存款由托管机构“ModuleAccount”保管，直到
+提案最终确定(通过或拒绝)。
 
-The deposit is kept in escrow and held by the governance `ModuleAccount` until the
-proposal is finalized (passed or rejected).
+### 押金退还烧掉
 
-### Deposit refund and burn
+当提案最终确定时，押金中的硬币要么退还要么烧毁
+根据提案的最终统计:
 
-When a proposal is finalized, the coins from the deposit are either refunded or burned
-according to the final tally of the proposal:
+- 如果提案被批准或拒绝但_not_否决，每笔存款将被
+  自动退还给其各自的存款人(从治理转移
+  `模块帐户`)。
+- 当提案被超过 1/3 否决时，存款将从
+  治理 `ModuleAccount` 和提案信息及其存款
+  信息将从状态中删除。
+- 所有退还或烧毁的存款都从国家中删除。事件是在什么时候发出的
+  烧毁或退还押金。 
 
-- If the proposal is approved or rejected but _not_ vetoed, each deposit will be
-  automatically refunded to its respective depositor (transferred from the governance
-  `ModuleAccount`).
-- When the proposal is vetoed with greater than 1/3, deposits will be burned from the
-  governance `ModuleAccount` and the proposal information along with its deposit
-  information will be removed from state.
-- All refunded or burned deposits are removed from the state. Events are issued when
-  burning or refunding a deposit.
+## 投票
 
-## Voting
+### 参与者
 
-### Participants
+_参与者_是有权对提案进行投票的用户。在
+Cosmos Hub，参与者是绑定的 Atom 持有者。未结合的原子持有者和
+其他用户没有参与治理的权利。然而，他们
+可以提交和存入提案。
 
-_Participants_ are users that have the right to vote on proposals. On the
-Cosmos Hub, participants are bonded Atom holders. Unbonded Atom holders and
-other users do not get the right to participate in governance. However, they
-can submit and deposit on proposals.
+请注意，某些 _participants_ 可能会被禁止在以下情况下对提案进行投票
+某些验证器，如果:
 
-Note that some _participants_ can be forbidden to vote on a proposal under a
-certain validator if:
+- _participant_ 在提案后将 Atom 绑定或未绑定到所述验证器
+  进入投票期。
+- _participant_ 在提案进入投票期后成为验证人。
 
-- _participant_ bonded or unbonded Atoms to said validator after proposal
-  entered voting period.
-- _participant_ became validator after proposal entered voting period.
+这不会阻止_participant_ 将 Atoms 绑定到其他
+验证器。例如，如果 _participant_ 将一些 Atom 绑定到验证器 A
+在提案进入投票期之前和其他 Atom 到验证者 B 之后
+提案进入投票期，只有验证者 B 下的投票才会通过
+禁止。
 
-This does not prevent _participant_ to vote with Atoms bonded to other
-validators. For example, if a _participant_ bonded some Atoms to validator A
-before a proposal entered voting period and other Atoms to validator B after
-proposal entered voting period, only the vote under validator B will be
-forbidden.
+### 投票期
 
-### Voting period
+一旦提案达到`MinDeposit`，它立即进入`投票期`。我们
+将“投票期”定义为投票开始和投票之间的时间间隔
+投票结束的那一刻。 “投票期”应始终短于
+“解除绑定期”以防止双重投票。的初始值
+“投票期”为 2 周。
 
-Once a proposal reaches `MinDeposit`, it immediately enters `Voting period`. We
-define `Voting period` as the interval between the moment the vote opens and
-the moment the vote closes. `Voting period` should always be shorter than
-`Unbonding period` to prevent double voting. The initial value of
-`Voting period` is 2 weeks.
+### 选项集
 
-### Option set
+提案的选项集是指参与者可以选择的集合
+在投票时选择。
 
-The option set of a proposal refers to the set of choices a participant can
-choose from when casting its vote.
+初始选项集包括以下选项:
 
-The initial option set includes the following options:
+-`是`
+-`不`
+-`NoWithVeto`
+-`弃权`
 
-- `Yes`
-- `No`
-- `NoWithVeto`
-- `Abstain`
+`NoWithVeto` 算作`No`，但也会增加一个`Veto` 投票。 `弃权`选项
+允许选民表明他们不打算投票赞成或反对
+提议但接受投票结果。
 
-`NoWithVeto` counts as `No` but also adds a `Veto` vote. `Abstain` option
-allows voters to signal that they do not intend to vote in favor or against the
-proposal but accept the result of the vote.
+_注意:从用户界面来看，对于紧急提案，我们可能应该添加“不紧急”
+投出“NoWithVeto”投票的选项。_
 
-_Note: from the UI, for urgent proposals we should maybe add a ‘Not Urgent’
-option that casts a `NoWithVeto` vote._
+### 加权投票
 
-### Weighted Votes
+[ADR-037](../../../docs/architecture/adr-037-gov-split-vote.md) 引入了加权投票功能，允许权益人将他们的投票分成几个投票选项。例如，它可以用 70% 的投票权投赞成票，用 30% 的投票权投反对票。
 
-[ADR-037](../../../docs/architecture/adr-037-gov-split-vote.md) introduces the weighted vote feature which allows a staker to split their votes into several voting options. For example, it could use 70% of its voting power to vote Yes and 30% of its voting power to vote No.
+通常，拥有该地址的实体可能不是一个人。例如，一家公司可能有不同的利益相关者想要以不同的方式投票，因此允许他们分配投票权是有意义的。目前，他们无法进行“传递投票”并赋予用户对其代币的投票权。然而，通过这个系统，交易所可以对用户的投票偏好进行投票，然后根据投票结果按比例在链上投票。
 
-Often times the entity owning that address might not be a single individual. For example, a company might have different stakeholders who want to vote differently, and so it makes sense to allow them to split their voting power. Currently, it is not possible for them to do "passthrough voting" and giving their users voting rights over their tokens. However, with this system, exchanges can poll their users for voting preferences, and then vote on-chain proportionally to the results of the poll.
-
-To represent weighted vote on chain, we use the following Protobuf message.
+为了表示链上的加权投票，我们使用以下 Protobuf 消息。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.43.0-alpha1/proto/cosmos/gov/v1beta1/gov.proto#L32-L40
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.43.0-alpha1/proto/cosmos/gov/v1beta1/gov.proto#L126-L137
 
-For a weighted vote to be valid, the `options` field must not contain duplicate vote options, and the sum of weights of all options must be equal to 1.
+要使加权投票有效，`options` 字段不得包含重复的投票选项，并且所有选项的权重总和必须等于 1。
 
-### Quorum
+###法定人数
 
-Quorum is defined as the minimum percentage of voting power that needs to be
-casted on a proposal for the result to be valid.
+法定人数定义为需要获得的最低投票权百分比
+对结果有效的提案进行了投票。
 
-### Threshold
+### 临界点
 
-Threshold is defined as the minimum proportion of `Yes` votes (excluding
-`Abstain` votes) for the proposal to be accepted.
+阈值定义为“是”票的最小比例(不包括
+`弃权`票) 的提案被接受。
 
-Initially, the threshold is set at 50% with a possibility to veto if more than
-1/3rd of votes (excluding `Abstain` votes) are `NoWithVeto` votes. This means
-that proposals are accepted if the proportion of `Yes` votes (excluding
-`Abstain` votes) at the end of the voting period is superior to 50% and if the
-proportion of `NoWithVeto` votes is inferior to 1/3 (excluding `Abstain`
-votes).
+最初，阈值设置为 50%，如果超过 50% 有可能否决
+1/3 的票(不包括“弃权”票)是“NoWithVeto”票。这意味着
+如果“是”的投票比例(不包括
+`弃权`票)在投票期结束时高于 50%，并且如果
+“NoWithVeto”票的比例低于1/3(不包括“Abstain”
+票)。
 
-### Inheritance
+### 继承
 
-If a delegator does not vote, it will inherit its validator vote.
+如果委托人不投票，它将继承其验证人投票。
 
-- If the delegator votes before its validator, it will not inherit from the
-  validator's vote.
-- If the delegator votes after its validator, it will override its validator
-  vote with its own. If the proposal is urgent, it is possible
-  that the vote will close before delegators have a chance to react and
-  override their validator's vote. This is not a problem, as proposals require more than 2/3rd of the total voting power to pass before the end of the voting period. If more than 2/3rd of validators collude, they can censor the votes of delegators anyway.
+- 如果委托人在其验证人之前投票，则不会继承
+  验证者的投票。
+- 如果委托人在其验证人之后投票，它将覆盖其验证人
+  用自己的投票。如果提案很紧急，可以
+  投票将在代表有机会做出反应之前结束，并且
+  覆盖他们的验证者的投票。这不是问题，因为提案需要总投票权的 2/3 以上才能在投票期结束前通过。如果超过 2/3 的验证者串通一气，他们无论如何都可以审查委托人的投票。 
 
-### Validator’s punishment for non-voting
+### 验证者对不投票的惩罚
 
-At present, validators are not punished for failing to vote.
+目前，验证者不会因未投票而受到惩罚。
 
-### Governance address
+###治理地址
 
-Later, we may add permissioned keys that could only sign txs from certain modules. For the MVP, the `Governance address` will be the main validator address generated at account creation. This address corresponds to a different PrivKey than the Tendermint PrivKey which is responsible for signing consensus messages. Validators thus do not have to sign governance transactions with the sensitive Tendermint PrivKey.
+稍后，我们可能会添加只能对来自某些模块的 txs 进行签名的许可密钥。对于 MVP，“治理地址”将是创建帐户时生成的主要验证器地址。该地址对应于与负责签署共识消息的 Tendermint PrivKey 不同的 PrivKey。因此，验证者不必使用敏感的 Tendermint PrivKey 签署治理交易。
 
-## Software Upgrade
+## 软件升级
 
-If proposals are of type `SoftwareUpgradeProposal`, then nodes need to upgrade
-their software to the new version that was voted. This process is divided in
-two steps.
+如果提案是“SoftwareUpgradeProposal”类型，则节点需要升级
+他们的软件更新到投票的新版本。这个过程分为
+两步。
 
-### Signal
+### 信号
 
-After a `SoftwareUpgradeProposal` is accepted, validators are expected to
-download and install the new version of the software while continuing to run
-the previous version. Once a validator has downloaded and installed the
-upgrade, it will start signaling to the network that it is ready to switch by
-including the proposal's `proposalID` in its _precommits_.(_Note: Confirmation
-that we want it in the precommit?_)
+在“SoftwareUpgradeProposal”被接受后，验证者应该
+在继续运行的同时下载并安装新版本的软件
+以前的版本。一旦验证器下载并安装了
+升级，它将开始向网络发出信号，表明它已准备好切换
+在其 _precommits_ 中包含提案的 `proposalID`。(_注意:确认
+我们希望在预提交中使用它？_)
 
-Note: There is only one signal slot per _precommit_. If several
-`SoftwareUpgradeProposals` are accepted in a short timeframe, a pipeline will
-form and they will be implemented one after the other in the order that they
-were accepted.
+注意:每个 _precommit_ 只有一个信号槽。如果几个
+`SoftwareUpgradeProposals` 在短时间内被接受，管道将
+形式，它们将按照它们的顺序依次实施
+被接受了。
 
-### Switch
+### 转变
 
-Once a block contains more than 2/3rd _precommits_ where a common
-`SoftwareUpgradeProposal` is signaled, all the nodes (including validator
-nodes, non-validating full nodes and light-nodes) are expected to switch to the
-new version of the software.
+一旦一个块包含超过 2/3 的 _precommits_，其中一个公共
+`SoftwareUpgradeProposal` 已发出信号，所有节点(包括验证器
+节点、非验证全节点和轻节点)预计将切换到
+软件的新版本。
 
-_Note: Not clear how the flip is handled programmatically_
+_注意:不清楚如何以编程方式处理翻转_ 

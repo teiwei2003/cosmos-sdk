@@ -1,7 +1,3 @@
-<!--
-order: 11
--->
-
 # Module Interfaces
 
 This document details how to build CLI and REST interfaces for a module. Examples from various Cosmos SDK modules are included. {synopsis}

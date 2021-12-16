@@ -1,7 +1,3 @@
-<!--
-order: 4
--->
-
 # BeginBlock
 
 ## Liveness Tracking

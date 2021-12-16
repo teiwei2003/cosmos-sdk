@@ -1,10 +1,3 @@
-<!--
-order: 20
-title: Epoching Overview
-parent:
-  title: "epoching"
--->
-
 # `x/epoching`
 
 ## Abstract

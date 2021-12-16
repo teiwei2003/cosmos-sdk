@@ -1,7 +1,3 @@
-<!--
-order: 4
--->
-
 # Begin-Block
 
 Each abci begin block call, the historical info will get stored and pruned

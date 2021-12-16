@@ -1,9 +1,3 @@
-<!--
-order: false
-parent:
-  order: 6
--->
-
 # Migrations
 
 This document contains all the migration guides to update your app and modules to Cosmos SDK v0.44.

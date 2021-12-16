@@ -1,63 +1,59 @@
-<!--
-order: 4
--->
+# 生成、签署和广播交易
 
-# Generating, Signing and Broadcasting Transactions
+本文档描述了如何生成(未签名)交易、对其进行签名(使用一个或多个密钥)并将其广播到网络。 {概要}
 
-This document describes how to generate an (unsigned) transaction, signing it (with one or multiple keys), and broadcasting it to the network. {synopsis}
+## 使用 CLI
 
-## Using the CLI
-
-The easiest way to send transactions is using the CLI, as we have seen in the previous page when [interacting with a node](./interact-node.md#using-the-cli). For example, running the following command
+发送交易的最简单方法是使用 CLI，正如我们在上一页中看到的 [与节点交互](./interact-node.md#using-the-cli)。 例如，运行以下命令 
 
 ```bash
 simd tx bank send $MY_VALIDATOR_ADDRESS $RECIPIENT 1000stake --chain-id my-test-chain --keyring-backend test
 ```
 
-will run the following steps:
+将运行以下步骤:
 
-- generate a transaction with one `Msg` (`x/bank`'s `MsgSend`), and print the generated transaction to the console.
-- ask the user for confirmation to send the transaction from the `$MY_VALIDATOR_ADDRESS` account.
-- fetch `$MY_VALIDATOR_ADDRESS` from the keyring. This is possible because we have [set up the CLI's keyring](./keyring.md) in a previous step.
-- sign the generated transaction with the keyring's account.
-- broadcast the signed transaction to the network. This is possible because the CLI connects to the node's Tendermint RPC endpoint.
+- 用一个 `Msg`(`x/bank` 的 `MsgSend`)生成一个交易，并将生成的交易打印到控制台。
+- 要求用户确认从`$MY_VALIDATOR_ADDRESS` 帐户发送交易。
+- 从钥匙圈中获取`$MY_VALIDATOR_ADDRESS`。 这是可能的，因为我们在上一步中[设置了 CLI 的密钥环](./keyring.md)。
+- 使用密钥环的帐户签署生成的交易。
+- 将签名的交易广播到网络。 这是可能的，因为 CLI 连接到节点的 Tendermint RPC 端点。
 
-The CLI bundles all the necessary steps into a simple-to-use user experience. However, it's possible to run all the steps individually too.
+CLI 将所有必要的步骤捆绑到易于使用的用户体验中。 但是，也可以单独运行所有步骤。
 
-### Generating a Transaction
+### 生成交易
 
-Generating a transaction can simply be done by appending the `--generate-only` flag on any `tx` command, e.g.:
+生成交易可以简单地通过在任何 `tx` 命令上附加 `--generate-only` 标志来完成，例如: 
 
 ```bash
 simd tx bank send $MY_VALIDATOR_ADDRESS $RECIPIENT 1000stake --chain-id my-test-chain --generate-only
 ```
 
-This will output the unsigned transaction as JSON in the console. We can also save the unsigned transaction to a file (to be passed around between signers more easily) by appending `> unsigned_tx.json` to the above command.
+这将在控制台中将未签名的交易输出为 JSON。 我们还可以通过将 `> unsigned_tx.json` 附加到上述命令，将未签名的交易保存到一个文件中(以便在签名者之间更容易地传递)。
 
-### Signing a Transaction
+### 签署交易
 
-Signing a transaction using the CLI requires the unsigned transaction to be saved in a file. Let's assume the unsigned transaction is in a file called `unsigned_tx.json` in the current directory (see previous paragraph on how to do that). Then, simply run the following command:
+使用 CLI 签署交易需要将未签名的交易保存在文件中。 让我们假设未签名的交易位于当前目录中名为“unsigned_tx.json”的文件中(请参阅上一段了解如何执行此操作)。 然后，只需运行以下命令: 
 
 ```bash
 simd tx sign unsigned_tx.json --chain-id my-test-chain --keyring-backend test --from $MY_VALIDATOR_ADDRESS
 ```
 
-This command will decode the unsigned transaction and sign it with `SIGN_MODE_DIRECT` with `$MY_VALIDATOR_ADDRESS`'s key, which we already set up in the keyring. The signed transaction will be output as JSON to the console, and, as above, we can save it to a file by appending `> signed_tx.json`.
+此命令将解码未签名的交易，并使用“SIGN_MODE_DIRECT”和“$MY_VALIDATOR_ADDRESS”的密钥对其进行签名，我们已经在密钥环中设置了该密钥。签名的交易将作为 JSON 输出到控制台，如上所述，我们可以通过附加 `> signed_tx.json` 将其保存到文件中。
 
-Some useful flags to consider in the `tx sign` command:
+在 `tx sign` 命令中需要考虑的一些有用标志:
 
-- `--sign-mode`: you may use `amino-json` to sign the transaction using `SIGN_MODE_LEGACY_AMINO_JSON`,
-- `--offline`: sign in offline mode. This means that the `tx sign` command doesn't connect to the node to retrieve the signer's account number and sequence, both needed for signing. In this case, you must manually supply the `--account-number` and `--sequence` flags. This is useful for offline signing, i.e. signing in a secure environment which doesn't have access to the internet.
+- `--sign-mode`:你可以使用 `amino-json` 使用 `SIGN_MODE_LEGACY_AMINO_JSON` 来签署交易，
+- `--offline`:在离线模式下登录。这意味着 `tx sign` 命令不会连接到节点来检索签名者的帐号和序列，这两者都是签名所必需的。在这种情况下，您必须手动提供 `--account-number` 和 `--sequence` 标志。这对于离线签名很有用，即在无法访问互联网的安全环境中签名。
 
-#### Signing with Multiple Signers
+#### 与多个签名者签名
 
-::: warning
-Please note that signing a transaction with multiple signers or with a multisig account, where at least one signer uses `SIGN_MODE_DIRECT`, is not yet possible. You may follow [this Github issue](https://github.com/cosmos/cosmos-sdk/issues/8141) for more info.
+::: 警告
+请注意，使用多个签名者或多重签名帐户签署交易(其中至少有一个签​​名者使用“SIGN_MODE_DIRECT”)尚不可能。您可以关注 [this Github issue](https://github.com/cosmos/cosmos-sdk/issues/8141) 了解更多信息。
 :::
 
-Signing with multiple signers is done with the `tx multisign` command. This command assumes that all signers use `SIGN_MODE_LEGACY_AMINO_JSON`. The flow is similar to the `tx sign` command flow, but instead of signing an unsigned transaction file, each signer signs the file signed by previous signer(s). The `tx multisign` command will append signatures to the existing transactions. It is important that signers sign the transaction **in the same order** as given by the transaction, which is retrievable using the `GetSigners()` method.
+使用“tx multisign”命令完成与多个签名者的签名。此命令假定所有签名者都使用“SIGN_MODE_LEGACY_AMINO_JSON”。该流程类似于“tx sign”命令流程，但不是签署未签名的交易文件，而是每个签署者签署由先前签署者签署的文件。 `tx multisign` 命令会将签名附加到现有交易中。签名者以与交易给出的相同顺序**签署交易非常重要，该顺序可以使用`GetSigners()`方法进行检索。
 
-For example, starting with the `unsigned_tx.json`, and assuming the transaction has 4 signers, we would run:
+例如，从 `unsigned_tx.json` 开始，假设交易有 4 个签名者，我们将运行: 
 
 ```bash
 # Let signer1 sign the unsigned tx.
@@ -71,49 +67,49 @@ simd tx multisign partial_tx_2.json signer_key_3 --chain-id my-test-chain --keyr
 
 ### Broadcasting a Transaction
 
-Broadcasting a transaction is done using the following command:
+使用以下命令广播事务: 
 
 ```bash
 simd tx broadcast tx_signed.json
 ```
 
-You may optionally pass the `--broadcast-mode` flag to specify which response to receive from the node:
+您可以选择传递 `--broadcast-mode` 标志来指定从节点接收哪个响应:
 
-- `block`: the CLI waits for the tx to be committed in a block.
-- `sync`: the CLI waits for a CheckTx execution response only.
-- `async`: the CLI returns immediately (transaction might fail).
+- `block`:CLI 等待 tx 在一个块中提交。
+- `sync`:CLI 仅等待 CheckTx 执行响应。
+- `async`:CLI 立即返回(交易可能会失败)。
 
-### Encoding a Transaction
+### 对交易进行编码
 
-In order to broadcast a transaction using the gRPC or REST endpoints, the transaction will need to be encoded first. This can be done using the CLI.
+为了使用 gRPC 或 REST 端点广播交易，需要先对交易进行编码。 这可以使用 CLI 来完成。
 
-Encoding a transaction is done using the following command:
+使用以下命令对交易进行编码: 
 
 ```bash
 simd tx encode tx_signed.json
 ```
 
-This will read the transaction from the file, serialize it using Protobuf, and output the transaction bytes as base64 in the console.
+这将从文件中读取交易，使用 Protobuf 对其进行序列化，并在控制台中以 base64 格式输出交易字节。
 
-### Decoding a Transaction
+### 解码交易
 
-The CLI can also be used to decode transaction bytes.
+CLI 还可用于解码事务字节。
 
-Decoding a transaction is done using the following command:
+使用以下命令对交易进行解码: 
 
 ```bash
 simd tx decode [protobuf-byte-string]
 ```
 
-This will decode the transaction bytes and output the transaction as JSON in the console. You can also save the transaction to a file by appending `> tx.json` to the above command.
+这将解码交易字节并在控制台中将交易输出为 JSON。 您还可以通过将 `> tx.json` 附加到上述命令来将交易保存到文件中。
 
-## Programmatically with Go
+## 用 Go 编程
 
-It is possible to manipulate transactions programmatically via Go using the Cosmos SDK's `TxBuilder` interface.
+可以使用 Cosmos SDK 的“TxBuilder”接口通过 Go 以编程方式操作事务。
 
-### Generating a Transaction
+### 生成交易
 
-Before generating a transaction, a new instance of a `TxBuilder` needs to be created. Since the Cosmos SDK supports both Amino and Protobuf transactions, the first step would be to decide which encoding scheme to use. All the subsequent steps remain unchanged, whether you're using Amino or Protobuf, as `TxBuilder` abstracts the encoding mechanisms. In the following snippet, we will use Protobuf.
+在生成交易之前，需要创建一个“TxBuilder”的新实例。 由于 Cosmos SDK 支持 Amino 和 Protobuf 事务，第一步是决定使用哪种编码方案。 所有后续步骤都保持不变，无论您使用的是 Amino 还是 Protobuf，因为“TxBuilder”抽象了编码机制。 在以下代码段中，我们将使用 Protobuf。 
 
 ```go
 import (
@@ -132,7 +128,7 @@ func sendTx() error {
 }
 ```
 
-We can also set up some keys and addresses that will send and receive the transactions. Here, for the purpose of the tutorial, we will be using some dummy data to create keys.
+我们还可以设置一些将发送和接收交易的密钥和地址。 在这里，出于本教程的目的，我们将使用一些虚拟数据来创建密钥。 
 
 ```go
 import (
@@ -173,16 +169,16 @@ func sendTx() error {
 }
 ```
 
-At this point, `TxBuilder`'s underlying transaction is ready to be signed.
+此时，`TxBuilder` 的底层交易已准备好进行签名。
 
-### Signing a Transaction
+### 签署交易
 
-We set encoding config to use Protobuf, which will use `SIGN_MODE_DIRECT` by default. As per [ADR-020](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/docs/architecture/adr-020-protobuf-transaction-encoding.md), each signer needs to sign the `SignerInfo`s of all other signers. This means that we need to perform two steps sequentially:
+我们将编码配置设置为使用 Protobuf，默认使用 `SIGN_MODE_DIRECT`。 根据 [ADR-020](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/docs/architecture/adr-020-protobuf-transaction-encoding.md)，每个签名者需要 签署所有其他签名者的`SignerInfo`s。 这意味着我们需要依次执行两个步骤:
 
-- for each signer, populate the signer's `SignerInfo` inside `TxBuilder`,
-- once all `SignerInfo`s are populated, for each signer, sign the `SignDoc` (the payload to be signed).
+- 对于每个签名者，在 `TxBuilder` 中填充签名者的 `SignerInfo`，
+- 一旦所有`SignerInfo`s 被填充，对于每个签名者，签署`SignDoc`(要签名的有效负载)。
 
-In the current `TxBuilder`'s API, both steps are done using the same method: `SetSignatures()`. The current API requires us to first perform a round of `SetSignatures()` _with empty signatures_, only to populate `SignerInfo`s, and a second round of `SetSignatures()` to actually sign the correct payload.
+在当前的 `TxBuilder` 的 API 中，这两个步骤都是使用相同的方法完成的:`SetSignatures()`。 当前的 API 要求我们首先执行一轮 `SetSignatures()` _带有空签名_，只填充 `SignerInfo`s，第二轮 `SetSignatures()` 以实际签署正确的有效负载。
 
 ```go
 import (
@@ -242,7 +238,7 @@ func sendTx() error {
 }
 ```
 
-The `TxBuilder` is now correctly populated. To print it, you can use the `TxConfig` interface from the initial encoding config `encCfg`:
+“TxBuilder”现在已正确填充。 要打印它，您可以使用初始编码配置 `encCfg` 中的 `TxConfig` 接口: 
 
 ```go
 func sendTx() error {
@@ -265,7 +261,7 @@ func sendTx() error {
 
 ### Broadcasting a Transaction
 
-The preferred way to broadcast a transaction is to use gRPC, though using REST (via `gRPC-gateway`) or the Tendermint RPC is also posible. An overview of the differences between these methods is exposed [here](../core/grpc_rest.md). For this tutorial, we will only describe the gRPC method.
+广播交易的首选方式是使用 gRPC，但也可以使用 REST(通过 `gRPC-gateway`)或 Tendermint RPC。 [此处](../core/grpc_rest.md) 公开了这些方法之间差异的概述。 在本教程中，我们将仅描述 gRPC 方法。
 
 ```go
 import (
@@ -310,7 +306,7 @@ func sendTx(ctx context.Context) error {
 
 #### Simulating a Transaction
 
-Before broadcasting a transaction, we sometimes may want to dry-run the transaction, to estimate some information about the transaction without actually committing it. This is called simulating a transaction, and can be done as follows:
+在广播一个事务之前，我们有时可能想要试运行该事务，以在不实际提交它的情况下估计有关该事务的一些信息。 这称为模拟交易，可以按如下方式完成:
 
 ```go
 import (
@@ -350,11 +346,11 @@ func simulateTx() error {
 
 ## Using gRPC
 
-It is not possible to generate or sign a transaction using gRPC, only to broadcast one. In order to broadcast a transaction using gRPC, you will need to generate, sign, and encode the transaction using either the CLI or programmatically with Go.
+不可能使用 gRPC 生成或签署交易，只能广播一个。 为了使用 gRPC 广播交易，您需要使用 CLI 或使用 Go 以编程方式生成、签署和编码交易。
 
-### Broadcasting a Transaction
+### 广播交易
 
-Broadcasting a transaction using the gRPC endpoint can be done by sending a `BroadcastTx` request as follows, where the `txBytes` are the protobuf-encoded bytes of a signed transaction:
+可以通过发送如下的“BroadcastTx”请求来使用 gRPC 端点广播交易，其中“txBytes”是签名交易的 protobuf 编码字节:
 
 ```bash
 grpcurl -plaintext \
@@ -363,13 +359,13 @@ grpcurl -plaintext \
     cosmos.tx.v1beta1.Service/BroadcastTx
 ```
 
-## Using REST
+## 使用 REST
 
-It is not possible to generate or sign a transaction using REST, only to broadcast one. In order to broadcast a transaction using REST, you will need to generate, sign, and encode the transaction using either the CLI or programmatically with Go.
+不可能使用 REST 生成或签署交易，只能广播一个。 为了使用 REST 广播交易，您需要使用 CLI 或使用 Go 以编程方式生成、签署和编码交易。
 
-### Broadcasting a Transaction
+### 广播交易
 
-Broadcasting a transaction using the REST endpoint (served by `gRPC-gateway`) can be done by sending a POST request as follows, where the `txBytes` are the protobuf-encoded bytes of a signed transaction:
+使用 REST 端点(由 `gRPC-gateway` 提供服务)广播交易可以通过如下发送 POST 请求来完成，其中 `txBytes` 是签名交易的 protobuf 编码字节: 
 
 ```bash
 curl -X POST \
@@ -378,6 +374,6 @@ curl -X POST \
     localhost:1317/cosmos/tx/v1beta1/txs
 ```
 
-## Using CosmJS (JavaScript & TypeScript)
+## 使用 CosmJS(JavaScript 和 TypeScript)
 
-CosmJS aims to build client libraries in JavaScript that can be embedded in web applications. Please see [https://cosmos.github.io/cosmjs](https://cosmos.github.io/cosmjs) for more information. As of January 2021, CosmJS documentation is still work in progress.
+CosmJS 旨在用 JavaScript 构建可以嵌入 Web 应用程序的客户端库。 请参阅 [https://cosmos.github.io/cosmjs](https://cosmos.github.io/cosmjs) 了解更多信息。 截至 2021 年 1 月，CosmJS 文档仍在进行中。 

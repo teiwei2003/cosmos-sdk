@@ -1,10 +1,3 @@
-<!--
-order: 0
-title: Crisis Overview
-parent:
-  title: "crisis"
--->
-
 # `crisis`
 
 ## Overview

@@ -1,58 +1,58 @@
-# ADR 016: Validator Consensus Key Rotation
+# ADR 016:验证者共识密钥轮换
 
-## Changelog
+## 变更日志
 
-- 2019 Oct 23: Initial draft
-- 2019 Nov 28: Add key rotation fee
+- 2019 年 10 月 23 日:初稿
+- 2019 年 11 月 28 日:增加密钥轮换费
 
-## Context
+## 语境
 
-Validator consensus key rotation feature has been discussed and requested for a long time, for the sake of safer validator key management policy (e.g. https://github.com/tendermint/tendermint/issues/1136). So, we suggest one of the simplest form of validator consensus key rotation implementation mostly onto Cosmos SDK.
+为了更安全的验证者密钥管理策略(例如 https://github.com/tendermint/tendermint/issues/1136)，验证者共识密钥轮换功能已经被讨论和请求了很长时间。因此，我们建议在 Cosmos SDK 上使用最简单的验证器共识密钥轮换实现形式之一。
 
-We don't need to make any update on consensus logic in Tendermint because Tendermint does not have any mapping information of consensus key and validator operator key, meaning that from Tendermint point of view, a consensus key rotation of a validator is simply a replacement of a consensus key to another.
+我们不需要对 Tendermint 中的共识逻辑进行任何更新，因为 Tendermint 没有任何共识密钥和验证者操作者密钥的映射信息，这意味着从 Tendermint 的角度来看，验证者的共识密钥轮换只是替换了另一个的共识密钥。
 
-Also, it should be noted that this ADR includes only the simplest form of consensus key rotation without considering multiple consensus keys concept. Such multiple consensus keys concept shall remain a long term goal of Tendermint and Cosmos SDK.
+另外，应该注意的是，这个 ADR 只包括最简单的共识密钥轮换形式，没有考虑多个共识密钥的概念。这种多重共识密钥的概念仍将是 Tendermint 和 Cosmos SDK 的长期目标。
 
-## Decision
+## 决定
 
-### Pseudo procedure for consensus key rotation
+### 共识密钥轮换的伪过程
 
-- create new random consensus key.
-- create and broadcast a transaction with a `MsgRotateConsPubKey` that states the new consensus key is now coupled with the validator operator with signature from the validator's operator key.
-- old consensus key becomes unable to participate on consensus immediately after the update of key mapping state on-chain.
-- start validating with new consensus key.
-- validators using HSM and KMS should update the consensus key in HSM to use the new rotated key after the height `h` when `MsgRotateConsPubKey` committed to the blockchain.
+- 创建新的随机共识密钥。
+- 使用“MsgRotateConsPubKey”创建和广播交易，该交易声明新的共识密钥现在与验证器操作符耦合，并带有来自验证器操作符密钥的签名。
+- 旧的共识密钥在链上密钥映射状态更新后立即无法参与共识。
+- 开始使用新的共识密钥进行验证。
+- 当`MsgRotateConsPubKey`提交到区块链时，使用HSM和KMS的验证者应该更新HSM中的共识密钥以在高度`h`之后使用新的轮换密钥。
 
-### Considerations
+###注意事项
 
-- consensus key mapping information management strategy
-    - store history of each key mapping changes in the kvstore.
-    - the state machine can search corresponding consensus key paired with given validator operator for any arbitrary height in a recent unbonding period.
-    - the state machine does not need any historical mapping information which is past more than unbonding period.
-- key rotation costs related to LCD and IBC
-    - LCD and IBC will have traffic/computation burden when there exists frequent power changes
-    - In current Tendermint design, consensus key rotations are seen as power changes from LCD or IBC perspective
-    - Therefore, to minimize unnecessary frequent key rotation behavior, we limited maximum number of rotation in recent unbonding period and also applied exponentially increasing rotation fee
-- limits
-    - a validator cannot rotate its consensus key more than `MaxConsPubKeyRotations` time for any unbonding period, to prevent spam.
-    - parameters can be decided by governance and stored in genesis file.
-- key rotation fee
-    - a validator should pay `KeyRotationFee` to rotate the consensus key which is calculated as below
-    - `KeyRotationFee` = (max(`VotingPowerPercentage` *100, 1)* `InitialKeyRotationFee`) * 2^(number of rotations in `ConsPubKeyRotationHistory` in recent unbonding period)
-- evidence module
-    - evidence module can search corresponding consensus key for any height from slashing keeper so that it can decide which consensus key is supposed to be used for given height.
+- 共识密钥映射信息管理策略
+    - 在 kvstore 中存储每个键映射更改的历史记录。
+    - 状态机可以在最近的解除绑定期间搜索与给定验证器操作符配对的任意高度的相应共识密钥。
+    - 状态机不需要任何超过解除绑定期的历史映射信息。
+- 与 LCD 和 IBC 相关的密钥轮换成本
+    - LCD和IBC在频繁的电源变化时会产生流量/计算负担
+    - 在当前的 Tendermint 设计中，共识密钥轮换被视为从 LCD 或 IBC 的角度来看权力的变化
+    - 因此，为了尽量减少不必要的频繁密钥轮换行为，我们限制了最近解除绑定期间的最大轮换次数，并且还应用了成倍增加的轮换费用
+- 限制
+    - 验证者在任何解除绑定期间都不能旋转其共识密钥超过 `MaxConsPubKeyRotations` 时间，以防止垃圾邮件。
+    - 参数可以由治理决定并存储在创世文件中。
+- 密钥轮换费
+    - 验证者应该支付`KeyRotationFee`来轮换共识密钥，计算如下
+    - `KeyRotationFee` = (max(`VotingPowerPercentage` *100, 1)* `InitialKeyRotationFee`) * 2^(最近解绑期间`ConsPubKeyRotationHistory`中的旋转次数)
+- 证据模块
+    - 证据模块可以从slashing keeper中搜索任何高度的相应共识密钥，以便它可以决定对于给定的高度应该使用哪个共识密钥。
 - abci.ValidatorUpdate
-    - tendermint already has ability to change a consensus key by ABCI communication(`ValidatorUpdate`).
-    - validator consensus key update can be done via creating new + delete old by change the power to zero.
-    - therefore, we expect we even do not need to change tendermint codebase at all to implement this feature.
-- new genesis parameters in `staking` module
-    - `MaxConsPubKeyRotations` : maximum number of rotation can be executed by a validator in recent unbonding period. default value 10 is suggested(11th key rotation will be rejected)
-    - `InitialKeyRotationFee` : the initial key rotation fee when no key rotation has happened in recent unbonding period. default value 1atom is suggested(1atom fee for the first key rotation in recent unbonding period)
+    -tendermint 已经能够通过 ABCI 通信(`ValidatorUpdate`)更改共识密钥。
+    - 验证者共识密钥更新可以通过将功率更改为零来创建新的 + 删除旧的来完成。
+    - 因此，我们希望我们甚至根本不需要更改tendermint 代码库来实现此功能。
+- `staking` 模块中的新创世参数
+    - `MaxConsPubKeyRotations`:在最近的解除绑定期间验证者可以执行的最大轮换次数。建议使用默认值 10(第 11 次密钥轮换将被拒绝)
+    - `InitialKeyRotationFee`:在最近解绑期间没有发生密钥轮换时的初始密钥轮换费用。建议使用默认值 1atom(最近解绑期间第一次密钥轮换的费用为 1atom) 
 
 ### Workflow
 
-1. The validator generates a new consensus keypair.
-2. The validator generates and signs a `MsgRotateConsPubKey` tx with their operator key and new ConsPubKey
+1. 验证者生成一个新的共识密钥对。
+2. 验证器使用他们的操作符密钥和新的 ConsPubKey 生成并签署一个 `MsgRotateConsPubKey` tx 
 
     ```go
     type MsgRotateConsPubKey struct {
@@ -61,16 +61,16 @@ Also, it should be noted that this ADR includes only the simplest form of consen
     }
     ```
 
-3. `handleMsgRotateConsPubKey` gets `MsgRotateConsPubKey`, calls `RotateConsPubKey` with emits event
-4. `RotateConsPubKey`
-    - checks if `NewPubKey` is not duplicated on `ValidatorsByConsAddr`
-    - checks if the validator is does not exceed parameter `MaxConsPubKeyRotations` by iterating `ConsPubKeyRotationHistory`
-    - checks if the signing account has enough balance to pay `KeyRotationFee`
-    - pays `KeyRotationFee` to community fund
-    - overwrites `NewPubKey` in `validator.ConsPubKey`
-    - deletes old `ValidatorByConsAddr`
-    - `SetValidatorByConsAddr` for `NewPubKey`
-    - Add `ConsPubKeyRotationHistory` for tracking rotation
+3.`handleMsgRotateConsPubKey`获取`MsgRotateConsPubKey`，调用`RotateConsPubKey`并带有emits事件
+4.`RotateConsPubKey`
+     - 检查 `NewPubKey` 是否在 `ValidatorsByConsAddr` 上没有重复
+     - 通过迭代 `ConsPubKeyRotationHistory` 检查验证器是否不超过参数 `MaxConsPubKeyRotations`
+     - 检查签名账户是否有足够的余额来支付`KeyRotationFee`
+     - 向社区基金支付`KeyRotationFee`
+     - 覆盖 `validator.ConsPubKey` 中的 `NewPubKey`
+     - 删除旧的`ValidatorByConsAddr`
+     -`NewPubKey` 的`SetValidatorByConsAddr`
+     - 添加 `ConsPubKeyRotationHistory` 用于跟踪旋转 
 
     ```go
     type ConsPubKeyRotationHistory struct {
@@ -81,7 +81,7 @@ Also, it should be noted that this ADR includes only the simplest form of consen
     }
     ```
 
-5. `ApplyAndReturnValidatorSetUpdates` checks if there is `ConsPubKeyRotationHistory` with `ConsPubKeyRotationHistory.RotatedHeight == ctx.BlockHeight()` and if so, generates 2 `ValidatorUpdate` , one for a remove validator and one for create new validator
+5.`ApplyAndReturnValidatorSetUpdates`检查是否有`ConsPubKeyRotationHistory`和`ConsPubKeyRotationHistory.RotatedHeight == ctx.BlockHeight()`，如果有，生成2个`ValidatorUpdate`，一个用于删除验证器，一个用于创建新验证器 
 
     ```go
     abci.ValidatorUpdate{
@@ -95,10 +95,10 @@ Also, it should be noted that this ADR includes only the simplest form of consen
     }
     ```
 
-6. at `previousVotes` Iteration logic of `AllocateTokens`,  `previousVote` using `OldConsPubKey` match up with `ConsPubKeyRotationHistory`, and replace validator for token allocation
-7. Migrate `ValidatorSigningInfo` and `ValidatorMissedBlockBitArray` from `OldConsPubKey` to `NewConsPubKey`
+6.在`AllocateTokens`的`previousVotes`迭代逻辑中，`previousVote`使用`OldConsPubKey`匹配`ConsPubKeyRotationHistory`，并替换validator进行令牌分配
+7. 将 `ValidatorSigningInfo` 和 `ValidatorMissedBlockBitArray` 从 `OldConsPubKey` 迁移到 `NewConsPubKey`
 
-- Note : All above features shall be implemented in `staking` module.
+- 注意:以上所有功能都应在`staking` 模块中实现。 
 
 ## Status
 
@@ -108,14 +108,13 @@ Proposed
 
 ### Positive
 
-- Validators can immediately or periodically rotate their consensus key to have better security policy
-- improved security against Long-Range attacks (https://nearprotocol.com/blog/long-range-attacks-and-a-new-fork-choice-rule) given a validator throws away the old consensus key(s)
+- 验证者可以立即或定期轮换他们的共识密钥以获得更好的安全策略
+- 提高了针对远程攻击的安全性(https://nearprotocol.com/blog/long-range-attacks-and-a-new-fork-choice-rule)，因为验证器丢弃了旧的共识密钥 
 
 ### Negative
 
-- Slash module needs more computation because it needs to lookup corresponding consensus key of validators for each height
-- frequent key rotations will make light client bisection less efficient
-
+- Slash 模块需要更多的计算，因为它需要为每个高度查找相应的验证器共识密钥
+- 频繁的密钥轮换会降低轻客户端二分的效率 
 ### Neutral
 
 ## References

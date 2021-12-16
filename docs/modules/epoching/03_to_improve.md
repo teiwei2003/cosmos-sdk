@@ -1,7 +1,3 @@
-<!--
-order: 3
--->
-
 # Changes to make
 
 ## Validator self-unbonding (which exceed minimum self delegation) could be required to start instantly

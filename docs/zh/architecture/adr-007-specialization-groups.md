@@ -1,30 +1,30 @@
-# ADR 007: Specialization Groups
+# ADR 007:专业化组
 
-## Changelog
+## 变更日志
 
-- 2019 Jul 31: Initial Draft
+- 2019 年 7 月 31 日:初稿
 
-## Context
+## 语境
 
-This idea was first conceived of in order to fulfill the use case of the
-creation of a decentralized Computer Emergency Response Team (dCERT), whose
-members would be elected by a governing community and would fulfill the role of
-coordinating the community under emergency situations. This thinking
-can be further abstracted into the conception of "blockchain specialization
-groups".
+这个想法最初是为了满足
+创建分散的计算机应急响应小组 (dCERT)，其
+成员将由治理社区选举，并将履行职责
+在紧急情况下协调社区。这种思维
+可以进一步抽象为“区块链专业化”的概念
+团体”。
 
-The creation of these groups are the beginning of specialization capabilities
-within a wider blockchain community which could be used to enable a certain
-level of delegated responsibilities. Examples of specialization which could be
-beneficial to a blockchain community include: code auditing, emergency response,
-code development etc. This type of community organization paves the way for
-individual stakeholders to delegate votes by issue type, if in the future
-governance proposals include a field for issue type.
+这些组的创建是专业化能力的开始
+在更广泛的区块链社区中，可用于启用某些
+委派职责的级别。可以是专业化的例子
+对区块链社区有益的包括:代码审计、应急响应、
+代码开发等。这种类型的社区组织为
+个人利益相关者按问题类型委托投票，如果将来的话
+治理提案包括一个问题类型字段。
 
-## Decision
+## 决定
 
-A specialization group can be broadly broken down into the following functions
-(herein containing examples):
+专业化组可以大致分为以下功能
+(此处包含示例): 
 
 - Membership Admittance
 - Membership Acceptance
@@ -44,18 +44,18 @@ A specialization group can be broadly broken down into the following functions
     - Individual compensation for all constituents of a group from the
      greater community
 
-Membership admittance to a specialization group could take place over a wide
-variety of mechanisms. The most obvious example is through a general vote among
-the entire community, however in certain systems a community may want to allow
-the members already in a specialization group to internally elect new members,
-or maybe the community may assign a permission to a particular specialization
-group to appoint members to other 3rd party groups. The sky is really the limit
-as to how membership admittance can be structured. We attempt to capture
-some of these possiblities in a common interface dubbed the `Electionator`. For
-its initial implementation as a part of this ADR we recommend that the general
-election abstraction (`Electionator`) is provided as well as a basic
-implementation of that abstraction which allows for a continuous election of
-members of a specialization group.
+专业化小组的成员资格准入可以在广泛的范围内进行
+多种机制。 最明显的例子是通过在
+整个社区，但是在某些系统中，社区可能希望允许
+已经在专业化小组内部选举新成员的成员，
+或者社区可能会为特定专业分配权限
+组任命成员到其他 3rd 党组。 天空真的是极限
+关于如何构建会员准入。 我们试图捕捉
+其中一些可能出现在称为“选举人”的通用界面中。 为了
+作为本 ADR 的一部分，我们建议一般
+提供了选举抽象(`Electionator`)以及一个基本的
+该抽象的实现允许连续选择
+专业化小组的成员。 
 
 ``` golang
 // The Electionator abstraction covers the concept space for
@@ -126,14 +126,14 @@ type Revoker interface {
 }
 ```
 
-Certain level of commonality likely exists between the existing code within
-`x/governance` and required functionality of elections. This common
-functionality should be abstracted during implementation. Similarly for each
-vote implementation client CLI/REST functionality should be abstracted
-to be reused for multiple elections.
+现有代码之间可能存在某种程度的共性
+`x/governance` 和选举所需的功能。 这种常见的
+功能应该在实现过程中抽象出来。 同样对于每个
+投票实现客户端 CLI/REST 功能应该被抽象化
+可重复用于多次选举。
 
-The specialization group abstraction firstly extends the `Electionator`
-but also further defines traits of the group.
+专业化组抽象首先扩展了`Electionator`
+但也进一步定义了群体的特征。 
 
 ``` golang
 type SpecializationGroup interface {
@@ -163,12 +163,12 @@ type SpecializationGroup interface {
 
 ### Positive
 
-- increases specialization capabilities of a blockchain
-- improve abstractions in `x/gov/` such that they can be used with specialization groups
+- 增加区块链的专业化能力
+- 改进 `x/gov/` 中的抽象，以便它们可以与专业化组一起使用 
 
 ### Negative
 
-- could be used to increase centralization within a community
+- 可用于增加社区内的中心化 
 
 ### Neutral
 

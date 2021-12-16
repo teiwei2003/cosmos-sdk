@@ -1,29 +1,24 @@
-<!--
-order: 2
--->
+# 状态
 
-# State
+## 帐户
 
-## Accounts
+帐户包含 SDK 区块链唯一标识的外部用户的身份验证信息，
+包括用于重放保护的公钥、地址和帐号/序列号。 为了效率，
+由于还必须获取帐户余额以支付费用，因此帐户结构还存储用户的余额
+作为`sdk.Coins`。
 
-Accounts contain authentication information for a uniquely identified external user of an SDK blockchain,
-including public key, address, and account number / sequence number for replay protection. For efficiency,
-since account balances must also be fetched to pay fees, account structs also store the balance of a user
-as `sdk.Coins`.
+帐户作为接口对外公开，在内部存储为
+基本账户或归属账户。 希望添加更多模块的客户
+帐户类型可能会这样做。
 
-Accounts are exposed externally as an interface, and stored internally as
-either a base account or vesting account. Module clients wishing to add more
-account types may do so.
+- `0x01 | 地址 -> ProtocolBuffer(account)`
 
-- `0x01 | Address -> ProtocolBuffer(account)`
+###账户界面
 
-### Account Interface
-
-The account interface exposes methods to read and write standard account information.
-Note that all of these methods operate on an account struct confirming to the
-interface - in order to write the account to the store, the account keeper will
-need to be used.
-
+帐户接口公开了读取和写入标准帐户信息的方法。
+请注意，所有这些方法都在一个帐户结构上运行，以确认
+接口 - 为了将帐户写入存储，帐户管理员将
+需要使用。 
 ```go
 // AccountI is an interface used to store coins at a given address within state.
 // It presumes a notion of sequence numbers for replay protection,
@@ -51,10 +46,10 @@ type AccountI interface {
 }
 ```
 
-#### Base Account
+#### 基本帐户
 
-A base account is the simplest and most common account type, which just stores all requisite
-fields directly in a struct.
+基本帐户是最简单和最常见的帐户类型，它只存储所有必需的
+字段直接在结构中。
 
 ```protobuf
 // BaseAccount defines a base account type. It contains all the necessary fields
@@ -68,6 +63,6 @@ message BaseAccount {
 }
 ```
 
-### Vesting Account
+### 归属账户
 
-See [Vesting](05_vesting.md).
+请参阅[归属](05_vesting.md)。 

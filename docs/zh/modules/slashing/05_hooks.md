@@ -1,25 +1,21 @@
-<!--
-order: 5
--->
+# 钩子
 
-# Hooks
+本节包含对模块`hooks` 的描述。 挂钩是在引发事件时自动执行的操作。
 
-This section contains a description of the module's `hooks`. Hooks are operations that are executed automatically when events are raised.
+## 放样钩子
 
-## Staking hooks
+slashing 模块实现了 `x/staking` 中定义的 `StakingHooks`，并用作验证者信息的记录保存。 在应用程序初始化期间，这些钩子应该在 staking 模块结构中注册。
 
-The slashing module implements the `StakingHooks` defined in `x/staking` and are used as record-keeping of validators information. During the app initialization, these hooks should be registered in the staking module struct.
+以下挂钩会影响 slashing 状态:
 
-The following hooks impact the slashing state:
++ `AfterValidatorBonded` 创建一个 `ValidatorSigningInfo` 实例，如下一节所述。
++ `AfterValidatorCreated` 存储验证者的共识密钥。
++ `AfterValidatorRemoved` 删除验证者的共识密钥。
 
-+ `AfterValidatorBonded` creates a `ValidatorSigningInfo` instance as described in the following section.
-+ `AfterValidatorCreated` stores a validator's consensus key.
-+ `AfterValidatorRemoved` removes a validator's consensus key.
+## 验证者绑定
 
-## Validator Bonded
-
-Upon successful first-time bonding of a new validator, we create a new `ValidatorSigningInfo` structure for the
-now-bonded validator, which `StartHeight` of the current block.
+在成功首次绑定新验证器后，我们为
+现在绑定的验证器，当前块的“StartHeight”。 
 
 ```
 onValidatorBonded(address sdk.ValAddress)

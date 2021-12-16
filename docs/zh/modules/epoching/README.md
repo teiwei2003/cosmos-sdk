@@ -1,19 +1,12 @@
-<!--
-order: 20
-title: Epoching Overview
-parent:
-  title: "epoching"
--->
-
 # `x/epoching`
 
-## Abstract
+## 摘要
 
-The epoching module allows modules to queue messages for execution at a certain block height. Each module will have its own instance of the epoching module, this allows each module to have its own message queue and own duration for epochs.
+epoching 模块允许模块将消息排队以在某个块高度执行。 每个模块都有自己的纪元模块实例，这允许每个模块有自己的消息队列和纪元的持续时间。
 
-## Example
+## 例子
 
-In this example, we are creating an epochkeeper for a module that will be used by the module to queue messages to be executed at a later point in time.
+在这个例子中，我们正在为一个模块创建一个 epochkeeper，该模块将使用该模块将消息排队以在稍后的时间点执行。 
 
 ```go
 type Keeper struct {

@@ -1,17 +1,13 @@
-<!--
-order: 4
--->
-
-# Messages
+# 消息
 
 ## MsgSetWithdrawAddress
 
-By default, the withdraw address is the delegator address. To change its withdraw address, a delegator must send a `MsgSetWithdrawAddress` message.
-Changing the withdraw address is possible only if the parameter `WithdrawAddrEnabled` is set to `true`.
+默认情况下，提现地址为委托人地址。 要更改其提款地址，委托人必须发送“MsgSetWithdrawAddress”消息。
+只有当参数 `WithdrawAddrEnabled` 设置为 `true` 时，才可以更改提款地址。
 
-The withdraw address cannot be any of the module accounts. These accounts are blocked from being withdraw addresses by being added to the distribution keeper's `blockedAddrs` array at initialization.
+提现地址不能是任何模块账户。 通过在初始化时将这些帐户添加到分发管理员的“blockedAddrs”数组中，可以阻止这些帐户被提取地址。
 
-Response:
+回复: 
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.4/proto/cosmos/distribution/v1beta1/tx.proto#L29-L37
 
@@ -30,22 +26,22 @@ func (k Keeper) SetWithdrawAddr(ctx sdk.Context, delegatorAddr sdk.AccAddress, w
 
 ## MsgWithdrawDelegatorReward
 
-A delegator can withdraw its rewards.
-Internally in the distribution module, this transaction simultaneously removes the previous delegation with associated rewards, the same as if the delegator simply started a new delegation of the same value.
-The rewards are sent immediately from the distribution `ModuleAccount` to the withdraw address.
-Any remainder (truncated decimals) are sent to the community pool.
-The starting height of the delegation is set to the current validator period, and the reference count for the previous period is decremented.
-The amount withdrawn is deducted from the `ValidatorOutstandingRewards` variable for the validator.
+委托人可以撤回其奖励。
+在分配模块内部，该交易同时删除了先前的委托和相关的奖励，就像委托人只是简单地开始了一个相同价值的新委托。
+奖励会立即从分配“ModuleAccount”发送到提款地址。
+任何余数(截断的小数)都被发送到社区池。
+委托的起始高度设置为当前validator周期，上一周期的引用计数递减。
+提取的金额从验证器的“ValidatorOutstandingRewards”变量中扣除。
 
-In the F1 distribution, the total rewards are calculated per validator period, and a delegator receives a piece of those rewards in proportion to their stake in the validator.
-In basic F1, the total rewards that all the delegators are entitled to between to periods is calculated the following way.
-Let `R(X)` be the total accumulated rewards up to period `X` divided by the tokens staked at that time. The delegator allocation is `R(X) * delegator_stake`.
-Then the rewards for all the delegators for staking between periods `A` and `B` are `(R(B) - R(A)) * total stake`.
-However, these calculated rewards don't account for slashing.
+在 F1 分配中，总奖励是按每个验证者周期计算的，委托人根据他们在验证者中的股份比例获得这些奖励的一部分。
+在基本的 F1 中，所有委托人在不同时期之间有权获得的总奖励按以下方式计算。
+令‘R(X)’是直到‘X’期的总累积奖励除以当时质押的代币。委托人分配是`R(X) * delegator_stake`。
+那么所有委托人在“A”和“B”期间质押的奖励为“(R(B) - R(A)) * 总质押”。
+然而，这些计算的奖励没有考虑到削减。
 
-Taking the slashes into account requires iteration.
-Let `F(X)` be the fraction a validator is to be slashed for a slashing event that happened at period `X`.
-If the validator was slashed at periods `P1, ..., PN`, where `A < P1`, `PN < B`, the distribution module calculates the individual delegator's rewards, `T(A, B)`, as follows:
+考虑斜线需要迭代。
+令`F(X)` 是验证者因在时间段`X` 发生的削减事件而削减的分数。
+如果验证人在‘P1, ..., PN’期间被削减，其中‘A < P1’，‘PN < B’，分配模块计算个体委托人的奖励，‘T(A, B)’，如下所示: 
 
 ```
 stake := initial stake
@@ -58,25 +54,25 @@ for P in P1, ..., PN`:
 rewards = rewards + (R(B) - R(PN)) * stake
 ```
 
-The historical rewards are calculated retroactively by playing back all the slashes and then attenuating the delegator's stake at each step.
-The final calculated stake is equivalent to the actual staked coins in the delegation with a margin of error due to rounding errors.
+历史奖励是通过回放所有斜线然后在每一步减少委托人的赌注来追溯计算的。
+最终计算的赌注相当于代表团中实际赌注的硬币，由于舍入误差而存在误差。
 
-Response:
+回复:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.4/proto/cosmos/distribution/v1beta1/tx.proto#L42-L50
 
 ## WithdrawValidatorCommission
 
-The validator can send the WithdrawValidatorCommission message to withdraw their accumulated commission.
-The commission is calculated in every block during `BeginBlock`, so no iteration is required to withdraw.
-The amount withdrawn is deducted from the `ValidatorOutstandingRewards` variable for the validator.
-Only integer amounts can be sent. If the accumulated awards have decimals, the amount is truncated before the withdrawal is sent, and the remainder is left to be withdrawn later.
+验证者可以发送 WithdrawValidatorCommission 消息来提取他们累积的佣金。
+在“BeginBlock”期间，每个区块都会计算佣金，因此无需迭代即可退出。
+提取的金额从验证器的“ValidatorOutstandingRewards”变量中扣除。
+只能发送整数金额。如果累积奖励有小数，则在发送提款前将金额截断，剩余部分留待稍后提款。
 
 ## FundCommunityPool
 
-This message sends coins directly from the sender to the community pool.
+该消息直接从发送者向社区池发送硬币。
 
-The transaction fails if the amount cannot be transferred from the sender to the distribution module account.
+如果金额无法从发送方转移到分发模块帐户，则交易失败。 
 
 ```go
 func (k Keeper) FundCommunityPool(ctx sdk.Context, amount sdk.Coins, sender sdk.AccAddress) error {
@@ -94,12 +90,12 @@ func (k Keeper) FundCommunityPool(ctx sdk.Context, amount sdk.Coins, sender sdk.
 
 ## Common distribution operations
 
-These operations take place during many different messages.
+这些操作发生在许多不同的消息中。
 
-### Initialize delegation
+### 初始化委托
 
-Each time a delegation is changed, the rewards are withdrawn and the delegation is reinitialized.
-Initializing a delegation increments the validator period and keeps track of the starting period of the delegation.
+每次委托变更时，奖励被撤回，委托重新初始化。
+初始化委托会增加验证器周期并跟踪委托的开始周期。 
 
 ```go
 // initialize starting info for a new delegation

@@ -1,8 +1,3 @@
----
-parent:
-  order: false
----
-
 # Specifications
 
 This directory contains specifications for the modules of the Cosmos SDK as well as Interchain Standards (ICS) and other specifications.

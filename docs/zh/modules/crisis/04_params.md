@@ -1,10 +1,6 @@
-<!--
-order: 4
--->
+# 参数
 
-# Parameters
-
-The crisis module contains the following parameters:
+危机模块包含以下参数: 
 
 | Key         | Type          | Example                           |
 |-------------|---------------|-----------------------------------|

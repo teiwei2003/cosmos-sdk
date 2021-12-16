@@ -1,7 +1,3 @@
-<!--
-order: 3
--->
-
 # Begin Block
 
 At each `BeginBlock`, all fees received in the previous block are transferred to

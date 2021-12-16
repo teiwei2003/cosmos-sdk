@@ -1,153 +1,153 @@
-# ADR 008: Decentralized Computer Emergency Response Team (dCERT) Group
+# ADR 008:分散式计算机应急响应小组 (dCERT) 组
 
-## Changelog
+## 变更日志
 
-- 2019 Jul 31: Initial Draft
+- 2019 年 7 月 31 日:初稿
 
-## Context
+## 语境
 
-In order to reduce the number of parties involved with handling sensitive
-information in an emergency scenario, we propose the creation of a
-specialization group named The Decentralized Computer Emergency Response Team
-(dCERT).  Initially this group's role is intended to serve as coordinators
-between various actors within a blockchain community such as validators,
-bug-hunters, and developers.  During a time of crisis, the dCERT group would
-aggregate and relay input from a variety of stakeholders to the developers who
-are actively devising a patch to the software, this way sensitive information
-does not need to be publicly disclosed while some input from the community can
-still be gained.
+为了减少涉及处理敏感信息的各方数量
+在紧急情况下的信息，我们建议创建一个
+名为 The Decentralized Computer Emergency Response Team 的专业化小组
+(dCERT)。最初这个小组的角色是作为协调员
+区块链社区内的各种参与者之间，例如验证者，
+漏洞猎人和开发人员。在危机时期，dCERT 小组将
+将各种利益相关者的意见汇总并转发给开发人员
+正在积极为软件设计补丁，这样敏感信息
+不需要公开披露，而社区的一些意见可以
+还是有收获的。
 
-Additionally, a special privilege is proposed for the dCERT group: the capacity
-to "circuit-break" (aka. temporarily disable)  a particular message path. Note
-that this privilege should be enabled/disabled globally with a governance
-parameter such that this privilege could start disabled and later be enabled
-through a parameter change proposal, once a dCERT group has been established.
+此外，为 dCERT 组提出了一项特殊特权:容量
+“断路”(又名。暂时禁用)特定的消息路径。笔记
+应通过治理在全局范围内启用/禁用此特权
+参数，以便此权限可以开始禁用并稍后启用
+dCERT 组建立后，通过参数更改提议。
 
-In the future it is foreseeable that the community may wish to expand the roles
-of dCERT with further responsibilities such as the capacity to "pre-approve" a
-security update on behalf of the community prior to a full community
-wide vote whereby the sensitive information would be revealed prior to a
-vulnerability being patched on the live network.  
+可以预见，未来社区可能希望扩大角色
+dCERT 的职责，例如“预先批准”一个
+在完整社区之前代表社区进行安全更新
+广泛投票，在此之前将披露敏感信息
+正在修补实时网络上的漏洞。
 
-## Decision
+## 决定
 
-The dCERT group is proposed to include an implementation of a `SpecializationGroup`
-as defined in [ADR 007](./adr-007-specialization-groups.md). This will include the
-implementation of:
+建议 dCERT 组包含一个“SpecializationGroup”的实现
+如 [ADR 007](./adr-007-specialization-groups.md) 中所定义。这将包括
+实施:
 
-- continuous voting
-- slashing due to breach of soft contract
-- revoking a member due to breach of soft contract
-- emergency disband of the entire dCERT group (ex. for colluding maliciously)
-- compensation stipend from the community pool or other means decided by
-   governance
+- 连续投票
+- 因违反软合同而被削减
+- 因违反软合同而撤销会员
+- 紧急解散整个dCERT小组(例如恶意串通)
+- 从社区池或其他方式决定的补偿津贴
+   治理
 
-This system necessitates the following new parameters:
+该系统需要以下新参数:
 
-- blockly stipend allowance per dCERT member
-- maximum number of dCERT members
-- required staked slashable tokens for each dCERT member
-- quorum for suspending a particular member
-- proposal wager for disbanding the dCERT group
-- stabilization period for dCERT member transition
-- circuit break dCERT privileges enabled
+- 每位 dCERT 成员的定期津贴
+- dCERT 成员的最大数量
+- 每个 dCERT 成员需要质押的 slashable 代币
+- 暂停特定成员的法定人数
+- 解散 dCERT 小组的提议赌注
+- dCERT 成员过渡的稳定期
+- 断路 dCERT 权限已启用
 
-These parameters are expected to be implemented through the param keeper such
-that governance may change them at any given point.
+这些参数预计将通过 param keeper 实现，例如
+这种治理可能会在任何时候改变它们。 
 
-### Continuous Voting Electionator
+### 连续投票选举人
 
-An `Electionator` object is to be implemented as continuous voting and with the
-following specifications:
+`Electionator` 对象将被实现为连续投票，并带有
+以下规格:
 
-- All delegation addresses may submit votes at any point which updates their
-   preferred representation on the dCERT group.
-- Preferred representation may be arbitrarily split between addresses (ex. 50%
-   to John, 25% to Sally, 25% to Carol)
-- In order for a new member to be added to the dCERT group they must
-   send a transaction accepting their admission at which point the validity of
-   their admission is to be confirmed.
-    - A sequence number is assigned when a member is added to dCERT group.
-     If a member leaves the dCERT group and then enters back, a new sequence number
-     is assigned.  
-- Addresses which control the greatest amount of preferred-representation are
-   eligible to join the dCERT group (up the _maximum number of dCERT members_).
-   If the dCERT group is already full and new member is admitted, the existing
-   dCERT member with the lowest amount of votes is kicked from the dCERT group.
-    - In the split situation where the dCERT group is full but a vying candidate
-     has the same amount of vote as an existing dCERT member, the existing
-     member should maintain its position.
-    - In the split situation where somebody must be kicked out but the two
-     addresses with the smallest number of votes have the same number of votes,
-     the address with the smallest sequence number maintains its position.  
-- A stabilization period can be optionally included to reduce the
-   "flip-flopping" of the dCERT membership tail members. If a stabilization
-   period is provided which is greater than 0, when members are kicked due to
-   insufficient support, a queue entry is created which documents which member is
-   to replace which other member. While this entry is in the queue, no new entries
-   to kick that same dCERT member can be made. When the entry matures at the
-   duration of the  stabilization period, the new member is instantiated, and old
-   member kicked.
+- 所有代表团地址都可以随时提交投票以更新其
+   dCERT 小组的首选代表。
+- 首选表示可以在地址之间任意分割(例如 50%
+   约翰，25% 给莎莉，25% 给卡罗尔)
+- 要将新成员添加到 dCERT 组，他们必须
+   发送接受他们承认的交易，此时有效
+   他们的录取有待确认。
+    - 将成员添加到 dCERT 组时会分配一个序列号。
+     如果成员离开 dCERT 组然后重新进入，一个新的序列号
+     被安排了。
+- 控制最大数量的首选表示的地址是
+   有资格加入 dCERT 组(最多 _dCERT 成员的最大数量_)。
+   如果 dCERT 组已满并且新成员被接纳，则现有的
+   得票最低的 dCERT 成员将被踢出 dCERT 小组。
+    - 在 dCERT 组已满但竞争候选人的分裂情况下
+     拥有与现有 dCERT 成员相同的票数，现有的
+     会员应保持其地位。
+    - 在必须有人被踢出但两人被踢出的分裂情况下
+     票数最少的地址拥有相同的票数，
+     具有最小序列号的地址保持其位置。
+- 可以选择性地包括稳定期以减少
+   dCERT 成员尾部成员的“翻转”。如果稳定
+   提供大于 0 的周期，当成员因以下原因被踢出时
+   支持不足，会创建一个队列条目来记录哪个成员是
+   替换哪个其他成员。当这个条目在队列中时，没有新条目
+   可以踢同一个 dCERT 成员。当条目在
+   稳定期的持续时间，新成员被实例化，旧成员被实例化
+   成员踢。
 
-### Staking/Slashing
+### 放样/削减
 
-All members of the dCERT group must stake tokens _specifically_ to maintain
-eligibility as a dCERT member. These tokens can be staked directly by the vying
-dCERT member or out of the good will of a 3rd party (who shall gain no on-chain
-benefits for doing so). This staking mechanism should use the existing global
-unbonding time of tokens staked for network validator security. A dCERT member
-can _only be_ a member if it has the required tokens staked under this
-mechanism. If those tokens are unbonded then the dCERT member must be
-automatically kicked from the group.  
+dCERT 组的所有成员必须_特别地_ 抵押代币以维持
+dCERT 成员资格。这些代币可以由竞争者直接抵押
+dCERT 成员或出于善意的第 3 方(不得获得链上
+这样做的好处)。这种抵押机制应该使用现有的全球
+为网络验证器安全而抵押的代币的解绑时间。 dCERT 成员
+_only 可以是_一个成员，前提是它在此下抵押了所需的代币
+机制。如果这些代币未绑定，则 dCERT 成员必须是
+自动踢出群。
 
-Slashing of a particular dCERT member due to soft-contract breach should be
-performed by governance on a per member basis based on the magnitude of the
-breach.  The process flow is anticipated to be that a dCERT member is suspended
-by the dCERT group prior to being slashed by governance.  
+因违反软合同而裁减特定 dCERT 成员应
+由治理基于每个成员的规模执行
+违反。流程预计是 dCERT 成员被暂停
+在被治理削减之前由 dCERT 小组执行。
 
-Membership suspension by the dCERT group takes place through a voting procedure
-by the dCERT group members. After this suspension has taken place, a governance
-proposal to slash the dCERT member must be submitted, if the proposal is not
-approved by the time the rescinding member has completed unbonding their
-tokens, then the tokens are no longer staked and unable to be slashed.
+dCERT 小组的成员资格暂停是通过投票程序进行的
+由 dCERT 小组成员。在此暂停发生后，治理
+必须提交削减 dCERT 成员的提议，如果该提议不是
+在撤销成员完成解除其绑定时获得批准
+代币，则代币不再被质押且无法被削减。
 
-Additionally in the case of an emergency situation of a colluding and malicious
-dCERT group, the community needs the capability to disband the entire dCERT
-group and likely fully slash them. This could be achieved though a special new
-proposal type (implemented as a general governance proposal) which would halt
-the functionality of the dCERT group until the proposal was concluded. This
-special proposal type would likely need to also have a fairly large wager which
-could be slashed if the proposal creator was malicious. The reason a large
-wager should be required is because as soon as the proposal is made, the
-capability of the dCERT group to halt message routes is put on temporarily
-suspended, meaning that a malicious actor who created such a proposal could
-then potentially exploit a bug during this period of time, with no dCERT group
-capable of shutting down the exploitable message routes.
+此外，在出现串通和恶意的紧急情况时
+dCERT 小组，社区需要解散整个 dCERT 的能力
+组并可能完全削减它们。这可以通过一个特殊的新
+提案类型(作为一般治理提案实施)将停止
+dCERT 小组的功能，直到提案结束。这
+特殊提案类型可能还需要有相当大的赌注
+如果提案创建者是恶意的，则可能会被削减。大的原因
+应该要求下注是因为一旦提出建议，
+临时启用 dCERT 组停止消息路由的功能
+暂停，这意味着创建此类提案的恶意行为者可以
+然后在没有 dCERT 组的情况下可能在此期间利用错误
+能够关闭可利用的消息路由。 
 
-### dCERT membership transactions
+### dCERT 会员交易
 
-Active dCERT members
+活跃的 dCERT 成员
 
-- change of the description of the dCERT group
-- circuit break a message route
-- vote to suspend a dCERT member.
+- 更改 dCERT 组的描述
+- 断路消息路由
+- 投票暂停 dCERT 成员。
 
-Here circuit-breaking refers to the capability to disable a groups of messages,
-This could for instance mean: "disable all staking-delegation messages", or
-"disable all distribution messages". This could be accomplished by verifying
-that the message route has not been "circuit-broken" at CheckTx time (in
-`baseapp/baseapp.go`).
+这里的断路是指禁用一组消息的能力，
+例如，这可能意味着:“禁用所有质押委托消息”，或
+“禁用所有分发消息”。这可以通过验证来完成
+消息路由在 CheckTx 时间(在
+`baseapp/baseapp.go`)。
 
-"unbreaking" a circuit is anticipated only to occur during a hard fork upgrade
-meaning that no capability to unbreak a message route on a live chain is
-required.
+“不间断”电路预计只会在硬分叉升级期间发生
+这意味着无法在实时链上打开消息路由
+必需的。
 
-Note also, that if there was a problem with governance voting (for instance a
-capability to vote many times) then governance would be broken and should be
-halted with this mechanism, it would be then up to the validator set to
-coordinate and hard-fork upgrade to a patched version of the software where
-governance is re-enabled (and fixed). If the dCERT group abuses this privilege
-they should all be severely slashed.
+另请注意，如果治理投票存在问题(例如
+多次投票的能力)然后治理将被打破，应该
+使用这种机制停止，然后由验证器设置为
+协调和硬分叉升级到软件的补丁版本，其中
+重新启用(并修复)治理。如果 dCERT 组滥用此权限
+他们都应该被严厉削减。 
 
 ## Status
 
@@ -157,8 +157,8 @@ they should all be severely slashed.
 
 ### Positive
 
-- Potential to reduces the number of parties to coordinate with during an emergency
-- Reduction in possibility of disclosing sensitive information to malicious parties
+- 有可能减少紧急情况下需要协调的各方数量
+- 减少向恶意方泄露敏感信息的可能性 
 
 ### Negative
 

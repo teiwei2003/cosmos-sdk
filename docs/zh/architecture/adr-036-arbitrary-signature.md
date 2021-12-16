@@ -1,61 +1,61 @@
-# ADR 036: Arbitrary Message Signature Specification
+# ADR 036:任意消息签名规范
 
-## Changelog
+## 变更日志
 
-- 28/10/2020 - Initial draft
+- 28/10/2020 - 初稿
 
-## Authors
+##作者
 
 - Antoine Herzog (@antoineherzog)
 - Zaki Manian (@zmanian)
-- Aleksandr Bezobchuk (alexanderbez) [1]
+- 亚历山大·贝佐布丘克 (alexanderbez) [1]
 - Frojdi Dymylja (@fdymylja)
 
-## Status
+## 地位
 
-Draft
+草稿
 
-## Abstract
+## 摘要
 
-Currently, in the Cosmos SDK, there is no convention to sign arbitrary message like on Ethereum. We propose with this specification, for Cosmos SDK ecosystem, a way to sign and validate off-chain arbitrary messages.
+目前，在 Cosmos SDK 中，没有像以太坊那样签署任意消息的约定。我们在此规范中为 Cosmos SDK 生态系统提出了一种对链下任意消息进行签名和验证的方法。
 
-This specification serves the purpose of covering every use case, this means that cosmos-sdk applications developers decide how to serialize and represent `Data` to users.
+该规范旨在涵盖每个用例，这意味着 cosmos-sdk 应用程序开发人员决定如何序列化并向用户表示“数据”。
 
-## Context
+## 语境
 
-Having the ability to sign messages off-chain has proven to be a fundamental aspect of nearly any blockchain. The notion of signing messages off-chain has many added benefits such as saving on computational costs and reducing transaction throughput and overhead. Within the context of the Cosmos, some of the major applications of signing such data includes, but is not limited to, providing a cryptographic secure and verifiable means of proving validator identity and possibly associating it with some other framework or organization. In addition, having the ability to sign Cosmos messages with a Ledger or similar HSM device.
+事实证明，能够在链外签署消息已被证明是几乎所有区块链的基本方面。在链外签署消息的概念有许多额外的好处，例如节省计算成本和减少交易吞吐量和开销。在 Cosmos 的背景下，签署此类数据的一些主要应用包括但不限于提供加密安全和可验证的方式来证明验证者身份，并可能将其与其他框架或组织相关联。此外，能够使用 Ledger 或类似的 HSM 设备对 Cosmos 消息进行签名。
 
-Further context and use cases can be found in the references links.
+更多上下文和用例可以在参考链接中找到。
 
-## Decision
+## 决定
 
-The aim is being able to sign arbitrary messages, even using Ledger or similar HSM devices.
+目标是能够签署任意消息，甚至使用 Ledger 或类似的 HSM 设备。
 
-As a result signed messages should look roughly like Cosmos SDK messages but **must not** be a valid on-chain transaction. `chain-id`, `account_number` and `sequence` can all be assigned invalid values.
+因此，签名消息应该大致类似于 Cosmos SDK 消息，但**不能**是有效的链上交易。 `chain-id`、`account_number` 和 `sequence` 都可以分配无效值。
 
-Cosmos SDK 0.40 also introduces a concept of “auth_info” this can specify SIGN_MODES.
+Cosmos SDK 0.40 还引入了“auth_info”的概念，可以指定SIGN_MODES。
 
-A spec should include an `auth_info` that supports SIGN_MODE_DIRECT and SIGN_MODE_LEGACY_AMINO.
+规范应该包括一个支持 SIGN_MODE_DIRECT 和 SIGN_MODE_LEGACY_AMINO 的 `auth_info`。
 
-Create the `offchain` proto definitions, we extend the auth module with `offchain` package to offer functionalities to verify and sign offline messages.
+创建 `offchain` proto 定义，我们使用 `offchain` 包扩展 auth 模块以提供验证和签署离线消息的功能。
 
-An offchain transaction follows these rules:
+链下交易遵循以下规则:
 
-- the memo must be empty
-- nonce, sequence number must be equal to 0
-- chain-id must be equal to “”
-- fee gas must be equal to 0
-- fee amount must be an empty array
+- 备忘录必须是空的
+- nonce，序号必须等于0
+- 链 ID 必须等于“”
+- 费用gas必须等于0
+- 费用金额必须是一个空数组
 
-Verification of an offchain transaction follows the same rules as an onchain one, except for the spec differences highlighted above.
+除了上面强调的规范差异之外，链下交易的验证遵循与链上交易相同的规则。
 
-The first message added to the `offchain` package is `MsgSignData`.
+添加到 `offchain` 包的第一条消息是 `MsgSignData`。
 
-`MsgSignData` allows developers to sign arbitrary bytes valid offchain only. Where `Signer` is the account address of the signer. `Data` is arbitrary bytes which can represent `text`, `files`, `object`s. It's applications developers decision how `Data` should be deserialized, serialized and the object it can represent in their context.
+`MsgSignData` 允许开发人员仅对有效的链外字节进行签名。其中“Signer”是签名者的账户地址。 `Data` 是可以表示 `text`、`files`、`object`s 的任意字节。应用程序开发人员决定“数据”应该如何反序列化、序列化以及它可以在其上下文中表示的对象。
 
-It's applications developers decision how `Data` should be treated, by treated we mean the serialization and deserialization process and the Object `Data` should represent.
+应用程序开发人员决定如何处理“数据”，我们所处理的意思是序列化和反序列化过程以及“数据”应该代表的对象。
 
-Proto definition:
+原型定义: 
 
 ```proto
 // MsgSignData defines an arbitrary, general-purpose, off-chain message
@@ -67,7 +67,7 @@ message MsgSignData {
 }
 ```
 
-Signed MsgSignData json example:
+签名 MsgSignData json 示例: 
 
 ```json
 {
@@ -102,27 +102,26 @@ Signed MsgSignData json example:
 
 ## Consequences
 
-There is a specification on how messages, that are not meant to be broadcast to a live chain, should be formed.
+有一个关于如何形成不打算广播到实时链的消息的规范。 
 
 ### Backwards Compatibility
 
-Backwards compatibility is maintained as this is a new message spec definition.
+由于这是一个新的消息规范定义，因此保持向后兼容性。 
 
 ### Positive
 
-- A common format that can be used by multiple applications to sign and verify off-chain messages.
-- The specification is primitive which means it can cover every use case without limiting what is possible to fit inside it.
-- It gives room for other off-chain messages specifications that aim to target more specific and common use cases such as off-chain-based authN/authZ layers [2].
-
+- 一种通用格式，可被多个应用程序用于签署和验证链外消息。
+- 规范是原始的，这意味着它可以涵盖每个用例，而不会限制可能适合其中的内容。
+- 它为其他链下消息规范提供了空间，这些规范旨在针对更具体和常见的用例，例如基于链下的 authN/authZ 层 [2]。 
 ### Negative
 
-- Current proposal requires a fixed relationship between an account address and a public key.
-- Doesn't work with multisig accounts.
+- 当前的提案需要账户地址和公钥之间的固定关系。
+- 不适用于多重签名帐户。 
 
-## Further discussion
+## 进一步讨论
 
-- Regarding security in `MsgSignData`, the developer using `MsgSignData` is in charge of making the content laying in `Data` non-replayable when, and if, needed.
-- the offchain package will be further extended with extra messages that target specific use cases such as, but not limited to, authentication in applications, payment channels, L2 solutions in general.
+- 关于 `MsgSignData` 中的安全性，使用 `MsgSignData` 的开发人员负责使放置在 `Data` 中的内容在需要时不可重播。
+- 链下包将通过针对特定用例的额外消息进一步扩展，例如但不限于应用程序中的身份验证、支付渠道、一般的 L2 解决方案。 
 
 ## References
 

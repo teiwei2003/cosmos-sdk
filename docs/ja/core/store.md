@@ -1,7 +1,3 @@
-<!--
-order: 5
--->
-
 # Store
 
 A store is a data structure that holds the state of the application. {synopsis}

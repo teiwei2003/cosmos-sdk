@@ -1,9 +1,3 @@
-<!--
-order: false
-parent:
-  order: 5
--->
-
 # Running a Node, API and CLI
 
 This script contains documentation on how to run a node and interact with it.

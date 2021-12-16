@@ -1,34 +1,30 @@
-<!--
-order: 1
--->
+# 概念
 
-# Concepts
+在权益证明 (PoS) 区块链中，从交易费用中获得的奖励将支付给验证者。费用分配模块将奖励公平地分配给验证者的组成委托人。
 
-In Proof of Stake (PoS) blockchains, rewards gained from transaction fees are paid to validators. The fee distribution module fairly distributes the rewards to the validators' constituent delegators.
+奖励按周期计算。每次验证者的委托发生变化时都会更新周期，例如，当验证者收到新的委托时。
+单个验证者的奖励可以通过将委托开始前的总奖励减去当前的总奖励来计算。
+要了解更多信息，请参阅 [F1 费用分配文件](/docs/spec/fee_distribution/f1_fee_distr.pdf)。
 
-Rewards are calculated per period. The period is updated each time a validator's delegation changes, for example, when the validator receives a new delegation.
-The rewards for a single validator can then be calculated by taking the total rewards for the period before the delegation started, minus the current total rewards.
-To learn more, see the [F1 Fee Distribution paper](/docs/spec/fee_distribution/f1_fee_distr.pdf).
+当验证器被移除或验证器请求提款时，会向验证器支付佣金。
+佣金在每次“BeginBlock”操作时计算并递增，以更新累计费用金额。
 
-The commission to the validator is paid when the validator is removed or when the validator requests a withdrawal.
-The commission is calculated and incremented at every `BeginBlock` operation to update accumulated fee amounts.
+委托人变更、解除委托、提款时，分配给委托人的奖励。
+在分配奖励之前，会应用当前委托期间发生的对验证者的所有斜线。
 
-The rewards to a delegator are distributed when the delegation is changed or removed, or a withdrawal is requested.
-Before rewards are distributed, all slashes to the validator that occurred during the current delegation are applied.
+## F1 费用分配中的引用计数
 
-## Reference Counting in F1 Fee Distribution
+在 F1 费用分配中，委托人收到的奖励是在其委托撤回时计算的。此计算必须阅读奖励总和除以代币份额的条款，这些条款从他们委托时结束的时期开始，以及为提款创建的最后时期。
 
-In F1 fee distribution, the rewards a delegator receives are calculated when their delegation is withdrawn. This calculation must read the terms of the summation of rewards divided by the share of tokens from the period which they ended when they delegated, and the final period that was created for the withdrawal.
+此外，由于斜线会改变代表团将拥有的代币数量(但我们懒惰地计算，
+仅当委托人取消委托时)，我们必须在任何斜线之前/之后计算不同时期的奖励
+这发生在委托人授权和他们撤回奖励之间。因此斜线，如
+请各代表团参考以斜线事件结束的时期。
 
-Additionally, as slashes change the amount of tokens a delegation will have (but we calculate this lazily,
-only when a delegator un-delegates), we must calculate rewards in separate periods before / after any slashes
-which occurred in between when a delegator delegated and when they withdrew their rewards. Thus slashes, like
-delegations, reference the period which was ended by the slash event.
-
-All stored historical rewards records for periods which are no longer referenced by any delegations
-or any slashes can thus be safely removed, as they will never be read (future delegations and future
-slashes will always reference future periods). This is implemented by tracking a `ReferenceCount`
-along with each historical reward storage entry. Each time a new object (delegation or slash)
-is created which might need to reference the historical record, the reference count is incremented.
-Each time one object which previously needed to reference the historical record is deleted, the reference
-count is decremented. If the reference count hits zero, the historical record is deleted.
+所有已存储的历史奖励记录，不再被任何代表团引用
+或者任何斜线都可以安全地删除，因为它们永远不会被读取(未来的代表团和未来的
+斜线将始终引用未来的时期)。这是通过跟踪一个“ReferenceCount”来实现的
+以及每个历史奖励存储条目。每次一个新对象(委托或斜线)
+创建可能需要引用历史记录时，引用计数会增加。
+每次删除一个先前需要引用历史记录的对象时，引用
+计数递减。如果引用计数为零，则删除历史记录。 

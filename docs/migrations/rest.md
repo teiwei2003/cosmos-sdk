@@ -1,7 +1,3 @@
-<!--
-order: 2
--->
-
 # REST Endpoints Migration
 
 Migrate to gRPC-Gateway REST endpoints. Legacy REST endpoints were marked as deprecated in v0.40 and will be removed in v0.45. {synopsis}

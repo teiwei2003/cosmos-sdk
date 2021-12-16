@@ -1,10 +1,3 @@
-<!--
-order: 0
-title: Authz Overview
-parent:
-  title: "authz"
--->
-
 # `authz`
 
 ## Contents

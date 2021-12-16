@@ -1,18 +1,14 @@
-<!--
-order: 5
--->
+#存储
 
-# Store
+存储是保存应用程序状态的数据结构。 {概要}
 
-A store is a data structure that holds the state of the application. {synopsis}
+### 先决条件阅读
 
-### Pre-requisite Readings
+- [Cosmos SDK 应用剖析](../basics/app-anatomy.md) {prereq}
 
-- [Anatomy of a Cosmos SDK application](../basics/app-anatomy.md) {prereq}
+## Cosmos SDK存储介绍
 
-## Introduction to Cosmos SDK Stores
-
-The Cosmos SDK comes with a large set of stores to persist the state of applications. By default, the main store of Cosmos SDK applications is a `multistore`, i.e. a store of stores. Developers can add any number of key-value stores to the multistore, depending on their application needs. The multistore exists to support the modularity of the Cosmos SDK, as it lets each module declare and manage their own subset of the state. Key-value stores in the multistore can only be accessed with a specific capability `key`, which is typically held in the [`keeper`](../building-modules/keeper.md) of the module that declared the store.
+Cosmos SDK 附带了大量存储来持久化应用程序的状态。 默认情况下，Cosmos SDK 应用程序的主存储是一个“multistore”，即存储的存储。 开发人员可以根据他们的应用程序需求将任意数量的键值存储添加到多存储中。 multistore 的存在是为了支持 Cosmos SDK 的模块化，因为它允许每个模块声明和管理自己的状态子集。 多存储中的键值存储只能通过特定的能力`key`访问，该能力通常保存在声明存储的模块的[`keeper`](../building-modules/keeper.md)中。 
 
 ```
 +-----------------------------------------------------+
@@ -54,204 +50,204 @@ The Cosmos SDK comes with a large set of stores to persist the state of applicat
                    Application's State
 ```
 
-### Store Interface
+###存储界面
 
-At its very core, a Cosmos SDK `store` is an object that holds a `CacheWrapper` and has a `GetStoreType()` method:
+在其核心，Cosmos SDK `store` 是一个对象，它包含一个 `CacheWrapper` 并具有一个 `GetStoreType()` 方法:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L15-L18
 
-The `GetStoreType` is a simple method that returns the type of store, whereas a `CacheWrapper` is a simple interface that implements store read caching and write branching through `Write` method:
+`GetStoreType` 是一个返回存储类型的简单方法，而一个 `CacheWrapper` 是一个简单的接口，它通过 `Write` 方法实现存储读取缓存和写入分支:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L240-L264
 
-Branching and cache is used ubiquitously in the Cosmos SDK and required to be implemented on every store type. A storage branch creates an isolated, ephemeral branch of a store that can be passed around and updated without affecting the main underlying store. This is used to trigger temporary state-transitions that may be reverted later should an error occur. Read more about it in [context](./context.md#Store-branching)
+分支和缓存在 Cosmos SDK 中无处不在，并且需要在每种存储类型上实现。一个存储分支创建一个隔离的、临时的存储分支，可以在不影响主要底层存储的情况下传递和更新。这用于触发临时状态转换，如果发生错误，可以稍后恢复。在 [context](./context.md#Store-branching) 中阅读更多相关信息
 
-### Commit Store
+### 提交存储
 
-A commit store is a store that has the ability to commit changes made to the underlying tree or db. The Cosmos SDK differentiates simple stores from commit stores by extending the basic store interfaces with a `Committer`:
+提交存储是一种能够提交对底层树或数据库所做更改的存储。 Cosmos SDK 通过使用 `Committer` 扩展基本存储接口来区分简单存储和提交存储:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L29-L33
 
-The `Committer` is an interface that defines methods to persist changes to disk:
+`Committer` 是一个接口，它定义了将更改持久化到磁盘的方法:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L20-L27
 
-The `CommitID` is a deterministic commit of the state tree. Its hash is returned to the underlying consensus engine and stored in the block header. Note that commit store interfaces exist for various purposes, one of which is to make sure not every object can commit the store. As part of the [object-capabilities model](./ocap.md) of the Cosmos SDK, only `baseapp` should have the ability to commit stores. For example, this is the reason why the `ctx.KVStore()` method by which modules typically access stores returns a `KVStore` and not a `CommitKVStore`.
+`CommitID` 是状态树的确定性提交。它的哈希值返回到底层的共识引擎并存储在块头中。请注意，提交存储接口有多种用途，其中之一是确保不是每个对象都可以提交存储。作为 Cosmos SDK 的 [object-capabilities 模型](./ocap.md) 的一部分，只有 `baseapp` 应该具有提交存储的能力。例如，这就是为什么模块通常用来访问存储的 `ctx.KVStore()` 方法返回一个 `KVStore` 而不是 `CommitKVStore` 的原因。
 
-The Cosmos SDK comes with many types of stores, the most used being [`CommitMultiStore`](#multistore), [`KVStore`](#kvstore) and [`GasKv` store](#gaskv-store). [Other types of stores](#other-stores) include `Transient` and `TraceKV` stores.
+Cosmos SDK 提供了多种存储类型，最常用的是 [`CommitMultiStore`](#multistore)、[`KVStore`](#kvstore) 和 [`GasKv` store](#gaskv-store)。 [其他类型的存储](#other-stores) 包括`Transient` 和`TraceKV` 存储。
 
-## Multistore
+## 多存储
 
-### Multistore Interface
+### 多存储接口
 
-Each Cosmos SDK application holds a multistore at its root to persist its state. The multistore is a store of `KVStores` that follows the `Multistore` interface:
+每个 Cosmos SDK 应用程序都在其根部拥有一个多存储以保持其状态。 multistore 是一个遵循 `Multistore` 接口的 `KVStores` 存储:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L104-L133
 
-If tracing is enabled, then branching the multistore will firstly wrap all the underlying `KVStore` in [`TraceKv.Store`](#tracekv-store).
+如果启用了跟踪，那么分支 multistore 将首先将所有底层的 `KVStore` 包装在 [`TraceKv.Store`](#tracekv-store) 中。
 
 ### CommitMultiStore
 
-The main type of `Multistore` used in the Cosmos SDK is `CommitMultiStore`, which is an extension of the `Multistore` interface:
+Cosmos SDK 中使用的`Multistore` 的主要类型是`CommitMultiStore`，它是`Multistore` 接口的扩展:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L141-L184
 
-As for concrete implementation, the [`rootMulti.Store`] is the go-to implementation of the `CommitMultiStore` interface.
+至于具体实现，[`rootMulti.Store`] 是 `CommitMultiStore` 接口的首选实现。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/rootmulti/store.go#L43-L61
 
-The `rootMulti.Store` is a base-layer multistore built around a `db` on top of which multiple `KVStores` can be mounted, and is the default multistore store used in [`baseapp`](./baseapp.md).
+`rootMulti.Store` 是一个围绕 `db` 构建的基础层多存储，其上可以安装多个 `KVStores`，并且是 [`baseapp`](./baseapp.md) 中使用的默认多存储存储.
 
-### CacheMultiStore
+### CacheMultiStore 
 
-Whenever the `rootMulti.Store` needs to be branched, a [`cachemulti.Store`](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/store/cachemulti/store.go) is used.
+每当 `rootMulti.Store` 需要分支时，一个 [`cachemulti.Store`](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/store/cachemulti/store.go) 是用过的。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/cachemulti/store.go#L17-L28
 
-`cachemulti.Store` branches all substores (creates a virtual store for each substore) in its constructor and hold them in `Store.stores`. Moreover caches all read queries. `Store.GetKVStore()` returns the store from `Store.stores`, and `Store.Write()` recursively calls `CacheWrap.Write()` on all the substores.
+`cachemulti.Store` 在其构造函数中分支所有子存储(为每个子存储创建一个虚拟存储)并将它们保存在 `Store.stores` 中。此外缓存所有读取查询。 `Store.GetKVStore()` 从`Store.stores` 返回存储，并且`Store.Write()` 在所有子存储上递归调用`CacheWrap.Write()`。
 
-## Base-layer KVStores
+## 基础层 KVStores
 
-### `KVStore` and `CommitKVStore` Interfaces
+### `KVStore` 和 `CommitKVStore` 接口
 
-A `KVStore` is a simple key-value store used to store and retrieve data. A `CommitKVStore` is a `KVStore` that also implements a `Committer`. By default, stores mounted in `baseapp`'s main `CommitMultiStore` are `CommitKVStore`s. The `KVStore` interface is primarily used to restrict modules from accessing the committer.
+`KVStore` 是一个简单的键值存储，用于存储和检索数据。 `CommitKVStore` 是一个也实现了 `Committer` 的 `KVStore`。默认情况下，安装在`baseapp` 的主`CommitMultiStore` 中的存储是`CommitKVStore`。 `KVStore` 接口主要用于限制模块访问提交者。
 
-Individual `KVStore`s are used by modules to manage a subset of the global state. `KVStores` can be accessed by objects that hold a specific key. This `key` should only be exposed to the [`keeper`](../building-modules/keeper.md) of the module that defines the store.
+模块使用单个“KVStore”来管理全局状态的子集。 `KVStores` 可以被持有特定键的对象访问。这个`key` 应该只暴露给定义存储的模块的 [`keeper`](../building-modules/keeper.md)。
 
-`CommitKVStore`s are declared by proxy of their respective `key` and mounted on the application's [multistore](#multistore) in the [main application file](../basics/app-anatomy.md#core-application-file). In the same file, the `key` is also passed to the module's `keeper` that is responsible for managing the store.
+`CommitKVStore`s 由它们各自的 `key` 代理声明，并安装在应用程序的 [multistore](#multistore) 上的[主应用程序文件](../basics/app-anatomy.md#core-application-file )。在同一个文件中，`key` 也被传递给负责管理 store 的模块的 `keeper`。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L189-L219
 
-Apart from the traditional `Get` and `Set` methods, a `KVStore` must provide an `Iterator(start, end)` method which returns an `Iterator` object. It is used to iterate over a range of keys, typically keys that share a common prefix. Below is an example from the bank's module keeper, used to iterate over all account balances:
+除了传统的`Get` 和`Set` 方法，`KVStore` 必须提供一个`Iterator(start, end)` 方法，该方法返回一个`Iterator` 对象。它用于迭代一系列键，通常是共享公共前缀的键。以下是银行模块 keeper 的示例，用于迭代所有帐户余额:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/x/bank/keeper/view.go#L115-L134
 
-### `IAVL` Store
+### `IAVL`存储
 
-The default implementation of `KVStore` and `CommitKVStore` used in `baseapp` is the `iavl.Store`.
+`baseapp` 中使用的 `KVStore` 和 `CommitKVStore` 的默认实现是 `iavl.Store`。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/iavl/store.go#L37-L40
 
-`iavl` stores are based around an [IAVL Tree](https://github.com/tendermint/iavl), a self-balancing binary tree which guarantees that:
+`iavl`存储基于 [IAVL 树](https://github.com/tendermint/iavl)，这是一种自平衡二叉树，可保证:
 
-- `Get` and `Set` operations are O(log n), where n is the number of elements in the tree.
-- Iteration efficiently returns the sorted elements within the range.
-- Each tree version is immutable and can be retrieved even after a commit (depending on the pruning settings).
+- `Get` 和 `Set` 操作的复杂度为 O(log n)，其中 n 是树中元素的数量。
+- 迭代有效地返回范围内的排序元素。
+- 每个树版本都是不可变的，即使在提交后也可以检索(取决于修剪设置)。
 
-The documentation on the IAVL Tree is located [here](https://github.com/cosmos/iavl/blob/v0.15.0-rc5/docs/overview.md).
+关于 IAVL 树的文档位于 [此处](https://github.com/cosmos/iavl/blob/v0.15.0-rc5/docs/overview.md)。
 
-### `DbAdapter` Store
+### `DbAdapter` 存储
 
-`dbadapter.Store` is a adapter for `dbm.DB` making it fulfilling the `KVStore` interface.
+`dbadapter.Store` 是 `dbm.DB` 的适配器，使其实现 `KVStore` 接口。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/dbadapter/store.go#L13-L16
 
-`dbadapter.Store` embeds `dbm.DB`, meaning most of the `KVStore` interface functions are implemented. The other functions (mostly miscellaneous) are manually implemented. This store is primarily used within [Transient Stores](#transient-stores)
+`dbadapter.Store` 嵌入了 `dbm.DB`，这意味着大部分 `KVStore` 接口功能都已实现。其他功能(主要是杂项)是手动实现的。此存储主要用于 [Transient Stores](#transient-stores)
 
-### `Transient` Store
+### `瞬态`存储
 
-`Transient.Store` is a base-layer `KVStore` which is automatically discarded at the end of the block.
+`Transient.Store` 是一个基础层 `KVStore`，它在块的末尾被自动丢弃。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/transient/store.go#L13-L16
 
-`Transient.Store` is a `dbadapter.Store` with a `dbm.NewMemDB()`. All `KVStore` methods are reused. When `Store.Commit()` is called, a new `dbadapter.Store` is assigned, discarding previous reference and making it garbage collected.
+`Transient.Store` 是一个带有 `dbm.NewMemDB()` 的 `dbadapter.Store`。所有`KVStore` 方法都被重用。当调用`Store.Commit()` 时，会分配一个新的`dbadapter.Store`，丢弃之前的引用并使其垃圾回收。
 
-This type of store is useful to persist information that is only relevant per-block. One example would be to store parameter changes (i.e. a bool set to `true` if a parameter changed in a block).
+这种类型的存储对于保留仅与每个块相关的信息很有用。一个例子是存储参数更改(即，如果块中的参数发生更改，则将 bool 设置为“true”)。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/x/params/types/subspace.go#L20-L30
 
-Transient stores are typically accessed via the [`context`](./context.md) via the `TransientStore()` method:
+瞬态存储通常通过 [`context`](./context.md) 通过 `TransientStore()` 方法访问:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/types/context.go#L232-L235
 
-## KVStore Wrappers
+## KVStore 包装器
 
 ### CacheKVStore
 
-`cachekv.Store` is a wrapper `KVStore` which provides buffered writing / cached reading functionalities over the underlying `KVStore`.
+`cachekv.Store` 是一个包装器 `KVStore`，它在底层 `KVStore` 上提供缓冲写入/缓存读取功能。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/cachekv/store.go#L27-L34
 
-This is the type used whenever an IAVL Store needs to be branched to create an isolated store (typically when we need to mutate a state that might be reverted later).
+每当需要分支 IAVL 存储以创建隔离存储时(通常当我们需要改变可能会在以后恢复的状态时)，就会使用这种类型。
 
-#### `Get`
+#### `获取`
 
-`Store.Get()` firstly checks if `Store.cache` has an associated value with the key. If the value exists, the function returns it. If not, the function calls `Store.parent.Get()`, caches the result in `Store.cache`, and returns it.
+`Store.Get()` 首先检查 `Store.cache` 是否具有与键相关联的值。如果该值存在，则函数返回它。如果没有，该函数调用`Store.parent.Get()`，将结果缓存在`Store.cache`中，并返回它。 
 
-#### `Set`
+#### `设置`
 
-`Store.Set()` sets the key-value pair to the `Store.cache`. `cValue` has the field dirty bool which indicates whether the cached value is different from the underlying value. When `Store.Set()` caches a new pair, the `cValue.dirty` is set `true` so when `Store.Write()` is called it can be written to the underlying store.
+`Store.Set()` 将键值对设置为 `Store.cache`。 `cValue` 具有字段dirty bool，指示缓存值是否与底层值不同。当`Store.Set()`缓存一个新对时，`cValue.dirty`被设置为`true`，所以当`Store.Write()`被调用时，它可以被写入底层存储。
 
-#### `Iterator`
+#### `迭代器`
 
-`Store.Iterator()` have to traverse on both cached items and the original items. In `Store.iterator()`, two iterators are generated for each of them, and merged. `memIterator` is essentially a slice of the `KVPairs`, used for cached items. `mergeIterator` is a combination of two iterators, where traverse happens ordered on both iterators.
+`Store.Iterator()` 必须遍历缓存项和原始项。在`Store.iterator()` 中，为每个迭代器生成两个迭代器，并合并。 `memIterator` 本质上是 `KVPairs` 的一部分，用于缓存项。 `mergeIterator` 是两个迭代器的组合，遍历是在两个迭代器上有序进行的。
 
-### `GasKv` Store
+### `GasKv`存储
 
-Cosmos SDK applications use [`gas`](../basics/gas-fees.md) to track resources usage and prevent spam. [`GasKv.Store`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/gaskv/store.go) is a `KVStore` wrapper that enables automatic gas consumption each time a read or write to the store is made. It is the solution of choice to track storage usage in Cosmos SDK applications.
+Cosmos SDK 应用程序使用 [`gas`](../basics/gas-fees.md) 来跟踪资源使用情况并防止垃圾邮件。 [`GasKv.Store`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/gaskv/store.go) 是一个 `KVStore` 包装器，可以自动消耗每个 Gas读取或写入存储的时间。它是在 Cosmos SDK 应用程序中跟踪存储使用情况的首选解决方案。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/gaskv/store.go#L13-L19
 
-When methods of the parent `KVStore` are called, `GasKv.Store` automatically consumes appropriate amount of gas depending on the `Store.gasConfig`:
+当父`KVStore`的方法被调用时，`GasKv.Store`会根据`Store.gasConfig`自动消耗适量的gas:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/gas.go#L153-L162
 
-By default, all `KVStores` are wrapped in `GasKv.Stores` when retrieved. This is done in the `KVStore()` method of the [`context`](./context.md):
+默认情况下，所有 `KVStores` 在检索时都包含在 `GasKv.Stores` 中。这是在 [`context`](./context.md) 的 `KVStore()` 方法中完成的:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/types/context.go#L227-L230
 
-In this case, the default gas configuration is used:
+在这种情况下，使用默认气体配置:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/gas.go#L164-L175
 
-### `TraceKv` Store
+### `TraceKv`存储
 
-`tracekv.Store` is a wrapper `KVStore` which provides operation tracing functionalities over the underlying `KVStore`. It is applied automatically by the Cosmos SDK on all `KVStore` if tracing is enabled on the parent `MultiStore`.
+`tracekv.Store` 是一个包装器 `KVStore`，它在底层 `KVStore` 上提供操作跟踪功能。如果在父“MultiStore”上启用跟踪，Cosmos SDK 会自动在所有“KVStore”上应用它。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/tracekv/store.go#L20-L43
 
-When each `KVStore` methods are called, `tracekv.Store` automatically logs `traceOperation` to the `Store.writer`. `traceOperation.Metadata` is filled with `Store.context` when it is not nil. `TraceContext` is a `map[string]interface{}`.
+当每个 `KVStore` 方法被调用时，`tracekv.Store` 会自动将 `traceOperation` 记录到 `Store.writer`。 `traceOperation.Metadata` 填充为 `Store.context` 当它不为零时。 `TraceContext` 是一个 `map[string]interface{}`。
 
-### `Prefix` Store
+### `Prefix` 存储
 
-`prefix.Store` is a wrapper `KVStore` which provides automatic key-prefixing functionalities over the underlying `KVStore`.
+`prefix.Store` 是一个包装器 `KVStore`，它在底层的 `KVStore` 上提供自动键前缀功能。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/prefix/store.go#L15-L21
 
-When `Store.{Get, Set}()` is called, the store forwards the call to its parent, with the key prefixed with the `Store.prefix`.
+当调用`Store.{Get, Set}()` 时，存储将调用转发给其父级，键以`Store.prefix` 为前缀。
 
-When `Store.Iterator()` is called, it does not simply prefix the `Store.prefix`, since it does not work as intended. In that case, some of the elements are traversed even they are not starting with the prefix.
+当调用`Store.Iterator()` 时，它不会简单地给`Store.prefix` 加上前缀，因为它不能按预期工作。在这种情况下，即使某些元素不是以前缀开头，也会遍历它们。
 
-### `ListenKv` Store
+### `ListenKv`存储
 
-`listenkv.Store` is a wrapper `KVStore` which provides state listening capabilities over the underlying `KVStore`.
-It is applied automatically by the Cosmos SDK on any `KVStore` whose `StoreKey` is specified during state streaming configuration.
-Additional information about state streaming configuration can be found in the [store/streaming/README.md](../../store/streaming/README.md).
+`listenkv.Store` 是一个包装器 `KVStore`，它提供了对底层 `KVStore` 的状态监听功能。
+它由 Cosmos SDK 自动应用于任何在状态流配置期间指定了“StoreKey”的“KVStore”。
+有关状态流配置的其他信息可以在 [store/streaming/README.md](../../store/streaming/README.md) 中找到。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.44.1/store/listenkv/store.go#L11-L18
 
-When `KVStore.Set` or `KVStore.Delete` methods are called, `listenkv.Store` automatically writes the operations to the set of `Store.listeners`.
+当调用`KVStore.Set` 或`KVStore.Delete` 方法时，`listenkv.Store` 会自动将操作写入到`Store.listeners` 集合中。
 
-## New Store package (`store/v2`)
+## 新存储包 (`store/v2`)
 
-The SDK is in the process of transitioning to use the types listed here as the default interface for state storage. At the time of writing, these cannot be used within an application and are not directly compatible with the `CommitMultiStore` and related types.
+SDK 正在过渡到使用此处列出的类型作为状态存储的默认接口。在撰写本文时，这些无法在应用程序中使用，并且与 `CommitMultiStore` 和相关类型不直接兼容。
 
-### `BasicKVStore` interface
+### `BasicKVStore` 接口
 
-An interface providing only the basic CRUD functionality (`Get`, `Set`, `Has`, and `Delete` methods), without iteration or caching. This is used to partially expose components of a larger store, such as a `flat.Store`.
+仅提供基本 CRUD 功能(`Get`、`Set`、`Has` 和 `Delete` 方法)的接口，没有迭代或缓存。这用于部分公开较大存储的组件，例如`flat.Store`。
 
-### Flat Store
+### 平铺
 
-`flat.Store` is the new default persistent store, which internally decouples the concerns of state storage and commitment scheme. Values are stored directly in the backing key-value database (the "storage" bucket), while the value's hash is mapped in a separate store which is able to generate a cryptographic commitment (the "state commitment" bucket, implmented with `smt.Store`).
+`flat.Store` 是新的默认持久化存储，它在内部解耦了状态存储和承诺方案的关注点。值直接存储在后备键值数据库(“存储”存储桶)中，而值的哈希映射到能够生成加密承诺的单独存储(“状态承诺”存储桶，使用 `smt.存储`)。
 
-This can optionally be constructed to use different backend databases for each bucket.
+这可以选择性地构建为对每个存储桶使用不同的后端数据库。
 
-<!-- TODO: add link +++ https://github.com/cosmos/cosmos-sdk/blob/v0.44.0/store/v2/flat/store.go -->
+<!-- TODO: 添加链接 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.44.0/store/v2/flat/store.go -->
 
-### SMT Store
+### SMT存储
 
-A `BasicKVStore` which is used to partially expose functions of an underlying store (for instance, to allow access to the commitment store in `flat.Store`).
+一个 `BasicKVStore`，用于部分公开底层存储的功能(例如，允许访问 `flat.Store` 中的承诺存储)。
 
-## Next {hide}
+## 下一个 {hide}
 
-Learn about [encoding](./encoding.md) {hide}
+了解 [encoding](./encoding.md) {hide} 

@@ -1,7 +1,3 @@
-<!--
-order: 8
--->
-
 # Client
 
 ## CLI

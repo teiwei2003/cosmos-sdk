@@ -1,7 +1,3 @@
-<!--
-order: 3
--->
-
 # Query Lifecycle
 
 This document describes the lifecycle of a query in a Cosmos SDK application, from the user interface to application stores and back. {synopsis}

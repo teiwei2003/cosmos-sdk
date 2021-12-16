@@ -1,39 +1,35 @@
-<!--
-order: 6
--->
+# BeginBlocker 和 EndBlocker
 
-# BeginBlocker and EndBlocker
+`BeginBlocker` 和 `EndBlocker` 是模块开发人员可以在他们的模块中实现的可选方法。当 [`BeginBlock`](../core/baseapp.md#beginblock) 和 [`EndBlock`](../core/baseapp.md #endblock) 从底层共识引擎接收 ABCI 消息。 {概要}
 
-`BeginBlocker` and `EndBlocker` are optional methods module developers can implement in their module. They will be triggered at the beginning and at the end of each block respectively, when the [`BeginBlock`](../core/baseapp.md#beginblock) and [`EndBlock`](../core/baseapp.md#endblock) ABCI messages are received from the underlying consensus engine. {synopsis}
+## 先决条件阅读
 
-## Pre-requisite Readings
+- [模块管理器](./module-manager.md) {prereq}
 
-- [Module Manager](./module-manager.md) {prereq}
+## BeginBlocker 和 EndBlocker
 
-## BeginBlocker and EndBlocker
+`BeginBlocker` 和 `EndBlocker` 是模块开发人员向其模块添加逻辑自动执行的一种方式。这是一个应该谨慎使用的强大工具，因为复杂的自动功能可能会减慢甚至停止链条。
 
-`BeginBlocker` and `EndBlocker` are a way for module developers to add automatic execution of logic to their module. This is a powerful tool that should be used carefully, as complex automatic functions can slow down or even halt the chain.
+需要时，`BeginBlocker` 和`EndBlocker` 作为[`AppModule` 接口](./module-manager.md#appmodule) 的一部分实现。 `module.go`中实现的接口的`BeginBlock`和`EndBlock`方法一般分别遵循`BeginBlocker`和`EndBlocker`方法，通常在`abci.go`中实现。
 
-When needed, `BeginBlocker` and `EndBlocker` are implemented as part of the [`AppModule` interface](./module-manager.md#appmodule). The `BeginBlock` and `EndBlock` methods of the interface implemented in `module.go` generally defer to `BeginBlocker` and `EndBlocker` methods respectively, which are usually implemented in `abci.go`.
+`abci.go` 中 `BeginBlocker` 和 `EndBlocker` 的实际实现与 [`Msg` 服务](./msg-services.md) 的实现非常相似:
 
-The actual implementation of `BeginBlocker` and `EndBlocker` in `abci.go` are very similar to that of a [`Msg` service](./msg-services.md):
+- 他们通常使用 [`keeper`](./keeper.md) 和 [`ctx`](../core/context.md) 来检索有关最新状态的信息。
+- 如果需要，他们使用 `keeper` 和 `ctx` 来触发状态转换。
+- 如果需要，他们可以通过 `ctx` 的 `EventManager` 发出 [`events`](../core/events.md)。
 
-- They generally use the [`keeper`](./keeper.md) and [`ctx`](../core/context.md) to retrieve information about the latest state.
-- If needed, they use the `keeper` and `ctx` to trigger state-transitions.
-- If needed, they can emit [`events`](../core/events.md) via the `ctx`'s `EventManager`.
+`EndBlocker` 的一个特殊性是它可以以 [`[]abci.ValidatorUpdates`](https://tendermint.com/docs/app-dev/abci- spec.html#validatorupdate)。这是实现自定义验证器更改的首选方式。
 
-A specificity of the `EndBlocker` is that it can return validator updates to the underlying consensus engine in the form of an [`[]abci.ValidatorUpdates`](https://tendermint.com/docs/app-dev/abci-spec.html#validatorupdate). This is the preferred way to implement custom validator changes.
+开发人员可以通过模块的管理器“SetOrderBeginBlocker”/“SetOrderEndBlocker”方法定义每个应用程序模块的“BeginBlocker”/“EndBlocker”函数之间的执行顺序。有关模块管理器的更多信息，请单击 [此处](./module-manager.md#manager)。
 
-It is possible for developers to define the order of execution between the `BeginBlocker`/`EndBlocker` functions of each of their application's modules via the module's manager `SetOrderBeginBlocker`/`SetOrderEndBlocker` methods. For more on the module manager, click [here](./module-manager.md#manager).
-
-See an example implementation of `BeginBlocker` from the `distr` module:
+从 `disr` 模块查看 `BeginBlocker` 的示例实现:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/f33749263f4ecc796115ad6e789cb0f7cddf9148/x/distribution/abci.go#L14-L38
 
-and an example implementation of `EndBlocker` from the `staking` module:
+以及来自 `staking` 模块的 `EndBlocker` 的示例实现:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/f33749263f4ecc796115ad6e789cb0f7cddf9148/x/staking/abci.go#L22-L27
 
-## Next {hide}
+## 下一个 {hide}
 
-Learn about [`keeper`s](./keeper.md) {hide}
+了解 [`keeper`s](./keeper.md) {hide} 

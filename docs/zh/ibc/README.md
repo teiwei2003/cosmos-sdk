@@ -1,20 +1,14 @@
-<!--
-order: false
-parent:
-  order: 5
--->
-
 # IBC
 
-This repository contains reference documentation for the IBC protocol integration and concepts:
+此存储库包含 IBC 协议集成和概念的参考文档:
 
-1. [Overview](./overview.md)
-2. [Integration](./integration.md)
-3. [Customization](./custom.md)
-4. [Relayer](./relayer.md)
-5. [Governance Proposals](./proposals.md)
+1. [概述](./overview.md)
+2. [集成](./integration.md)
+3. [自定义](./custom.md)
+4. [中继器](./relayer.md)
+5. [治理提案](./proposals.md)
 
-**NOTE**: The IBC module has been moved to its [own repository](https://github.com/cosmos/ibc-go).
+**注意**:IBC 模块已移至其[自己的存储库](https://github.com/cosmos/ibc-go)。
 
-After reading about IBC, head on to the [Building Modules
-documentation](../building-modules/README.md) to learn more about the process of building modules.
+阅读完 IBC 后，请前往 [构建模块
+文档](../building-modules/README.md) 以了解有关构建模块过程的更多信息。 

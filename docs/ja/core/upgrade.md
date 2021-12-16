@@ -1,7 +1,3 @@
-<!--
-order: 15
--->
-
 # In-Place Store Migrations
 
 ::: warning

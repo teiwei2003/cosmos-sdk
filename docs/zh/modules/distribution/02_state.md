@@ -1,21 +1,17 @@
-<!--
-order: 2
--->
+# 状态
 
-# State
+## 费用池
 
-## FeePool
+所有用于分发的全局跟踪参数都存储在
+`费用池`。 收集奖励并添加到奖励池中
+从这里分发给验证者/委托者。
 
-All globally tracked parameters for distribution are stored within
-`FeePool`. Rewards are collected and added to the reward pool and
-distributed to validators/delegators from here.
+请注意，奖励池包含十进制硬币(`DecCoins`)以允许
+从通货膨胀等操作中获得一小部分硬币。
+当硬币从池中分配时，它们会被截断回
+`sdk.Coins` 非十进制。
 
-Note that the reward pool holds decimal coins (`DecCoins`) to allow
-for fractions of coins to be received from operations like inflation.
-When coins are distributed from the pool they are truncated back to
-`sdk.Coins` which are non-decimal.
-
-- FeePool: `0x00 -> ProtocolBuffer(FeePool)`
+- 费用池:`0x00 -> ProtocolBuffer(FeePool)` 
 
 ```go
 // coins with decimal
@@ -29,14 +25,14 @@ type DecCoin struct {
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/distribution/v1beta1/distribution.proto#L94-L101
 
-## Validator Distribution
+## 验证器分发
 
-Validator distribution information for the relevant validator is updated each time:
+相关验证器的验证器分布信息每次都会更新:
 
-1. delegation amount to a validator is updated,
-2. a validator successfully proposes a block and receives a reward,
-3. any delegator withdraws from a validator, or
-4. the validator withdraws its commission.
+1. 更新了验证者的委托数量，
+2. 验证者成功提出区块并获得奖励，
+3. 任何委托人退出验证人，或
+4. 验证者撤回其佣金。 
 
 - ValidatorDistInfo: `0x02 | ValOperatorAddrLen (1 byte) | ValOperatorAddr -> ProtocolBuffer(validatorDistribution)`
 
@@ -48,15 +44,15 @@ type ValidatorDistInfo struct {
 }
 ```
 
-## Delegation Distribution
+## 委托分发
 
-Each delegation distribution only needs to record the height at which it last
-withdrew fees. Because a delegation must withdraw fees each time it's
-properties change (aka bonded tokens etc.) its properties will remain constant
-and the delegator's _accumulation_ factor can be calculated passively knowing
-only the height of the last withdrawal and its current properties.
+每个委托分布只需要记录它最后的高度
+撤回费用。 因为代表团每次都必须撤回费用
+属性改变(又名绑定令牌等)它的属性将保持不变
+并且委托人的_accumulation_因子可以被动计算
+只有最后一次提款的高度及其当前属性。
 
-- DelegationDistInfo: `0x02 | DelegatorAddrLen (1 byte) | DelegatorAddr | ValOperatorAddrLen (1 byte) | ValOperatorAddr -> ProtocolBuffer(delegatorDist)`
+- 委托分布信息:`0x02 | DelegatorAddrLen (1 字节) | 委托人地址 | ValOperatorAddrLen (1 字节) | ValOperatorAddr -> ProtocolBuffer(delegatorDist)` 
 
 ```go
 type DelegationDistInfo struct {

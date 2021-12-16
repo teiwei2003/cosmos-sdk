@@ -1,11 +1,6 @@
-<!--
-order: 6
--->
+# 事件
 
-# Events
-
-The slashing module emits the following events:
-
+slashing 模块发出以下事件: 
 ## MsgServer
 
 ### MsgUnjail

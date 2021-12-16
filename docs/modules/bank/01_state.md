@@ -1,7 +1,3 @@
-<!--
-order: 1
--->
-
 # State
 
 The `x/bank` module keeps state of three primary objects:

@@ -1,7 +1,3 @@
-<!--
-order: 8
--->
-
 # Parameters
 
 The slashing module contains the following parameters:

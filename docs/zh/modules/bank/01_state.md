@@ -1,19 +1,15 @@
-<!--
-order: 1
--->
+# 状态
 
-# State
+`x/bank` 模块保持三个主要对象的状态:
 
-The `x/bank` module keeps state of three primary objects:
+1. 账户余额
+2. 面额元数据
+3. 所有余额的总供应量
 
-1. Account balances
-2. Denomination metadata
-3. The total supply of all balances
+此外，`x/bank` 模块保存了以下索引来管理
+上述状态:
 
-In addition, the `x/bank` module keeps the following indexes to manage the
-aforementioned state:
-
-- Supply Index: `0x0 | byte(denom) -> byte(amount)`
-- Denom Metadata Index: `0x1 | byte(denom) -> ProtocolBuffer(Metadata)`
-- Balances Index: `0x2 | byte(address length) | []byte(address) | []byte(balance.Denom) -> ProtocolBuffer(balance)`
-- Reverse Denomination to Address Index: `0x03 | byte(denom) | 0x00 | []byte(address) -> 0`
+- 供应指数:`0x0 | byte(denom) -> byte(amount)`
+- Denom 元数据索引:`0x1 | byte(denom) -> ProtocolBuffer(Metadata)`
+- 余额指数:`0x2 | 字节(地址长度)| []字节(地址)| []byte(balance.Denom) -> ProtocolBuffer(balance)`
+- 反向命名地址索引:`0x03 | 字节(denom) | 0x00 | []字节(地址)-> 0`

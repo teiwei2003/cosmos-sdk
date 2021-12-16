@@ -1,40 +1,33 @@
-<!--
-order: 0
-title: Evidence Overview
-parent:
-  title: "evidence"
--->
+# `x/证据`
 
-# `x/evidence`
+## 目录
 
-## Table of Contents
+<!-- 目录 -->
 
-<!-- TOC -->
-
-1. **[Concepts](01_concepts.md)**
-2. **[State](02_state.md)**
-3. **[Messages](03_messages.md)**
-4. **[Events](04_events.md)**
-5. **[Params](05_params.md)**
+1. **[概念](01_concepts.md)**
+2. **[状态](02_state.md)**
+3. **[消息](03_messages.md)**
+4. **[事件](04_events.md)**
+5. **[参数](05_params.md)**
 6. **[BeginBlock](06_begin_block.md)**
 
-## Abstract
+## 摘要
 
-`x/evidence` is an implementation of a Cosmos SDK module, per [ADR 009](./../../../docs/architecture/adr-009-evidence-module.md),
-that allows for the submission and handling of arbitrary evidence of misbehavior such
-as equivocation and counterfactual signing.
+`x/evidence` 是 Cosmos SDK 模块的实现，根据 [ADR 009](./../../../docs/architecture/adr-009-evidence-module.md)，
+允许提交和处理不当行为的任意证据，例如
+作为模棱两可和反事实签名。
 
-The evidence module differs from standard evidence handling which typically expects the
-underlying consensus engine, e.g. Tendermint, to automatically submit evidence when
-it is discovered by allowing clients and foreign chains to submit more complex evidence
-directly.
+证据模块不同于标准证据处理，标准证据处理通常期望
+底层共识引擎，例如Tendermint，自动提交证据时
+它是通过允许客户和外国连锁存储提交更复杂的证据来发现的
+直接地。
 
-All concrete evidence types must implement the `Evidence` interface contract. Submitted
-`Evidence` is first routed through the evidence module's `Router` in which it attempts
-to find a corresponding registered `Handler` for that specific `Evidence` type.
-Each `Evidence` type must have a `Handler` registered with the evidence module's
-keeper in order for it to be successfully routed and executed.
+所有具体的证据类型都必须实现“证据”接口契约。已提交
+`Evidence` 首先通过它尝试的证据模块的 `Router` 路由
+为该特定的“证据”类型找到相应的注册“处理程序”。
+每个 `Evidence` 类型都必须有一个注册到证据模块的`Handler`
+keeper 以使其成功路由和执行。
 
-Each corresponding handler must also fulfill the `Handler` interface contract. The
-`Handler` for a given `Evidence` type can perform any arbitrary state transitions
-such as slashing, jailing, and tombstoning.
+每个相应的处理程序还必须履行`Handler` 接口契约。这
+给定“证据”类型的“处理程序”可以执行任意状态转换
+例如砍伐、监禁和墓碑。

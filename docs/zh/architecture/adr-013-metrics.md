@@ -1,34 +1,34 @@
-# ADR 013: Observability
+# ADR 013:可观察性
 
-## Changelog
+## 变更日志
 
-- 20-01-2020: Initial Draft
+- 20-01-2020:初稿
 
-## Status
+## 地位
 
-Proposed
+建议的
 
-## Context
+## 语境
 
-Telemetry is paramount into debugging and understanding what the application is doing and how it is
-performing. We aim to expose metrics from modules and other core parts of the Cosmos SDK.
+遥测对于调试和了解应用程序正在做什么以及它是如何进行的至关重要
+表演。我们的目标是公开来自 Cosmos SDK 的模块和其他核心部分的指标。
 
-In addition, we should aim to support multiple configurable sinks that an operator may choose from.
-By default, when telemetry is enabled, the application should track and expose metrics that are
-stored in-memory. The operator may choose to enable additional sinks, where we support only
-[Prometheus](https://prometheus.io/) for now, as it's battle-tested, simple to setup, open source,
-and is rich with ecosystem tooling.
+此外，我们的目标应该是支持运营商可以选择的多个可配置接收器。
+默认情况下，启用遥测时，应用程序应跟踪和公开指标
+存储在内存中。运营商可以选择启用额外的接收器，我们只支持
+[Prometheus](https://prometheus.io/) 现在，因为它经过实战测试，设置简单，开源，
+并且拥有丰富的生态系统工具。
 
-We must also aim to integrate metrics into the Cosmos SDK in the most seamless way possible such that
-metrics may be added or removed at will and without much friction. To do this, we will use the
-[go-metrics](https://github.com/armon/go-metrics) library.
+我们还必须以最无缝的方式将指标集成到 Cosmos SDK 中，以便
+指标可以随意添加或删除，不会有太多摩擦。为此，我们将使用
+[go-metrics](https://github.com/armon/go-metrics) 库。
 
-Finally, operators may enable telemetry along with specific configuration options. If enabled, metrics
-will be exposed via `/metrics?format={text|prometheus}` via the API server.
+最后，运营商可以启用遥测以及特定的配置选项。如果启用，指标
+将通过 API 服务器通过 `/metrics?format={text|prometheus}` 公开。
 
-## Decision
+## 决定
 
-We will add an additional configuration block to `app.toml` that defines telemetry settings:
+我们将向 `app.toml` 添加一个额外的配置块，用于定义遥测设置: 
 
 ```toml
 ###############################################################################
@@ -92,12 +92,12 @@ func (m *Metrics) Gather(format string) (GatherResponse, error) {
 }
 ```
 
-In addition, `Metrics` allows us to gather the current set of metrics at any given point in time. An
-operator may also choose to send a signal, SIGUSR1, to dump and print formatted metrics to STDERR.
+此外，`Metrics` 允许我们在任何给定时间点收集当前的指标集。 一个
+操作员还可以选择发送信号 SIGUSR1 以将格式化的指标转储和打印到 STDERR。
 
-During an application's bootstrapping and construction phase, if `Telemetry.Enabled` is `true`, the
-API server will create an instance of a reference to `Metrics` object and will register a metrics
-handler accordingly.
+在应用程序的引导和构建阶段，如果“Telemetry.Enabled”为“true”，则
+API 服务器将创建一个对`Metrics` 对象的引用实例，并将注册一个指标
+相应的处理程序。 
 
 ```go
 func (s *Server) Start(cfg config.Config) error {
@@ -148,7 +148,7 @@ func (k BaseKeeper) MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins)
 
 ### Positive
 
-- Exposure into the performance and behavior of an application
+- 了解应用程序的性能和行为
 
 ### Negative
 

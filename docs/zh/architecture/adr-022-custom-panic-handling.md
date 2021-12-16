@@ -1,62 +1,61 @@
-# ADR 022: Custom BaseApp panic handling
+# ADR 022:自定义 BaseApp 恐慌处理
 
-## Changelog
+## 变更日志
 
-- 2020 Apr 24: Initial Draft
-- 2021 Sep 14: Superseded by ADR-045
+- 2020 年 4 月 24 日:初稿
+- 2021 年 9 月 14 日:被 ADR-045 取代
 
-## Status
+## 地位
 
-SUPERSEDED by ADR-045
+由 ADR-045 取代
 
-## Context
+## 语境
 
-The current implementation of BaseApp does not allow developers to write custom error handlers during panic recovery
+BaseApp 的当前实现不允许开发人员在恐慌恢复期间编写自定义错误处理程序
 [runTx()](https://github.com/cosmos/cosmos-sdk/blob/bad4ca75f58b182f600396ca350ad844c18fc80b/baseapp/baseapp.go#L539)
-method. We think that this method can be more flexible and can give Cosmos SDK users more options for customizations without
-the need to rewrite whole BaseApp. Also there's one special case for `sdk.ErrorOutOfGas` error handling, that case
-might be handled in a "standard" way (middleware) alongside the others.
+方法。我们认为这种方法可以更灵活，可以给 Cosmos SDK 用户更多的自定义选项，而无需
+需要重写整个 BaseApp。 `sdk.ErrorOutOfGas` 错误处理还有一种特殊情况，就是这种情况
+可能会以“标准”方式(中间件)与其他方式一起处理。
 
-We propose middleware-solution, which could help developers implement the following cases:
+我们提出了中间件解决方案，可以帮助开发者实现以下案例:
 
-* add external logging (let's say sending reports to external services like [Sentry](https://sentry.io));
-* call panic for specific error cases;
+* 添加外部日志记录(假设将报告发送到 [Sentry](https://sentry.io) 等外部服务)；
+* 针对特定错误情况调用恐慌；
 
-It will also make `OutOfGas` case and `default` case one of the middlewares.
-`Default` case wraps recovery object to an error and logs it ([example middleware implementation](#Recovery-middleware)).
+它还将使 `OutOfGas` case 和 `default` case 成为中间件之一。
+`Default` case 将恢复对象包装为错误并将其记录下来([示例中间件实现](#Recovery-middleware))。
 
-Our project has a sidecar service running alongside the blockchain node (smart contracts virtual machine). It is
-essential that node <-> sidecar connectivity stays stable for TXs processing. So when the communication breaks we need
-to crash the node and reboot it once the problem is solved. That behaviour makes node's state machine execution
-deterministic. As all keeper panics are caught by runTx's `defer()` handler, we have to adjust the BaseApp code
-in order to customize it.
-
+我们的项目有一个与区块链节点(智能合约虚拟机)一起运行的 sidecar 服务。它是
+节点 <-> sidecar 连接对于 TX 处理保持稳定至关重要。所以当沟通中断时我们需要
+使节点崩溃并在问题解决后重新启动它。该行为使节点的状态机执行
+确定性的。由于 runTx 的 `defer()` 处理程序捕获了所有 keeper 恐慌，我们必须调整 BaseApp 代码
+为了定制它。 
 ## Decision
 
 ### Design
 
 #### Overview
 
-Instead of hardcoding custom error handling into BaseApp we suggest using set of middlewares which can be customized
-externally and will allow developers use as many custom error handlers as they want. Implementation with tests
-can be found [here](https://github.com/cosmos/cosmos-sdk/pull/6053).
+我们建议使用一组可以自定义的中间件，而不是将自定义错误处理硬编码到 BaseApp 中
+外部，并允许开发人员根据需要使用任意数量的自定义错误处理程序。 通过测试实现
+可以在这里找到(https://github.com/cosmos/cosmos-sdk/pull/6053)。 
 
 #### Implementation details
 
 ##### Recovery handler
 
-New `RecoveryHandler` type added. `recoveryObj` input argument is an object returned by the standard Go function
-`recover()` from the `builtin` package.
+添加了新的“RecoveryHandler”类型。 `recoveryObj` 输入参数是标准 Go 函数返回的对象
+来自 `builtin` 包的 `recover()`。 
 
 ```go
 type RecoveryHandler func(recoveryObj interface{}) error
 ```
 
-Handler should type assert (or other methods) an object to define if object should be handled.
-`nil` should be returned if input object can't be handled by that `RecoveryHandler` (not a handler's target type).
-Not `nil` error should be returned if input object was handled and middleware chain execution should be stopped.
+处理程序应该输入断言(或其他方法)一个对象来定义是否应该处理对象。
+如果输入对象不能被那个 `RecoveryHandler`(不是处理程序的目标类型)处理，则应该返回 `nil`。
+如果处理了输入对象并且应该停止中间件链执行，则不应返回“nil”错误。
 
-An example:
+一个例子: 
 
 ```go
 func exampleErrHandler(recoveryObj interface{}) error {
@@ -71,13 +70,13 @@ func exampleErrHandler(recoveryObj interface{}) error {
 }
 ```
 
-This example breaks the application execution, but it also might enrich the error's context like the `OutOfGas` handler.
+这个例子中断了应用程序的执行，但它也可能丰富错误的上下文，如 `OutOfGas` 处理程序。
 
-##### Recovery middleware
+##### 恢复中间件
 
-We also add a middleware type (decorator). That function type wraps `RecoveryHandler` and returns the next middleware in
-execution chain and handler's `error`. Type is used to separate actual `recovery()` object handling from middleware
-chain processing.
+我们还添加了一个中间件类型(装饰器)。 该函数类型包装了 `RecoveryHandler` 并返回下一个中间件
+执行链和处理程序的“错误”。 类型用于将实际的 `recovery()` 对象处理与中间件分开
+链处理。 
 
 ```go
 type recoveryMiddleware func(recoveryObj interface{}) (recoveryMiddleware, error)
@@ -92,14 +91,13 @@ func newRecoveryMiddleware(handler RecoveryHandler, next recoveryMiddleware) rec
 }
 ```
 
-Function receives a `recoveryObj` object and returns:
+这个例子中断了应用程序的执行，但它也可能丰富错误的上下文，如 `OutOfGas` 处理程序。
 
-* (next `recoveryMiddleware`, `nil`) if object wasn't handled (not a target type) by `RecoveryHandler`;
-* (`nil`, not nil `error`) if input object was handled and other middlewares in the chain should not be executed;
-* (`nil`, `nil`) in case of invalid behavior. Panic recovery might not have been properly handled;
-this can be avoided by always using a `default` as a rightmost middleware in the chain (always returns an `error`');
+##### 恢复中间件
 
-`OutOfGas` middleware example:
+我们还添加了一个中间件类型(装饰器)。 该函数类型包装了 `RecoveryHandler` 并返回下一个中间件
+执行链和处理程序的“错误”。 类型用于将实际的 `recovery()` 对象处理与中间件分开
+链处理。 
 
 ```go
 func newOutOfGasRecoveryMiddleware(gasWanted uint64, ctx sdk.Context, next recoveryMiddleware) recoveryMiddleware {
@@ -118,7 +116,7 @@ func newOutOfGasRecoveryMiddleware(gasWanted uint64, ctx sdk.Context, next recov
 }
 ```
 
-`Default` middleware example:
+`默认` 中间件示例: 
 
 ```go
 func newDefaultRecoveryMiddleware() recoveryMiddleware {
@@ -132,9 +130,9 @@ func newDefaultRecoveryMiddleware() recoveryMiddleware {
 }
 ```
 
-##### Recovery processing
+##### 恢复处理
 
-Basic chain of middlewares processing would look like:
+中间件处理的基本链如下所示: 
 
 ```go
 func processRecovery(recoveryObj interface{}, middleware recoveryMiddleware) error {
@@ -148,12 +146,12 @@ func processRecovery(recoveryObj interface{}, middleware recoveryMiddleware) err
 }
 ```
 
-That way we can create a middleware chain which is executed from left to right, the rightmost middleware is a
-`default` handler which must return an `error`.
+这样我们就可以创建一个从左到右执行的中间件链，最右边的中间件是
+`default` 处理程序必须返回一个 `error`。
 
-##### BaseApp changes
+##### BaseApp 更改
 
-The `default` middleware chain must exist in a `BaseApp` object. `Baseapp` modifications:
+`default` 中间件链必须存在于 `BaseApp` 对象中。 `Baseapp` 修改: 
 
 ```go
 type BaseApp struct {
@@ -180,7 +178,7 @@ func (app *BaseApp) runTx(...) {
 }
 ```
 
-Developers can add their custom `RecoveryHandler`s by providing `AddRunTxRecoveryHandler` as a BaseApp option parameter to the `NewBaseapp` constructor:
+开发人员可以通过将 `AddRunTxRecoveryHandler` 作为 BaseApp 选项参数提供给 `NewBaseapp` 构造函数来添加他们的自定义 `RecoveryHandler`:
 
 ```go
 func (app *BaseApp) AddRunTxRecoveryHandler(handlers ...RecoveryHandler) {
@@ -190,27 +188,27 @@ func (app *BaseApp) AddRunTxRecoveryHandler(handlers ...RecoveryHandler) {
 }
 ```
 
-This method would prepend handlers to an existing chain.
+此方法会将处理程序添加到现有链中。 
 
 ## Consequences
 
 ### Positive
 
-- Developers of Cosmos SDK based projects can add custom panic handlers to:
-    * add error context for custom panic sources (panic inside of custom keepers);
-    * emit `panic()`: passthrough recovery object to the Tendermint core;
-    * other necessary handling;
-- Developers can use standard Cosmos SDK `BaseApp` implementation, rather that rewriting it in their projects;
-- Proposed solution doesn't break the current "standard" `runTx()` flow;
+- 基于 Cosmos SDK 的项目的开发人员可以将自定义恐慌处理程序添加到:
+     * 为自定义恐慌源添加错误上下文(自定义保持器内部的恐慌)；
+     * 发出`panic()`:将恢复对象传递给Tendermint 核心；
+     * 其他必要的处理；
+- 开发人员可以使用标准的 Cosmos SDK `BaseApp` 实现，而不是在他们的项目中重写它；
+- 提议的解决方案不会破坏当前的“标准”`runTx()` 流程； 
 
 ### Negative
 
-- Introduces changes to the execution model design.
+- 引入了对执行模型设计的更改。 
 
 ### Neutral
 
-- `OutOfGas` error handler becomes one of the middlewares;
-- Default panic handler becomes one of the middlewares;
+- `OutOfGas` 错误处理程序成为中间件之一；
+- 默认的恐慌处理程序成为中间件之一； 
 
 ## References
 

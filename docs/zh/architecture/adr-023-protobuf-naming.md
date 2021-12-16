@@ -1,263 +1,262 @@
-# ADR 023: Protocol Buffer Naming and Versioning Conventions
+# ADR 023:协议缓冲区命名和版本约定
 
-## Changelog
+## 变更日志
 
-- 2020 April 27: Initial Draft
-- 2020 August 5: Update guidelines
+- 2020 年 4 月 27 日:初稿
+- 2020 年 8 月 5 日:更新指南
 
-## Status
+## 地位
 
-Accepted
+公认
 
-## Context
+## 语境
 
-Protocol Buffers provide a basic [style guide](https://developers.google.com/protocol-buffers/docs/style)
-and [Buf](https://buf.build/docs/style-guide) builds upon that. To the
-extent possible, we want to follow industry accepted guidelines and wisdom for
-the effective usage of protobuf, deviating from those only when there is clear
-rationale for our use case.
+Protocol Buffers 提供了一个基本的[风格指南](https://developers.google.com/protocol-buffers/docs/style)
+[Buf](https://buf.build/docs/style-guide) 以此为基础。到
+在可能的情况下，我们希望遵循行业公认的准则和智慧
+protobuf 的有效使用，偏离那些只有在有明确
+我们用例的基本原理。
 
-### Adoption of `Any`
+### 采用`Any`
 
-The adoption of `google.protobuf.Any` as the recommended approach for encoding
-interface types (as opposed to `oneof`) makes package naming a central part
-of the encoding as fully-qualified message names now appear in encoded
-messages.
+采用“google.protobuf.Any”作为推荐的编码方法
+接口类型(而不是`oneof`)使包命名成为核心部分
+编码为完全限定的消息名称现在出现在编码中
+消息。
 
-### Current Directory Organization
+### 当前目录组织
 
-Thus far we have mostly followed [Buf's](https://buf.build) [DEFAULT](https://buf.build/docs/lint-checkers#default)
-recommendations, with the minor deviation of disabling [`PACKAGE_DIRECTORY_MATCH`](https://buf.build/docs/lint-checkers#file_layout)
-which although being convenient for developing code comes with the warning
-from Buf that:
+到目前为止，我们主要遵循 [Buf's](https://buf.build) [DEFAULT](https://buf.build/docs/lint-checkers#default)
+建议，禁用 [`PACKAGE_DIRECTORY_MATCH`](https://buf.build/docs/lint-checkers#file_layout) 的小偏差
+虽然方便开发代码，但带有警告
+从 Buf 说:
 
-> you will have a very bad time with many Protobuf plugins across various languages if you do not do this
+> 如果您不这样做，您将在各种语言的许多 Protobuf 插件中度过一段非常糟糕的时光
 
-### Adoption of gRPC Queries
+### 采用 gRPC 查询
 
-In [ADR 021](adr-021-protobuf-query-encoding.md), gRPC was adopted for Protobuf
-native queries. The full gRPC service path thus becomes a key part of ABCI query
-path. In the future, gRPC queries may be allowed from within persistent scripts
-by technologies such as CosmWasm and these query routes would be stored within
-script binaries.
+在[ADR 021](adr-021-protobuf-query-encoding.md)中，Protobuf采用gRPC
+本机查询。完整的 gRPC 服务路径因此成为 ABCI 查询的关键部分
+小路。将来，可能会允许在持久脚本中进行 gRPC 查询
+通过 CosmWasm 等技术，这些查询路由将存储在
+脚本二进制文件。
 
-## Decision
+## 决定
 
-The goal of this ADR is to provide thoughtful naming conventions that:
+此 ADR 的目标是提供周到的命名约定:
 
-* encourage a good user experience for when users interact directly with
-.proto files and fully-qualified protobuf names
-* balance conciseness against the possibility of either over-optimizing (making
-names too short and cryptic) or under-optimizing (just accepting bloated names
-with lots of redundant information)
+* 鼓励用户直接与之交互时的良好用户体验
+.proto 文件和完全限定的 protobuf 名称
+* 平衡简洁性与过度优化的可能性(使
+名称太短和神秘)或优化不足(只接受臃肿的名称
+有很多冗余信息)
 
-These guidelines are meant to act as a style guide for both the Cosmos SDK and
-third-party modules.
+这些指南旨在作为 Cosmos SDK 和
+第三方模块。
 
-As a starting point, we should adopt all of the [DEFAULT](https://buf.build/docs/lint-checkers#default)
-checkers in [Buf's](https://buf.build) including [`PACKAGE_DIRECTORY_MATCH`](https://buf.build/docs/lint-checkers#file_layout),
-except:
+作为起点，我们应该采用所有 [DEFAULT](https://buf.build/docs/lint-checkers#default)
+[Buf's](https://buf.build) 中的跳棋，包括 [`PACKAGE_DIRECTORY_MATCH`](https://buf.build/docs/lint-checkers#file_layout)，
+除了: 
 
 * [PACKAGE_VERSION_SUFFIX](https://buf.build/docs/lint-checkers#package_version_suffix)
 * [SERVICE_SUFFIX](https://buf.build/docs/lint-checkers#service_suffix)
 
-Further guidelines to be described below.
+将在下面描述的进一步指南。
 
-### Principles
+### 原则
 
-#### Concise and Descriptive Names
+#### 简洁和描述性的名称
 
-Names should be descriptive enough to convey their meaning and distinguish
-them from other names.
+名称应具有足够的描述性以传达其含义并区分
+他们来自其他名字。
 
-Given that we are using fully-qualifed names within
-`google.protobuf.Any` as well as within gRPC query routes, we should aim to
-keep names concise, without going overboard. The general rule of thumb should
-be if a shorter name would convey more or else the same thing, pick the shorter
-name.
+鉴于我们在其中使用了完全限定的名称
+`google.protobuf.Any` 以及在 gRPC 查询路由中，我们的目标应该是
+保持名称简洁，不要过分。一般的经验法则应该
+如果一个较短的名字会传达更多或同样的东西，选择较短的
+名称。
 
-For instance, `cosmos.bank.MsgSend` (19 bytes) conveys roughly the same information
-as `cosmos_sdk.x.bank.v1.MsgSend` (28 bytes) but is more concise.
+例如，`cosmos.bank.MsgSend`(19 字节)传达的信息大致相同
+如`cosmos_sdk.x.bank.v1.MsgSend`(28 字节)但更简洁。
 
-Such conciseness makes names both more pleasant to work with and take up less
-space within transactions and on the wire.
+这种简洁使名称更易于使用且占用更少
+交易和线上的空间。
 
-We should also resist the temptation to over-optimize, by making names
-cryptically short with abbreviations. For instance, we shouldn't try to
-reduce `cosmos.bank.MsgSend` to `csm.bk.MSnd` just to save a few bytes.
+我们还应该通过命名来抵制过度优化的诱惑
+带有缩写的神秘短。例如，我们不应该尝试
+将 `cosmos.bank.MsgSend` 减少到 `csm.bk.MSnd` 只是为了节省几个字节。
 
-The goal is to make names **_concise but not cryptic_**.
+目标是使名称 **_concise 但不神秘_**。
 
-#### Names are for Clients First
+#### 名称是为客户服务的
 
-Package and type names should be chosen for the benefit of users, not
-necessarily because of legacy concerns related to the go code-base.
+应为用户的利益选择包和类型名称，而不是
+必然是因为与 go 代码库相关的遗留问题。
 
-#### Plan for Longevity
+#### 长寿计划
 
-In the interests of long-term support, we should plan on the names we do
-choose to be in usage for a long time, so now is the opportunity to make
-the best choices for the future.
+为了长期支持，我们应该计划我们做的名字
+选择长期使用，所以现在是制造的机会
+未来的最佳选择。
 
-### Versioning
+### 版本控制
 
-#### Guidelines on Stable Package Versions
+#### 稳定包版本指南
 
-In general, schema evolution is the way to update protobuf schemas. That means that new fields,
-messages, and RPC methods are _added_ to existing schemas and old fields, messages and RPC methods
-are maintained as long as possible.
+一般来说，模式演化是更新 protobuf 模式的方式。这意味着新的领域，
+消息和 RPC 方法被_添加_到现有模式和旧字段、消息和 RPC 方法
+尽可能长时间地保持。
 
-Breaking things is often unacceptable in a blockchain scenario. For instance, immutable smart contracts
-may depend on certain data schemas on the host chain. If the host chain breaks those schemas, the smart
-contract may be irreparably broken. Even when things can be fixed (for instance in client software),
-this often comes at a high cost.
+在区块链场景中，破坏事物通常是不可接受的。例如，不可变的智能合约
+可能取决于主机链上的某些数据模式。如果宿主链破坏了这些模式，智能
+合同可能无法挽回地破裂。即使事情可以修复(例如在客户端软件中)，
+这通常需要付出高昂的代价。
 
-Instead of breaking things, we should make every effort to evolve schemas rather than just breaking them.
-[Buf](https://buf.build) breaking change detection should be used on all stable (non-alpha or beta) packages
-to prevent such breakage.
+我们不应该破坏事物，而应该尽一切努力发展模式而不是仅仅破坏它们。
+[Buf](https://buf.build) 重大变更检测应该用于所有稳定(非 alpha 或 beta)包
+以防止此类破损。
 
-With that in mind, different stable versions (i.e. `v1` or `v2`) of a package should more or less be considered
-different packages and this should be last resort approach for upgrading protobuf schemas. Scenarios where creating
-a `v2` may make sense are:
+考虑到这一点，应该或多或少地考虑包的不同稳定版本(即`v1` 或`v2`)
+不同的包，这应该是升级 protobuf 模式的最后手段。创造的场景
+`v2` 可能有意义的是:
 
-* we want to create a new module with similar functionality to an existing module and adding `v2` is the most natural
-way to do this. In that case, there are really just two different, but similar modules with different APIs.
-* we want to add a new revamped API for an existing module and it's just too cumbersome to add it to the existing package,
-so putting it in `v2` is cleaner for users. In this case, care should be made to not deprecate support for
-`v1` if it is actively used in immutable smart contracts.
+* 我们想创建一个与现有模块功能相似的新模块，添加 `v2` 是最自然的
+方法来做到这一点。在这种情况下，实际上只有两个具有不同 API 的不同但相似的模块。
+* 我们想为现有模块添加一个新的改进 API，但将其添加到现有包中太麻烦了，
+所以把它放在 `v2` 中对用户来说更干净。在这种情况下，应注意不要弃用对
+`v1` 如果它在不可变的智能合约中被积极使用。
 
-#### Guidelines on unstable (alpha and beta) package versions
+#### 不稳定(alpha 和 beta)包版本指南
 
-The following guidelines are recommended for marking packages as alpha or beta:
+建议遵循以下准则将包标记为 alpha 或 beta:
 
-* marking something as `alpha` or `beta` should be a last resort and just putting something in the
-stable package (i.e. `v1` or `v2`) should be preferred
-* a package *should* be marked as `alpha` *if and only if* there are active discussions to remove
-or significantly alter the package in the near future
-* a package *should* be marked as `beta` *if and only if* there is an active discussion to
-significantly refactor/rework the functionality in the near future but not remove it
-* modules *can and should* have types in both stable (i.e. `v1` or `v2`) and unstable (`alpha` or `beta`) packages.
+* 将某些内容标记为 `alpha` 或 `beta` 应该是最后的手段，只需将某些内容放入
+稳定包(即`v1`或`v2`)应该是首选
+* 一个包*应该*被标记为`alpha` *当且仅当*有要删除的活跃讨论
+或在不久的将来显着改变包装
+* 一个包*应该*被标记为`beta` *当且仅当*有一个积极的讨论
+在不久的将来显着重构/重新设计功能，但不会删除它
+* 模块*can 和should* 具有稳定(即`v1` 或`v2`)和不稳定(`alpha` 或`beta`)包的类型。
 
-*`alpha` and `beta` should not be used to avoid responsibility for maintaining compatibility.*
-Whenever code is released into the wild, especially on a blockchain, there is a high cost to changing things. In some
-cases, for instance with immutable smart contracts, a breaking change may be impossible to fix.
+*`alpha` 和 `beta` 不应用于避免维护兼容性的责任。*
+每当代码被发布到野外时，尤其是在区块链上，更改事物的成本很高。在一些
+例如，对于不可变的智能合约，重大更改可能无法修复。
 
-When marking something as `alpha` or `beta`, maintainers should ask the questions:
+将某些内容标记为“alpha”或“beta”时，维护人员应该提出以下问题: 
 
-* what is the cost of asking others to change their code vs the benefit of us maintaining the optionality to change it?
-* what is the plan for moving this to `v1` and how will that affect users?
+* 要求其他人更改他们的代码的成本与我们保持更改它的可选性的好处是什么？
+* 将其移至 `v1` 的计划是什么，这将如何影响用户？
 
-`alpha` or `beta` should really be used to communicate "changes are planned".
+`alpha` 或 `beta` 真的应该用于传达“计划中的更改”。
 
-As a case study, gRPC reflection is in the package `grpc.reflection.v1alpha`. It hasn't been changed since
-2017 and it is now used in other widely used software like gRPCurl. Some folks probably use it in production services
-and so if they actually went and changed the package to `grpc.reflection.v1`, some software would break and
-they probably don't want to do that... So now the `v1alpha` package is more or less the de-facto `v1`. Let's not do that.
+作为一个案例研究，gRPC 反射位于`grpc.reflection.v1alpha` 包中。从那以后就没有改变
+2017，它现在​​用于其他广泛使用的软件，如 gRPCurl。有些人可能在生产服务中使用它
+所以如果他们真的去把包改成`grpc.reflection.v1`，一些软件就会崩溃并且
+他们可能不想那样做……所以现在`v1alpha` 包或多或少是事实上的`v1`。我们不要那样做。
 
-The following are guidelines for working with non-stable packages:
+以下是使用非稳定包的指南:
 
-* [Buf's recommended version suffix](https://buf.build/docs/lint-checkers#package_version_suffix)
-(ex. `v1alpha1`) _should_ be used for non-stable packages
-* non-stable packages should generally be excluded from breaking change detection
-* immutable smart contract modules (i.e. CosmWasm) _should_ block smart contracts/persistent
-scripts from interacting with `alpha`/`beta` packages
+* [Buf推荐的版本后缀](https://buf.build/docs/lint-checkers#package_version_suffix)
+(例如`v1alpha1`)_应该_用于非稳定包
+* 不稳定的包通常应该被排除在破坏性变更检测之外
+* 不可变的智能合约模块(即 CosmWasm)_应该_阻止智能合约/持久
+与 `alpha`/`beta` 包交互的脚本
 
-#### Omit v1 suffix
+####省略v1后缀
 
-Instead of using [Buf's recommended version suffix](https://buf.build/docs/lint-checkers#package_version_suffix),
-we can omit `v1` for packages that don't actually have a second version. This
-allows for more concise names for common use cases like `cosmos.bank.Send`.
-Packages that do have a second or third version can indicate that with `.v2`
-or `.v3`.
+而不是使用 [Buf 推荐的版本后缀](https://buf.build/docs/lint-checkers#package_version_suffix)，
+对于实际上没有第二个版本的包，我们可以省略 `v1`。这
+允许为常见用例提供更简洁的名称，例如 `cosmos.bank.Send`。
+有第二个或第三个版本的包可以用`.v2`表示
+或`.v3`。
 
-### Package Naming
+### 包命名
 
-#### Adopt a short, unique top-level package name
+#### 采用简短的、唯一的顶级包名称
 
-Top-level packages should adopt a short name that is known to not collide with
-other names in common usage within the Cosmos ecosystem. In the near future, a
-registry should be created to reserve and index top-level package names used
-within the Cosmos ecosystem. Because the Cosmos SDK is intended to provide
-the top-level types for the Cosmos project, the top-level package name `cosmos`
-is recommended for usage within the Cosmos SDK instead of the longer `cosmos_sdk`.
-[ICS](https://github.com/cosmos/ics) specifications could consider a
-short top-level package like `ics23` based upon the standard number.
+顶级包应采用已知不冲突的短名称
+Cosmos 生态系统中常用的其他名称。在不久的将来，一个
+应创建注册表以保留和索引使用的顶级包名称
+在 Cosmos 生态系统中。因为 Cosmos SDK 旨在提供
+Cosmos 项目的顶级类型，顶级包名 `cosmos`
+建议在 Cosmos SDK 中使用，而不是更长的 `cosmos_sdk`。
+[ICS](https://github.com/cosmos/ics) 规范可以考虑一个
+基于标准编号的简短顶级包，如`ics23`。
 
-#### Limit sub-package depth
+#### 限制子包深度
 
-Sub-package depth should be increased with caution. Generally a single
-sub-package is needed for a module or a library. Even though `x` or `modules`
-is used in source code to denote modules, this is often unnecessary for .proto
-files as modules are the primary thing sub-packages are used for. Only items which
-are known to be used infrequently should have deep sub-package depths.
+应谨慎增加分包深度。一般是单
+模块或库需要子包。即使 `x` 或 `modules`
+在源代码中用于表示模块，这对于 .proto 来说通常是不必要的
+作为模块的文件是子包的主要用途。只有那些
+已知不常使用的应具有较深的子封装深度。
 
-For the Cosmos SDK, it is recommended that that we simply write `cosmos.bank`,
-`cosmos.gov`, etc. rather than `cosmos.x.bank`. In practice, most non-module
-types can go straight in the `cosmos` package or we can introduce a
-`cosmos.base` package if needed. Note that this naming _will not_ change
-go package names, i.e. the `cosmos.bank` protobuf package will still live in
-`x/bank`.
+对于Cosmos SDK，建议我们简单的写成`cosmos.bank`，
+`cosmos.gov` 等，而不是 `cosmos.x.bank`。在实践中，大多数非模块
+类型可以直接放在 `cosmos` 包中，或者我们可以引入一个
+如果需要，`cosmos.base` 包。注意这个命名_不会_改变
+go 包名称，即 `cosmos.bank` protobuf 包仍然存在
+`x/银行`。
 
-### Message Naming
+### 消息命名
 
-Message type names should be as concise possible without losing clarity. `sdk.Msg`
-types which are used in transactions will retain the `Msg` prefix as that provides
-helpful context.
+消息类型名称应尽可能简洁而不失清晰度。 `sdk.Msg`
+交易中使用的类型将保留 `Msg` 前缀，因为它提供
+有用的上下文。
 
-### Service and RPC Naming
+### 服务和 RPC 命名
 
-[ADR 021](adr-021-protobuf-query-encoding.md) specifies that modules should
-implement a gRPC query service. We should consider the principle of conciseness
-for query service and RPC names as these may be called from persistent script
-modules such as CosmWasm. Also, users may use these query paths from tools like
-[gRPCurl](https://github.com/fullstorydev/grpcurl). As an example, we can shorten
-`/cosmos_sdk.x.bank.v1.QueryService/QueryBalance` to
-`/cosmos.bank.Query/Balance` without losing much useful information.
+[ADR 021](adr-021-protobuf-query-encoding.md) 指定模块应该
+实现 gRPC 查询服务。我们应该考虑简洁的原则
+用于查询服务和 RPC 名称，因为它们可以从持久化脚本中调用
+CosmWasm 等模块。此外，用户可以使用这些来自工具的查询路径，例如
+[gRPCurl](https://github.com/fullstorydev/grpcurl)。例如，我们可以缩短
+`/cosmos_sdk.x.bank.v1.QueryService/QueryBalance` 到
+`/cosmos.bank.Query/Balance` 不会丢失很多有用的信息。
 
-RPC request and response types _should_ follow the `ServiceNameMethodNameRequest`/
-`ServiceNameMethodNameResponse` naming convention. i.e. for an RPC method named `Balance`
-on the `Query` service, the request and response types would be `QueryBalanceRequest`
-and `QueryBalanceResponse`. This will be more self-explanatory than `BalanceRequest`
-and `BalanceResponse`.
+RPC 请求和响应类型_应该_遵循`ServiceNameMethodNameRequest`/
+`ServiceNameMethodNameResponse` 命名约定。即对于名为“Balance”的 RPC 方法
+在 `Query` 服务上，请求和响应类型将是 `QueryBalanceRequest`
+和`QueryBalanceResponse`。这将比 `BalanceRequest` 更不言自明
+和“平衡响应”。
 
-#### Use just `Query` for the query service
+#### 只使用`Query` 作为查询服务
 
-Instead of [Buf's default service suffix recommendation](https://github.com/cosmos/cosmos-sdk/pull/6033),
-we should simply use the shorter `Query` for query services.
+而不是[Buf的默认服务后缀推荐](https://github.com/cosmos/cosmos-sdk/pull/6033)，
+我们应该简单地使用较短的 `Query` 来提供查询服务。
 
-For other types of gRPC services, we should consider sticking with Buf's
-default recommendation.
+对于其他类型的 gRPC 服务，我们应该考虑坚持使用 Buf 的
+默认推荐。 
 
-#### Omit `Get` and `Query` from query service RPC names
+#### 从查询服务RPC名称中省略`Get`和`Query`
 
-`Get` and `Query` should be omitted from `Query` service names because they are
-redundant in the fully-qualified name. For instance, `/cosmos.bank.Query/QueryBalance`
-just says `Query` twice without any new information.
+`Query` 服务名称中应该省略 `Get` 和 `Query`，因为它们是
+在完全限定的名称中是多余的。 例如，`/cosmos.bank.Query/QueryBalance`
+只是说“查询”两次，没有任何新信息。
 
-## Future Improvements
+## 未来的改进
 
-A registry of top-level package names should be created to coordinate naming
-across the ecosystem, prevent collisions, and also help developers discover
-useful schemas. A simple starting point would be a git repository with
-community-based governance.
-
+应创建顶级包名称的注册表以协调命名
+跨生态，防止冲突，也帮助开发者发现
+有用的模式。 一个简单的起点是一个 git 存储库
+基于社区的治理。 
 ## Consequences
 
 ### Positive
 
-* names will be more concise and easier to read and type
-* all transactions using `Any` will be at shorter (`_sdk.x` and `.v1` will be removed)
-* `.proto` file imports will be more standard (without `"third_party/proto"` in
-the path)
-* code generation will be easier for clients because .proto files will be
-in a single `proto/` directory which can be copied rather than scattered
-throughout the Cosmos SDK
+*名称将更简洁，更易于阅读和输入
+* 所有使用 `Any` 的交易都将缩短(`_sdk.x` 和 `.v1` 将被删除)
+* `.proto` 文件导入将更加标准(没有 `"third_party/proto"` 在
+路径)
+* 客户端的代码生成将更容易，因为 .proto 文件将是
+在单个 `proto/` 目录中，可以复制而不是分散
+整个 Cosmos SDK 
 
 ### Negative
 
 ### Neutral
 
-* `.proto`  files will need to be reorganized and refactored
-* some modules may need to be marked as alpha or beta
+* `.proto` 文件需要重新组织和重构
+* 某些模块可能需要标记为 alpha 或 beta 
 
 ## References

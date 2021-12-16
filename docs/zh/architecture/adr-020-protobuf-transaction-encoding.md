@@ -1,61 +1,62 @@
-# ADR 020: Protocol Buffer Transaction Encoding
+# ADR 020:协议缓冲区事务编码
 
-## Changelog
+## 变更日志
 
-- 2020 March 06: Initial Draft
-- 2020 March 12: API Updates
-- 2020 April 13: Added details on interface `oneof` handling
-- 2020 April 30: Switch to `Any`
-- 2020 May 14: Describe public key encoding
-- 2020 June 08: Store `TxBody` and `AuthInfo` as bytes in `SignDoc`; Document `TxRaw` as broadcast and storage type.
-- 2020 August 07: Use ADR 027 for serializing `SignDoc`.
-- 2020 August 19: Move sequence field from `SignDoc` to `SignerInfo`, as discussed in [#6966](https://github.com/cosmos/cosmos-sdk/issues/6966).
-- 2020 September 25: Remove `PublicKey` type in favor of `secp256k1.PubKey`, `ed25519.PubKey` and `multisig.LegacyAminoPubKey`.
-- 2020 October 15: Add `GetAccount` and `GetAccountWithHeight` methods to the `AccountRetriever` interface.
-- 2021 Feb 24: The Cosmos SDK does not use Tendermint's `PubKey` interface anymore, but its own `cryptotypes.PubKey`. Updates to reflect this.
-- 2021 May 3: Rename `clientCtx.JSONMarshaler` to `clientCtx.JSONCodec`.
-- 2021 June 10: Add `clientCtx.Codec: codec.Codec`.
+- 2020 年 3 月 6 日:初稿
+- 2020 年 3 月 12 日:API 更新
+- 2020 年 4 月 13 日:添加了有关“oneof”接口处理的详细信息
+- 2020 年 4 月 30 日:切换到“任何”
+- 2020 年 5 月 14 日:描述公钥编码
+- 2020 年 6 月 8 日:将“TxBody”和“AuthInfo”作为字节存储在“SignDoc”中；文档“TxRaw”作为广播和存储类型。
+- 2020 年 8 月 7 日:使用 ADR 027 序列化 `SignDoc`。
+- 2020 年 8 月 19 日:将序列字段从 `SignDoc` 移动到 `SignerInfo`，如 [#6966](https://github.com/cosmos/cosmos-sdk/issues/6966) 中所述。
+- 2020 年 9 月 25 日:删除“PublicKey”类型，取而代之的是“secp256k1.PubKey”、“ed25519.PubKey”和“multisig.LegacyAminoPubKey”。
+- 2020 年 10 月 15 日:向“AccountRetriever”接口添加“GetAccount”和“GetAccountWithHeight”方法。
+- 2021 年 2 月 24 日:Cosmos SDK 不再使用 Tendermint 的 `PubKey` 接口，而是使用它自己的 `cryptotypes.PubKey`。更新以反映这一点。
+- 2021 年 5 月 3 日:将 `clientCtx.JSONMarshaler` 重命名为 `clientCtx.JSONCodec`。
+- 2021 年 6 月 10 日:添加`clientCtx.Codec: codec.Codec`。
 
-## Status
+## 地位
 
-Accepted
+公认
 
-## Context
+## 语境
 
-This ADR is a continuation of the motivation, design, and context established in
-[ADR 019](./adr-019-protobuf-state-encoding.md), namely, we aim to design the
-Protocol Buffer migration path for the client-side of the Cosmos SDK.
+该 ADR 是在
+[ADR 019](./adr-019-protobuf-state-encoding.md)，即我们的目标是设计
+Cosmos SDK 客户端的协议缓冲区迁移路径。
 
-Specifically, the client-side migration path primarily includes tx generation and
-signing, message construction and routing, in addition to CLI & REST handlers and
-business logic (i.e. queriers).
+具体来说，客户端迁移路径主要包括 tx 生成和
+签名、消息构建和路由，以及 CLI 和 REST 处理程序和
+业务逻辑(即查询器)。
 
-With this in mind, we will tackle the migration path via two main areas, txs and
-querying. However, this ADR solely focuses on transactions. Querying should be
-addressed in a future ADR, but it should build off of these proposals.
+考虑到这一点，我们将通过两个主要领域来处理迁移路径，txs 和
+查询。但是，此 ADR 仅关注交易。查询应该是
+在未来的 ADR 中解决，但它应该建立在这些建议的基础上。
 
-Based on detailed discussions ([\#6030](https://github.com/cosmos/cosmos-sdk/issues/6030)
-and [\#6078](https://github.com/cosmos/cosmos-sdk/issues/6078)), the original
-design for transactions was changed substantially from an `oneof` /JSON-signing
-approach to the approach described below.
+基于详细讨论 ([\#6030](https://github.com/cosmos/cosmos-sdk/issues/6030)
+和 [\#6078](https://github.com/cosmos/cosmos-sdk/issues/6078))，原始
+交易的设计从`oneof` / JSON-signing 发生了很大变化
+下面描述的方法的方法。
 
-## Decision
+## 决定
 
-### Transactions
+### 交易
 
-Since interface values are encoded with `google.protobuf.Any` in state (see [ADR 019](adr-019-protobuf-state-encoding.md)),
-`sdk.Msg`s are encoding with `Any` in transactions.
+由于接口值在 state 中使用 `google.protobuf.Any` 进行编码(参见 [ADR 019](adr-019-protobuf-state-encoding.md))，
+`sdk.Msg`s 在交易中使用 `Any` 进行编码。
 
-One of the main goals of using `Any` to encode interface values is to have a
-core set of types which is reused by apps so that
-clients can safely be compatible with as many chains as possible.
+使用 `Any` 来编码接口值的主要目标之一是有一个
+由应用程序重用的核心类型集，以便
+客户端可以安全地与尽可能多的链兼容。
 
-It is one of the goals of this specification to provide a flexible cross-chain transaction
-format that can serve a wide variety of use cases without breaking client
-compatibility.
+提供灵活的跨链交易是本规范的目标之一
+可以在不破坏客户端的情况下为各种用例提供​​服务的格式
+兼容性。
 
-In order to facilitate signing, transactions are separated into `TxBody`,
-which will be re-used by `SignDoc` below, and `signatures`:
+为了方便签名，交易被分成`TxBody`，
+下面的`SignDoc` 和`signatures` 将重新使用它:
+
 
 ```proto
 // types/types.proto
@@ -151,44 +152,44 @@ enum SignMode {
 }
 ```
 
-As will be discussed below, in order to include as much of the `Tx` as possible
-in the `SignDoc`, `SignerInfo` is separated from signatures so that only the
-raw signatures themselves live outside of what is signed over.
+正如下面将要讨论的，为了包含尽可能多的“Tx”
+在 `SignDoc` 中，`SignerInfo` 与签名分开，因此只有
+原始签名本身存在于已签署的内容之外。
 
-Because we are aiming for a flexible, extensible cross-chain transaction
-format, new transaction processing options should be added to `TxBody` as soon
-those use cases are discovered, even if they can't be implemented yet.
+因为我们的目标是灵活、可扩展的跨链交易
+格式，新的事务处理选项应尽快添加到`TxBody`
+这些用例被发现了，即使它们还不能实现。
 
-Because there is coordination overhead in this, `TxBody` includes an
-`extension_options` field which can be used for any transaction processing
-options that are not already covered. App developers should, nevertheless,
-attempt to upstream important improvements to `Tx`.
+因为这里有协调开销，`TxBody` 包括一个
+`extension_options` 字段，可用于任何事务处理
+尚未涵盖的选项。尽管如此，应用程序开发人员应该
+尝试上游对“Tx”的重要改进。
 
-### Signing
+### 签名
 
-All of the signing modes below aim to provide the following guarantees:
+以下所有签名模式旨在提供以下保证:
 
-- **No Malleability**: `TxBody` and `AuthInfo` cannot change once the transaction
-  is signed
-- **Predictable Gas**: if I am signing a transaction where I am paying a fee,
-  the final gas is fully dependent on what I am signing
+- **无延展性**:一旦交易，`TxBody` 和`AuthInfo` 不能改变
+  已签署
+- **可预测的气体**:如果我正在签署一项我支付费用的交易，
+  最后的gas完全取决于我签署的内容
 
-These guarantees give the maximum amount confidence to message signers that
-manipulation of `Tx`s by intermediaries can't result in any meaningful changes.
+这些保证为消息签名者提供了最大的信心
+中间人对“Tx”的操纵不会导致任何有意义的变化。
 
 #### `SIGN_MODE_DIRECT`
 
-The "direct" signing behavior is to sign the raw `TxBody` bytes as broadcast over
-the wire. This has the advantages of:
+“直接”签名行为是将原始“TxBody”字节签名为广播
+电线。这具有以下优点:
 
-- requiring the minimum additional client capabilities beyond a standard protocol
-  buffers implementation
-- leaving effectively zero holes for transaction malleability (i.e. there are no
-  subtle differences between the signing and encoding formats which could
-  potentially be exploited by an attacker)
+- 需要超出标准协议的最少附加客户端功能
+  缓冲区实现
+- 为交易延展性留下有效的零漏洞(即没有
+  签名和编码格式之间的细微差别可能
+  可能被攻击者利用)
 
-Signatures are structured using the `SignDoc` below which reuses the serialization of
-`TxBody` and `AuthInfo` and only adds the fields which are needed for signatures:
+签名使用下面的`SignDoc` 结构化，它重用了
+`TxBody` 和 `AuthInfo`，只添加签名所需的字段: 
 
 ```proto
 // types/types.proto
@@ -202,98 +203,98 @@ message SignDoc {
 }
 ```
 
-In order to sign in the default mode, clients take the following steps:
+为了以默认模式登录，客户端执行以下步骤:
 
-1. Serialize `TxBody` and `AuthInfo` using any valid protobuf implementation.
-2. Create a `SignDoc` and serialize it using [ADR 027](./adr-027-deterministic-protobuf-serialization.md).
-3. Sign the encoded `SignDoc` bytes.
-4. Build a `TxRaw` and serialize it for broadcasting.
+1. 使用任何有效的 protobuf 实现序列化 `TxBody` 和 `AuthInfo`。
+2. 创建一个 `SignDoc` 并使用 [ADR 027](./adr-027-deterministic-protobuf-serialization.md) 对其进行序列化。
+3. 对编码的`SignDoc` 字节进行签名。
+4. 构建一个 `TxRaw` 并将其序列化以进行广播。
 
-Signature verification is based on comparing the raw `TxBody` and `AuthInfo`
-bytes encoded in `TxRaw` not based on any ["canonicalization"](https://github.com/regen-network/canonical-proto3)
-algorithm which creates added complexity for clients in addition to preventing
-some forms of upgradeability (to be addressed later in this document).
+签名验证基于比较原始的“TxBody”和“AuthInfo”
+`TxRaw` 中编码的字节不基于任何 ["规范化"](https://github.com/regen-network/canonical-proto3)
+除了防止
+某些形式的可升级性(将在本文档后面讨论)。
 
-Signature verifiers do:
+签名验证者做:
 
-1. Deserialize a `TxRaw` and pull out `body` and `auth_info`.
-2. Create a list of required signer addresses from the messages.
-3. For each required signer:
-   - Pull account number and sequence from the state.
-   - Obtain the public key either from state or `AuthInfo`'s `signer_infos`.
-   - Create a `SignDoc` and serialize it using [ADR 027](./adr-027-deterministic-protobuf-serialization.md).
-   - Verify the signature at the the same list position against the serialized `SignDoc`.
+1. 反序列化一个 `TxRaw` 并拉出 `body` 和 `auth_info`。
+2. 根据消息创建所需签名者地址的列表。
+3. 对于每个需要的签名者:
+   - 从状态中提取帐号和序列。
+   - 从 state 或 `AuthInfo` 的 `signer_infos` 获取公钥。
+   - 创建一个 `SignDoc` 并使用 [ADR 027](./adr-027-deterministic-protobuf-serialization.md) 对其进行序列化。
+   - 针对序列化的“SignDoc”验证相同列表位置的签名。
 
 #### `SIGN_MODE_LEGACY_AMINO`
 
-In order to support legacy wallets and exchanges, Amino JSON will be temporarily
-supported transaction signing. Once wallets and exchanges have had a
-chance to upgrade to protobuf based signing, this option will be disabled. In
-the meantime, it is foreseen that disabling the current Amino signing would cause
-too much breakage to be feasible. Note that this is mainly a requirement of the
-Cosmos Hub and other chains may choose to disable Amino signing immediately.
+为了支持旧钱包和交易所，Amino JSON 将暂时
+支持交易签名。一旦钱包和交易所有了
+有机会升级到基于 protobuf 的签名，此选项将被禁用。在
+同时，可以预见禁用当前的 Amino 签名将导致
+太多的破损是不可行的。请注意，这主要是要求
+Cosmos Hub 和其他链可能会选择立即禁用 Amino 签名。
 
-Legacy clients will be able to sign a transaction using the current Amino
-JSON format and have it encoded to protobuf using the REST `/tx/encode`
-endpoint before broadcasting.
+旧客户将能够使用当前的 Amino 签署交易
+JSON 格式并使用 REST `/tx/encode` 将其编码为 protobuf
+广播前的端点。
 
 #### `SIGN_MODE_TEXTUAL`
 
-As was discussed extensively in [\#6078](https://github.com/cosmos/cosmos-sdk/issues/6078),
-there is a desire for a human-readable signing encoding, especially for hardware
-wallets like the [Ledger](https://www.ledger.com) which display
-transaction contents to users before signing. JSON was an attempt at this but
-falls short of the ideal.
+正如 [\#6078](https://github.com/cosmos/cosmos-sdk/issues/6078) 中广泛讨论的那样，
+需要人类可读的签名编码，尤其是硬件
+像 [Ledger](https://www.ledger.com) 这样显示的钱包
+交易内容在签署前告知用户。 JSON 是一个尝试，但是
+达不到理想。
 
-`SIGN_MODE_TEXTUAL` is intended as a placeholder for a human-readable
-encoding which will replace Amino JSON. This new encoding should be even more
-focused on readability than JSON, possibly based on formatting strings like
-[MessageFormat](http://userguide.icu-project.org/formatparse/messages).
+`SIGN_MODE_TEXTUAL` 旨在作为人类可读的占位符
+将替换氨基 JSON 的编码。这种新的编码应该更
+比 JSON 更注重可读性，可能基于格式化字符串，例如
+[消息格式](http://userguide.icu-project.org/formatparse/messages)。
 
-In order to ensure that the new human-readable format does not suffer from
-transaction malleability issues, `SIGN_MODE_TEXTUAL`
-requires that the _human-readable bytes are concatenated with the raw `SignDoc`_
-to generate sign bytes.
+为了确保新的人类可读格式不会受到
+交易延展性问题，`SIGN_MODE_TEXTUAL`
+要求将 _human-readable 字节与原始 `SignDoc`_ 连接起来
+生成符号字节。
 
-Multiple human-readable formats (maybe even localized messages) may be supported
-by `SIGN_MODE_TEXTUAL` when it is implemented.
+可能支持多种人类可读的格式(甚至可能是本地化的消息)
+在实现时通过`SIGN_MODE_TEXTUAL`。
 
-### Unknown Field Filtering
+### 未知字段过滤
 
-Unknown fields in protobuf messages should generally be rejected by transaction
-processors because:
+protobuf 消息中的未知字段通常应该被事务拒绝
+处理器，因为:
 
-- important data may be present in the unknown fields, that if ignored, will
-  cause unexpected behavior for clients
-- they present a malleability vulnerability where attackers can bloat tx size
-  by adding random uninterpreted data to unsigned content (i.e. the master `Tx`,
-  not `TxBody`)
+- 重要数据可能存在于未知字段中，如果忽略，将
+  导致客户出现意外行为
+- 他们提出了一个延展性漏洞，攻击者可以在其中膨胀 tx 大小
+  通过将随机未解释的数据添加到未签名的内容(即主“Tx”，
+  不是`TxBody`)
 
-There are also scenarios where we may choose to safely ignore unknown fields
-(https://github.com/cosmos/cosmos-sdk/issues/6078#issuecomment-624400188) to
-provide graceful forwards compatibility with newer clients.
+还有一些场景我们可以选择安全地忽略未知字段
+(https://github.com/cosmos/cosmos-sdk/issues/6078#issuecomment-624400188)到
+提供与较新客户端的优雅向前兼容性。
 
-We propose that field numbers with bit 11 set (for most use cases this is
-the range of 1024-2047) be considered non-critical fields that can safely be
-ignored if unknown.
+我们建议设置第 11 位的字段编号(对于大多数用例，这是
+1024-2047 的范围)被认为是可以安全的非关键领域
+如果未知，则忽略。
 
-To handle this we will need a unknown field filter that:
+为了解决这个问题，我们需要一个未知字段过滤器:
 
-- always rejects unknown fields in unsigned content (i.e. top-level `Tx` and
-  unsigned parts of `AuthInfo` if present based on the signing mode)
-- rejects unknown fields in all messages (including nested `Any`s) other than
-  fields with bit 11 set
+- 始终拒绝未签名内容中的未知字段(即顶级`Tx` 和
+  `AuthInfo` 的未签名部分(如果基于签名模式存在)
+- 拒绝所有消息(包括嵌套的`Any`s)中的未知字段，除了
+  设置了第 11 位的字段
 
-This will likely need to be a custom protobuf parser pass that takes message bytes
-and `FileDescriptor`s and returns a boolean result.
+这可能需要一个自定义的 protobuf 解析器传递，它接受消息字节
+和`FileDescriptor`s ​​并返回一个布尔结果。
 
-### Public Key Encoding
+### 公钥编码
 
-Public keys in the Cosmos SDK implement the `cryptotypes.PubKey` interface.
-We propose to use `Any` for protobuf encoding as we are doing with other interfaces (for example, in `BaseAccount.PubKey` and `SignerInfo.PublicKey`).
-The following public keys are implemented: secp256k1, secp256r1, ed25519 and legacy-multisignature.
+Cosmos SDK 中的公钥实现了 `cryptotypes.PubKey` 接口。
+我们建议使用 `Any` 进行 protobuf 编码，就像我们使用其他接口一样(例如，在 `BaseAccount.PubKey` 和 `SignerInfo.PublicKey` 中)。
+实现了以下公钥:secp256k1、secp256r1、ed25519 和 legacy-multisignature。
 
-Ex:
+Ex: 
 
 ```proto
 message PubKey {
@@ -301,21 +302,21 @@ message PubKey {
 }
 ```
 
-`multisig.LegacyAminoPubKey` has an array of `Any`'s member to support any
-protobuf public key type.
+`multisig.LegacyAminoPubKey` 有一个 `Any` 的成员数组来支持任何
+protobuf 公钥类型。
 
-Apps should only attempt to handle a registered set of public keys that they
-have tested. The provided signature verification ante handler decorators will
-enforce this.
+应用程序应该只尝试处理他们注册的一组公钥
+已经测试。 提供的签名验证 ante 处理程序装饰器将
+强制执行此操作。
 
-### CLI & REST
+### CLI 和 REST
 
-Currently, the REST and CLI handlers encode and decode types and txs via Amino
-JSON encoding using a concrete Amino codec. Being that some of the types dealt with
-in the client can be interfaces, similar to how we described in [ADR 019](./adr-019-protobuf-state-encoding.md),
-the client logic will now need to take a codec interface that knows not only how
-to handle all the types, but also knows how to generate transactions, signatures,
-and messages.
+目前，REST 和 CLI 处理程序通过 Amino 对类型和 txs 进行编码和解码
+使用具体的 Amino 编解码器的 JSON 编码。 由于某些类型处理
+在客户端可以是接口，类似于我们在 [ADR 019](./adr-019-protobuf-state-encoding.md) 中描述的方式，
+客户端逻辑现在需要采用一个编解码器接口，该接口不仅知道如何
+处理所有类型，但也知道如何生成交易、签名、
+和消息。 
 
 ```go
 type AccountRetriever interface {
@@ -345,13 +346,13 @@ type TxBuilder interface {
 }
 ```
 
-We then update `Context` to have new fields: `Codec`, `TxGenerator`,
-and `AccountRetriever`, and we update `AppModuleBasic.GetTxCmd` to take
-a `Context` which should have all of these fields pre-populated.
+然后我们更新 `Context` 以获得新字段:`Codec`、`TxGenerator`、
+和`AccountRetriever`，我们更新`AppModuleBasic.GetTxCmd`
+一个“上下文”，它应该预先填充所有这些字段。
 
-Each client method should then use one of the `Init` methods to re-initialize
-the pre-populated `Context`. `tx.GenerateOrBroadcastTx` can be used to
-generate or broadcast a transaction. For example:
+然后每个客户端方法应该使用“Init”方法之一来重新初始化
+预填充的“上下文”。 `tx.GenerateOrBroadcastTx` 可用于
+生成或广播交易。 例如: 
 
 ```go
 import "github.com/spf13/cobra"
@@ -373,40 +374,40 @@ func NewCmdDoSomething(clientCtx client.Context) *cobra.Command {
 
 ### `SIGN_MODE_TEXTUAL` specification
 
-A concrete specification and implementation of `SIGN_MODE_TEXTUAL` is intended
-as a near-term future improvement so that the ledger app and other wallets
-can gracefully transition away from Amino JSON.
+“SIGN_MODE_TEXTUAL”的具体规范和实现旨在
+作为近期未来的改进，以便分类帐应用程序和其他钱包
+可以优雅地从 Amino JSON 过渡。
 
 ### `SIGN_MODE_DIRECT_AUX`
 
-(\*Documented as option (3) in https://github.com/cosmos/cosmos-sdk/issues/6078#issuecomment-628026933)
+(\*在 https://github.com/cosmos/cosmos-sdk/issues/6078#issuecomment-628026933 中记录为选项(3))
 
-We could add a mode `SIGN_MODE_DIRECT_AUX`
-to support scenarios where multiple signatures
-are being gathered into a single transaction but the message composer does not
-yet know which signatures will be included in the final transaction. For instance,
-I may have a 3/5 multisig wallet and want to send a `TxBody` to all 5
-signers to see who signs first. As soon as I have 3 signatures then I will go
-ahead and build the full transaction.
+我们可以添加一个模式`SIGN_MODE_DIRECT_AUX`
+支持多个签名的场景
+正在被收集到单个事务中，但消息编辑器没有
+还知道哪些签名将包含在最终交易中。例如，
+我可能有一个 3/5 的多重签名钱包，并想向所有 5 个人发送一个“TxBody”
+签名者看谁先签名。一有3个签名我就去
+提前并建立完整的交易。
 
-With `SIGN_MODE_DIRECT`, each signer needs
-to sign the full `AuthInfo` which includes the full list of all signers and
-their signing modes, making the above scenario very hard.
+使用`SIGN_MODE_DIRECT`，每个签名者需要
+签署完整的“AuthInfo”，其中包括所有签名者的完整列表和
+他们的签名模式，使上述场景变得非常困难。
 
-`SIGN_MODE_DIRECT_AUX` would allow "auxiliary" signers to create their signature
-using only `TxBody` and their own `PublicKey`. This allows the full list of
-signers in `AuthInfo` to be delayed until signatures have been collected.
+`SIGN_MODE_DIRECT_AUX` 将允许“辅助”签名者创建他们的签名
+只使用 `TxBody` 和他们自己的 `PublicKey`。这允许完整的列表
+AuthInfo 中的签名者将被延迟，直到收集到签名。
 
-An "auxiliary" signer is any signer besides the primary signer who is paying
-the fee. For the primary signer, the full `AuthInfo` is actually needed to calculate gas and fees
-because that is dependent on how many signers and which key types and signing
-modes they are using. Auxiliary signers, however, do not need to worry about
-fees or gas and thus can just sign `TxBody`.
+“辅助”签名人是除主要签名人之外的任何签名人
+费用。对于主要签名者，实际上需要完整的 AuthInfo 来计算 gas 和费用
+因为这取决于有多少签名者以及哪些密钥类型和签名
+他们正在使用的模式。但是，辅助签名者无需担心
+费用或汽油，因此可以只签署“TxBody”。
 
-To generate a signature in `SIGN_MODE_DIRECT_AUX` these steps would be followed:
+要在“SIGN_MODE_DIRECT_AUX”中生成签名，将遵循以下步骤:
 
-1. Encode `SignDocAux` (with the same requirement that fields must be serialized
-   in order):
+1. 编码`SignDocAux`(与字段必须序列化的要求相同
+   为了): 
 
 ```proto
 // types/types.proto
@@ -430,34 +431,33 @@ message SignDocAux {
 }
 ```
 
-2. Sign the encoded `SignDocAux` bytes
-3. Send their signature and `SignerInfo` to primary signer who will then
-   sign and broadcast the final transaction (with `SIGN_MODE_DIRECT` and `AuthInfo`
-   added) once enough signatures have been collected
-
+2.对编码后的`SignDocAux`字节进行签名
+3. 将他们的签名和 `SignerInfo` 发送给主要签名者，然后他们将
+    签署并广播最终交易(使用“SIGN_MODE_DIRECT”和“AuthInfo”
+    添加)一旦收集到足够的签名 
 ### `SIGN_MODE_DIRECT_RELAXED`
 
 (_Documented as option (1)(a) in https://github.com/cosmos/cosmos-sdk/issues/6078#issuecomment-628026933_)
 
-This is a variation of `SIGN_MODE_DIRECT` where multiple signers wouldn't need to
-coordinate public keys and signing modes in advance. It would involve an alternate
-`SignDoc` similar to `SignDocAux` above with fee. This could be added in the future
-if client developers found the burden of collecting public keys and modes in advance
-too burdensome.
+这是“SIGN_MODE_DIRECT”的变体，其中多个签名者不需要
+提前协调公钥和签名模式。 这将涉及一个替代
+`SignDoc` 类似于上面的 `SignDocAux`，收费。 这可以在未来添加
+如果客户端开发者发现提前收集公钥和模式的负担
+太累赘了。 
 
 ## Consequences
 
 ### Positive
 
-- Significant performance gains.
-- Supports backward and forward type compatibility.
-- Better support for cross-language clients.
-- Multiple signing modes allow for greater protocol evolution
+- 显着的性能提升。
+- 支持向后和向前类型兼容性。
+- 更好地支持跨语言客户端。
+- 多种签名模式允许更大的协议演变 
 
 ### Negative
 
-- `google.protobuf.Any` type URLs increase transaction size although the effect
-  may be negligible or compression may be able to mitigate it.
+- `google.protobuf.Any` 类型的 URL 会增加交易规模
+   可能可以忽略不计，或者压缩可以减轻它。 
 
 ### Neutral
 

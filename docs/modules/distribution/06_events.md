@@ -1,7 +1,3 @@
-<!--
-order: 6
--->
-
 # Events
 
 The distribution module emits the following events:

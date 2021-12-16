@@ -1,28 +1,24 @@
-<!--
-order: 1
--->
+# 概念
 
-# Concepts
+## 铸币机制
 
-## The Minting Mechanism
+铸造机制旨在:
 
-The minting mechanism was designed to:
+- 允许由市场需求决定的灵活通胀率针对特定的保税股份比率
+- 在市场流动性和抵押供应之间取得平衡
 
-- allow for a flexible inflation rate determined by market demand targeting a particular bonded-stake ratio
-- effect a balance between market liquidity and staked supply
+为了最好地确定通货膨胀奖励的适当市场利率，
+使用移动变化率。移动变化率机制确保如果
+保税百分比高于或低于保税目标百分比，通货膨胀率将
+分别调整以进一步激励或不激励绑定。设定目标
+%-bonded 低于 100% 鼓励网络维护一些非抵押代币
+这应该有助于提供一些流动性。
 
-In order to best determine the appropriate market rate for inflation rewards, a
-moving change rate is used.  The moving change rate mechanism ensures that if
-the % bonded is either over or under the goal %-bonded, the inflation rate will
-adjust to further incentivize or disincentivize being bonded, respectively. Setting the goal
-%-bonded at less than 100% encourages the network to maintain some non-staked tokens
-which should help provide some liquidity.
+它可以通过以下方式分解:
 
-It can be broken down in the following way:
-
-- If the inflation rate is below the goal %-bonded the inflation rate will
-   increase until a maximum value is reached
-- If the goal % bonded (67% in Cosmos-Hub) is maintained, then the inflation
-   rate will stay constant
-- If the inflation rate is above the goal %-bonded the inflation rate will
-   decrease until a minimum value is reached
+- 如果通胀率低于目标 %-bonded 通胀率将
+   增加直到达到最大值
+- 如果维持目标百分比(在 Cosmos-Hub 中为 67%)，则通货膨胀
+   率将保持不变
+- 如果通胀率高于目标 %-bonded 通胀率将
+   减少直到达到最小值 

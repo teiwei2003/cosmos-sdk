@@ -1,16 +1,12 @@
-<!--
-order: 8
--->
+# 客户
 
-# Client
+##命令行界面
 
-## CLI
+用户可以使用 CLI 查询“分发”模块并与之交互。
 
-A user can query and interact with the `distribution` module using the CLI.
+### 询问
 
-### Query
-
-The `query` commands allow users to query `distribution` state.
+`query` 命令允许用户查询 `distribution` 状态。 
 
 ```
 simd query distribution --help
@@ -281,7 +277,7 @@ Example Output:
 
 ### ValidatorCommission
 
-The `ValidatorCommission` endpoint allows users to query accumulated commission for a validator.
+`commission` 命令允许用户按地址查询验证人佣金奖励。 
 
 Example:
 
@@ -309,7 +305,7 @@ Example Output:
 
 ### ValidatorSlashes
 
-The `ValidatorSlashes` endpoint allows users to query slash events of a validator.
+`ValidatorSlashes` 端点允许用户查询验证器的斜线事件。 
 
 Example:
 
@@ -338,7 +334,7 @@ Example Output:
 
 ### DelegationRewards
 
-The `DelegationRewards` endpoint allows users to query the total rewards accrued by a delegation.
+“DelegationRewards”端点允许用户查询委托产生的总奖励。 
 
 Example:
 
@@ -364,7 +360,7 @@ Example Output:
 
 ### DelegationTotalRewards
 
-The `DelegationTotalRewards` endpoint allows users to query the total rewards accrued by each validator.
+`DelegationTotalRewards` 端点允许用户查询每个验证器累积的总奖励。 
 
 Example:
 
@@ -401,7 +397,7 @@ Example Output:
 
 ### DelegatorValidators
 
-The `DelegatorValidators` endpoint allows users to query all validators for given delegator.
+`DelegatorValidators` 端点允许用户查询给定委托人的所有验证器。
 
 Example:
 
@@ -424,7 +420,7 @@ Example Output:
 
 ### DelegatorWithdrawAddress
 
-The `DelegatorWithdrawAddress` endpoint allows users to query the withdraw address of a delegator.
+`DelegatorWithdrawAddress` 端点允许用户查询委托人的提现地址。 
 
 Example:
 

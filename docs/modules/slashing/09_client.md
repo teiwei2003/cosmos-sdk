@@ -1,7 +1,3 @@
-<!--
-order: 9
--->
-
 # CLI
 
 A user can query and interact with the `slashing` module using the CLI.

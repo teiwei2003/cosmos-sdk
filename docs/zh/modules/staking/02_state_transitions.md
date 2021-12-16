@@ -1,176 +1,172 @@
-<!--
-order: 2
--->
+# 状态转换
 
-# State Transitions
+本文档描述了与以下相关的状态转换操作:
 
-This document describes the state transition operations pertaining to:
+1. [验证器](./02_state_transitions.md#validators)
+2. [委托](./02_state_transitions.md#delegations)
+3. [斜线](./02_state_transitions.md#slashing)
 
-1. [Validators](./02_state_transitions.md#validators)
-2. [Delegations](./02_state_transitions.md#delegations)
-3. [Slashing](./02_state_transitions.md#slashing)
+## 验证器
 
-## Validators
+验证器中的状态转换在每个 [`EndBlock`](./05_end_block.md#validator-set-changes) 上执行
+为了检查活动的“ValidatorSet”中的变化。
 
-State transitions in validators are performed on every [`EndBlock`](./05_end_block.md#validator-set-changes)
-in order to check for changes in the active `ValidatorSet`.
+验证器可以是“Unbonded”、“Unbonding”或“Bonded”。 `未绑定`
+和“Unbonding”统称为“Not Bonded”。验证者可以移动
+直接在所有状态之间，除了从“Bonded”到“Unbonded”。
 
-A validator can be `Unbonded`, `Unbonding` or `Bonded`. `Unbonded`
-and `Unbonding` are collectively called `Not Bonded`. A validator can move
-directly between all the states, except for from `Bonded` to `Unbonded`.
+### 未绑定到绑定
 
-### Not bonded to Bonded
+当验证者在 ValidatorPowerIndex 中的排名超过
+“LastValidator”的那个。
 
-The following transition occurs when a validator's ranking in the `ValidatorPowerIndex` surpasses
-that of the `LastValidator`.
+- 将 `validator.Status` 设置为 `Bonded`
+- 将 `validator.Tokens` 从 `NotBondedTokens` 发送到 `BondedPool` `ModuleAccount`
+- 从 `ValidatorByPowerIndex` 中删除现有记录
+- 向 `ValidatorByPowerIndex` 添加一条新的更新记录
+- 更新此验证器的 `Validator` 对象
+- 如果存在，删除此验证器的任何“ValidatorQueue”记录
 
-- set `validator.Status` to `Bonded`
-- send the `validator.Tokens` from the `NotBondedTokens` to the `BondedPool` `ModuleAccount`
-- delete the existing record from `ValidatorByPowerIndex`
-- add a new updated record to the `ValidatorByPowerIndex`
-- update the `Validator` object for this validator
-- if it exists, delete any `ValidatorQueue` record for this validator
+### 绑定到解绑
 
-### Bonded to Unbonding
+当验证者开始解除绑定过程时，会发生以下操作:
 
-When a validator begins the unbonding process the following operations occur:
+- 将 `validator.Tokens` 从 `BondedPool` 发送到 `NotBondedTokens` `ModuleAccount`
+- 将 `validator.Status` 设置为 `Unbonding`
+- 从 `ValidatorByPowerIndex` 中删除现有记录
+- 向 `ValidatorByPowerIndex` 添加一条新的更新记录
+- 更新此验证器的 `Validator` 对象
+- 为这个验证器在 `ValidatorQueue` 中插入一条新记录
 
-- send the `validator.Tokens` from the `BondedPool` to the `NotBondedTokens` `ModuleAccount`
-- set `validator.Status` to `Unbonding`
-- delete the existing record from `ValidatorByPowerIndex`
-- add a new updated record to the `ValidatorByPowerIndex`
-- update the `Validator` object for this validator
-- insert a new record into the `ValidatorQueue` for this validator
+### 解除绑定到解除绑定
 
-### Unbonding to Unbonded
+当“ValidatorQueue”对象出现时，验证器从解除绑定状态变为解除绑定状态
+从保税到非保税
 
-A validator moves from unbonding to unbonded when the `ValidatorQueue` object
-moves from bonded to unbonded
+- 更新此验证器的 `Validator` 对象
+- 将 `validator.Status` 设置为 `Unbonded`
 
-- update the `Validator` object for this validator
-- set `validator.Status` to `Unbonded`
+### 入狱/出狱
 
-### Jail/Unjail
+当验证者被监禁时，它实际上会从 Tendermint 集合中删除。
+这个过程也可以逆转。发生以下操作:
 
-when a validator is jailed it is effectively removed from the Tendermint set.
-this process may be also be reversed. the following operations occur:
+- 设置 `Validator.Jailed` 并更新对象
+- 如果被监禁，从`ValidatorByPowerIndex` 中删除记录
+- 如果未监禁，则将记录添加到 `ValidatorByPowerIndex`
 
-- set `Validator.Jailed` and update object
-- if jailed delete record from `ValidatorByPowerIndex`
-- if unjailed add record to `ValidatorByPowerIndex`
+被监禁的验证器不存在于以下任何存储中:
 
-Jailed validators are not present in any of the following stores:
-
-- the power store (from consensus power to address)
+- 电力存储(从共识权力到地址) 
 
 ## Delegations
 
 ### Delegate
 
-When a delegation occurs both the validator and the delegation objects are affected
+当委托发生时，验证器和委托对象都会受到影响
 
-- determine the delegators shares based on tokens delegated and the validator's exchange rate
-- remove tokens from the sending account
-- add shares the delegation object or add them to a created validator object
-- add new delegator shares and update the `Validator` object
-- transfer the `delegation.Amount` from the delegator's account to the `BondedPool` or the `NotBondedPool` `ModuleAccount` depending if the `validator.Status` is `Bonded` or not
-- delete the existing record from `ValidatorByPowerIndex`
-- add an new updated record to the `ValidatorByPowerIndex`
+- 根据委托的代币和验证者的汇率确定委托人的份额
+- 从发送帐户中删除令牌
+- 添加共享委托对象或将它们添加到创建的验证器对象
+- 添加新的委托人份额并更新`Validator`对象
+- 将`delegation.Amount`从委托人的账户转移到`BondedPool`或`NotBondedPool``ModuleAccount`，具体取决于`validator.Status`是否为`Bonded`
+- 从 `ValidatorByPowerIndex` 中删除现有记录
+- 向 `ValidatorByPowerIndex` 添加一条新的更新记录
 
-### Begin Unbonding
+### 开始解绑
 
-As a part of the Undelegate and Complete Unbonding state transitions Unbond
-Delegation may be called.
+作为 Undelegate 和 Complete Unbonding 状态转换的一部分 Unbond
+可以调用委托。
 
-- subtract the unbonded shares from delegator
-- if the validator is `Unbonding` or `Bonded` add the tokens to an `UnbondingDelegation` Entry
-- if the validator is `Unbonded` send the tokens directly to the withdraw
-  account
-- update the delegation or remove the delegation if there are no more shares
-- if the delegation is the operator of the validator and no more shares exist then trigger a jail validator
-- update the validator with removed the delegator shares and associated coins
-- if the validator state is `Bonded`, transfer the `Coins` worth of the unbonded
-  shares from the `BondedPool` to the `NotBondedPool` `ModuleAccount`
-- remove the validator if it is unbonded and there are no more delegation shares.
+- 从委托人中减去未绑定股份
+- 如果验证器是“Unbonding”或“Bonded”，则将代币添加到“UnbondingDelegation”条目中
+- 如果验证人是“Unbonded”，则将代币直接发送给提款人
+  帐户
+- 如果没有更多共享，则更新委托或删除委托
+- 如果委托是验证者的操作者并且没有更多的股份存在，则触发监狱验证者
+- 更新验证器，删除委托人股份和相关代币
+- 如果验证者状态为“Bonded”，则转移未绑定的“Coins”价值
+  从`BondedPool` 到`NotBondedPool``ModuleAccount` 的共享
+- 如果验证器未绑定并且没有更多的委托份额，则删除验证器。
 
-### Complete Unbonding
+### 完全解绑
 
-For undelegations which do not complete immediately, the following operations
-occur when the unbonding delegation queue element matures:
+对于未立即完成的取消委托，请执行以下操作
+当解除绑定委托队列元素成熟时发生:
 
-- remove the entry from the `UnbondingDelegation` object
-- transfer the tokens from the `NotBondedPool` `ModuleAccount` to the delegator `Account`
+- 从 `UnbondingDelegation` 对象中删除条目
+- 将代币从 `NotBondedPool` `ModuleAccount` 转移到委托人 `Account`
 
-### Begin Redelegation
+### 开始重新授权
 
-Redelegations affect the delegation, source and destination validators.
+重新委派会影响委派、源和目标验证器。
 
-- perform an `unbond` delegation from the source validator to retrieve the tokens worth of the unbonded shares
-- using the unbonded tokens, `Delegate` them to the destination validator
-- if the `sourceValidator.Status` is `Bonded`, and the `destinationValidator` is not,
-  transfer the newly delegated tokens from the `BondedPool` to the `NotBondedPool` `ModuleAccount`
-- otherwise, if the `sourceValidator.Status` is not `Bonded`, and the `destinationValidator`
-  is `Bonded`, transfer the newly delegated tokens from the `NotBondedPool` to the `BondedPool` `ModuleAccount`
-- record the token amount in an new entry in the relevant `Redelegation`
+- 执行来自源验证器的“unbond”委托以检索未绑定股票的代币价值
+- 使用未绑定的代币，将它们“委托”给目标验证器
+- 如果`sourceValidator.Status` 是`Bonded`，而`destinationValidator` 不是，
+  将新委托的代币从 `BondedPool` 转移到 `NotBondedPool` `ModuleAccount`
+- 否则，如果 `sourceValidator.Status` 不是 `Bonded`，并且 `destinationValidator`
+  是`Bonded`，将新委托的代币从`NotBondedPool`转移到`BondedPool``ModuleAccount`
+- 在相关“重新授权”的新条目中记录代币数量
 
-From when a redelegation begins until it completes, the delegator is in a state of "pseudo-unbonding", and can still be
-slashed for infractions that occured before the redelegation began.
+从重新授权开始到完成，被授权人处于“伪解绑”状态，并且仍然可以
+因在重新授权开始之前发生的违规行为而受到惩罚。
 
-### Complete Redelegation
+### 完成重新授权
 
-When a redelegations complete the following occurs:
+当重新授权完成时，会发生以下情况:
 
-- remove the entry from the `Redelegation` object
+- 从 `Redelegation` 对象中删除条目
 
-## Slashing
+## 削减
 
-### Slash Validator
+### 斜线验证器
 
-When a Validator is slashed, the following occurs:
+当验证器被削减时，会发生以下情况:
 
-- The total `slashAmount` is calculated as the `slashFactor` (a chain parameter) \* `TokensFromConsensusPower`,
-  the total number of tokens bonded to the validator at the time of the infraction.
-- Every unbonding delegation and pseudo-unbonding redelegation such that the infraction occured before the unbonding or
-  redelegation began from the validator are slashed by the `slashFactor` percentage of the initialBalance.
-- Each amount slashed from redelegations and unbonding delegations is subtracted from the
-  total slash amount.
-- The `remaingSlashAmount` is then slashed from the validator's tokens in the `BondedPool` or
-  `NonBondedPool` depending on the validator's status. This reduces the total supply of tokens.
+- 总`slashAmount` 计算为`slashFactor`(链参数)\* `TokensFromConsensusPower`，
+  违规时绑定到验证器的令牌总数。
+- 每次解除绑定授权和伪解除绑定重新授权，使得违规发生在解除绑定之前或
+  从验证器开始的重新授权被初始余额的“slashFactor”百分比削减。
+- 从重新授权和解除授权中削减的每一笔金额都从
+  总斜线金额。
+- 然后从 `BondedPool` 中的验证者代币中削减 `remaingSlashAmount` 或
+  `NonBondedPool` 取决于验证器的状态。这减少了代币的总供应量。
 
-In the case of a slash due to any infraction that requires evidence to submitted (for example double-sign), the slash
-occurs at the block where the evidence is included, not at the block where the infraction occured.
-Put otherwise, validators are not slashed retroactively, only when they are caught.
+如果由于任何需要提交证据的违规行为(例如双重签名)而出现斜线，则斜线
+发生在包含证据的区块，而不是发生违规的区块。
+否则，验证者不会被追溯削减，只有当他们被抓住时。
 
-### Slash Unbonding Delegation
+### 斜线解除绑定委托
 
-When a validator is slashed, so are those unbonding delegations from the validator that began unbonding
-after the time of the infraction. Every entry in every unbonding delegation from the validator
-is slashed by `slashFactor`. The amount slashed is calculated from the `InitialBalance` of the
-delegation and is capped to prevent a resulting negative balance. Completed (or mature) unbondings are not slashed.
+当验证者被削减时，那些开始解除绑定的验证者的解除绑定委托也会被削减
+违规后。来自验证者的每个解除绑定委托中的每个条目
+被“slashFactor”削减。削减的金额是根据“InitialBalance”计算的
+并设置上限以防止由此产生的负余额。完成(或成熟)的解除绑定不会被削减。
 
-### Slash Redelegation
+### 斜线重新授权
 
-When a validator is slashed, so are all redelegations from the validator that began after the
-infraction. Redelegations are slashed by `slashFactor`.
-Redelegations that began before the infraction are not slashed.
-The amount slashed is calculated from the `InitialBalance` of the delegation and is capped to
-prevent a resulting negative balance.
-Mature redelegations (that have completed pseudo-unbonding) are not slashed.
+当验证器被削减时，所有在验证器之后开始的验证器的重新授权也会被削减
+违规。重新授权被“slashFactor”削减。
+在违规之前开始的重新授权不会被削减。
+削减的金额是根据委托的“InitialBalance”计算的，上限为
+防止由此产生的负余额。
+成熟的再授权(已完成伪解除绑定)不会被削减。
 
-## How Shares are calculated
+## 如何计算份额
 
-At any given point in time, each validator has a number of tokens, `T`, and has a number of shares issued, `S`.
-Each delegator, `i`, holds a number of shares, `S_i`.
-The number of tokens is the sum of all tokens delegated to the validator, plus the rewards, minus the slashes.
+在任何给定的时间点，每个验证者都有一定数量的代币“T”，并有一定数量的已发行股份“S”。
+每个委托人‘i’持有一定数量的股份‘S_i’。
+代币的数量是委托给验证者的所有代币的总和，加上奖励，减去斜线。
 
-The delegator is entitled to a portion of the underlying tokens proportional to their proportion of shares.
-So delegator `i` is entitled to `T * S_i / S` of the validator's tokens.
+委托人有权获得与其股份比例成比例的一部分基础代币。
+因此，委托人`i` 有权获得验证人代币的`T * S_i / S`。
 
-When a delegator delegates new tokens to the validator, they receive a number of shares proportional to their contribution.
-So when delegator `j` delegates `T_j` tokens, they receive `S_j = S * T_j / T` shares.
-The total number of tokens is now `T + T_j`, and the total number of shares is `S + S_j`.
-`j`s proportion of the shares is the same as their proportion of the total tokens contributed: `(S + S_j) / S = (T + T_j) / T`.
+当委托人将新代币委托给验证人时，他们会收到与他们的贡献成正比的份额。
+因此，当委托人`j` 委托`T_j` 代币时，他们会收到`S_j = S * T_j / T` 份额。
+现在代币总数为‘T + T_j’，股份总数为‘S + S_j’。
+`j 的份额比例与其贡献的总代币的比例相同:`(S + S_j) / S = (T + T_j) / T`。
 
-A special case is the initial delegation, when `T = 0` and `S = 0`, so `T_j / T` is undefined.
-For the initial delegation, delegator `j` who delegates `T_j` tokens receive `S_j = T_j` shares.
-So a validator that hasn't received any rewards and has not been slashed will have `T = S`.
+一个特殊情况是初始委托，当`T = 0` 和`S = 0` 时，所以`T_j / T` 是未定义的。
+对于初始委托，委托“T_j”代币的委托人“j”获得“S_j = T_j”份额。
+所以一个没有收到任何奖励也没有被削减的验证者将拥有 `T = S`。 

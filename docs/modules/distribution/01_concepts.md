@@ -1,7 +1,3 @@
-<!--
-order: 1
--->
-
 # Concepts
 
 In Proof of Stake (PoS) blockchains, rewards gained from transaction fees are paid to validators. The fee distribution module fairly distributes the rewards to the validators' constituent delegators.

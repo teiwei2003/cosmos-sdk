@@ -1,37 +1,33 @@
-<!--
-order: 1
--->
+# 高级概述
 
-# High-level Overview
+## 什么是 Cosmos SDK？
 
-## What is the Cosmos SDK?
+[Cosmos SDK](https://github.com/cosmos/cosmos-sdk) 是一个开源框架，用于构建多资产公共权益证明(PoS)<df value="blockchain">区块链< /df>，如 Cosmos Hub，以及许可的权威证明 (PoA) 区块链。使用 Cosmos SDK 构建的区块链通常称为 **特定于应用程序的区块链**。
 
-The [Cosmos SDK](https://github.com/cosmos/cosmos-sdk) is an open-source framework for building multi-asset public Proof-of-Stake (PoS) <df value="blockchain">blockchains</df>, like the Cosmos Hub, as well as permissioned Proof-of-Authority (PoA) blockchains. Blockchains built with the Cosmos SDK are generally referred to as **application-specific blockchains**.
+Cosmos SDK 的目标是让开发人员能够轻松地从头开始创建可以与其他区块链进行本地互操作的自定义区块链。我们将 Cosmos SDK 设想为类似 npm 的框架，以在 [Tendermint](https://github.com/tendermint/tendermint) 之上构建安全的区块链应用程序。基于 SDK 的区块链由可组合的 [模块](../building-modules/intro.md) 构建而成，其中大部分是开源的，可供任何开发人员使用。任何人都可以为 Cosmos SDK 创建一个模块，集成已经构建的模块就像将它们导入区块链应用程序一样简单。更重要的是，Cosmos SDK 是一个基于能力的系统，它允许开发人员更好地推理模块之间交互的安全性。要更深入地了解功能，请跳转到 [Object-Capability Model](../core/ocap.md)。
 
-The goal of the Cosmos SDK is to allow developers to easily create custom blockchains from scratch that can natively interoperate with other blockchains. We envision the Cosmos SDK as the npm-like framework to build secure blockchain applications on top of [Tendermint](https://github.com/tendermint/tendermint). SDK-based blockchains are built out of composable [modules](../building-modules/intro.md), most of which are open source and readily available for any developers to use. Anyone can create a module for the Cosmos SDK, and integrating already-built modules is as simple as importing them into your blockchain application. What's more, the Cosmos SDK is a capabilities-based system that allows developers to better reason about the security of interactions between modules. For a deeper look at capabilities, jump to [Object-Capability Model](../core/ocap.md).
+## 什么是特定于应用程序的区块链？
 
-## What are Application-Specific Blockchains?
+当今区块链世界的一个开发范式是像以太坊这样的虚拟机区块链，其中开发通常围绕在现有区块链之上构建分散式应用程序作为一组智能合约。虽然智能合约对于某些用例非常有用，例如一次性应用程序(例如 ICO)，但它们通常无法构建复杂的去中心化平台。更一般地说，智能合约在灵活性、主权和性能方面可能会受到限制。
 
-One development paradigm in the blockchain world today is that of virtual-machine blockchains like Ethereum, where development generally revolves around building a decentralised applications on top of an existing blockchain as a set of smart contracts. While smart contracts can be very good for some use cases like single-use applications (e.g. ICOs), they often fall short for building complex decentralised platforms. More generally, smart contracts can be limiting in terms of flexibility, sovereignty and performance.
+特定于应用程序的区块链提供了与虚拟机区块链完全不同的开发范式。特定于应用程序的区块链是为操作单个应用程序而定制的区块链:开发人员可以完全自由地做出应用程序以最佳方式运行所需的设计决策。它们还可以提供更好的主权、安全和性能。
 
-Application-specific blockchains offer a radically different development paradigm than virtual-machine blockchains. An application-specific blockchain is a blockchain customized to operate a single application: developers have all the freedom to make the design decisions required for the application to run optimally. They can also provide better sovereignty, security and performance.
+了解有关 [特定于应用程序的区块链](./why-app-specific.md) 的更多信息。
 
-Learn more about [application-specific blockchains](./why-app-specific.md).
+## 为什么是 Cosmos SDK？
 
-## Why the Cosmos SDK?
+Cosmos SDK 是当今构建自定义应用程序特定区块链的最先进框架。以下是您可能要考虑使用 Cosmos SDK 构建分散式应用程序的几个原因:
 
-The Cosmos SDK is the most advanced framework for building custom application-specific blockchains today. Here are a few reasons why you might want to consider building your decentralised application with the Cosmos SDK:
+- Cosmos SDK 中可用的默认共识引擎是 [Tendermint Core](https://github.com/tendermint/tendermint)。 Tendermint 是现存最(也是唯一)成熟的 BFT 共识引擎。它在整个行业中被广泛使用，被认为是构建权益证明系统的黄金标准共识引擎。
+- Cosmos SDK 是开源的，旨在使从可组合的 [模块](../../x/) 构建区块链变得容易。随着开源 Cosmos SDK 模块生态系统的发展，使用它构建复杂的去中心化平台将变得越来越容易。
+- Cosmos SDK 的灵感来自基于功能的安全性，并从多年与区块链状态机的角力中汲取灵感。这使得 Cosmos SDK 成为构建区块链的非常安全的环境。
+- 最重要的是，Cosmos SDK 已经被用于构建许多已经投入生产的特定于应用程序的区块链。其中，我们可以引用[Cosmos Hub](https://hub.cosmos.network)、[IRIS Hub](https://irisnet.org)、[Binance Chain](https://docs.binance.org) /)、[Terra](https://terra.money/) 或 [Kava](https://www.kava.io/)。 [更多](https://cosmos.network/ecosystem) 是基于 Cosmos SDK 构建的。
 
-- The default consensus engine available within the Cosmos SDK is [Tendermint Core](https://github.com/tendermint/tendermint). Tendermint is the most (and only) mature BFT consensus engine in existence. It is widely used across the industry and is considered the gold standard consensus engine for building Proof-of-Stake systems.
-- The Cosmos SDK is open source and designed to make it easy to build blockchains out of composable [modules](../../x/). As the ecosystem of open source Cosmos SDK modules grows, it will become increasingly easier to build complex decentralised platforms with it.
-- The Cosmos SDK is inspired by capabilities-based security, and informed by years of wrestling with blockchain state-machines. This makes the Cosmos SDK a very secure environment to build blockchains.
-- Most importantly, the Cosmos SDK has already been used to build many application-specific blockchains that are already in production. Among others, we can cite [Cosmos Hub](https://hub.cosmos.network), [IRIS Hub](https://irisnet.org), [Binance Chain](https://docs.binance.org/), [Terra](https://terra.money/) or [Kava](https://www.kava.io/). [Many more](https://cosmos.network/ecosystem) are building on the Cosmos SDK.
+## Cosmos SDK 入门
 
-## Getting started with the Cosmos SDK
+- 详细了解 [Cosmos SDK 应用程序的架构](./sdk-app-architecture.md)
+- 通过 [Cosmos SDK 教程](https://cosmos.network/docs/tutorial) 了解如何从头开始构建特定于应用程序的区块链
 
-- Learn more about the [architecture of a Cosmos SDK application](./sdk-app-architecture.md)
-- Learn how to build an application-specific blockchain from scratch with the [Cosmos SDK Tutorial](https://cosmos.network/docs/tutorial)
+## 下一个 {hide}
 
-## Next {hide}
-
-Learn about [application-specific blockchains](./why-app-specific.md) {hide}
+了解 [特定于应用程序的区块链](./why-app-specific.md) {hide} 

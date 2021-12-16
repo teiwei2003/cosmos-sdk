@@ -1,11 +1,6 @@
-<!--
-order: 4
--->
+# 事件
 
-# Events
-
-The feegrant module emits the following events:
-
+Feegrant 模块发出以下事件: 
 # Msg Server
 
 ### MsgGrantAllowance

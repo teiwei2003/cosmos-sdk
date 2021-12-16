@@ -1,46 +1,46 @@
-# ADR 18: Extendable Voting Periods
+# ADR 18:可延长的投票期
 
-## Changelog
+## 变更日志
 
-- 1 January 2020: Start of first version
+- 2020 年 1 月 1 日:第一个版本开始
 
-## Context
+## 语境
 
-Currently the voting period for all governance proposals is the same.  However, this is suboptimal as all governance proposals do not require the same time period.  For more non-contentious proposals, they can be dealt with more efficently with a faster period, while more contentious or complex proposals may need a longer period for extended discussion/consideration.
+目前所有治理提案的投票期是相同的。然而，这是次优的，因为所有治理提案不需要相同的时间段。对于更多的非争议性提案，可以在更快的时间内得到更有效的处理，而更具争议性或复杂性的提案可能需要更长的时间来进行更长时间的讨论/考虑。
 
-## Decision
+## 决定
 
-We would like to design a mechanism for making the voting period of a governance proposal variable based on the demand of voters.  We would like it to be based on the view of the governance participants, rather than just the proposer of a governance proposal (thus, allowing the proposer to select the voting period length is not sufficient).
+我们想设计一种机制，根据选民的需求，使治理提案的投票周期可变。我们希望它基于治理参与者的观点，而不仅仅是治理提案的提议者(因此，允许提议者选择投票周期长度是不够的)。
 
-However, we would like to avoid the creation of an entire second voting process to determine the length of the voting period, as it just pushed the problem to determining the length of that first voting period.
+但是，我们希望避免创建完整的第二次投票过程来确定投票期的长度，因为它只是将问题推到了确定第一次投票期的长度上。
 
-Thus, we propose the following mechanism:
+因此，我们提出以下机制:
 
-### Params
+### 参数
 
-- The current gov param `VotingPeriod` is to be replaced by a `MinVotingPeriod` param.  This is the the default voting period that all governance proposal voting periods start with.
-- There is a new gov param called `MaxVotingPeriodExtension`.
+- 当前的 gov 参数 `VotingPeriod` 将被替换为 `MinVotingPeriod` 参数。这是所有治理提案投票期开始的默认投票期。
+- 有一个名为“MaxVotingPeriodExtension”的新政府参数。
 
-### Mechanism
+### 机制
 
-There is a new `Msg` type called `MsgExtendVotingPeriod`, which can be sent by any staked account during a proposal's voting period.  It allows the sender to unilaterally extend the length of the voting period by `MaxVotingPeriodExtension * sender's share of voting power`.  Every address can only call `MsgExtendVotingPeriod` once per proposal.
+有一种名为“MsgExtendVotingPeriod”的新“Msg”类型，可以在提案投票期间由任何质押账户发送。它允许发送者通过“MaxVotingPeriodExtension *发送者的投票权份额”单方面延长投票周期的长度。每个地址每个提案只能调用一次 `MsgExtendVotingPeriod`。
 
-So for example, if the `MaxVotingPeriodExtension` is set to 100 Days, then anyone with 1% of voting power can extend the voting power by 1 day.  If 33% of voting power has sent the message, the voting period will be extended by 33 days.  Thus, if absolutely everyone chooses to extend the voting period, the absolute maximum voting period will be `MinVotingPeriod + MaxVotingPeriodExtension`.
+例如，如果“MaxVotingPeriodExtension”设置为 100 天，那么任何拥有 1% 投票权的人都可以将投票权延长 1 天。如果 33% 的投票权已发送消息，则投票期将延长 33 天。因此，如果绝对每个人都选择延长投票期，则绝对最大投票期将是`MinVotingPeriod + MaxVotingPeriodExtension`。
 
-This system acts as a sort of distributed coordination, where individual stakers choosing to extend or not, allows the system the guage the conentiousness/complexity of the proposal.  It is extremely unlikely that many stakers will choose to extend at the exact same time, it allows stakers to view how long others have already extended thus far, to decide whether or not to extend further.
+该系统充当一种分布式协调，其中各个利益相关者选择扩展或不扩展，允许系统衡量提案的连续性/复杂性。许多质押者选择同时延长的可能性极小，它允许质押者查看到目前为止其他人已经延长了多长时间，以决定是否进一步延长。
 
-### Dealing with Unbonding/Redelegation
+### 处理解除绑定/重新授权
 
-There is one thing that needs to be addressed.  How to deal with redelegation/unbonding during the voting period.  If a staker of 5% calls `MsgExtendVotingPeriod` and then unbonds, does the voting period then decrease by 5 days again?  This is not good as it can give people a false sense of how long they have to make their decision.  For this reason, we want to design it such that the voting period length can only be extended, not shortened.  To do this, the current extension amount is based on the highest percent that voted extension at any time.  This is best explained by example:
+有一件事情需要解决。如何在投票期间处理重新授权/解除绑定。如果 5% 的权益持有者调用 `MsgExtendVotingPeriod` 然后解除绑定，那么投票周期是否会再次减少 5 天？这并不好，因为它会让人们误以为他们需要多长时间来做出决定。出于这个原因，我们希望将其设计为只能延长而不是缩短投票周期长度。为此，当前的延期金额基于任何时候投票延期的最高百分比。这最好通过示例来解释:
 
-1. Let's say 2 stakers of voting power 4% and 3% respectively vote to extend.  The voting period will be extended by 7 days.
-2. Now the staker of 3% decides to unbond before the end of the voting period.  The voting period extension remains 7 days.
-3. Now, let's say another staker of 2% voting power decides to extend voting period.  There is now 6% of active voting power choosing the extend.  The voting power remains 7 days.
-4. If a fourth staker of 10% chooses to extend now, there is a total of 16% of active voting power wishing to extend.  The voting period will be extended to 16 days.
+1.假设2个投票权分别为4%和3%的stakers投票延长。投票期将延长7天。
+2. 现在3%的staker决定在投票期结束前解绑。投票期延长仍为 7 天。
+3. 现在，假设另一个拥有 2% 投票权的权益人决定延长投票期。现在有 6% 的活跃投票权选择扩展。投票权仍为 7 天。
+4. 如果现在有 10% 的第四个权益人选择延期，则总共有 16% 的活跃投票权希望延期。投票期将延长至16天。 
 
-### Delegators
+### 委托人
 
-Just like votes in the actual voting period, delegators automatically inherit the extension of their validators.  If their validator chooses to extend, their voting power will be used in the validator's extension.  However, the delegator is unable to override their validator and "unextend" as that would contradict the "voting power length can only be ratcheted up" principle described in the previous section.  However, a delegator may choose the extend using their personal voting power, if their validator has not done so.
+就像实际投票期间的投票一样，委托人会自动继承其验证人的延期。 如果他们的验证人选择延期，他们的投票权将用于验证人的延期。 但是，委托人无法覆盖他们的验证人并“取消扩展”，因为这与上一节中描述的“投票权长度只能增加”原则相矛盾。 但是，委托人可以使用他们的个人投票权选择扩展，如果他们的验证人没有这样做。 
 
 ## Status
 
@@ -50,16 +50,16 @@ Proposed
 
 ### Positive
 
-- More complex/contentious governance proposals will have more time to properly digest and deliberate
+- 更复杂/有争议的治理提案将有更多时间来适当消化和审议 
 
 ### Negative
 
-- Governance process becomes more complex and requires more understanding to interact with effectively
-- Can no longer predict when a governance proposal will end. Can't assume order in which governance proposals will end.
+- 治理过程变得更加复杂，需要更多的理解才能有效地互动
+- 无法再预测治理提案何时结束。 无法假设治理提案结束的顺序。
 
 ### Neutral
 
-- The minimum voting period can be made shorter
+- 可以缩短最短投票期 
 
 ## References
 

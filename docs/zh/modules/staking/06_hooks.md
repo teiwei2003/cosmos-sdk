@@ -1,13 +1,9 @@
-<!--
-order: 6
--->
+# 钩子
 
-# Hooks
-
-Other modules may register operations to execute when a certain event has
-occurred within staking.  These events can be registered to execute either
-right `Before` or `After` the staking event (as per the hook name). The
-following hooks can registered with staking:
+当某个事件发生时，其他模块可能会注册要执行的操作
+发生在 Staking 内。 可以注册这些事件以执行
+对赌注事件的“之前”或“之后”(根据挂钩名称)。 这
+以下挂钩可以通过 staking 注册: 
 
 - `AfterValidatorCreated(Context, ValAddress) error`
     - called when a validator is created

@@ -1,14 +1,14 @@
-# Pre-Upgrade Handling
+# 升级前处理
 
-Cosmovisor supports custom pre-upgrade handling. Use pre-upgrade handling when you need to implement application config changes that are required in the newer version before you perform the upgrade.
+Cosmovisor 支持自定义升级前处理。 当您需要在执行升级之前实施较新版本中所需的应用程序配置更改时，请使用升级前处理。
 
-Using Cosmovisor pre-upgrade handling is optional. If pre-upgrade handling is not implemented, the upgrade continues.
+使用 Cosmovisor 升级前处理是可选的。 如果未实施升级前处理，升级将继续。
 
-For example, make the required new-version changes to `app.toml` settings during the pre-upgrade handling. The pre-upgrade handling process means that the file does not have to be manually updated after the upgrade.
+例如，在升级前处理期间对 `app.toml` 设置进行所需的新版本更改。 升级前处理过程意味着升级后无需手动更新文件。
 
-Before the application binary is upgraded, Cosmovisor calls a `pre-upgrade` command that can  be implemented by the application.
+在应用程序二进制文件升级之前，Cosmovisor 调用了一个可由应用程序实现的“pre-upgrade”命令。
 
-The `pre-upgrade` command does not take in any command-line arguments and is expected to terminate with the following exit codes:
+`pre-upgrade` 命令不接受任何命令行参数，预计会以以下退出代码终止: 
 
 | Exit status code | How it is handled in Cosmosvisor                                                                                    |
 |------------------|---------------------------------------------------------------------------------------------------------------------|
@@ -19,7 +19,7 @@ The `pre-upgrade` command does not take in any command-line arguments and is exp
 
 ## Sample
 
-Here is a sample structure of the `pre-upgrade` command:
+以下是“pre-upgrade”命令的示例结构: 
 
 ```go
 func preUpgradeCommand() *cobra.Command {
@@ -44,7 +44,7 @@ func preUpgradeCommand() *cobra.Command {
 }
 ```
 
-Ensure that the pre-upgrade command has been registered in the application:
+确保已在应用程序中注册了 pre-upgrade 命令:
 
 ```go
 rootCmd.AddCommand(

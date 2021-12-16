@@ -1,22 +1,22 @@
-# ADR 3：动态能力存储
+# ADR 3:动态能力存储
 
 ## 变更日志
 
-- 2019 年 12 月 12 日：初始版本
-- 2020 年 4 月 2 日：内存存储修订
+- 2019 年 12 月 12 日:初始版本
+- 2020 年 4 月 2 日:内存存储修订
 
 ## 语境
 
-[IBC 规范](https://github.com/cosmos/ibs) 的完整实现需要能够在运行时（即在事务执行期间）创建和验证对象能力密钥，
+[IBC 规范](https://github.com/cosmos/ibs) 的完整实现需要能够在运行时(即在事务执行期间)创建和验证对象能力密钥，
 如 [ICS 5](https://github.com/cosmos/ibc/tree/master/spec/core/ics-005-port-allocation#technical-specification) 中所述。在 IBC 规范中，为每个新初始化的
 端口和通道，用于验证端口或通道的未来使用情况。由于通道和潜在的端口可以在事务执行期间初始化，状态机必须能够创建
 此时的对象功能键。
 
-目前，Cosmos SDK 没有能力做到这一点。对象功能键当前是在应用程序初始化时在 `app.go` 中创建的 `StoreKey` 结构的指针（内存地址）（[示例]（https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app .go#L132))
-并作为固定参数传递给 Keepers（[示例]（https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app.go#L160））。 Keepers 无法在交易执行期间创建或存储功能密钥——尽管他们可以调用 `NewKVStoreKey` 并获取内存地址
-对于返回的结构，将其存储在 Merklised 存储中会导致共识错误，因为每台机器上的内存地址将不同（这是故意的 - 如果不是这种情况，密钥将是可预测的，并且不能用作对象能力）。
+目前，Cosmos SDK 没有能力做到这一点。对象功能键当前是在应用程序初始化时在 `app.go` 中创建的 `StoreKey` 结构的指针(内存地址)([示例](https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app .go#L132))
+并作为固定参数传递给 Keepers([示例](https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app.go#L160))。 Keepers 无法在交易执行期间创建或存储功能密钥——尽管他们可以调用 `NewKVStoreKey` 并获取内存地址
+对于返回的结构，将其存储在 Merklised 存储中会导致共识错误，因为每台机器上的内存地址将不同(这是故意的 - 如果不是这种情况，密钥将是可预测的，并且不能用作对象能力)。
 
-Keepers 需要一种方法来保存可以在事务执行期间更改的存储密钥的私有映射，以及在应用程序启动或重新启动时重新生成此映射中唯一内存地址（功能密钥）的合适机制，以及一种机制在 tx 失败时恢复能力创建。
+Keepers 需要一种方法来保存可以在事务执行期间更改的存储密钥的私有映射，以及在应用程序启动或重新启动时重新生成此映射中唯一内存地址(功能密钥)的合适机制，以及一种机制在 tx 失败时恢复能力创建。
 本 ADR 提出了这样的接口和机制。
 
 ## 决定
@@ -24,12 +24,12 @@ Keepers 需要一种方法来保存可以在事务执行期间更改的存储密
 Cosmos SDK 将包含一个新的“CapabilityKeeper”抽象，它负责供应、
 在运行时跟踪和验证功能。在 app.go 中的应用程序初始化期间，
 `CapabilityKeeper` 将通过唯一的函数引用连接到模块
-（通过调用`ScopeToModule`，定义如下）以便稍后识别调用模块
+(通过调用`ScopeToModule`，定义如下)以便稍后识别调用模块
 调用。
 
 当从磁盘加载初始状态时，`CapabilityKeeper` 的 `Initialise` 函数将创建
-所有先前分配的能力标识符的新能力密钥（在执行过程中分配）
-过去的事务并分配给特定模式），并将它们保存在仅内存存储中，而
+所有先前分配的能力标识符的新能力密钥(在执行过程中分配)
+过去的事务并分配给特定模式)，并将它们保存在仅内存存储中，而
 链正在运行。
 
 `CapabilityKeeper` 将包括一个持久化的 `KVStore`、一个 `MemoryStore` 和一个内存映射。
@@ -40,7 +40,7 @@ Cosmos SDK 将包含一个新的“CapabilityKeeper”抽象，它负责供应�
 KVStore 中的反向映射将简单地映射到索引。然后可以将此索引用作临时文件中的键
 go-map 在原始内存位置检索功能。
 
-`CapabilityKeeper` 将定义以下类型和功能：
+`CapabilityKeeper` 将定义以下类型和功能:
 
 `Capability` 类似于 `StoreKey`，但有一个全局唯一的 `Index()` 而不是
 一个名字。提供了一个 `String()` 方法用于调试。
@@ -175,7 +175,7 @@ func (sck ScopedCapabilityKeeper) NewCapability(ctx Context, name string) (Capab
 ```
 
 任何模块都可以调用 AuthenticateCapability 来检查能力
-实际上确实对应于特定名称（该名称可以是不受信任的用户输入）
+实际上确实对应于特定名称(该名称可以是不受信任的用户输入)
 调用模块之前与之关联的。
 
 ```golang
@@ -261,7 +261,7 @@ func (sck ScopedCapabilityKeeper) ReleaseCapability(ctx Context, capability Capa
 
 #### 初始化
 
-任何使用动态功能的模块都必须在 `app.go` 中提供一个 `ScopedCapabilityKeeper`：
+任何使用动态功能的模块都必须在 `app.go` 中提供一个 `ScopedCapabilityKeeper`:
 
 ```golang
 ck := NewCapabilityKeeper(persistentKey, memoryKey)
@@ -277,16 +277,16 @@ ck.InitialiseAndSeal(initialContext)
 
 #### 创建、传递、声明和使用功能
 
-考虑这样一种情况，“mod1”想要创建一个能力，通过名称将其与资源（例如 IBC 通道）相关联，然后将其传递给“mod2”，后者将在稍后使用它：
+考虑这样一种情况，“mod1”想要创建一个能力，通过名称将其与资源(例如 IBC 通道)相关联，然后将其传递给“mod2”，后者将在稍后使用它:
 
-模块 1 将具有以下代码：
+模块 1 将具有以下代码:
 
 ```golang
 capability := scopedCapabilityKeeper.NewCapability(ctx, "resourceABC")
 mod2Keeper.SomeFunction(ctx, capability, args...)
 ```
 
-`SomeFunction`，在模块 2 中运行，然后可以声明该功能：
+`SomeFunction`，在模块 2 中运行，然后可以声明该功能:
 
 ```golang
 func (k Mod2Keeper) SomeFunction(ctx Context, capability Capability) {
@@ -295,7 +295,7 @@ func (k Mod2Keeper) SomeFunction(ctx Context, capability Capability) {
 }
 ```
 
-稍后，模块 2 可以通过名称检索该功能并将其传递给模块 1，模块 1 将根据资源对其进行身份验证：
+稍后，模块 2 可以通过名称检索该功能并将其传递给模块 1，模块 1 将根据资源对其进行身份验证:
 
 ```golang
 func (k Mod2Keeper) SomeOtherFunction(ctx Context, name string) {
@@ -304,7 +304,7 @@ func (k Mod2Keeper) SomeOtherFunction(ctx Context, name string) {
 }
 ```
 
-在允许模块 2 使用资源之前，模块 1 将检查此功能密钥是否经过身份验证以使用资源：
+在允许模块 2 使用资源之前，模块 1 将检查此功能密钥是否经过身份验证以使用资源:
 
 ```golang
 func (k Mod1Keeper) UseResource(ctx Context, capability Capability, resource string) {
@@ -316,15 +316,15 @@ func (k Mod1Keeper) UseResource(ctx Context, capability Capability, resource str
 ```
 
 如果模块 2 将功能密钥传递给模块 3，则模块 3 可以声明它并像模块 2 一样调用模块 1
-（在这种情况下，模块 1、模块 2 和模块 3 都可以使用此功能）。
+(在这种情况下，模块 1、模块 2 和模块 3 都可以使用此功能)。
 
-## 地位
+## 状态
 
 建议的。
 
 ## 结果
 
-### 积极的
+### 目的
 
 - 动态能力支持。
 - 允许 CapabilityKeeper 从 go-map 返回相同的能力指针，同时在 tx 失败时恢复对持久性“KVStore”和内存中“MemoryStore”的任何写入。
@@ -332,12 +332,12 @@ func (k Mod1Keeper) UseResource(ctx Context, capability Capability, resource str
 ### 消极的
 
 - 需要额外的守门员。
-- 与现有的“StoreKey”系统有些重叠（将来它们可以合并，因为这是一个超集功能）。
+- 与现有的“StoreKey”系统有些重叠(将来它们可以合并，因为这是一个超集功能)。
 - 在反向映射中需要额外的间接级别，因为 MemoryStore 必须映射到索引，然后必须将其用作 go map 中的键以检索实际功能
 
 ### 中性的
 
-（无人知晓）
+(无人知晓)
 
 ## 参考
 

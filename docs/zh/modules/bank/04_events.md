@@ -1,10 +1,6 @@
-<!--
-order: 4
--->
+# 事件
 
-# Events
-
-The bank module emits the following events:
+bank 模块发出以下事件: 
 
 ## Handlers
 
@@ -30,7 +26,7 @@ The bank module emits the following events:
 
 ## Keeper events
 
-In addition to handlers events, the bank keeper will produce events when the following methods are called (or any method which ends up calling them)
+除了处理程序事件之外，银行管理员将在调用以下方法(或最终调用它们的任何方法)时产生事件 
 
 ### MintCoins
 

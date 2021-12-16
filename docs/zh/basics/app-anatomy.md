@@ -1,14 +1,10 @@
-<!--
-order: 1
--->
+# Cosmos SDK 应用剖析
 
-# Anatomy of a Cosmos SDK Application
+本文档描述了 Cosmos SDK 应用程序的核心部分。 在整个文档中，将使用名为“app”的占位符应用程序。 {概要}
 
-This document describes the core parts of a Cosmos SDK application. Throughout the document, a placeholder application named `app` will be used. {synopsis}
+## 节点客户端
 
-## Node Client
-
-The Daemon, or [Full-Node Client](../core/node.md), is the core process of a Cosmos SDK-based blockchain. Participants in the network run this process to initialize their state-machine, connect with other full-nodes and update their state-machine as new blocks come in.
+Daemon 或 [Full-Node Client](../core/node.md) 是基于 Cosmos SDK 的区块链的核心进程。 网络中的参与者运行这个过程来初始化他们的状态机，与其他全节点连接并在新块进入时更新他们的状态机。 
 
 ```
                 ^  +-------------------------------+  ^
@@ -28,226 +24,226 @@ Blockchain Node |  |           Consensus           |  |
                 v  +-------------------------------+  v
 ```
 
-The blockchain full-node presents itself as a binary, generally suffixed by `-d` for "daemon" (e.g. `appd` for `app` or `gaiad` for `gaia`). This binary is built by running a simple [`main.go`](../core/node.md#main-function) function placed in `./cmd/appd/`. This operation usually happens through the [Makefile](#dependencies-and-makefile).
+区块链全节点将自己呈现为二进制文件，通常后缀“-d”表示“守护进程”(例如，“appd”表示“app”或“gaiad”表示“gaia”)。这个二进制文件是通过运行一个简单的 [`main.go`](../core/node.md#main-function) 函数来构建的，该函数放置在 `./cmd/appd/` 中。此操作通常通过 [Makefile](#dependencies-and-makefile) 发生。
 
-Once the main binary is built, the node can be started by running the [`start` command](../core/node.md#start-command). This command function primarily does three things:
+构建主二进制文件后，可以通过运行 [`start` 命令](../core/node.md#start-command) 来启动节点。这个命令函数主要做三件事:
 
-1. Create an instance of the state-machine defined in [`app.go`](#core-application-file).
-2. Initialize the state-machine with the latest known state, extracted from the `db` stored in the `~/.app/data` folder. At this point, the state-machine is at height `appBlockHeight`.
-3. Create and start a new Tendermint instance. Among other things, the node will perform a handshake with its peers. It will get the latest `blockHeight` from them, and replay blocks to sync to this height if it is greater than the local `appBlockHeight`. If `appBlockHeight` is `0`, the node is starting from genesis and Tendermint sends an `InitChain` message via the ABCI to the `app`, which triggers the [`InitChainer`](#initchainer).
+1.创建一个在[`app.go`](#core-application-file)中定义的状态机实例。
+2. 使用从存储在`~/.app/data` 文件夹中的`db` 中提取的最新已知状态初始化状态机。此时，状态机处于“appBlockHeight”高度。
+3. 创建并启动一个新的 Tendermint 实例。除其他事项外，该节点将与其对等方执行握手。它将从它们那里获取最新的 `blockHeight`，如果它大于本地 `appBlockHeight`，则重放块以同步到这个高度。如果`appBlockHeight`为`0`，则节点从创世开始，Tendermint通过ABCI向`app`发送`InitChain`消息，触发[`InitChainer`](#initchainer)。
 
-## Core Application File
+## 核心应用程序文件
 
-In general, the core of the state-machine is defined in a file called `app.go`. It mainly contains the **type definition of the application** and functions to **create and initialize it**.
+通常，状态机的核心定义在名为“app.go”的文件中。它主要包含**应用程序的类型定义**和**创建和初始化应用程序**的函数。
 
-### Type Definition of the Application
+### 应用的类型定义
 
-The first thing defined in `app.go` is the `type` of the application. It is generally comprised of the following parts:
+`app.go` 中定义的第一件事是应用程序的 `type`。它一般由以下几部分组成:
 
-- **A reference to [`baseapp`](../core/baseapp.md).** The custom application defined in `app.go` is an extension of `baseapp`. When a transaction is relayed by Tendermint to the application, `app` uses `baseapp`'s methods to route them to the appropriate module. `baseapp` implements most of the core logic for the application, including all the [ABCI methods](https://tendermint.com/docs/spec/abci/abci.html#overview) and the [routing logic](../core/baseapp.md#routing).
-- **A list of store keys**. The [store](../core/store.md), which contains the entire state, is implemented as a [`multistore`](../core/store.md#multistore) (i.e. a store of stores) in the Cosmos SDK. Each module uses one or multiple stores in the multistore to persist their part of the state. These stores can be accessed with specific keys that are declared in the `app` type. These keys, along with the `keepers`, are at the heart of the [object-capabilities model](../core/ocap.md) of the Cosmos SDK.
-- **A list of module's `keeper`s.** Each module defines an abstraction called [`keeper`](../building-modules/keeper.md), which handles reads and writes for this module's store(s). The `keeper`'s methods of one module can be called from other modules (if authorized), which is why they are declared in the application's type and exported as interfaces to other modules so that the latter can only access the authorized functions.
-- **A reference to an [`appCodec`](../core/encoding.md).** The application's `appCodec` is used to serialize and deserialize data structures in order to store them, as stores can only persist `[]bytes`. The default codec is [Protocol Buffers](../core/encoding.md).
-- **A reference to a [`legacyAmino`](../core/encoding.md) codec.** Some parts of the Cosmos SDK have not been migrated to use the `appCodec` above, and are still hardcoded to use Amino. Other parts explicity use Amino for backwards compatibility. For these reasons, the application still holds a reference to the legacy Amino codec. Please note that the Amino codec will be removed from the SDK in the upcoming releases.
-- **A reference to a [module manager](../building-modules/module-manager.md#manager)** and a [basic module manager](../building-modules/module-manager.md#basicmanager). The module manager is an object that contains a list of the application's module. It facilitates operations related to these modules, like registering their [`Msg` service](../core/baseapp.md#msg-services) and [gRPC `Query` service](../core/baseapp.md#grpc-query-services), or setting the order of execution between modules for various functions like [`InitChainer`](#initchainer), [`BeginBlocker` and `EndBlocker`](#beginblocker-and-endblocker).
+- **对[`baseapp`](../core/baseapp.md)的引用。**`app.go`中定义的自定义应用程序是`baseapp`的扩展。当 Tendermint 将交易中继到应用程序时，`app` 使用 `baseapp` 的方法将它们路由到适当的模块。 `baseapp` 实现了应用程序的大部分核心逻辑，包括所有 [ABCI 方法](https://tendermint.com/docs/spec/abci/abci.html#overview) 和 [路由逻辑](../core/baseapp.md#routing)。
+- **存储键列表**。包含整个状态的 [store](../core/store.md) 在Cosmos SDK。每个模块使用 multistore 中的一个或多个 store 来持久化它们的状态部分。可以使用在“app”类型中声明的特定键来访问这些存储。这些键和 `keepers` 是 Cosmos SDK [对象功能模型](../core/ocap.md) 的核心。
+- **模块的`keeper`s 列表。** 每个模块都定义了一个名为[`keeper`](../building-modules/keeper.md) 的抽象，它处理这个模块存储的读写.一个模块的`keeper`的方法可以从其他模块(如果授权)调用，这就是为什么它们在应用程序的类型中声明并作为接口导出到其他模块，以便后者只能访问授权的功能。
+- **对 [`appCodec`](../core/encoding.md) 的引用。** 应用程序的 `appCodec` 用于序列化和反序列化数据结构以存储它们，因为存储只能持久化` []字节`。默认编解码器是 [Protocol Buffers](../core/encoding.md)。
+- **对 [`legacyAmino`](../core/encoding.md) 编解码器的引用。** Cosmos SDK 的某些部分尚未迁移到使用上面的 `appCodec`，并且仍然硬编码使用氨基。其他部分明确使用 Amino 以实现向后兼容性。由于这些原因，该应用程序仍然保留对旧版 Amino 编解码器的引用。请注意，Amino 编解码器将在即将发布的版本中从 SDK 中删除。
+- **对 [模块管理器](../building-modules/module-manager.md#manager)** 和 [基本模块管理器](../building-modules/module-manager.md# 的引用基本管理器)。模块管理器是一个包含应用程序模块列表的对象。它促进了与这些模块相关的操作，例如注册它们的 [`Msg` 服务](../core/baseapp.md#msg-services) 和 [gRPC `Query` 服务](../core/baseapp.md#grpc -query-services)，或为各种功能设置模块之间的执行顺序，如 [`InitChainer`](#initchainer)、[`BeginBlocker` 和 `EndBlocker`](#beginblocker-and-endblocker)。
 
-See an example of application type definition from `simapp`, the Cosmos SDK's own app used for demo and testing purposes:
+请参阅“simapp”中的应用程序类型定义示例，Cosmos SDK 自己的应用程序用于演示和测试目的:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/app.go#L145-L187
 
-### Constructor Function
+### 构造函数
 
-This function constructs a new application of the type defined in the section above. It must fulfill the `AppCreator` signature in order to be used in the [`start` command](../core/node.md#start-command) of the application's daemon command.
+该函数构造了一个新的应用程序，该应用程序的类型在上一节中定义。它必须满足 `AppCreator` 签名才能在应用程序守护程序命令的 [`start` 命令](../core/node.md#start-command) 中使用。 
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/server/types/app.go#L48-L50
 
-Here are the main actions performed by this function:
+以下是此功能执行的主要操作:
 
-- Instantiate a new [`codec`](../core/encoding.md) and initialize the `codec` of each of the application's module using the [basic manager](../building-modules/module-manager.md#basicmanager)
-- Instantiate a new application with a reference to a `baseapp` instance, a codec and all the appropriate store keys.
-- Instantiate all the [`keeper`s](#keeper) defined in the application's `type` using the `NewKeeper` function of each of the application's modules. Note that `keepers` must be instantiated in the correct order, as the `NewKeeper` of one module might require a reference to another module's `keeper`.
-- Instantiate the application's [module manager](../building-modules/module-manager.md#manager) with the [`AppModule`](#application-module-interface) object of each of the application's modules.
-- With the module manager, initialize the application's [`Msg` services](../core/baseapp.md#msg-services), [gRPC `Query` services](../core/baseapp.md#grpc-query-services), [legacy `Msg` routes](../core/baseapp.md#routing) and [legacy query routes](../core/baseapp.md#query-routing). When a transaction is relayed to the application by Tendermint via the ABCI, it is routed to the appropriate module's [`Msg` service](#msg-services) using the routes defined here. Likewise, when a gRPC query request is received by the application, it is routed to the appropriate module's [`gRPC query service`](#grpc-query-services) using the gRPC routes defined here. The Cosmos SDK still supports legacy `Msg`s and legacy Tendermint queries, which are routed using respectively the legacy `Msg` routes and the legacy query routes.
-- With the module manager, register the [application's modules' invariants](../building-modules/invariants.md). Invariants are variables (e.g. total supply of a token) that are evaluated at the end of each block. The process of checking invariants is done via a special module called the [`InvariantsRegistry`](../building-modules/invariants.md#invariant-registry). The value of the invariant should be equal to a predicted value defined in the module. Should the value be different than the predicted one, special logic defined in the invariant registry will be triggered (usually the chain is halted). This is useful to make sure no critical bug goes unnoticed and produces long-lasting effects that would be hard to fix.
-- With the module manager, set the order of execution between the `InitGenesis`, `BeginBlocker` and `EndBlocker` functions of each of the [application's modules](#application-module-interface). Note that not all modules implement these functions.
-- Set the remainder of application's parameters:
-    - [`InitChainer`](#initchainer): used to initialize the application when it is first started.
-    - [`BeginBlocker`, `EndBlocker`](#beginblocker-and-endlbocker): called at the beginning and the end of every block).
-    - [`anteHandler`](../core/baseapp.md#antehandler): used to handle fees and signature verification.
-- Mount the stores.
-- Return the application.
+- 实例化一个新的 [`codec`](../core/encoding.md) 并使用 [basic manager](../building-modules/module-manager.md) 初始化每个应用程序模块的 `codec` #basicmanager)
+- 使用对“baseapp”实例、编解码器和所有适当存储键的引用来实例化新应用程序。
+- 使用每个应用程序模块的`NewKeeper` 函数实例化应用程序`type` 中定义的所有[`keeper`s](#keeper)。请注意，`keepers` 必须以正确的顺序实例化，因为一个模块的 `NewKeeper` 可能需要引用另一个模块的 `keeper`。
+- 使用每个应用程序模块的 [`AppModule`](#application-module-interface) 对象实例化应用程序的 [模块管理器](../building-modules/module-manager.md#manager)。
+- 使用模块管理器，初始化应用程序的 [`Msg` 服务](../core/baseapp.md#msg-services), [gRPC `Query` 服务](../core/baseapp.md#grpc-query -services)、[旧版`Msg` 路由](../core/baseapp.md#routing) 和[旧版查询路由](../core/baseapp.md#query-routing)。当 Tendermint 通过 ABCI 将交易中继到应用程序时，它会使用此处定义的路由路由到相应模块的 [`Msg` 服务](#msg-services)。同样，当应用程序接收到 gRPC 查询请求时，它会使用此处定义的 gRPC 路由路由到相应模块的 [`gRPC 查询服务`](#grpc-query-services)。 Cosmos SDK 仍然支持旧版 `Msg` 和旧版 Tendermint 查询，它们分别使用旧版 `Msg` 路由和旧版查询路由进行路由。
+- 使用模块管理器，注册[应用程序模块的不变量](../building-modules/invariants.md)。不变量是在每个块结束时评估的变量(例如令牌的总供应量)。检查不变量的过程是通过一个称为 [`InvariantsRegistry`](../building-modules/invariants.md#invariant-registry) 的特殊模块完成的。不变量的值应等于模块中定义的预测值。如果该值与预测值不同，则将触发不变注册表中定义的特殊逻辑(通常会停止链)。这有助于确保没有严重错误被忽视并产生难以修复的持久影响。
+- 使用模块管理器，设置每个[应用程序模块](#application-module-interface) 的`InitGenesis`、`BeginBlocker` 和`EndBlocker` 函数之间的执行顺序。请注意，并非所有模块都实现了这些功能。
+- 设置应用程序的其余参数:
+    - [`InitChainer`](#initchainer):用于在应用程序第一次启动时对其进行初始化。
+    - [`BeginBlocker`, `EndBlocker`](#beginblocker-and-endlbocker):在每个块的开头和结尾调用)。
+    - [`anteHandler`](../core/baseapp.md#antehandler):用于处理费用和签名验证。
+- 安装存储。
+- 退回申请。
 
-Note that this function only creates an instance of the app, while the actual state is either carried over from the `~/.app/data` folder if the node is restarted, or generated from the genesis file if the node is started for the first time.
+请注意，此函数仅创建应用程序的一个实例，而实际状态要么在节点重新启动时从`~/.app/data` 文件夹中转移过来，要么在节点启动时从创世文件中生成。第一次。
 
-See an example of application constructor from `simapp`:
+请参阅“simapp”中的应用程序构造函数示例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/app.go#L198-L441
 
 ### InitChainer
 
-The `InitChainer` is a function that initializes the state of the application from a genesis file (i.e. token balances of genesis accounts). It is called when the application receives the `InitChain` message from the Tendermint engine, which happens when the node is started at `appBlockHeight == 0` (i.e. on genesis). The application must set the `InitChainer` in its [constructor](#constructor-function) via the [`SetInitChainer`](https://godoc.org/github.com/cosmos/cosmos-sdk/baseapp#BaseApp.SetInitChainer) method.
+`InitChainer` 是一个函数，它从创世文件(即创世账户的代币余额)初始化应用程序的状态。当应用程序从 Tendermint 引擎接收到 `InitChain` 消息时调用它，这发生在节点在 `appBlockHeight == 0` 处启动时(即在创世时)。应用程序必须通过 [`SetInitChainer`](https://godoc.org/github.com/cosmos/cosmos-sdk/baseapp#BaseApp.SetInitChainer) 在其 [构造函数](#constructor-function) 中设置 `InitChainer` ) 方法。
 
-In general, the `InitChainer` is mostly composed of the [`InitGenesis`](../building-modules/genesis.md#initgenesis) function of each of the application's modules. This is done by calling the `InitGenesis` function of the module manager, which in turn will call the `InitGenesis` function of each of the modules it contains. Note that the order in which the modules' `InitGenesis` functions must be called has to be set in the module manager using the [module manager's](../building-modules/module-manager.md) `SetOrderInitGenesis` method. This is done in the [application's constructor](#application-constructor), and the `SetOrderInitGenesis` has to be called before the `SetInitChainer`.
+一般来说，`InitChainer` 主要由应用程序各个模块的 [`InitGenesis`](../building-modules/genesis.md#initgenesis) 函数组成。这是通过调用模块管理器的 `InitGenesis` 函数来完成的，模块管理器又会调用它包含的每个模块的 `InitGenesis` 函数。请注意，必须使用 [模块管理器的](../building-modules/module-manager.md) `SetOrderInitGenesis` 方法在模块管理器中设置必须调用模块的 `InitGenesis` 函数的顺序。这是在[应用程序的构造函数](#application-constructor) 中完成的，并且必须在“SetInitChainer”之前调用“SetOrderInitGenesis”。
 
-See an example of an `InitChainer` from `simapp`:
+请参阅“simapp”中的“InitChainer”示例: 
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/app.go#L464-L471
 
 ### BeginBlocker and EndBlocker
 
-The Cosmos SDK offers developers the possibility to implement automatic execution of code as part of their application. This is implemented through two function called `BeginBlocker` and `EndBlocker`. They are called when the application receives respectively the `BeginBlock` and `EndBlock` messages from the Tendermint engine, which happens at the beginning and at the end of each block. The application must set the `BeginBlocker` and `EndBlocker` in its [constructor](#constructor-function) via the [`SetBeginBlocker`](https://godoc.org/github.com/cosmos/cosmos-sdk/baseapp#BaseApp.SetBeginBlocker) and [`SetEndBlocker`](https://godoc.org/github.com/cosmos/cosmos-sdk/baseapp#BaseApp.SetEndBlocker) methods.
+Cosmos SDK 为开发人员提供了将代码自动执行作为其应用程序的一部分的可能性。这是通过两个名为“BeginBlocker”和“EndBlocker”的函数实现的。当应用程序分别从 Tendermint 引擎接收到 `BeginBlock` 和 `EndBlock` 消息时调用它们，这发生在每个块的开头和结尾。应用程序必须通过 [`SetBeginBlocker`](https://godoc.org/github.com/cosmos/cosmos-sdk/baseapp) 在其 [构造函数](#constructor-function) 中设置 `BeginBlocker` 和 `EndBlocker` #BaseApp.SetBeginBlocker) 和 [`SetEndBlocker`](https://godoc.org/github.com/cosmos/cosmos-sdk/baseapp#BaseApp.SetEndBlocker) 方法。
 
-In general, the `BeginBlocker` and `EndBlocker` functions are mostly composed of the [`BeginBlock` and `EndBlock`](../building-modules/beginblock-endblock.md) functions of each of the application's modules. This is done by calling the `BeginBlock` and `EndBlock` functions of the module manager, which in turn will call the `BeginBlock` and `EndBlock` functions of each of the modules it contains. Note that the order in which the modules' `BeginBlock` and `EndBlock` functions must be called has to be set in the module manager using the `SetOrderBeginBlock` and `SetOrderEndBlock` methods respectively. This is done via the [module manager](../building-modules/module-manager.md) in the [application's constructor](#application-constructor), and the `SetOrderBeginBlock` and `SetOrderEndBlock` methods have to be called before the `SetBeginBlocker` and `SetEndBlocker` functions.
+一般来说，`BeginBlocker` 和`EndBlocker` 函数主要由每个应用程序模块的[`BeginBlock` 和`EndBlock`](../building-modules/beginblock-endblock.md) 函数组成。这是通过调用模块管理器的`BeginBlock` 和`EndBlock` 函数来完成的，模块管理器又会调用它包含的每个模块的`BeginBlock` 和`EndBlock` 函数。请注意，必须分别使用“SetOrderBeginBlock”和“SetOrderEndBlock”方法在模块管理器中设置必须调用模块“BeginBlock”和“EndBlock”函数的顺序。这是通过[应用程序的构造函数](#application-constructor)中的[模块管理器](../building-modules/module-manager.md)完成的，并且必须调用`SetOrderBeginBlock`和`SetOrderEndBlock`方法在`SetBeginBlocker` 和`SetEndBlocker` 函数之前。
 
-As a sidenote, it is important to remember that application-specific blockchains are deterministic. Developers must be careful not to introduce non-determinism in `BeginBlocker` or `EndBlocker`, and must also be careful not to make them too computationally expensive, as [gas](./gas-fees.md) does not constrain the cost of `BeginBlocker` and `EndBlocker` execution.
+作为旁注，重要的是要记住特定于应用程序的区块链是确定性的。开发人员必须注意不要在“BeginBlocker”或“EndBlocker”中引入不确定性，并且还必须注意不要使它们的计算成本过高，因为 [gas](./gas-fees.md) 不会限制成本`BeginBlocker` 和 `EndBlocker` 执行。
 
-See an example of `BeginBlocker` and `EndBlocker` functions from `simapp`
+请参阅“simapp”中的“BeginBlocker”和“EndBlocker”函数示例 
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/app.go#L454-L462
 
 ### Register Codec
 
-The `EncodingConfig` structure is the last important part of the `app.go` file. The goal of this structure is to define the codecs that will be used throughout the app.
+`EncodingConfig` 结构是 `app.go` 文件的最后一个重要部分。 此结构的目标是定义将在整个应用程序中使用的编解码器。 
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/params/encoding.go#L9-L16
 
-Here are descriptions of what each of the four fields means:
+以下是对四个字段中每个字段含义的说明:
 
-- `InterfaceRegistry`: The `InterfaceRegistry` is used by the Protobuf codec to handle interfaces that are encoded and decoded (we also say "unpacked") using [`google.protobuf.Any`](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/any.proto). `Any` could be thought as a struct that contains a `type_url` (name of a concrete type implementing the interface) and a `value` (its encoded bytes). `InterfaceRegistry` provides a mechanism for registering interfaces and implementations that can be safely unpacked from `Any`. Each of the application's modules implements the `RegisterInterfaces` method that can be used to register the module's own interfaces and implementations.
-    - You can read more about Any in [ADR-19](../architecture/adr-019-protobuf-state-encoding.md#usage-of-any-to-encode-interfaces).
-    - To go more into details, the Cosmos SDK uses an implementation of the Protobuf specification called [`gogoprotobuf`](https://github.com/gogo/protobuf). By default, the [gogo protobuf implementation of `Any`](https://godoc.org/github.com/gogo/protobuf/types) uses [global type registration](https://github.com/gogo/protobuf/blob/master/proto/properties.go#L540) to decode values packed in `Any` into concrete Go types. This introduces a vulnerability where any malicious module in the dependency tree could registry a type with the global protobuf registry and cause it to be loaded and unmarshaled by a transaction that referenced it in the `type_url` field. For more information, please refer to [ADR-019](../architecture/adr-019-protobuf-state-encoding.md).
-- `Marshaler`: the default codec used throughout the Cosmos SDK. It is composed of a `BinaryCodec` used to encode and decode state, and a `JSONCodec` used to output data to the users (for example in the [CLI](#cli)). By default, the SDK uses Protobuf as `Marshaler`.
-- `TxConfig`: `TxConfig` defines an interface a client can utilize to generate an application-defined concrete transaction type. Currently, the SDK handles two transaction types: `SIGN_MODE_DIRECT` (which uses Protobuf binary as over-the-wire encoding) and `SIGN_MODE_LEGACY_AMINO_JSON` (which depends on Amino). Read more about transactions [here](../core/transactions.md).
-- `Amino`: Some legacy parts of the Cosmos SDK still use Amino for backwards-compatibility. Each module exposes a `RegisterLegacyAmino` method to register the module's specific types within Amino. This `Amino` codec should not be used by app developers anymore, and will be removed in future releases.
+- `InterfaceRegistry`:Protobuf 编解码器使用 `InterfaceRegistry` 来处理使用 [`google.protobuf.Any`](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/any.proto)。 `Any` 可以被认为是一个包含 `type_url`(实现接口的具体类型的名称)和一个 `value`(它的编码字节)的结构。 `InterfaceRegistry` 提供了一种注册接口和实现的机制，可以从 `Any` 安全地解包。应用程序的每个模块都实现了`RegisterInterfaces` 方法，该方法可用于注册模块自己的接口和实现。
+    - 您可以在 [ADR-19](../architecture/adr-019-protobuf-state-encoding.md#usage-of-any-to-encode-interfaces) 中阅读有关 Any 的更多信息。
+    - 为了更详细地了解，Cosmos SDK 使用了名为 [`gogoprotobuf`](https://github.com/gogo/protobuf) 的 Protobuf 规范的实现。默认情况下，[`Any` 的gogo protobuf 实现](https://godoc.org/github.com/gogo/protobuf/types) 使用[全局类型注册](https://github.com/gogo/protobuf/blob/master/proto/properties.go#L540) 将封装在 `Any` 中的值解码为具体的 Go 类型。这引入了一个漏洞，依赖树中的任何恶意模块都可以在全局 protobuf 注册表中注册一个类型，并导致它被在 `type_url` 字段中引用它的事务加载和解组。更多信息请参考[ADR-019](../architecture/adr-019-protobuf-state-encoding.md)。
+- `Marshaler`:整个 Cosmos SDK 中使用的默认编解码器。它由用于编码和解码状态的 `BinaryCodec` 和用于向用户输出数据的 `JSONCodec` 组成(例如在 [CLI](#cli) 中)。默认情况下，SDK 使用 Protobuf 作为`Marshaler`。
+- `TxConfig`:`TxConfig` 定义了一个接口，客户端可以利用它来生成应用程序定义的具体事务类型。目前，SDK 处理两种交易类型:“SIGN_MODE_DIRECT”(使用 Protobuf 二进制作为在线编码)和“SIGN_MODE_LEGACY_AMINO_JSON”(取决于 Amino)。阅读有关交易的更多信息 [此处](../core/transactions.md)。
+- `Amino`:Cosmos SDK 的一些遗留部分仍然使用 Amino 来实现向后兼容。每个模块都公开了一个 `RegisterLegacyAmino` 方法来在 Amino 中注册模块的特定类型。应用程序开发人员不应再使用此 `Amino` 编解码器，并将在未来版本中删除。
 
-The Cosmos SDK exposes a `MakeTestEncodingConfig` function used to create a `EncodingConfig` for the app constructor (`NewApp`). It uses Protobuf as a default `Marshaler`.
-NOTE: this function is marked deprecated and should only be used to create an app or in tests. We are working on refactoring codec management in a post Stargate release.
+Cosmos SDK 公开了一个 `MakeTestEncodingConfig` 函数，用于为应用程序构造函数(`NewApp`)创建一个 `EncodingConfig`。它使用 Protobuf 作为默认的“Marshaler”。
+注意:此功能已标记为已弃用，只能用于创建应用程序或在测试中使用。我们正在努力在星际之门发布后重构编解码器管理。
 
-See an example of a `MakeTestEncodingConfig` from `simapp`:
+请参阅“simapp”中的“MakeTestEncodingConfig”示例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/590358652cc1cbc13872ea1659187e073ea38e75/simapp/encoding.go#L8-L19
 
 ## Modules
 
-[Modules](../building-modules/intro.md) are the heart and soul of Cosmos SDK applications. They can be considered as state-machines nested within the state-machine. When a transaction is relayed from the underlying Tendermint engine via the ABCI to the application, it is routed by [`baseapp`](../core/baseapp.md) to the appropriate module in order to be processed. This paradigm enables developers to easily build complex state-machines, as most of the modules they need often already exist. For developers, most of the work involved in building a Cosmos SDK application revolves around building custom modules required by their application that do not exist yet, and integrating them with modules that do already exist into one coherent application. In the application directory, the standard practice is to store modules in the `x/` folder (not to be confused with the Cosmos SDK's `x/` folder, which contains already-built modules).
+[模块](../building-modules/intro.md) 是 Cosmos SDK 应用程序的核心和灵魂。它们可以被视为嵌套在状态机中的状态机。当交易通过 ABCI 从底层 Tendermint 引擎中继到应用程序时，它由 [`baseapp`](../core/baseapp.md) 路由到适当的模块以进行处理。这种范式使开发人员能够轻松构建复杂的状态机，因为他们需要的大多数模块通常已经存在。对于开发人员而言，构建 Cosmos SDK 应用程序所涉及的大部分工作都围绕构建其应用程序所需的尚不存在的自定义模块，并将它们与已经存在的模块集成到一个连贯的应用程序中。在应用程序目录中，标准做法是将模块存储在 `x/` 文件夹中(不要与 Cosmos SDK 的 `x/` 文件夹混淆，其中包含已构建的模块)。
 
-### Application Module Interface
+### 应用模块接口
 
-Modules must implement [interfaces](../building-modules/module-manager.md#application-module-interfaces) defined in the Cosmos SDK, [`AppModuleBasic`](../building-modules/module-manager.md#appmodulebasic) and [`AppModule`](../building-modules/module-manager.md#appmodule). The former implements basic non-dependent elements of the module, such as the `codec`, while the latter handles the bulk of the module methods (including methods that require references to other modules' `keeper`s). Both the `AppModule` and `AppModuleBasic` types are defined in a file called `./module.go`.
+模块必须实现 Cosmos SDK 中定义的 [interfaces](../building-modules/module-manager.md#application-module-interfaces)，[`AppModuleBasic`](../building-modules/module-manager.md #appmodulebasic) 和 [`AppModule`](../building-modules/module-manager.md#appmodule)。前者实现模块的基本非依赖元素，例如`codec`，而后者处理模块的大部分方法(包括需要引用其他模块的`keeper`的方法)。 `AppModule` 和 `AppModuleBasic` 类型都在名为 `./module.go` 的文件中定义。
 
-`AppModule` exposes a collection of useful methods on the module that facilitates the composition of modules into a coherent application. These methods are called from the `module manager`(../building-modules/module-manager.md#manager), which manages the application's collection of modules.
+`AppModule` 在模块上公开了一组有用的方法，这些方法有助于将模块组合成一个连贯的应用程序。这些方法从管理应用程序模块集合的`模块管理器`(../building-modules/module-manager.md#manager) 调用。
 
-### `Msg` Services
+### `Msg` 服务
 
-Each module defines two [Protobuf services](https://developers.google.com/protocol-buffers/docs/proto#services): one `Msg` service to handle messages, and one gRPC `Query` service to handle queries. If we consider the module as a state-machine, then a `Msg` service is a set of state transition RPC methods.
-Each Protobuf `Msg` service method is 1:1 related to a Protobuf request type, which must implement `sdk.Msg` interface.
-Note that `sdk.Msg`s are bundled in [transactions](../core/transactions.md), and each transaction contains one or multiple messages.
+每个模块定义了两个 [Protobuf 服务](https://developers.google.com/protocol-buffers/docs/proto#services):一个用于处理消息的 `Msg` 服务，以及一个用于处理查询的 gRPC `Query` 服务。如果我们将模块视为状态机，那么“Msg”服务就是一组状态转换 RPC 方法。
+每个 Protobuf `Msg` 服务方法都与一个 Protobuf 请求类型 1:1 相关，它必须实现 `sdk.Msg` 接口。
+请注意，`sdk.Msg`s 捆绑在 [transactions](../core/transactions.md) 中，每个交易包含一条或多条消息。
 
-When a valid block of transactions is received by the full-node, Tendermint relays each one to the application via [`DeliverTx`](https://tendermint.com/docs/app-dev/abci-spec.html#delivertx). Then, the application handles the transaction:
+当全节点收到一个有效的交易块时，Tendermint 通过 [`DeliverTx`](https://tendermint.com/docs/app-dev/abci-spec.html#delivertx) 将每个交易块中继到应用程序.然后，应用程序处理事务:
 
-1. Upon receiving the transaction, the application first unmarshalls it from `[]bytes`.
-2. Then, it verifies a few things about the transaction like [fee payment and signatures](#gas-fees.md#antehandler) before extracting the `Msg`(s) contained in the transaction.
-3. `sdk.Msg`s are encoded using Protobuf [`Any`s](#register-codec). By analyzing each `Any`'s `type_url`, baseapp's `msgServiceRouter` routes the `sdk.Msg` to the corresponding module's `Msg` service.
-4. If the message is successfully processed, the state is updated.
+1. 收到交易后，应用程序首先将其从 `[]bytes` 中解组。
+2. 然后，在提取交易中包含的 `Msg`(s) 之前，它会验证一些关于交易的事情，比如 [费用支付和签名](#gas-fees.md#antehandler)。
+3. `sdk.Msg`s 使用 Protobuf [`Any`s](#register-codec) 进行编码。通过分析每个 `Any` 的 `type_url`，baseapp 的 `msgServiceRouter` 将 `sdk.Msg` 路由到相应模块的 `Msg` 服务。
+4. 如果消息处理成功，则更新状态。
 
-For a more details look at a transaction [lifecycle](./tx-lifecycle.md).
+有关更多详细信息，请查看事务 [lifecycle](./tx-lifecycle.md)。
 
-Module developers create custom `Msg` services when they build their own module. The general practice is to define the `Msg` Protobuf service in a `tx.proto` file. For example, the `x/bank` module defines a service with two methods to transfer tokens:
+模块开发人员在构建自己的模块时会创建自定义的 `Msg` 服务。一般的做法是在 `tx.proto` 文件中定义 `Msg` Protobuf 服务。例如，`x/bank` 模块定义了一个服务，它具有两种传输令牌的方法:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/proto/cosmos/bank/v1beta1/tx.proto#L10-L17
 
-Service methods use `keeper` in order to update the module state.
+服务方法使用 `keeper` 来更新模块状态。
 
-Each module should also implement the `RegisterServices` method as part of the [`AppModule` interface](#application-module-interface). This method should call the `RegisterMsgServer` function provided by the generated Protobuf code.
+每个模块还应该实现 `RegisterServices` 方法作为 [`AppModule` 接口](#application-module-interface) 的一部分。这个方法应该调用生成的 Protobuf 代码提供的 `RegisterMsgServer` 函数。
 
-### gRPC `Query` Services
+### gRPC `Query` 服务
 
-gRPC `Query` services are introduced in the v0.40 Stargate release. They allow users to query the state using [gRPC](https://grpc.io). They are enabled by default, and can be configured under the `grpc.enable` and `grpc.address` fields inside [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml).
+gRPC `Query` 服务是在 v0.40 Stargate 版本中引入的。它们允许用户使用 [gRPC](https://grpc.io) 查询状态。它们默认启用，可以在 [`app.toml`](../run-node/run-node.md#configuring-the- 内的 `grpc.enable` 和 `grpc.address` 字段下配置节点使用应用程序)。
 
-gRPC `Query` services are defined in the module's Protobuf definition files, specifically inside `query.proto`. The `query.proto` definition file exposes a single `Query` [Protobuf service](https://developers.google.com/protocol-buffers/docs/proto#services). Each gRPC query endpoint corresponds to a service method, starting with the `rpc` keyword, inside the `Query` service.
+gRPC `Query` 服务在模块的 Protobuf 定义文件中定义，特别是在 `query.proto` 中。 `query.proto` 定义文件公开了一个 `Query` [Protobuf 服务](https://developers.google.com/protocol-buffers/docs/proto#services)。每个 gRPC 查询端点对应一个服务方法，以 rpc 关键字开头，位于 Query 服务中。
 
-Protobuf generates a `QueryServer` interface for each module, containing all the service methods. A module's [`keeper`](#keeper) then needs to implement this `QueryServer` interface, by providing the concrete implementation of each service method. This concrete implementation is the handler of the corresponding gRPC query endpoint.
+Protobuf 为每个模块生成一个 `QueryServer` 接口，包含所有服务方法。一个模块的 [`keeper`](#keeper) 则需要通过提供每个服务方法的具体实现来实现这个 `QueryServer` 接口。这个具体的实现是对应的 gRPC 查询端点的处理程序。
 
-Finally, each module should also implement the `RegisterServices` method as part of the [`AppModule` interface](#application-module-interface). This method should call the `RegisterQueryServer` function provided by the generated Protobuf code.
+最后，每个模块还应该实现 `RegisterServices` 方法作为 [`AppModule` 接口](#application-module-interface) 的一部分。这个方法应该调用生成的 Protobuf 代码提供的 `RegisterQueryServer` 函数。
 
-### Keeper
+### 守门员
 
-[`Keepers`](../building-modules/keeper.md) are the gatekeepers of their module's store(s). To read or write in a module's store, it is mandatory to go through one of its `keeper`'s methods. This is ensured by the [object-capabilities](../core/ocap.md) model of the Cosmos SDK. Only objects that hold the key to a store can access it, and only the module's `keeper` should hold the key(s) to the module's store(s).
+[`Keepers`](../building-modules/keeper.md) 是其模块存储的看门人。要在模块的存储中读取或写入，必须通过其 `keeper` 方法之一。这是由 Cosmos SDK 的 [object-capabilities](../core/ocap.md) 模型确保的。只有持有存储密钥的对象才能访问它，并且只有模块的`keeper` 应该持有模块存储的密钥。
 
-`Keepers` are generally defined in a file called `keeper.go`. It contains the `keeper`'s type definition and methods.
+`Keepers` 通常定义在一个名为 `keeper.go` 的文件中。它包含 `keeper` 的类型定义和方法。
 
-The `keeper` type definition generally consists of:
+`keeper` 类型定义通常包括:
 
-- **Key(s)** to the module's store(s) in the multistore.
-- Reference to **other module's `keepers`**. Only needed if the `keeper` needs to access other module's store(s) (either to read or write from them).
-- A reference to the application's **codec**. The `keeper` needs it to marshal structs before storing them, or to unmarshal them when it retrieves them, because stores only accept `[]bytes` as value.
+- **Key(s)** 到 multistore 中模块的 store(s)。
+- 参考**其他模块的`keepers`**。仅当 `keeper` 需要访问其他模块的存储(读取或写入它们)时才需要。
+- 对应用程序的 **codec** 的引用。 `keeper` 需要它在存储它们之前编组结构，或者在检索它们时解组它们，因为存储只接受 `[]bytes` 作为值。
 
-Along with the type definition, the next important component of the `keeper.go` file is the `keeper`'s constructor function, `NewKeeper`. This function instantiates a new `keeper` of the type defined above, with a `codec`, store `keys` and potentially references to other modules' `keeper`s as parameters. The `NewKeeper` function is called from the [application's constructor](#constructor-function). The rest of the file defines the `keeper`'s methods, primarily getters and setters.
+与类型定义一起，`keeper.go` 文件的下一个重要组件是 `keeper` 的构造函数，`NewKeeper`。这个函数实例化一个上面定义的类型的新的`keeper`，带有一个`codec`，存储`keys`和潜在的对其他模块`keeper`s的引用作为参数。 `NewKeeper` 函数是从 [应用程序的构造函数](#constructor-function) 调用的。文件的其余部分定义了 `keeper` 的方法，主要是 getter 和 setter。
 
-### Command-Line, gRPC Services and REST Interfaces
+### 命令行、gRPC 服务和 REST 接口
 
-Each module defines command-line commands, gRPC services and REST routes to be exposed to end-user via the [application's interfaces](#application-interfaces). This enables end-users to create messages of the types defined in the module, or to query the subset of the state managed by the module.
+每个模块都定义了命令行命令、gRPC 服务和 REST 路由，这些路由通过 [应用程序的接口](#application-interfaces) 暴露给最终用户。这使最终用户能够创建模块中定义的类型的消息，或查询模块管理的状态子集。
 
-#### CLI
+#### 命令行界面
 
-Generally, the [commands related to a module](../building-modules/module-interfaces.md#cli) are defined in a folder called `client/cli` in the module's folder. The CLI divides commands in two category, transactions and queries, defined in `client/cli/tx.go` and `client/cli/query.go` respectively. Both commands are built on top of the [Cobra Library](https://github.com/spf13/cobra):
+通常，[与模块相关的命令](../building-modules/module-interfaces.md#cli) 定义在模块文件夹中名为`client/cli` 的文件夹中。 CLI 将命令分为两类，事务和查询，分别在 `client/cli/tx.go` 和 `client/cli/query.go` 中定义。这两个命令都建立在 [Cobra 库](https://github.com/spf13/cobra) 之上:
 
-- Transactions commands let users generate new transactions so that they can be included in a block and eventually update the state. One command should be created for each [message type](#message-types) defined in the module. The command calls the constructor of the message with the parameters provided by the end-user, and wraps it into a transaction. The Cosmos SDK handles signing and the addition of other transaction metadata.
-- Queries let users query the subset of the state defined by the module. Query commands forward queries to the [application's query router](../core/baseapp.md#query-routing), which routes them to the appropriate [querier](#querier) the `queryRoute` parameter supplied.
+- 交易命令让用户生成新交易，以便它们可以包含在一个块中并最终更新状态。应该为模块中定义的每个 [消息类型](#message-types) 创建一个命令。该命令使用最终用户提供的参数调用消息的构造函数，并将其包装到事务中。 Cosmos SDK 处理签名和其他交易元数据的添加。
+- 查询让用户查询模块定义的状态的子集。查询命令将查询转发到 [application's query router](../core/baseapp.md#query-routing)，后者将它们路由到适当的 [querier](#querier) 提供的 `queryRoute` 参数。 
 
 #### gRPC
 
-[gRPC](https://grpc.io) is a modern open source high performance RPC framework that has support in multiple languages. It is the recommended way for external clients (such as wallets, browsers and other backend services) to interact with a node.
+[gRPC](https://grpc.io) 是一个现代开源的高性能 RPC 框架，支持多种语言。这是外部客户端(如钱包、浏览器和其他后端服务)与节点交互的推荐方式。
 
-Each module can expose gRPC endpoints, called [service methods](https://grpc.io/docs/what-is-grpc/core-concepts/#service-definition) and are defined in the [module's Protobuf `query.proto` file](#grpc-query-services). A service method is defined by its name, input arguments and output response. The module then needs to:
+每个模块都可以公开 gRPC 端点，称为 [服务方法](https://grpc.io/docs/what-is-grpc/core-concepts/#service-definition) 并在 [模块的 Protobuf `query.proto 中定义`文件](#grpc-query-services)。服务方法由其名称、输入参数和输出响应定义。然后模块需要:
 
-- define a `RegisterGRPCGatewayRoutes` method on `AppModuleBasic` to wire the client gRPC requests to the correct handler inside the module.
-- for each service method, define a corresponding handler. The handler implements the core logic necessary to serve the gRPC request, and is located in the `keeper/grpc_query.go` file.
+- 在`AppModuleBasic` 上定义一个`RegisterGRPCGatewayRoutes` 方法，将客户端gRPC 请求连接到模块内的正确处理程序。
+- 对于每个服务方法，定义一个相应的处理程序。处理程序实现服务 gRPC 请求所需的核心逻辑，位于 `keeper/grpc_query.go` 文件中。
 
-#### gRPC-gateway REST Endpoints
+#### gRPC 网关 REST 端点
 
-Some external clients may not wish to use gRPC. The Cosmos SDK provides in this case a gRPC gateway service, which exposes each gRPC service as a correspoding REST endpoint. Please refer to the [grpc-gateway](https://grpc-ecosystem.github.io/grpc-gateway/) documentation to learn more.
+一些外部客户端可能不希望使用 gRPC。在这种情况下，Cosmos SDK 提供了一个 gRPC 网关服务，它将每个 gRPC 服务公开为一个对应的 REST 端点。请参阅 [grpc-gateway](https://grpc-ecosystem.github.io/grpc-gateway/) 文档以了解更多信息。
 
-The REST endpoints are defined in the Protobuf files, along with the gRPC services, using Protobuf annotations. Modules that want to expose REST queries should add `google.api.http` annotations to their `rpc` methods. By default, all REST endpoints defined in the SDK have an URL starting with the `/cosmos/` prefix.
+REST 端点与 gRPC 服务一起在 Protobuf 文件中定义，使用 Protobuf 注释。想要公开 REST 查询的模块应该在它们的 `rpc` 方法中添加 `google.api.http` 注释。默认情况下，SDK 中定义的所有 REST 端点都有一个以 `/cosmos/` 前缀开头的 URL。
 
-The Cosmos SDK also provides a development endpoint to generate [Swagger](https://swagger.io/) definition files for these REST endpoints. This endpoint can be enabled inside the [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml) config file, under the `api.swagger` key.
+Cosmos SDK 还提供了一个开发端点来为这些 REST 端点生成 [Swagger](https://swagger.io/) 定义文件。可以在 [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml) 配置文件中的 `api.swagger` 键下启用此端点。
 
-## Application Interface
+## 应用程序接口
 
-[Interfaces](#command-line-grpc-services-and-rest-interfaces) let end-users interact with full-node clients. This means querying data from the full-node or creating and sending new transactions to be relayed by the full-node and eventually included in a block.
+[接口](#command-line-grpc-services-and-rest-interfaces) 让终端用户与全节点客户端交互。这意味着从全节点查询数据或创建和发送由全节点中继并最终包含在一个块中的新交易。
 
-The main interface is the [Command-Line Interface](../core/cli.md). The CLI of a Cosmos SDK application is built by aggregating [CLI commands](#cli) defined in each of the modules used by the application. The CLI of an application is the same as the daemon (e.g. `appd`), and defined in a file called `appd/main.go`. The file contains:
+主界面是[命令行界面](../core/cli.md)。 Cosmos SDK 应用程序的 CLI 是通过聚合应用程序使用的每个模块中定义的 [CLI 命令](#cli) 构建的。应用程序的 CLI 与守护进程(例如 `appd`)相同，并在名为 `appd/main.go` 的文件中定义。该文件包含:
 
-- **A `main()` function**, which is executed to build the `appd` interface client. This function prepares each command and adds them to the `rootCmd` before building them. At the root of `appd`, the function adds generic commands like `status`, `keys` and `config`, query commands, tx commands and `rest-server`.
-- **Query commands** are added by calling the `queryCmd` function. This function returns a Cobra command that contains the query commands defined in each of the application's modules (passed as an array of `sdk.ModuleClients` from the `main()` function), as well as some other lower level query commands such as block or validator queries. Query command are called by using the command `appd query [query]` of the CLI.
-- **Transaction commands** are added by calling the `txCmd` function. Similar to `queryCmd`, the function returns a Cobra command that contains the tx commands defined in each of the application's modules, as well as lower level tx commands like transaction signing or broadcasting. Tx commands are called by using the command `appd tx [tx]` of the CLI.
+- **一个`main()`函数**，用于构建`appd`接口客户端。此函数准备每个命令，并在构建它们之前将它们添加到 `rootCmd`。在`appd` 的根目录下，该函数添加了诸如`status`、`keys` 和`config` 等通用命令、查询命令、tx 命令和`rest-server`。
+- **查询命令**是通过调用`queryCmd`函数添加的。此函数返回一个 Cobra 命令，其中包含在每个应用程序模块中定义的查询命令(从 `main()` 函数作为 `sdk.ModuleClients` 数组传递)，以及一些其他较低级别的查询命令，例如块或验证器查询。使用 CLI 的命令 `appd query [query]` 调用查询命令。
+- 通过调用`txCmd` 函数添加**交易命令**。与 `queryCmd` 类似，该函数返回一个 Cobra 命令，其中包含在每个应用程序模块中定义的 tx 命令，以及较低级别的 tx 命令，如交易签名或广播。使用 CLI 的命令 `appd tx [tx]` 调用 Tx 命令。
 
-See an example of an application's main command-line file from the [nameservice tutorial](https://github.com/cosmos/sdk-tutorials/tree/master/nameservice)
+请参阅 [nameservice 教程](https://github.com/cosmos/sdk-tutorials/tree/master/nameservice) 中的应用程序主命令行文件示例
 
 +++ https://github.com/cosmos/sdk-tutorials/blob/86a27321cf89cc637581762e953d0c07f8c78ece/nameservice/cmd/nscli/main.go
 
-## Dependencies and Makefile
+## 依赖项和 Makefile
 
-::: warning
-A patch introduced in `go-grpc v1.34.0` made gRPC incompatible with the `gogoproto` library, making some [gRPC queries](https://github.com/cosmos/cosmos-sdk/issues/8426) panic. As such, the Cosmos SDK requires that `go-grpc <=v1.33.2` is installed in your `go.mod`.
+::: 警告
+`go-grpc v1.34.0` 中引入的补丁使 gRPC 与 `gogoproto` 库不兼容，导致一些 [gRPC 查询](https://github.com/cosmos/cosmos-sdk/issues/8426) 恐慌。因此，Cosmos SDK 要求在你的 `go.mod` 中安装 `go-grpc <=v1.33.2`。
 
-To make sure that gRPC is working properly, it is **highly recommended** to add the following line in your application's `go.mod`:
+为确保 gRPC 正常工作，**强烈建议**在您的应用程序的 `go.mod` 中添加以下行: 
 
 ```
 replace google.golang.org/grpc => google.golang.org/grpc v1.33.2
 ```
 
-Please see [issue #8392](https://github.com/cosmos/cosmos-sdk/issues/8392) for more info.
+请参阅 [issue #8392](https://github.com/cosmos/cosmos-sdk/issues/8392) 了解更多信息。
 :::
 
-This section is optional, as developers are free to choose their dependency manager and project building method. That said, the current most used framework for versioning control is [`go.mod`](https://github.com/golang/go/wiki/Modules). It ensures each of the libraries used throughout the application are imported with the correct version. See an example from the [nameservice tutorial](https://github.com/cosmos/sdk-tutorials/tree/master/nameservice):
+这部分是可选的，因为开发人员可以自由选择他们的依赖管理器和项目构建方法。也就是说，当前最常用的版本控制框架是 [`go.mod`](https://github.com/golang/go/wiki/Modules)。它确保在整个应用程序中使用的每个库都以正确的版本导入。请参阅 [nameservice 教程](https://github.com/cosmos/sdk-tutorials/tree/master/nameservice) 中的示例:
 
 +++ https://github.com/cosmos/sdk-tutorials/blob/c6754a1e313eb1ed973c5c91dcc606f2fd288811/go.mod#L1-L18
 
-For building the application, a [Makefile](https://en.wikipedia.org/wiki/Makefile) is generally used. The Makefile primarily ensures that the `go.mod` is run before building the two entrypoints to the application, [`appd`](#node-client) and [`appd`](#application-interface). See an example of Makefile from the [nameservice tutorial](https://tutorials.cosmos.network/nameservice/tutorial/00-intro.html)
+为了构建应用程序，通常使用 [Makefile](https://en.wikipedia.org/wiki/Makefile)。 Makefile 主要确保在构建应用程序的两个入口点 [`appd`](#node-client) 和 [`appd`](#application-interface) 之前运行 `go.mod`。请参阅 [nameservice 教程](https://tutorials.cosmos.network/nameservice/tutorial/00-intro.html) 中的 Makefile 示例
 
 +++ https://github.com/cosmos/sdk-tutorials/blob/86a27321cf89cc637581762e953d0c07f8c78ece/nameservice/Makefile
 
-## Next {hide}
+## 下一个 {hide}
 
-Learn more about the [Lifecycle of a transaction](./tx-lifecycle.md) {hide}
+详细了解 [交易的生命周期](./tx-lifecycle.md) {hide} 

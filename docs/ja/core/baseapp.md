@@ -1,7 +1,3 @@
-<!--
-order: 1
--->
-
 # BaseApp
 
 This document describes `BaseApp`, the abstraction that implements the core functionalities of a Cosmos SDK application. {synopsis}

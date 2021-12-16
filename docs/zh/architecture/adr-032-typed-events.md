@@ -1,40 +1,40 @@
-# ADR 032: Typed Events
+# ADR 032:类型化事件
 
-## Changelog
+## 变更日志
 
-- 28-Sept-2020: Initial Draft
+- 2020 年 9 月 28 日:初稿
 
-## Authors
+##作者
 
-- Anil Kumar (@anilcse)
-- Jack Zampolin (@jackzampolin)
-- Adam Bozanich (@boz)
+- 阿尼尔·库马尔 (@anilcse)
+- 杰克赞普林 (@jackzampolin)
+- 亚当·博赞奇 (@boz)
 
-## Status
+## 地位
 
-Proposed
+建议的
 
-## Abstract
+## 摘要
 
-Currently in the Cosmos SDK, events are defined in the handlers for each message as well as `BeginBlock` and `EndBlock`. Each module doesn't have types defined for each event, they are implemented as `map[string]string`. Above all else this makes these events difficult to consume as it requires a great deal of raw string matching and parsing. This proposal focuses on updating the events to use **typed events** defined in each module such that emiting and subscribing to events will be much easier. This workflow comes from the experience of the Akash Network team.
+目前在 Cosmos SDK 中，事件在每条消息的处理程序中以及“BeginBlock”和“EndBlock”中定义。每个模块都没有为每个事件定义类型，它们被实现为`map[string]string`。最重要的是，这使得这些事件难以使用，因为它需要大量的原始字符串匹配和解析。该提案的重点是更新事件以使用每个模块中定义的 **typed events**，从而使事件的发出和订阅变得更加容易。此工作流程来自 Akash Network 团队的经验。
 
-## Context
+## 语境
 
-Currently in the Cosmos SDK, events are defined in the handlers for each message, meaning each module doesn't have a cannonical set of types for each event. Above all else this makes these events difficult to consume as it requires a great deal of raw string matching and parsing. This proposal focuses on updating the events to use **typed events** defined in each module such that emiting and subscribing to events will be much easier. This workflow comes from the experience of the Akash Network team.
+目前在 Cosmos SDK 中，事件在每个消息的处理程序中定义，这意味着每个模块没有每个事件的规范类型集。最重要的是，这使得这些事件难以使用，因为它需要大量的原始字符串匹配和解析。该提案的重点是更新事件以使用每个模块中定义的 **typed events**，从而使事件的发出和订阅变得更加容易。此工作流程来自 Akash Network 团队的经验。
 
-[Our platform](http://github.com/ovrclk/akash) requires a number of programatic on chain interactions both on the provider (datacenter - to bid on new orders and listen for leases created) and user (application developer - to send the app manifest to the provider) side. In addition the Akash team is now maintaining the IBC [`relayer`](https://github.com/ovrclk/relayer), another very event driven process. In working on these core pieces of infrastructure, and integrating lessons learned from Kubernetes developement, our team has developed a standard method for defining and consuming typed events in Cosmos SDK modules. We have found that it is extremely useful in building this type of event driven application.
+[我们的平台](http://github.com/ovrclk/akash) 需要在提供者(数据中心 - 竞标新订单并监听创建的租约)和用户(应用程序开发人员 - 到将应用清单发送到提供者)端。此外，Akash 团队现在正在维护 IBC [`relayer`](https://github.com/ovrclk/relayer)，这是另一个非常事件驱动的过程。在处理这些基础设施的核心部分，并整合从 Kubernetes 开发中吸取的经验教训时，我们的团队开发了一种标准方法来定义和使用 Cosmos SDK 模块中的类型化事件。我们发现它在构建这种类型的事件驱动应用程序时非常有用。
 
-As the Cosmos SDK gets used more extensively for apps like `peggy`, other peg zones, IBC, DeFi, etc... there will be an exploding demand for event driven applications to support new features desired by users. We propose upstreaming our findings into the Cosmos SDK to enable all Cosmos SDK applications to quickly and easily build event driven apps to aid their core application. Wallets, exchanges, explorers, and defi protocols all stand to benefit from this work.
+随着 Cosmos SDK 被更广泛地用于“peggy”、其他挂钩区域、IBC、DeFi 等应用程序，对事件驱动应用程序的需求将呈爆炸式增长，以支持用户所需的新功能。我们建议将我们的发现上传到 Cosmos SDK 中，以使所有 Cosmos SDK 应用程序能够快速轻松地构建事件驱动的应用程序，以帮助其核心应用程序。钱包、交易所、浏览器和 defi 协议都将从这项工作中受益。
 
-If this proposal is accepted, users will be able to build event driven Cosmos SDK apps in go by just writing `EventHandler`s for their specific event types and passing them to `EventEmitters` that are defined in the Cosmos SDK.
+如果这个提议被接受，用户将能够在 go 中构建事件驱动的 Cosmos SDK 应用程序，只需为他们的特定事件类型编写 `EventHandler` 并将它们传递给 Cosmos SDK 中定义的 `EventEmitters`。
 
-The end of this proposal contains a detailed example of how to consume events after this refactor.
+本提案的末尾包含了一个详细的示例，说明在此重构后如何消费事件。
 
-This proposal is specifically about how to consume these events as a client of the blockchain, not for intermodule communication.
+这个提案具体是关于如何将这些事件作为区块链的客户端来消费，而不是用于模块间的通信。
 
-## Decision
+## 决定
 
-__Step-1__:  Implement additional functionality in the `types` package: `EmitTypedEvent` and `ParseTypedEvent` functions
+__Step-1__:在 `types` 包中实现附加功能:`EmitTypedEvent` 和 `ParseTypedEvent` 函数 
 
 ```go
 // types/events.go
@@ -107,13 +107,13 @@ func ParseTypedEvent(event abci.Event) (proto.Message, error) {
 }
 ```
 
-Here, the `EmitTypedEvent` is a method on `EventManager` which takes typed event as input and apply json serialization on it. Then it maps the JSON key/value pairs to `event.Attributes` and emits it in form of `sdk.Event`. `Event.Type` will be the type URL of the proto message.
+在这里，`EmitTypedEvent` 是`EventManager` 上的一个方法，它将类型化事件作为输入并对其应用 json 序列化。 然后它将 JSON 键/值对映射到 `event.Attributes` 并以 `sdk.Event` 的形式发出它。 `Event.Type` 将是 proto 消息的类型 URL。
 
-When we subscribe to emitted events on the tendermint websocket, they are emitted in the form of an `abci.Event`. `ParseTypedEvent` parses the event back to it's original proto message.
+当我们在tendermint websocket上订阅发出的事件时，它们以`abci.Event`的形式发出。 `ParseTypedEvent` 将事件解析回它的原始 proto 消息。
 
-__Step-2__: Add proto definitions for typed events for msgs in each module:
+__Step-2__:在每个模块中为 msgs 的类型化事件添加原型定义:
 
-For example, let's take `MsgSubmitProposal` of `gov` module and implement this event's type.
+例如，让我们以 `gov` 模块的 `MsgSubmitProposal` 来实现这个事件的类型。 
 
 ```protobuf
 // proto/cosmos/gov/v1beta1/gov.proto
@@ -128,7 +128,7 @@ message EventSubmitProposal {
 }
 ```
 
-__Step-3__: Refactor event emission to use the typed event created and emit using `sdk.EmitTypedEvent`:
+__Step-3__:重构事件发射以使用使用`sdk.EmitTypedEvent`创建和发射的类型化事件:
 
 ```go
 // x/gov/handler.go
@@ -145,30 +145,30 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper keeper.Keeper, msg types.Ms
 }
 ```
 
-#### How to subscribe to these typed events in `Client`
+#### 如何在`Client` 中订阅这些类型的事件
 
-> NOTE: Full code example below
+> 注意:下面的完整代码示例
 
-Users will be able to subscribe using `client.Context.Client.Subscribe` and consume events which are emitted using `EventHandler`s.
+用户将能够使用 `client.Context.Client.Subscribe` 订阅并使用使用 `EventHandler` 发出的事件。
 
-Akash Network has built a simple [`pubsub`](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/pubsub/bus.go#L20). This can be used to subscribe to `abci.Events` and [publish](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/events/publish.go#L21) them as typed events.
+Akash Network 构建了一个简单的 [`pubsub`](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/pubsub/bus.go#L20)。 这可用于订阅 `abci.Events` 和 [publish](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/events/publish.go#L21) 作为类型事件。
 
-Please see the below code sample for more detail on this flow looks for clients.
+有关此流程查找客户端的更多详细信息，请参阅以下代码示例。 
 
 ## Consequences
 
 ### Positive
 
-* Improves consistency of implementation for the events currently in the Cosmos SDK
-* Provides a much more ergonomic way to handle events and facilitates writing event driven applications
-* This implementation will support a middleware ecosystem of `EventHandler`s
+* 提高了当前 Cosmos SDK 中事件实现的一致性 
+* 提供一种更符合人体工程学的方式来处理事件并促进编写事件驱动的应用程序
+* 此实现将支持`EventHandler`s 的中间件生态系统 
 
 ### Negative
 
 ## Detailed code example of publishing events
 
-This ADR also proposes adding affordances to emit and consume these events. This way developers will only need to write
-`EventHandler`s which define the actions they desire to take.
+该 ADR 还建议添加可供性以发出和使用这些事件。 这样开发人员只需要编写
+`EventHandler`s 定义了他们想要采取的行动。 
 
 ```go
 // EventEmitter is a type that describes event emitter functions
@@ -315,5 +315,5 @@ func PublishChainTxEvents(ctx context.Context, client tmclient.EventsClient, bus
 
 ## References
 
-- [Publish Custom Events via a bus](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/events/publish.go#L19-L58)
-- [Consuming the events in `Client`](https://github.com/ovrclk/deploy/blob/bf6c633ab6c68f3026df59efd9982d6ca1bf0561/cmd/event-handlers.go#L57)
+- [通过总线发布自定义事件](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/events/publish.go#L19-L58)
+- [使用`Client`中的事件](https://github.com/ovrclk/deploy/blob/bf6c633ab6c68f3026df59efd9982d6ca1bf0561/cmd/event-handlers.go#L57) 

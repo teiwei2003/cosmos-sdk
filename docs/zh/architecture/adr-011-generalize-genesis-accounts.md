@@ -1,24 +1,24 @@
-# ADR 011: Generalize Genesis Accounts
+# ADR 011:推广创世纪账户
 
-## Changelog
+## 变更日志
 
-- 2019-08-30: initial draft
+- 2019-08-30:初稿
 
-## Context
+## 语境
 
-Currently, the Cosmos SDK allows for custom account types; the `auth` keeper stores any type fulfilling its `Account` interface. However `auth` does not handle exporting or loading accounts to/from a genesis file, this is done by `genaccounts`, which only handles one of 4 concrete account types (`BaseAccount`, `ContinuousVestingAccount`, `DelayedVestingAccount` and `ModuleAccount`).
+目前，Cosmos SDK 允许自定义帐户类型； `auth` keeper 存储满足其 `Account` 接口的任何类型。然而，`auth` 不处理从创世文件导出或加载帐户，这是由 `genaccounts` 完成的，它只处理 4 种具体帐户类型(`BaseAccount`、`ContinuousVestingAccount`、`DelayedVestingAccount` 和`ModuleAccount)中的一种`)。
 
-Projects desiring to use custom accounts (say custom vesting accounts) need to fork and modify `genaccounts`.
+希望使用自定义帐户(例如自定义归属帐户)的项目需要分叉和修改“genaccounts”。
 
-## Decision
+## 决定
 
-In summary, we will (un)marshal all accounts (interface types) directly using amino, rather than converting to `genaccounts`’s `GenesisAccount` type. Since doing this removes the majority of `genaccounts`'s code, we will merge `genaccounts` into `auth`. Marshalled accounts will be stored in `auth`'s genesis state.
+总而言之，我们将(取消)使用amino 直接编组所有帐户(接口类型)，而不是转换为`genaccounts` 的`GenesisAccount` 类型。由于这样做会删除大部分 `genaccounts` 的代码，我们将把 `genaccounts` 合并到 `auth` 中。编组的帐户将存储在“auth”的创世状态中。
 
-Detailed changes:
+详细变化:
 
-### 1) (Un)Marshal accounts directly using amino
+### 1) (Un)Marshal 帐户直接使用氨基
 
-The `auth` module's `GenesisState` gains a new field `Accounts`. Note these aren't of type `exported.Account` for reasons outlined in section 3.
+`auth` 模块的 `GenesisState` 获得了一个新的字段 `Accounts`。请注意，由于第 3 节中概述的原因，这些不是 `exported.Account` 类型。
 
 ```go
 // GenesisState - all auth state that must be provided at genesis
@@ -28,7 +28,7 @@ type GenesisState struct {
 }
 ```
 
-Now `auth`'s `InitGenesis` and `ExportGenesis` (un)marshal accounts as well as the defined params.
+现在`auth` 的`InitGenesis` 和`ExportGenesis` (un)marshal 帐户以及定义的参数。 
 
 ```go
 // InitGenesis - Init store state from genesis data
@@ -56,11 +56,11 @@ func ExportGenesis(ctx sdk.Context, ak AccountKeeper) GenesisState {
 }
 ```
 
-### 2) Register custom account types on the `auth` codec
+### 2) 在 `auth` 编解码器上注册自定义帐户类型
 
-The `auth` codec must have all custom account types registered to marshal them. We will follow the pattern established in `gov` for proposals.
+`auth` 编解码器必须注册所有自定义帐户类型以对其进行编组。 我们将遵循“gov”中建立的提案模式。
 
-An example custom account definition:
+自定义帐户定义示例:
 
 ```go
 import authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -74,7 +74,7 @@ type ModuleAccount struct {
     ...
 ```
 
-The `auth` codec definition:
+`auth` 编解码器定义: 
 
 ```go
 var ModuleCdc *codec.LegacyAmino
@@ -92,11 +92,11 @@ func RegisterAccountTypeCodec(o interface{}, name string) {
 }
 ```
 
-### 3) Genesis validation for custom account types
+### 3) 自定义账户类型的创世验证
 
-Modules implement a `ValidateGenesis` method. As `auth` does not know of account implementations, accounts will need to validate themselves.
+模块实现了一个 `ValidateGenesis` 方法。 由于“auth”不知道帐户的实现，因此帐户需要自我验证。
 
-We will unmarshal accounts into a `GenesisAccount` interface that includes a `Validate` method.
+我们将把账户解组到一个包含一个 Validate 方法的 GenesisAccount 接口中。 
 
 ```go
 type GenesisAccount interface {
@@ -105,7 +105,7 @@ type GenesisAccount interface {
 }
 ```
 
-Then the `auth` `ValidateGenesis` function becomes:
+然后`auth``ValidateGenesis`函数变成:
 
 ```go
 // ValidateGenesis performs basic validation of auth genesis data returning an
@@ -135,18 +135,18 @@ func ValidateGenesis(data GenesisState) error {
 }
 ```
 
-### 4) Move add-genesis-account cli to `auth`
+### 4) 将 add-genesis-account cli 移动到 `auth`
 
-The `genaccounts` module contains a cli command to add base or vesting accounts to a genesis file.
+`genaccounts` 模块包含一个 cli 命令，用于将基本帐户或归属帐户添加到创世文件中。
 
-This will be moved to `auth`. We will leave it to projects to write their own commands to add custom accounts. An extensible cli handler, similar to `gov`, could be created but it is not worth the complexity for this minor use case.
+这将被移动到`auth`。 我们将留给项目编写自己的命令来添加自定义帐户。 可以创建一个类似于 `gov` 的可扩展 cli 处理程序，但对于这个次要用例来说，复杂性不值得。
 
-### 5) Update module and vesting accounts
+### 5) 更新模块和归属账户
 
-Under the new scheme, module and vesting account types need some minor updates:
+在新方案下，模块和归属账户类型需要一些小的更新:
 
-- Type registration on `auth`'s codec (shown above)
-- A `Validate` method for each `Account` concrete type
+- 在 `auth` 的编解码器上键入注册(如上所示)
+- 每个“Account”具体类型的“Validate”方法 
 
 ## Status
 
@@ -156,15 +156,15 @@ Proposed
 
 ### Positive
 
-- custom accounts can be used without needing to fork `genaccounts`
-- reduction in lines of code
+- 无需分叉`genaccounts`即可使用自定义帐户
+- 减少代码行数 
 
 ### Negative
 
 ### Neutral
 
-- `genaccounts` module no longer exists
-- accounts in genesis files are stored under `accounts` in `auth` rather than in the `genaccounts` module.
--`add-genesis-account` cli command now in `auth`
+- `genaccounts` 模块不再存在
+- 创世文件中的帐户存储在“auth”中的“accounts”下，而不是“genaccounts”模块中。
+-`add-genesis-account` cli 命令现在在 `auth` 中 
 
 ## References

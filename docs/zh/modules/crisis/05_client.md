@@ -1,16 +1,12 @@
-<!--
-order: 5
--->
+# 客户
 
-# Client
+##命令行界面
 
-## CLI
-
-A user can query and interact with the `crisis` module using the CLI.
+用户可以使用 CLI 查询“危机”模块并与之交互。 
 
 ### Transactions
 
-The `tx` commands allow users to interact with the `crisis` module.
+`tx` 命令允许用户与 `crisis` 模块交互。 
 
 ```bash
 simd tx crisis --help
@@ -18,7 +14,7 @@ simd tx crisis --help
 
 #### invariant-broken
 
-The `invariant-broken` command submits proof when an invariant was broken to halt the chain
+`invariant-broken` 命令在不变量被破坏以停止链时提交证明 
 
 ```bash
 simd tx crisis invariant-broken [module-name] [invariant-route] [flags]

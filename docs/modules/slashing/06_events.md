@@ -1,7 +1,3 @@
-<!--
-order: 6
--->
-
 # Events
 
 The slashing module emits the following events:

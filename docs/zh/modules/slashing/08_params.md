@@ -1,10 +1,6 @@
-<!--
-order: 8
--->
+# 参数
 
-# Parameters
-
-The slashing module contains the following parameters:
+slashing 模块包含以下参数: 
 
 | Key                     | Type           | Example                |
 | ----------------------- | -------------- | ---------------------- |

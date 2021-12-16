@@ -1,72 +1,68 @@
-<!--
-order: 5
--->
+# 归属
 
-# Vesting
-
-- [Vesting](#vesting)
-    - [Intro and Requirements](#intro-and-requirements)
-    - [Note](#note)
-    - [Vesting Account Types](#vesting-account-types)
-    - [Vesting Account Specification](#vesting-account-specification)
-        - [Determining Vesting & Vested Amounts](#determining-vesting--vested-amounts)
-            - [Continuously Vesting Accounts](#continuously-vesting-accounts)
-        - [Periodic Vesting Accounts](#periodic-vesting-accounts)
-            - [Delayed/Discrete Vesting Accounts](#delayeddiscrete-vesting-accounts)
-        - [Transferring/Sending](#transferringsending)
-            - [Keepers/Handlers](#keepershandlers)
-        - [Delegating](#delegating)
-            - [Keepers/Handlers](#keepershandlers-1)
-        - [Undelegating](#undelegating)
-            - [Keepers/Handlers](#keepershandlers-2)
+- [归属](#vesting)
+    - [介绍和要求](#intro-and-requirements)
+    - [注意](#note)
+    - [归属账户类型](#vesting-account-types)
+    - [归属账户规范](#vesting-account-specification)
+        - [确定归属和归属金额](#determining-vesting--vested-amounts)
+            - [持续归属账户](#continuously-vesting-accounts)
+        - [定期归属账户](#periodic-vesting-accounts)
+            - [延迟/离散归属账户](#delayeddiscrete-vesting-accounts)
+        - [传输/发送](#transferringsending)
+            - [守护者/处理者](#keepershandlers)
+        - [委托](#delegating)
+            - [守护者/处理者](#keepershandlers-1)
+        - [取消委派](#取消委派)
+            - [守护者/处理者](#keepershandlers-2)
     - [Keepers & Handlers](#keepers--handlers)
-    - [Genesis Initialization](#genesis-initialization)
-    - [Examples](#examples)
-        - [Simple](#simple)
+    - [创世初始化](#genesis-initialization)
+    - [例子](#examples)
+        - [简单](#simple)
         - [Slashing](#slashing)
-        - [Periodic Vesting](#periodic-vesting)
-    - [Glossary](#glossary)
+        - [定期归属](#periodic-vesting)
+    - [词汇表](#glossary)
 
-## Intro and Requirements
+## 介绍和要求
 
-This specification defines the vesting account implementation that is used by
-the Cosmos Hub. The requirements for this vesting account is that it should be
-initialized during genesis with a starting balance `X` and a vesting end
-time `ET`. A vesting account may be initialized with a vesting start time `ST`
-and a number of vesting periods `P`. If a vesting start time is included, the
-vesting period does not begin until start time is reached. If vesting periods
-are included, the vesting occurs over the specified number of periods.
+该规范定义了由以下人员使用的归属账户实现
+宇宙中心。这个归属账户的要求是它应该是
+在创世期间用起始余额“X”和归属结束初始化
+时间`ET`。归属账户可以用归属开始时间`ST`初始化
+和一些归属期`P`。如果包括归属开始时间，则
+归属期直到开始时间才开始。如果归属期
+包括在内，归属发生在指定的时期数。
 
-For all vesting accounts, the owner of the vesting account is able to delegate
-and undelegate from validators, however they cannot transfer coins to another
-account until those coins are vested. This specification allows for four
-different kinds of vesting:
+对于所有归属账户，归属账户的所有者可以委托
+并从验证者那里取消委托，但是他们不能将硬币转移到另一个
+帐户，直到这些硬币归属。该规范允许四个
+不同类型的归属:
 
-- Delayed vesting, where all coins are vested once `ET` is reached.
-- Continous vesting, where coins begin to vest at `ST` and vest linearly with
-respect to time until `ET` is reached
-- Periodic vesting, where coins begin to vest at `ST` and vest periodically
-according to number of periods and the vesting amount per period.
-The number of periods, length per period, and amount per period are
-configurable. A periodic vesting account is distinguished from a continuous
-vesting account in that coins can be released in staggered tranches. For
-example, a periodic vesting account could be used for vesting arrangements
-where coins are relased quarterly, yearly, or over any other function of
-tokens over time.
-- Permanent locked vesting, where coins are locked forever. Coins in this account can
-still be used for delegating and for governance votes even while locked.
+- 延迟归属，一旦达到“ET”，所有硬币都归属。
+- 连续归属，其中硬币开始归属于“ST”并线性归属于
+关于到达“ET”的时间
+- 定期归属，硬币开始归属于“ST”并定期归属
+根据期数和每期的行权金额。
+期数、每期长度和每期金额为
+可配置。定期归属账户有别于连续的
+该代币的归属账户可以分批释放。为了
+例如，定期归属账户可用于归属安排
+硬币每季度、每年或通过任何其他功能发布
+随着时间的推移令牌。
+- 永久锁定归属，硬币永久锁定。这个账户里的币可以
+即使在锁定时，仍可用于委托和治理投票。
 
-## Note
+## 笔记
 
-Vesting accounts can be initialized with some vesting and non-vesting coins.
-The non-vesting coins would be immediately transferable. DelayedVesting and
-ContinuousVesting accounts can be created with normal messages after genesis.
-Other types of vesting accounts must be created at genesis, or as
-part of a manual network upgrade. The current specification only allows
-for _unconditional_ vesting (ie. there is no possibility of reaching `ET` and
-having coins fail to vest).
+归属账户可以用一些归属和非归属代币初始化。
+非归属代币将可立即转让。延迟归属和
+可以在创世后使用普通消息创建ContinuousVesting 帐户。
+其他类型的归属账户必须在创世时创建，或作为
+手动网络升级的一部分。目前的规范只允许
+对于_无条件_归属(即，不可能达到“ET”和
+有硬币无法归属)。
 
-## Vesting Account Types
+## 归属账户类型 
 
 ```go
 // VestingAccount defines an interface that any vesting account type must
@@ -118,9 +114,9 @@ type Periods []Period
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/vesting/v1beta1/vesting.proto#L64-L73
 
-In order to facilitate less ad-hoc type checking and assertions and to support
-flexibility in account balance usage, the existing `x/bank` `ViewKeeper` interface
-is updated to contain the following:
+为了促进较少的临时类型检查和断言并支持
+账户余额使用的灵活性，现有的`x/bank``ViewKeeper`接口
+更新为包含以下内容: 
 
 ```go
 type ViewKeeper interface {
@@ -140,31 +136,30 @@ type ViewKeeper interface {
 
 ## Vesting Account Specification
 
-Given a vesting account, we define the following in the proceeding operations:
+给定一个归属账户，我们在处理操作中定义以下内容:
 
-- `OV`: The original vesting coin amount. It is a constant value.
-- `V`: The number of `OV` coins that are still _vesting_. It is derived by
-`OV`, `StartTime` and `EndTime`. This value is computed on demand and not on a
-per-block basis.
-- `V'`: The number of `OV` coins that are _vested_ (unlocked). This value is
-computed on demand and not a per-block basis.
-- `DV`: The number of delegated _vesting_ coins. It is a variable value. It is
-stored and modified directly in the vesting account.
-- `DF`: The number of delegated _vested_ (unlocked) coins. It is a variable
-value. It is stored and modified directly in the vesting account.
-- `BC`: The number of `OV` coins less any coins that are transferred
-(which can be negative or delegated). It is considered to be balance of the
-embedded base account. It is stored and modified directly in the vesting account.
-
+- `OV`:原始归属币数量。 它是一个常数值。
+- `V`:仍然 _vesting_ 的 `OV` 代币数量。 它是由
+`OV`、`StartTime` 和 `EndTime`。 该值是按需计算的，而不是根据
+每块基础。
+- `V'`:_vested_(解锁)的 `OV` 硬币数量。 这个值是
+按需计算，而不是按块计算。
+- `DV`:委托_vesting_硬币的数量。 它是一个可变值。 它是
+直接在归属账户中存储和修改。
+- `DF`:委托的 _vested_(解锁)硬币的数量。 它是一个变量
+价值。 它直接在归属账户中存储和修改。
+- `BC`:`OV` 硬币的数量减去任何转移的硬币
+(可以是否定的或委托的)。 它被认为是平衡的
+嵌入式基本帐户。 它直接在归属账户中存储和修改。 
 ### Determining Vesting & Vested Amounts
 
-It is important to note that these values are computed on demand and not on a
-mandatory per-block basis (e.g. `BeginBlocker` or `EndBlocker`).
+需要注意的是，这些值是按需计算的，而不是根据
+强制每个块基础(例如`BeginBlocker` 或`EndBlocker`)。
 
 #### Continuously Vesting Accounts
 
-To determine the amount of coins that are vested for a given block time `T`, the
-following is performed:
+为了确定在给定的区块时间“T”内归属的代币数量，
+执行以下操作: 
 
 1. Compute `X := T - StartTime`
 2. Compute `Y := EndTime - StartTime`
@@ -198,10 +193,10 @@ func (cva ContinuousVestingAccount) GetVestingCoins(t Time) Coins {
 
 ### Periodic Vesting Accounts
 
-Periodic vesting accounts require calculating the coins released during each
-period for a given block time `T`. Note that multiple periods could have passed
-when calling `GetVestedCoins`, so we must iterate over each period until the
-end of that period is after `T`.
+定期归属账户需要计算每个时期释放的硬币
+给定区块时间‘T’的时间段。 请注意，多个时期可能已经过去
+当调用`GetVestedCoins`时，我们必须迭代每个周期，直到
+那个时期的结束是在“T”之后。 
 
 1. Set `CT := StartTime`
 2. Set `V' := 0`
@@ -240,9 +235,9 @@ func (pva PeriodicVestingAccount) GetVestingCoins(t Time) Coins {
 
 #### Delayed/Discrete Vesting Accounts
 
-Delayed vesting accounts are easier to reason about as they only have the full
-amount vesting up until a certain time, then all the coins become vested (unlocked).
-This does not include any unlocked coins the account may have initially.
+延迟归属账户更容易推理，因为它们只有完整的
+金额归属到某个时间，然后所有硬币都归属(解锁)。
+这不包括帐户最初可能拥有的任何解锁硬币。 
 
 ```go
 func (dva DelayedVestingAccount) GetVestedCoins(t Time) Coins {
@@ -260,16 +255,16 @@ func (dva DelayedVestingAccount) GetVestingCoins(t Time) Coins {
 
 ### Transferring/Sending
 
-At any given time, a vesting account may transfer: `min((BC + DV) - V, BC)`.
+在任何给定时间，归属账户可以转移:`min((BC + DV) - V, BC)`。
 
-In other words, a vesting account may transfer the minimum of the base account
-balance and the base account balance plus the number of currently delegated
-vesting coins less the number of coins vested so far.
+换句话说，一个归属账户可以转移基础账户的最小值
+余额和基本账户余额加上当前委托的数量
+归属代币少于迄今为止归属代币的数量。
 
-However, given that account balances are tracked via the `x/bank` module and that
-we want to avoid loading the entire account balance, we can instead determine
-the locked balance, which can be defined as `max(V - DV, 0)`, and infer the
-spendable balance from that.
+然而，鉴于账户余额是通过 `x/bank` 模块跟踪的，并且
+我们想避免加载整个帐户余额，我们可以改为确定
+锁定余额，可以定义为`max(V - DV, 0)`，并推断出
+可花费的余额。 
 
 ```go
 func (va VestingAccount) LockedCoins(t Time) Coins {
@@ -296,8 +291,8 @@ func (k Keeper) LockedCoins(ctx Context, addr AccAddress) Coins {
 
 #### Keepers/Handlers
 
-The corresponding `x/bank` keeper should appropriately handle sending coins
-based on if the account is a vesting account or not.
+相应的`x/bank` 管理员应该适当地处理发送硬币
+根据账户是否为归属账户。
 
 ```go
 func (k Keeper) SendCoins(ctx Context, from Account, to Account, amount Coins) {
@@ -317,7 +312,7 @@ func (k Keeper) SendCoins(ctx Context, from Account, to Account, amount Coins) {
 
 ### Delegating
 
-For a vesting account attempting to delegate `D` coins, the following is performed:
+对于尝试委托“D”币的归属账户，执行以下操作:
 
 1. Verify `BC >= D > 0`
 2. Compute `X := min(max(V - DV, 0), D)` (portion of `D` that is vesting)
@@ -336,8 +331,8 @@ func (va VestingAccount) TrackDelegation(t Time, balance Coins, amount Coins) {
 }
 ```
 
-**Note** `TrackDelegation` only modifies the `DelegatedVesting` and `DelegatedFree`
-fields, so upstream callers MUST modify the `Coins` field by subtracting `amount`.
+**注意** `TrackDelegation` 只修改了 `DelegatedVesting` 和 `DelegatedFree`
+字段，因此上游调用者必须通过减去 `amount` 来修改 `Coins` 字段。
 
 #### Keepers/Handlers
 
@@ -355,9 +350,9 @@ func DelegateCoins(t Time, from Account, amount Coins) {
 
 ### Undelegating
 
-For a vesting account attempting to undelegate `D` coins, the following is performed:
-NOTE: `DV < D` and `(DV + DF) < D` may be possible due to quirks in the rounding of
-delegation/undelegation logic.
+对于试图取消“D”代币委托的归属账户，执行以下操作:
+注意:`DV < D` 和 `(DV + DF) < D` 可能是由于四舍五入的怪癖
+委托/取消委托逻辑。
 
 1. Verify `D > 0`
 2. Compute `X := min(DF, D)` (portion of `D` that should become free, prioritizing free coins)
@@ -375,18 +370,17 @@ func (cva ContinuousVestingAccount) TrackUndelegation(amount Coins) {
 }
 ```
 
-**Note** `TrackUnDelegation` only modifies the `DelegatedVesting` and `DelegatedFree`
-fields, so upstream callers MUST modify the `Coins` field by adding `amount`.
+**注意** `TrackUnDelegation` 只修改了 `DelegatedVesting` 和 `DelegatedFree`
+字段，因此上游调用者必须通过添加 `amount` 来修改 `Coins` 字段。
 
-**Note**: If a delegation is slashed, the continuous vesting account ends up
-with an excess `DV` amount, even after all its coins have vested. This is because
-undelegating free coins are prioritized.
+**注**:如果授权被削减，则持续归属账户结束
+即使在所有代币都已归属之后，也有多余的“DV”金额。 这是因为
+优先考虑取消授权的免费硬币。
 
-**Note**: The undelegation (bond refund) amount may exceed the delegated
-vesting (bond) amount due to the way undelegation truncates the bond refund,
-which can increase the validator's exchange rate (tokens/shares) slightly if the
-undelegated tokens are non-integral.
-
+**注**:取消委托(退押金)金额可能会超过委托
+由于取消授权截断了债券退款的方式，归属(债券)金额，
+如果
+未委托代币是非完整的。 
 #### Keepers/Handlers
 
 ```go
@@ -405,25 +399,24 @@ func UndelegateCoins(to Account, amount Coins) {
 
 ## Keepers & Handlers
 
-The `VestingAccount` implementations reside in `x/auth`. However, any keeper in
-a module (e.g. staking in `x/staking`) wishing to potentially utilize any vesting
-coins, must call explicit methods on the `x/bank` keeper (e.g. `DelegateCoins`)
-opposed to `SendCoins` and `SubtractCoins`.
+`VestingAccount` 实现驻留在 `x/auth` 中。 然而，任何门将
+希望潜在地利用任何归属的模块(例如在`x/staking`中进行质押)
+硬币，必须在`x/bank` keeper 上调用显式方法(例如`DelegateCoins`)
+与“SendCoins”和“SubtractCoins”相反。
 
-In addition, the vesting account should also be able to spend any coins it
-receives from other users. Thus, the bank module's `MsgSend` handler should
-error if a vesting account is trying to send an amount that exceeds their
-unlocked coin amount.
+另外，归属账户也应该可以花掉任何币吧
+从其他用户接收。 因此，银行模块的 `MsgSend` 处理程序应该
+如果归属账户试图发送超过其数量的金额，则会出现错误
+解锁的硬币数量。
 
-See the above specification for full implementation details.
-
+有关完整的实现细节，请参阅上述规范。 
 ## Genesis Initialization
 
-To initialize both vesting and non-vesting accounts, the `GenesisAccount` struct
-includes new fields: `Vesting`, `StartTime`, and `EndTime`. Accounts meant to be
-of type `BaseAccount` or any non-vesting type have `Vesting = false`. The
-genesis initialization logic (e.g. `initFromGenesisState`) must parse
-and return the correct accounts accordingly based off of these fields.
+要初始化归属和非归属账户，“GenesisAccount”结构
+包括新字段:“Vesting”、“StartTime”和“EndTime”。 帐户应该是
+“BaseAccount”类型或任何非归属类型具有“Vesting = false”。 这
+创世初始化逻辑(例如`initFromGenesisState`)必须解析
+并根据这些字段相应地返回正确的帐户。 
 
 ```go
 type GenesisAccount struct {
@@ -459,7 +452,7 @@ func ToAccount(gacc GenesisAccount) Account {
 
 ### Simple
 
-Given a continuous vesting account with 10 vesting coins.
+给定一个具有 10 个归属币的连续归属账户。 
 
 ```
 OV = 10

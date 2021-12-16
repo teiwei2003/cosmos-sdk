@@ -1,65 +1,65 @@
-# ADR 43: NFT Module
+# ADR 43:NFT 模块
 
-## Changelog
+## 变更日志
 
-- 2021-05-01: Initial Draft
-- 2021-07-02: Review updates
+- 2021-05-01:初稿
+- 2021-07-02:审核更新
 
-## Status
+## 地位
 
-PROPOSED
+建议的
 
-## Abstract
+## 摘要
 
-This ADR defines the `x/nft` module which is a generic implementation of NFTs, roughly "compatible" with ERC721. **Applications using the `x/nft` module must implement the following functions**:
+该 ADR 定义了 `x/nft` 模块，它是 NFT 的通用实现，与 ERC721 大致“兼容”。 **使用 `x/nft` 模块的应用程序必须实现以下功能**:
 
-- `MsgNewClass` - Receive the user's request to create a class, and call the `NewClass` of the `x/nft` module.
-- `MsgUpdateClass` - Receive the user's request to update a class, and call the `UpdateClass` of the `x/nft` module.
-- `MsgMintNFT` - Receive the user's request to mint a nft, and call the `MintNFT` of the `x/nft` module.
-- `BurnNFT` - Receive the user's request to burn a nft, and call the `BurnNFT` of the `x/nft` module.
-- `UpdateNFT` - Receive the user's request to update a nft, and call the `UpdateNFT` of the `x/nft` module.
+- `MsgNewClass` - 接收用户创建类的请求，调用`x/nft`模块的`NewClass`。
+- `MsgUpdateClass` - 接收用户更新类的请求，并调用`x/nft`模块的`UpdateClass`。
+- `MsgMintNFT` - 接收用户创建 nft 的请求，并调用 `x/nft` 模块的 `MintNFT`。
+- `BurnNFT` - 接收用户的烧录nft请求，调用`x/nft`模块的`BurnNFT`。
+- `UpdateNFT` - 接收用户更新 nft 的请求，并调用 `x/nft` 模块的 `UpdateNFT`。
 
-## Context
+## 语境
 
-NFTs are more than just crypto art, which is very helpful for accruing value to the Cosmos ecosystem. As a result, Cosmos Hub should implement NFT functions and enable a unified mechanism for storing and sending the ownership representative of NFTs as discussed in https://github.com/cosmos/cosmos-sdk/discussions/9065.
+NFT 不仅仅是加密艺术，这对于为 Cosmos 生态系统积累价值非常有帮助。因此，Cosmos Hub 应实现 NFT 功能并启用统一机制来存储和发送 NFT 的所有权代表，如 https://github.com/cosmos/cosmos-sdk/discussions/9065 中所述。
 
-As discussed in [#9065](https://github.com/cosmos/cosmos-sdk/discussions/9065), several potential solutions can be considered:
+如 [#9065](https://github.com/cosmos/cosmos-sdk/discussions/9065) 中所述，可以考虑几种潜在的解决方案:
 
-- irismod/nft and modules/incubator/nft
+- irismod/nft 和模块/孵化器/nft
 - CW721
-- DID NFTs
-- interNFT
+- 做了 NFT
+- 跨NFT
 
-Since functions/use cases of NFTs are tightly connected with their logic, it is almost impossible to support all the NFTs' use cases in one Cosmos SDK module by defining and implementing different transaction types.
+由于 NFT 的功能/用例与其逻辑紧密相连，因此通过定义和实现不同的交易类型，几乎不可能在一个 Cosmos SDK 模块中支持所有 NFT 的用例。
 
-Considering generic usage and compatibility of interchain protocols including IBC and Gravity Bridge, it is preferred to have a generic NFT module design which handles the generic NFTs logic.
-This design idea can enable composability that application-specific functions should be managed by other modules on Cosmos Hub or on other Zones by importing the NFT module.
+考虑到包括 IBC 和 Gravity Bridge 在内的链间协议的通用用法和兼容性，最好采用通用 NFT 模块设计来处理通用 NFT 逻辑。
+这种设计思想可以实现可组合性，即通过导入 NFT 模块，特定应用程序的功能应该由 Cosmos Hub 或其他 Zones 上的其他模块管理。
 
-The current design is based on the work done by [IRISnet team](https://github.com/irisnet/irismod/tree/master/modules/nft) and an older implementation in the [Cosmos repository](https://github.com/cosmos/modules/tree/master/incubator/nft).
+当前的设计基于 [IRISnet 团队](https://github.com/irisnet/irismod/tree/master/modules/nft) 和 [Cosmos 存储库](https:// github.com/cosmos/modules/tree/master/incubator/nft)。
 
-## Decision
+## 决定
 
-We create a `x/nft` module, which contains the following functionality:
+我们创建了一个 `x/nft` 模块，它包含以下功能:
 
-- Store NFTs and track their ownership.
-- Expose `Keeper` interface for composing modules to transfer, mint and burn NFTs.
-- Expose external `Message` interface for users to transfer ownership of their NFTs.
-- Query NFTs and their supply information.
+- 存储 NFT 并跟踪其所有权。
+- 公开`Keeper` 接口，用于组合模块以传输、铸造和燃烧 NFT。
+- 公开外部“消息”接口，供用户转移其 NFT 的所有权。
+- 查询 NFT 及其供应信息。
 
-The proposed module is a base module for NFT app logic. It's goal it to provide a common layer for storage, basic transfer functionality and IBC. The module should not be used as a standalone.
-Instead an app should create a specialized module to handle app specific logic (eg: NFT ID construction, royalty), user level minting and burning. Moreover an app specialized module should handle auxiliary data to support the app logic (eg indexes, ORM, business data).
+提议的模块是 NFT 应用程序逻辑的基础模块。它的目标是为存储、基本传输功能和 IBC 提供一个公共层。该模块不应单独使用。
+相反，应用程序应该创建一个专门的模块来处理应用程序特定的逻辑(例如:NFT ID 构建、版税)、用户级别的铸造和刻录。此外，应用程序专用模块应处理辅助数据以支持应用程序逻辑(例如索引、ORM、业务数据)。 
 
-All data carried over IBC must be part of the `NFT` or `Class` type described below. The app specific NFT data should be encoded in `NFT.data` for cross-chain integrity. Other objects related to NFT, which are not important for integrity can be part of the app specific module.
+IBC 上携带的所有数据必须是下面描述的“NFT”或“Class”类型的一部分。 应用程序特定的 NFT 数据应在“NFT.data”中编码以实现跨链完整性。 与 NFT 相关的其他对完整性不重要的对象可以是应用程序特定模块的一部分。
 
-### Types
+### 类型
 
-We propose two main types:
-+ `Class` -- describes NFT class. We can think about it as a smart contract address.
-+ `NFT` -- object representing unique, non fungible asset. Each NFT is associated with a Class.
+我们建议两种主要类型:
++ `Class` -- 描述 NFT 类。 我们可以将其视为智能合约地址。
++ `NFT` -- 代表独特的、不可替代的资产的对象。 每个 NFT 都与一个类相关联。
 
-#### Class
+#### 班级
 
-NFT **Class** is comparable to an ERC-721 smart contract (provides description of a smart contract), under which a collection of NFTs can be created and managed.
+NFT **类**类似于 ERC-721 智能合约(提供智能合约的描述)，在该合约下可以创建和管理 NFT 的集合。 
 
 ```protobuf
 message Class {
@@ -73,17 +73,17 @@ message Class {
 }
 ```
 
-- `id` is an alphanumeric identifier of the NFT class; it is used as the primary index for storing the class; _required_
-- `name` is a descriptive name of the NFT class; _optional_
-- `symbol` is the symbol usually shown on exchanges for the NFT class; _optional_
-- `description` is a detailed description of the NFT class; _optional_
-- `uri` is a URI for the class metadata stored off chain. It should be a JSON file that contains metadata about the NFT class and NFT data schema ([OpenSea example](https://docs.opensea.io/docs/contract-level-metadata)); _optional_
-- `uri_hash` is a hash of the document pointed by uri; _optional_
-- `data` is app specific metadata of the class; _optional_
+- `id` 是 NFT 类的字母数字标识符； 它用作存储类的主要索引； _必需的_
+- `name` 是 NFT 类的描述性名称； _选修的_
+- `symbol` 是 NFT 类交易所通常显示的符号； _选修的_
+- `description` 是对 NFT 类的详细描述； _选修的_
+- `uri` 是链下存储的类元数据的 URI。 它应该是一个 JSON 文件，其中包含有关 NFT 类和 NFT 数据模式的元数据([OpenSea 示例](https://docs.opensea.io/docs/contract-level-metadata))； _选修的_
+- `uri_hash` 是 uri 指向的文档的哈希值； _选修的_
+- `data` 是类的特定于应用程序的元数据； _选修的_
 
 #### NFT
 
-We define a general model for `NFT` as follows.
+我们为“NFT”定义了一个通用模型，如下所示。 
 
 ```protobuf
 message NFT {
@@ -95,20 +95,20 @@ message NFT {
 }
 ```
 
-- `class_id` is the identifier of the NFT class where the NFT belongs; _required_
-- `id` is an alphanumeric identifier of the NFT, unique within the scope of its class. It is specified by the creator of the NFT and may be expanded to use DID in the future. `class_id` combined with `id` uniquely identifies an NFT and is used as the primary index for storing the NFT; _required_
+- `class_id` 是 NFT 所属的 NFT 类的标识符； _必需的_
+- `id` 是 NFT 的字母数字标识符，在其类范围内是唯一的。 它由 NFT 的创建者指定，将来可能会扩展为使用 DID。 `class_id` 结合 `id` 唯一标识一个 NFT，作为存储 NFT 的主索引； _必需的_ 
 
   ```
   {class_id}/{id} --> NFT (bytes)
   ```
 
-- `uri` is a URI for the NFT metadata stored off chain. Should point to a JSON file that contains metadata about this NFT (Ref: [ERC721 standard and OpenSea extension](https://docs.opensea.io/docs/metadata-standards)); _required_
-- `uri_hash` is a hash of the document pointed by uri; _optional_
-- `data` is an app specific data of the NFT. CAN be used by composing modules to specify additional properties of the NFT; _optional_
+- `uri` 是链下存储的 NFT 元数据的 URI。 应指向包含有关此 NFT 的元数据的 JSON 文件(参考:[ERC721 标准和 OpenSea 扩展](https://docs.opensea.io/docs/metadata-standards))； _必需的_
+- `uri_hash` 是 uri 指向的文档的哈希值； _选修的_
+- `data` 是 NFT 的应用程序特定数据。 可以通过组合模块使用来指定 NFT 的附加属性； _选修的_
 
-This ADR doesn't specify values that `data` can take; however, best practices recommend upper-level NFT modules clearly specify their contents.  Although the value of this field doesn't provide the additional context required to manage NFT records, which means that the field can technically be removed from the specification, the field's existence allows basic informational/UI functionality.
+此 ADR 未指定 `data` 可以采用的值； 然而，最佳实践建议上层 NFT 模块明确指定其内容。 尽管该字段的值不提供管理 NFT 记录所需的额外上下文，这意味着该字段可以从技术上从规范中删除，但该字段的存在允许基本的信息/UI 功能。
 
-### `Keeper` Interface
+### `Keeper` 接口 
 
 ```go
 type Keeper interface {
@@ -133,7 +133,7 @@ type Keeper interface {
 }
 ```
 
-Other business logic implementations should be defined in composing modules that import `x/nft` and use its `Keeper`.
+其他业务逻辑实现应该在组合模块中定义，这些模块导入 `x/nft` 并使用它的 `Keeper`。 
 
 ### `Msg` Service
 
@@ -151,9 +151,9 @@ message MsgSend {
 message MsgSendResponse {}
 ```
 
-`MsgSend` can be used to transfer the ownership of an NFT to another address.
+`MsgSend` 可用于将 NFT 的所有权转移到另一个地址。
 
-The implementation outline of the server is as follows:
+服务器的实现大纲如下: 
 
 ```go
 type msgServer struct{
@@ -171,7 +171,7 @@ func (m msgServer) Send(ctx context.Context, msg *types.MsgSend) (*types.MsgSend
 }
 ```
 
-The query service methods for the `x/nft` module are:
+`x/nft` 模块的查询服务方法有: 
 
 ```proto
 service Query {
@@ -304,10 +304,10 @@ message QueryClassesResponse {
 
 ### Interoperability
 
-Interoperability is all about reusing assets between modules and chains. The former one is achieved by ADR-33: Protobuf client - server communication. At the time of writing ADR-33 is not finalized. The latter is achieved by IBC. Here we will focus on the IBC side.
-IBC is implemented per module. Here, we aligned that NFTs will be recorded and managed in the x/nft. This requires creation of a new IBC standard and implementation of it.
+互操作性就是在模块和链之间重用资产。前一种是通过 ADR-33 实现的:Protobuf 客户端-服务器通信。在撰写本文时，ADR-33 尚未最终确定。后者是由 IBC 实现的。在这里，我们将重点介绍 IBC 方面。
+IBC 是按模块实现的。在这里，我们一致认为 NFT 将在 x/nft 中记录和管理。这需要创建一个新的 IBC 标准并实施它。
 
-For IBC interoperability, NFT custom modules MUST use the NFT object type understood by the IBC client. So, for x/nft interoperability, custom NFT implementations (example: x/cryptokitty) should use the canonical x/nft module and proxy all NFT balance keeping functionality to x/nft or else re-implement all functionality using the NFT object type understood by the IBC client. In other words: x/nft becomes the standard NFT registry for all Cosmos NFTs (example: x/cryptokitty will register a kitty NFT in x/nft and use x/nft for book keeping). This was [discussed](https://github.com/cosmos/cosmos-sdk/discussions/9065#discussioncomment-873206) in the context of using x/bank as a general asset balance book. Not using x/nft will require implementing another module for IBC.
+对于 IBC 互操作性，NFT 自定义模块必须使用 IBC 客户端理解的 NFT 对象类型。因此，对于 x/nft 互操作性，自定义 NFT 实现(例如:x/cryptokitty)应使用规范的 x/nft 模块并将所有 NFT 平衡保持功能代理到 x/nft，否则使用理解的 NFT 对象类型重新实现所有功能由 IBC 客户提供。换句话说:x/nft 成为所有 Cosmos NFT 的标准 NFT 注册表(例如:x/cryptokitty 将在 x/nft 中注册一个 kitty NFT 并使用 x/nft 进行簿记)。这是在使用 x/bank 作为一般资产平衡簿的背景下 [讨论](https://github.com/cosmos/cosmos-sdk/discussions/9065#discussioncomment-873206)。不使用 x/nft 将需要为 IBC 实现另一个模块。 
 
 ## Consequences
 
@@ -317,35 +317,33 @@ No backward incompatibilities.
 
 ### Forward Compatibility
 
-This specification conforms to the ERC-721 smart contract specification for NFT identifiers. Note that ERC-721 defines uniqueness based on (contract address, uint256 tokenId), and we conform to this implicitly because a single module is currently aimed to track NFT identifiers. Note: use of the (mutable) data field to determine uniqueness is not safe.s
+该规范符合 NFT 标识符的 ERC-721 智能合约规范。 请注意，ERC-721 定义了基于(合约地址，uint256 tokenId)的唯一性，我们隐含地遵守这一点，因为当前单个模块旨在跟踪 NFT 标识符。 注意:使用(可变)数据字段来确定唯一性是不安全的。 
 
 ### Positive
 
-- NFT identifiers available on Cosmos Hub.
-- Ability to build different NFT modules for the Cosmos Hub, e.g., ERC-721.
-- NFT module which supports interoperability with IBC and other cross-chain infrastructures like Gravity Bridge
+- Cosmos Hub 上可用的 NFT 标识符。
+- 能够为 Cosmos Hub 构建不同的 NFT 模块，例如 ERC-721。
+- NFT 模块，支持与 IBC 和 Gravity Bridge 等其他跨链基础设施的互操作性 
 
 ### Negative
 
-+ New IBC app is required for x/nft
-+ CW721 adapter is required
-
++ x/nft 需要新的 IBC 应用程序
++ 需要 CW721 适配器 
 ### Neutral
 
-- Other functions need more modules. For example, a custody module is needed for NFT trading function, a collectible module is needed for defining NFT properties.
-
+- 其他功能需要更多模块。 例如，NFT 交易功能需要一个托管模块，定义 NFT 属性需要一个收藏模块。 
 ## Further Discussions
 
-For other kinds of applications on the Hub, more app-specific modules can be developed in the future:
+对于 Hub 上的其他类型的应用，未来可以开发更多特定于应用的模块:
 
-- `x/nft/custody`: custody of NFTs to support trading functionality.
-- `x/nft/marketplace`: selling and buying NFTs using sdk.Coins.
-- `x/fractional`: a module to split an ownership of an asset (NFT or other assets) for multiple stakeholder. `x/group`  should work for most of the cases.
+- `x/nft/custody`:托管 NFT 以支持交易功能。
+- `x/nft/marketplace`:使用 sdk.Coins 买卖 NFT。
+- `x/fractional`:为多个利益相关者分割资产(NFT 或其他资产)所有权的模块。 `x/group` 应该适用于大多数情况。
 
-Other networks in the Cosmos ecosystem could design and implement their own NFT modules for specific NFT applications and use cases.
+Cosmos 生态系统中的其他网络可以为特定的 NFT 应用程序和用例设计和实现自己的 NFT 模块。
 
-## References
+## 参考
 
-- Initial discussion: https://github.com/cosmos/cosmos-sdk/discussions/9065
-- x/nft: initialize module: https://github.com/cosmos/cosmos-sdk/pull/9174
-- [ADR 033](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-033-protobuf-inter-module-comm.md)
+- 初步讨论:https://github.com/cosmos/cosmos-sdk/discussions/9065
+- x/nft:初始化模块:https://github.com/cosmos/cosmos-sdk/pull/9174
+- [ADR 033](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-033-protobuf-inter-module-comm.md) 

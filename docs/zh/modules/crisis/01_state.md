@@ -1,17 +1,13 @@
-<!--
-order: 1
--->
+# 状态
 
-# State
+## 固定费用
 
-## ConstantFee
+由于验证不变量(和
+可能超过最大允许的区块gas限制)一个恒定的费用是
+用于代替标准耗气量法。 固定费用是
+旨在大于运行不变量的预期 gas 成本
+用标准耗气量法。
 
-Due to the anticipated large gas cost requirement to verify an invariant (and
-potential to exceed the maximum allowable block gas limit) a constant fee is
-used instead of the standard gas consumption method. The constant fee is
-intended to be larger than the anticipated gas cost of running the invariant
-with the standard gas consumption method.
+ConstantFee 参数保存在全局参数存储中。
 
-The ConstantFee param is held in the global params store.
-
-- Params: `mint/params -> legacy_amino(sdk.Coin)`
+- 参数:`mint/params -> legacy_amino(sdk.Coin)` 

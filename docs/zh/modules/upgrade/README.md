@@ -1,31 +1,24 @@
-<!--
-order: 0
-title: Upgrade Overview
-parent:
-  title: "upgrade"
--->
+# `升级`
 
-# `upgrade`
+## 摘要
 
-## Abstract
+`x/upgrade` 是一个 Cosmos SDK 模块的实现
+将实时 Cosmos 链升级到新的(破坏性的)软件版本。它通过
+提供一个“BeginBlocker”钩子，防止区块链状态机
+一旦达到预定义的升级块高度，就继续进行。
 
-`x/upgrade` is an implementation of a Cosmos SDK module that facilitates smoothly
-upgrading a live Cosmos chain to a new (breaking) software version. It accomplishes this by
-providing a `BeginBlocker` hook that prevents the blockchain state machine from
-proceeding once a pre-defined upgrade block height has been reached.
+该模块没有规定任何关于治理如何决定做一个
+升级，但只是安全协调升级的机制。无需软件
+支持升级，升级一条活链是有风险的，因为所有的验证者
+需要在过程中完全相同的点暂停他们的状态机。如果
+这没有正确完成，可能会出现难以处理的状态不一致
+从。。。恢复。
 
-The module does not prescribe anything regarding how governance decides to do an
-upgrade, but just the mechanism for coordinating the upgrade safely. Without software
-support for upgrades, upgrading a live chain is risky because all of the validators
-need to pause their state machines at exactly the same point in the process. If
-this is not done correctly, there can be state inconsistencies which are hard to
-recover from.
-
-<!-- TOC -->
-1. **[Concepts](01_concepts.md)**
-2. **[State](02_state.md)**
-3. **[Events](03_events.md)**
-4. **[Client](04_client.md)**
+<!-- 目录 -->
+1. **[概念](01_concepts.md)**
+2. **[状态](02_state.md)**
+3. **[事件](03_events.md)**
+4. **[客户端](04_client.md)**
     - [CLI](04_client.md#cli)
     - [REST](04_client.md#rest)
-    - [gRPC](04_client.md#grpc)
+    - [gRPC](04_client.md#grpc) 
