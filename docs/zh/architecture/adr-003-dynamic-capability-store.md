@@ -318,13 +318,13 @@ func (k Mod1Keeper) UseResource(ctx Context, capability Capability, resource str
 如果模块 2 将功能密钥传递给模块 3，则模块 3 可以声明它并像模块 2 一样调用模块 1
 (在这种情况下，模块 1、模块 2 和模块 3 都可以使用此功能)。
 
-## 地位
+## 状态
 
 建议的。
 
 ## 结果
 
-### 积极的
+### 目的
 
 - 动态能力支持。
 - 允许 CapabilityKeeper 从 go-map 返回相同的能力指针，同时在 tx 失败时恢复对持久性“KVStore”和内存中“MemoryStore”的任何写入。

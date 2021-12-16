@@ -1,7 +1,3 @@
-<!--
-order: 4
--->
-
 # Accounts
 
 This document describes the in-built account and public key system of the Cosmos SDK. {synopsis}

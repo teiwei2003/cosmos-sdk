@@ -1,7 +1,3 @@
-<!--
-order: 2
--->
-
 # State
 
 The internal state of the `x/upgrade` module is relatively minimal and simple. The

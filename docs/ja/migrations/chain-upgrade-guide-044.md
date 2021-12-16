@@ -1,7 +1,3 @@
-<!--
-order: 1
--->
-
 # Chain Upgrade Guide to v0.44
 
 This document provides guidelines for a chain upgrade from v0.42 to v0.44 and an example of the upgrade process using `simapp`. {synopsis}

@@ -1,11 +1,7 @@
-<!--
-order: 2
--->
+# 状态
 
-# State
-
-Currently the `x/evidence` module only stores valid submitted `Evidence` in state.
-The evidence state is also stored and exported in the `x/evidence` module's `GenesisState`.
+目前，`x/evidence` 模块只存储有效提交的 `Evidence` 状态。
+证据状态也存储和导出在 `x/evidence` 模块的 `GenesisState` 中。
 
 ```protobuf
 // GenesisState defines the evidence module's genesis state.
@@ -16,4 +12,4 @@ message GenesisState {
 
 ```
 
-All `Evidence` is retrieved and stored via a prefix `KVStore` using prefix `0x00` (`KeyPrefixEvidence`).
+所有“证据”都通过前缀“KVStore”使用前缀“0x00”(“KeyPrefixEvidence”)检索和存储。 

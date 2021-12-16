@@ -1,12 +1,12 @@
-# Client
+# 客户
 
-## CLI
+##命令行界面
 
-A user can query and interact with the `evidence` module using the CLI.
+用户可以使用 CLI 查询“证据”模块并与之交互。
 
-### Query
+### 询问
 
-The `query` commands allows users to query `evidence` state.
+`query` 命令允许用户查询 `evidence` 状态。 
 
 ```bash
 simd query evidence --help
@@ -14,7 +14,7 @@ simd query evidence --help
 
 ### evidence
 
-The `evidence` command allows users to list all evidence or evidence by hash.
+`evidence` 命令允许用户通过哈希列出所有证据或证据。 
 
 Usage:
 

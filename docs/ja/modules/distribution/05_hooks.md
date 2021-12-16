@@ -1,7 +1,3 @@
-<!--
-order: 5
--->
-
 # Hooks
 
 Available hooks that can be called by and from this module.

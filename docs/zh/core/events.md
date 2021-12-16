@@ -1,47 +1,43 @@
-<!--
-order: 9
--->
+# 事件
 
-# Events
+`Event`s 是包含有关应用程序执行信息的对象。它们主要被区块浏览器和钱包等服务提供商用来跟踪各种消息和索引交易的执行。 {概要}
 
-`Event`s are objects that contain information about the execution of the application. They are mainly used by service providers like block explorers and wallet to track the execution of various messages and index transactions. {synopsis}
+## 先决条件阅读
 
-## Pre-requisite Readings
+- [Cosmos SDK 应用剖析](../basics/app-anatomy.md) {prereq}
+- [Tendermint 事件文档](https://docs.tendermint.com/master/spec/abci/abci.html#events) {prereq}
 
-- [Anatomy of a Cosmos SDK application](../basics/app-anatomy.md) {prereq}
-- [Tendermint Documentation on Events](https://docs.tendermint.com/master/spec/abci/abci.html#events) {prereq}
+## 事件
 
-## Events
-
-Events are implemented in the Cosmos SDK as an alias of the ABCI `Event` type and
-take the form of: `{eventType}.{attributeKey}={attributeValue}`.
+事件在 Cosmos SDK 中作为 ABCI `Event` 类型的别名实现，并且
+采用以下形式:`{eventType}.{attributeKey}={attributeValue}`。
 
 +++ https://github.com/tendermint/tendermint/blob/v0.34.8/proto/tendermint/abci/types.proto#L304-L313
 
-An Event contains:
+一个事件包含:
 
-- A `type` to categorize the Event at a high-level; for example, the Cosmos SDK uses the `"message"` type to filter Events by `Msg`s.
-- A list of `attributes` are key-value pairs that give more information about the categorized Event. For example, for the `"message"` type, we can filter Events by key-value pairs using `message.action={some_action}`, `message.module={some_module}` or `message.sender={some_sender}`.
+- 一种“类型”，用于在高级别对事件进行分类；例如，Cosmos SDK 使用 `"message"` 类型通过 `Msg` 过滤事件。
+- `attributes` 列表是键值对，提供有关分类事件的更多信息。例如，对于 `"message"` 类型，我们可以使用 `message.action={some_action}`、`message.module={some_module}` 或 `message.sender={some_sender} 通过键值对过滤事件`.
 
-::: tip
-To parse the attribute values as strings, make sure to add `'` (single quotes) around each attribute value.
+::: 小费
+要将属性值解析为字符串，请确保在每个属性值周围添加 `'`(单引号)。
 :::
 
-Events, the `type` and `attributes` are defined on a **per-module basis** in the module's
-`/types/events.go` file, and triggered from the module's Protobuf [`Msg` service](../building-modules/msg-services.md)
-by using the [`EventManager`](#eventmanager). In addition, each module documents its Events under
-`spec/xx_events.md`.
+事件，`type` 和 `attributes` 在模块的 **per-module 基础** 定义
+`/types/events.go` 文件，并从模块的 Protobuf [`Msg` 服务](../building-modules/msg-services.md) 触发
+通过使用 [`EventManager`](#eventmanager)。此外，每个模块将其事件记录在
+`spec/xx_events.md`。
 
-Events are returned to the underlying consensus engine in the response of the following ABCI messages:
+事件在以下 ABCI 消息的响应中返回到底层共识引擎:
 
 - [`BeginBlock`](./baseapp.md#beginblock)
 - [`EndBlock`](./baseapp.md#endblock)
 - [`CheckTx`](./baseapp.md#checktx)
 - [`DeliverTx`](./baseapp.md#delivertx)
 
-### Examples
+### 例子
 
-The following examples show how to query Events using the Cosmos SDK.
+以下示例展示了如何使用 Cosmos SDK 查询事件。 
 
 | Event                                            | Description                                                                                                                                              |
 | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -53,21 +49,21 @@ The following examples show how to query Events using the Cosmos SDK.
 
 ## EventManager
 
-In Cosmos SDK applications, Events are managed by an abstraction called the `EventManager`.
-Internally, the `EventManager` tracks a list of Events for the entire execution flow of a
-transaction or `BeginBlock`/`EndBlock`.
+在 Cosmos SDK 应用程序中，事件由称为“EventManager”的抽象管理。
+在内部，“EventManager”跟踪一个事件的整个执行流程的列表
+交易或`BeginBlock`/`EndBlock`。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/types/events.go#L17-L25
 
-The `EventManager` comes with a set of useful methods to manage Events. The method
-that is used most by module and application developers is `EmitEvent` that tracks
-an Event in the `EventManager`.
+`EventManager` 带有一组有用的方法来管理事件。 方法
+模块和应用程序开发人员使用最多的是“EmitEvent”，它跟踪
+`EventManager` 中的一个事件。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/types/events.go#L33-L37
 
-Module developers should handle Event emission via the `EventManager#EmitEvent` in each message
-`Handler` and in each `BeginBlock`/`EndBlock` handler. The `EventManager` is accessed via
-the [`Context`](./context.md), where Event emission generally follows this pattern:
+模块开发人员应通过每条消息中的 `EventManager#EmitEvent` 处理事件发射
+`Handler` 和每个 `BeginBlock`/`EndBlock` 处理程序。 `EventManager` 是通过访问
+[`Context`](./context.md)，其中事件发射通常遵循以下模式: 
 
 ```go
 ctx.EventManager().EmitEvent(
@@ -75,7 +71,7 @@ ctx.EventManager().EmitEvent(
 )
 ```
 
-Module's `handler` function should also set a new `EventManager` to the `context` to isolate emitted Events per `message`:
+模块的 `handler` 函数还应该为 `context` 设置一个新的 `EventManager`，以隔离每个 `message` 发出的事件:
 
 ```go
 func NewHandler(keeper Keeper) sdk.Handler {
@@ -84,12 +80,12 @@ func NewHandler(keeper Keeper) sdk.Handler {
         switch msg := msg.(type) {
 ```
 
-See the [`Msg` services](../building-modules/msg-services.md) concept doc for a more detailed
-view on how to typically implement Events and use the `EventManager` in modules.
+有关更详细的信息，请参阅 [`Msg` 服务](../building-modules/msg-services.md) 概念文档
+查看如何典型地实现事件并在模块中使用 `EventManager`。
 
-## Subscribing to Events
+## 订阅事件
 
-You can use Tendermint's [Websocket](https://docs.tendermint.com/master/tendermint-core/subscription.html#subscribing-to-events-via-websocket) to subscribe to Events by calling the `subscribe` RPC method:
+您可以使用 Tendermint 的 [Websocket](https://docs.tendermint.com/master/tendermint-core/subscription.html#subscribing-to-events-via-websocket) 通过调用 `subscribe` RPC 方法订阅 Events : 
 
 ```json
 {
@@ -102,16 +98,16 @@ You can use Tendermint's [Websocket](https://docs.tendermint.com/master/tendermi
 }
 ```
 
-The main `eventCategory` you can subscribe to are:
+您可以订阅的主要`eventCategory`是:
 
-- `NewBlock`: Contains Events triggered during `BeginBlock` and `EndBlock`.
-- `Tx`: Contains Events triggered during `DeliverTx` (i.e. transaction processing).
-- `ValidatorSetUpdates`: Contains validator set updates for the block.
+- `NewBlock`:包含在`BeginBlock` 和`EndBlock` 期间触发的事件。
+- `Tx`:包含在 `DeliverTx`(即事务处理)期间触发的事件。
+- `ValidatorSetUpdates`:包含块的验证器集更新。
 
-These Events are triggered from the `state` package after a block is committed. You can get the
-full list of Event categories [on the Tendermint Godoc page](https://godoc.org/github.com/tendermint/tendermint/types#pkg-constants).
+这些事件是在提交块后从 `state` 包触发的。 你可以得到
+事件类别的完整列表 [在 Tendermint Godoc 页面上](https://godoc.org/github.com/tendermint/tendermint/types#pkg-constants)。
 
-The `type` and `attribute` value of the `query` allow you to filter the specific Event you are looking for. For example, a `transfer` transaction triggers an Event of type `Transfer` and has `Recipient` and `Sender` as `attributes` (as defined in the [`events.go` file of the `bank` module](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/bank/types/events.go)). Subscribing to this Event would be done like so:
+`query` 的 `type` 和 `attribute` 值允许您过滤要查找的特定事件。 例如，一个 `transfer` 交易触发了一个类型为 `Transfer` 的 Event，并且将 `Recipient` 和 `Sender` 作为 `attributes`(在 `bank` 模块的 [`events.go` 文件中定义](https ://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/bank/types/events.go))。 订阅此事件的方式如下: 
 
 ```json
 {
@@ -124,14 +120,14 @@ The `type` and `attribute` value of the `query` allow you to filter the specific
 }
 ```
 
-where `senderAddress` is an address following the [`AccAddress`](../basics/accounts.md#addresses) format.
+其中 `senderAddress` 是遵循 [`AccAddress`](../basics/accounts.md#addresses) 格式的地址。
 
-## Typed Events (coming soon)
+## 类型事件(即将推出)
 
-As previously described, Events are defined on a per-module basis. It is the responsibility of the module developer to define Event types and Event attributes. Except in the `spec/XX_events.md` file, these Event types and attributes are unfortunately not easily discoverable, so the Cosmos SDK proposes to use Protobuf-defined [Typed Events](../architecture/adr-032-typed-events.md) for emitting and querying Events.
+如前所述，事件是在每个模块的基础上定义的。 定义事件类型和事件属性是模块开发人员的责任。 除了在`spec/XX_events.md`文件中，遗憾的是这些事件类型和属性不容易被发现，所以Cosmos SDK建议使用Protobuf定义的[Typed Events](../architecture/adr-032-typed-events .md) 用于发出和查询事件。
 
-The Typed Events proposal has not yet been fully implemented. Documentation is not yet available.
+Typed Events 提案尚未完全实施。 文档尚不可用。
 
-## Next {hide}
+## 下一个 {hide}
 
-Learn about Cosmos SDK [telemetry](./telemetry.md) {hide}
+了解 Cosmos SDK [遥测](./telemetry.md) {hide} 

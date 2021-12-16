@@ -1,9 +1,3 @@
-<!--
-order: false
-parent:
-  order: 5
--->
-
 # IBC
 
 此存储库包含 IBC 协议集成和概念的参考文档:

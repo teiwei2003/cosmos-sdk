@@ -1,7 +1,3 @@
-<!--
-order: 4
--->
-
 # 帐户
 
 本文档介绍了 Cosmos SDK 的内置账号和公钥系统。 {概要}
@@ -110,7 +106,7 @@ sdk.AccAddress(pub.Address().Bytes())
 
 ### 公钥
 
-Cosmos SDK 中的公钥由`cryptotypes.PubKey` 接口定义。由于公钥保存在商店中，`cryptotypes.PubKey` 扩展了 `proto.Message` 接口:
+Cosmos SDK 中的公钥由`cryptotypes.PubKey` 接口定义。由于公钥保存在存储中，`cryptotypes.PubKey` 扩展了 `proto.Message` 接口:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/crypto/types/types.go#L8-L17
 
@@ -146,6 +142,6 @@ Cosmos SDK 中的公钥由`cryptotypes.PubKey` 接口定义。由于公钥保存
 
 - `ExportPrivKeyArmor(uid, encryptPassphrase string) (armor string, err error)` 使用给定的密码以 ASCII 装甲加密格式导出私钥。然后，您可以使用 `ImportPrivKey(uid, Armor, passphrase string)` 函数将私钥再次导入密钥环，或者使用 `UnarmorDecryptPrivKey(armorStr string, passphrase string)` 函数将其解密为原始私钥。
 
-## 下一个{隐藏}
+## 下一个 {hide}
 
 了解 [gas 和费用](./gas-fees.md) {hide} 

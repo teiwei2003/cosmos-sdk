@@ -1,10 +1,6 @@
-<!--
-order: 8
--->
+# 参数
 
-# Parameters
-
-The staking module contains the following parameters:
+staking 模块包含以下参数
 
 | Key               | Type             | Example                |
 |-------------------|------------------|------------------------|

@@ -1,7 +1,3 @@
-<!--
-order: 5
--->
-
 # Events
 
 The minting module emits the following events:

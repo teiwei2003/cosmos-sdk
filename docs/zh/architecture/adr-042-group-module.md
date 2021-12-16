@@ -1,44 +1,44 @@
-# ADR 042: Group Module
+# ADR 042:组模块
 
-## Changelog
+## 变更日志
 
-- 2020/04/09: Initial Draft
+- 2020/04/09:初稿
 
-## Status
+## 地位
 
-Draft
+草稿
 
-## Abstract
+## 摘要
 
-This ADR defines the `x/group` module which allows the creation and management of on-chain multi-signature accounts and enables voting for message execution based on configurable decision policies.
+该 ADR 定义了“x/group”模块，该模块允许创建和管理链上多重签名帐户，并基于可配置的决策策略启用对消息执行的投票。
 
-## Context
+## 语境
 
-The legacy amino multi-signature mechanism of the Cosmos SDK has certain limitations:
+Cosmos SDK 遗留的氨基多重签名机制有一定的局限性:
 
-- Key rotation is not possible, although this can be solved with [account rekeying](adr-034-account-rekeying.md).
-- Thresholds can't be changed.
-- UX is cumbersome for non-technical users ([#5661](https://github.com/cosmos/cosmos-sdk/issues/5661)).
-- It requires `legacy_amino` sign mode ([#8141](https://github.com/cosmos/cosmos-sdk/issues/8141)).
+- 密钥轮换是不可能的，尽管这可以通过 [account rekeying](adr-034-account-rekeying.md) 解决。
+- 无法更改阈值。
+- UX 对于非技术用户来说很麻烦 ([#5661](https://github.com/cosmos/cosmos-sdk/issues/5661))。
+- 它需要 `legacy_amino` 符号模式 ([#8141](https://github.com/cosmos/cosmos-sdk/issues/8141))。
 
-While the group module is not meant to be a total replacement for the current multi-signature accounts, it provides a solution to the limitations described above, with a more flexible key management system where keys can be added, updated or removed, as well as configurable thresholds.
-It's meant to be used with other access control modules such as [`x/feegrant`](./adr-029-fee-grant-module.md) ans [`x/authz`](adr-030-authz-module.md) to simplify key management for individuals and organizations.
+虽然组模块并不意味着要完全替代当前的多重签名帐户，但它提​​供了一种解决上述限制的方法，具有更灵活的密钥管理系统，可以在其中添加、更新或删除密钥，以及可配置的阈值。
+它旨在与其他访问控制模块一起使用，例如 [`x/feegrant`](./adr-029-fee-grant-module.md) ans [`x/authz`](adr-030-authz-module .md) 以简化个人和组织的密钥管理。
 
-The proof of concept of the group module can be found in https://github.com/regen-network/regen-ledger/tree/master/proto/regen/group/v1alpha1 and https://github.com/regen-network/regen-ledger/tree/master/x/group.
+group 模块的概念证明可以在 https://github.com/regen-network/regen-ledger/tree/master/proto/regen/group/v1alpha1 和 https://github.com/regen-网络/regen-ledger/tree/master/x/group。
 
-## Decision
+## 决定
 
-We propose merging the `x/group` module with its supporting [ORM/Table Store package](https://github.com/regen-network/regen-ledger/tree/master/orm) ([#7098](https://github.com/cosmos/cosmos-sdk/issues/7098)) into the Cosmos SDK and continuing development here. There will be a dedicated ADR for the ORM package.
+我们建议将 `x/group` 模块与其支持的 [ORM/Table Store 包](https://github.com/regen-network/regen-ledger/tree/master/orm) ([#7098](https ://github.com/cosmos/cosmos-sdk/issues/7098)) 进入 Cosmos SDK 并在此处继续开发。 ORM 包将有一个专用的 ADR。
 
-### Group
+### 团体
 
-A group is a composition of accounts with associated weights. It is not
-an account and doesn't have a balance. It doesn't in and of itself have any
-sort of voting or decision weight.
-Group members can create proposals and vote on them through group accounts using different decision policies.
+组是具有相关权重的帐户组合。它不是
+一个帐户并且没有余额。它本身没有任何
+某种投票权重或决策权重。
+组成员可以使用不同的决策策略通过组帐户创建提案并对其进行投票。
 
-It has an `admin` account which can manage members in the group, update the group
-metadata and set a new admin.
+它有一个“admin”账户，可以管理群组成员，更新群组
+元数据并设置新的管理员。 
 
 ```proto
 message GroupInfo {
@@ -88,19 +88,19 @@ message Member {
 }
 ```
 
-### Group Account
+### 组帐户
 
-A group account is an account associated with a group and a decision policy.
-A group account does have a balance.
+组帐户是与组和决策策略相关联的帐户。
+组帐户确实有余额。
 
-Group accounts are abstracted from groups because a single group may have
-multiple decision policies for different types of actions. Managing group
-membership separately from decision policies results in the least overhead
-and keeps membership consistent across different policies. The pattern that
-is recommended is to have a single master group account for a given group,
-and then to create separate group accounts with different decision policies
-and delegate the desired permissions from the master account to
-those "sub-accounts" using the [`x/authz` module](adr-030-authz-module.md).
+组帐户是从组中抽象出来的，因为单个组可能有
+不同类型动作的多种决策策略。 管理组
+与决策策略分开的成员资格导致最少的开销
+并在不同的政策中保持成员资格一致。 那个图案
+建议为给定组设置一个主组帐户，
+然后创建具有不同决策策略的单独组帐户
+并将所需的权限从主帐户委派给
+那些使用 [`x/authz` 模块](adr-030-authz-module.md) 的“子账户”。 
 
 ```proto
 message GroupAccountInfo {
@@ -126,24 +126,24 @@ message GroupAccountInfo {
 }
 ```
 
-Similarly to a group admin, a group account admin can update its metadata, decision policy or set a new group account admin.
+与组管理员类似，组帐户管理员可以更新其元数据、决策策略或设置新的组帐户管理员。
 
-A group account can also be an admin or a member of a group.
-For instance, a group admin could be another group account which could "elects" the members or it could be the same group that elects itself.
+群组帐户也可以是管理员或群组成员。
+例如，组管理员可以是另一个可以“选举”成员的组帐户，也可以是选举自己的同一个组。
 
-### Decision Policy
+### 决策政策
 
-A decision policy is the mechanism by which members of a group can vote on
-proposals.
+决策策略是组成员可以投票的机制
+提案。
 
-All decision policies should have a minimum and maximum voting window.
-The minimum voting window is the minimum duration that must pass in order
-for a proposal to potentially pass, and it may be set to 0. The maximum voting
-window is the maximum time that a proposal may be voted on and executed if
-it reached enough support before it is closed.
-Both of these values must be less than a chain-wide max voting window parameter.
+所有决策策略都应该有一个最小和最大投票窗口。
+最小投票窗口是必须按顺序通过的最短持续时间
+一个可能通过的提案，它可能被设置为 0。最大投票数
+窗口是提案可以被投票和执行的最长时间，如果
+它在关闭之前获得了足够的支持。
+这两个值都必须小于全链最大投票窗口参数。
 
-We define the `DecisionPolicy` interface that all decision policies must implement:
+我们定义了所有决策策略都必须实现的 `DecisionPolicy` 接口: 
 
 ```go
 type DecisionPolicy interface {
@@ -161,11 +161,11 @@ type DecisionPolicyResult struct {
 }
 ```
 
-#### Threshold decision policy
+#### 阈值决策策略
 
-A threshold decision policy defines a minimum support votes (_yes_), based on a tally
-of voter weights, for a proposal to pass. For
-this decision policy, abstain and veto are treated as no support (_no_).
+阈值决策策略基于计数定义了最低支持票数 (_yes_)
+选民权重，以通过提案。 为了
+这个决定政策，弃权和否决被视为不支持(_no_)。 
 
 ```proto
 message ThresholdDecisionPolicy {
@@ -181,15 +181,15 @@ message ThresholdDecisionPolicy {
 
 ### Proposal
 
-Any member of a group can submit a proposal for a group account to decide upon.
-A proposal consists of a set of `sdk.Msg`s that will be executed if the proposal
-passes as well as any metadata associated with the proposal. These `sdk.Msg`s get validated as part of the `Msg/CreateProposal` request validation. They should also have their signer set as the group account.
+群组的任何成员都可以提交提案以供群组帐户决定。
+提案由一组 `sdk.Msg` 组成，如果提案
+通过以及与提案相关的任何元数据。 这些 `sdk.Msg` 被验证为 `Msg/CreateProposal` 请求验证的一部分。 他们还应该将他们的签名者设置为组帐户。
 
-Internally, a proposal also tracks:
+在内部，提案还跟踪:
 
-- its current `Status`: submitted, closed or aborted
-- its `Result`: unfinalized, accepted or rejected
-- its `VoteState` in the form of a `Tally`, which is calculated on new votes and when executing the proposal.
+- 它当前的“状态”:已提交、关闭或中止
+- 它的“结果”:未完成、接受或拒绝
+- 它的“VoteState”以“Tally”的形式，根据新投票和执行提案时计算。 
 
 ```proto
 // Tally represents the sum of weighted votes.
@@ -210,70 +210,70 @@ message Tally {
 }
 ```
 
-### Voting
+### 投票
 
-Members of a group can vote on proposals. There are four choices to choose while voting - yes, no, abstain and veto. Not
-all decision policies will support them. Votes can contain some optional metadata.
-In the current implementation, the voting window begins as soon as a proposal
-is submitted.
+小组成员可以对提案进行投票。投票时有四种选择 - 是、否、弃权和否决。不是
+所有的决策政策都会支持他们。投票可以包含一些可选的元数据。
+在当前的实现中，投票窗口在提案后立即开始
+被提交。
 
-Voting internally updates the proposal `VoteState` as well as `Status` and `Result` if needed.
+如果需要，投票会在内部更新提案“VoteState”以及“Status”和“Result”。
 
-### Executing Proposals
+### 执行提案
 
-Proposals will not be automatically executed by the chain in this current design,
-but rather a user must submit a `Msg/Exec` transaction to attempt to execute the
-proposal based on the current votes and decision policy. A future upgrade could
-automate this and have the group account (or a fee granter) pay.
+在当前设计中，链不会自动执行提案，
+而是用户必须提交一个 `Msg/Exec` 事务来尝试执行
+基于当前投票和决策政策的提案。未来的升级可能
+自动执行此操作并让组帐户(或费用授予者)支付。
 
-#### Changing Group Membership
+#### 更改组成员身份
 
-In the current implementation, updating a group or a group account after submitting a proposal will make it invalid. It will simply fail if someone calls `Msg/Exec` and will eventually be garbage collected.
+在目前的实现中，提交提案后更新群组或群组账号会使其失效。如果有人调用`Msg/Exec`，它只会失败，最终会被垃圾收集。
 
-### Notes on current implementation
+### 当前实现的注意事项
 
-This section outlines the current implementation used in the proof of concept of the group module but this could be subject to changes and iterated on.
+本节概述了组模块概念验证中使用的当前实现，但这可能会发生变化和迭代。
 
 #### ORM
 
-The [ORM package](https://github.com/cosmos/cosmos-sdk/discussions/9156) defines tables, sequences and secondary indexes which are used in the group module.
+[ORM 包](https://github.com/cosmos/cosmos-sdk/discussions/9156) 定义了组模块中使用的表、序列和二级索引。
 
-Groups are stored in state as part of a `groupTable`, the `group_id` being an auto-increment integer. Group members are stored in a `groupMemberTable`.
+组作为“groupTable”的一部分存储在状态中，“group_id”是一个自动递增的整数。组成员存储在“groupMemberTable”中。
 
-Group accounts are stored in a `groupAccountTable`. The group account address is generated based on an auto-increment integer which is used to derive the group module `RootModuleKey` into a `DerivedModuleKey`, as stated in [ADR-033](adr-033-protobuf-inter-module-comm.md#modulekeys-and-moduleids). The group account is added as a new `ModuleAccount` through `x/auth`.
+组帐户存储在“groupAccountTable”中。组帐户地址是基于自动递增整数生成的，该整数用于将组模块 `RootModuleKey` 派生为 `DerivedModuleKey`，如 [ADR-033](adr-033-protobuf-inter-module-comm .md#modulekeys-and-moduleids)。群组帐户通过`x/auth` 添加为新的`ModuleAccount`。
 
-Proposals are stored as part of the `proposalTable` using the `Proposal` type. The `proposal_id` is an auto-increment integer.
+提案使用“Proposal”类型存储为“proposalTable”的一部分。 `proposal_id` 是一个自动递增的整数。
 
-Votes are stored in the `voteTable`. The primary key is based on the vote's `proposal_id` and `voter` account address.
+投票存储在“voteTable”中。主键基于投票的`proposal_id`和`voter`账户地址。
 
-#### ADR-033 to route proposal messages
+#### ADR-033 路​​由提案消息
 
-Inter-module communication introduced by [ADR-033](adr-033-protobuf-inter-module-comm.md) can be used to route a proposal's messages using the `DerivedModuleKey` corresponding to the proposal's group account.
+[ADR-033](adr-033-protobuf-inter-module-comm.md) 引入的模块间通信可用于使用与提案的组帐户对应的“DerivedModuleKey”路由提案的消息。 
 
 ## Consequences
 
 ### Positive
 
-- Improved UX for multi-signature accounts allowing key rotation and custom decision policies.
+- 改进了多签名帐户的 UX，允许密钥轮换和自定义决策策略。 
 
 ### Negative
 
 ### Neutral
 
-- It uses ADR 033 so it will need to be implemented within the Cosmos SDK, but this doesn't imply necessarily any large refactoring of existing Cosmos SDK modules.
-- The current implementation of the group module uses the ORM package.
+- 它使用 ADR 033，因此需要在 Cosmos SDK 中实现，但这并不意味着对现有 Cosmos SDK 模块进行任何大规模重构。
+- group 模块的当前实现使用 ORM 包。
 
-## Further Discussions
+## 进一步讨论
 
-- Convergence of `/group` and `x/gov` as both support proposals and voting: https://github.com/cosmos/cosmos-sdk/discussions/9066
-- `x/group` possible future improvements:
-    - Execute proposals on submission (https://github.com/regen-network/regen-ledger/issues/288)
-    - Withdraw a proposal (https://github.com/regen-network/cosmos-modules/issues/41)
-    - Make `Tally` more flexible and support non-binary choices
+- `/group` 和 `x/gov` 作为支持提案和投票的收敛:https://github.com/cosmos/cosmos-sdk/discussions/9066
+- `x/group` 未来可能的改进:
+     - 在提交时执行提案 (https://github.com/regen-network/regen-ledger/issues/288)
+     - 撤回提案(https://github.com/regen-network/cosmos-modules/issues/41)
+     - 使“Tally”更加灵活并支持非二元选择
 
-## References
+## 参考
 
-- Initial specification:
-    - https://gist.github.com/aaronc/b60628017352df5983791cad30babe56#group-module
-    - [#5236](https://github.com/cosmos/cosmos-sdk/pull/5236)
-- Proposal to add `x/group` into the Cosmos SDK: [#7633](https://github.com/cosmos/cosmos-sdk/issues/7633)
+- 初始规格:
+     - https://gist.github.com/aaronc/b60628017352df5983791cad30babe56#group-module
+     - [#5236](https://github.com/cosmos/cosmos-sdk/pull/5236)
+- 在 Cosmos SDK 中添加 `x/group` 的建议:[#7633](https://github.com/cosmos/cosmos-sdk/issues/7633) 

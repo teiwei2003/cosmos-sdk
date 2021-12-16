@@ -1,7 +1,3 @@
-<!-- 
-order: 1 
--->
-
 # IBC 概览
 
 了解 IBC 是什么、它的组件和用例。 {概要}
@@ -148,6 +144,6 @@ IBC 模块负责声明在`BindPort` 上返回的能力。
 - [IBC 规范](https://github.com/cosmos/ibc/tree/master/spec)
 - [Cosmos SDK 上的IBC 协议](https://github.com/cosmos/ibc-go/tree/main/docs)
 
-## 下一个{hide}
+## 下一个 {hide}
 
 了解如何 [integrate](./integration.md) IBC 到您的应用程序 {hide} 

@@ -1,7 +1,3 @@
-<!--
-order: 3
--->
-
 # 区块链架构
 
 ## 状态机
@@ -92,6 +88,6 @@ Tendermint 通过名为 [ABCI](https://docs.tendermint.com/v0.34/spec/abci/) 的
 
 任何基于 Tendermint 构建的应用程序都需要实现 ABCI 接口，以便与底层的本地 Tendermint 引擎进行通信。幸运的是，您不必实现 ABCI 接口。 Cosmos SDK 以 [baseapp](./sdk-design.md#baseapp) 的形式提供了它的样板实现。
 
-## 下一个{hide}
+## 下一个 {hide}
 
 阅读 [Cosmos SDK 的高级设计原则](./sdk-design.md) {hide} 

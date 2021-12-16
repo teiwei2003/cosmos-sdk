@@ -1,7 +1,3 @@
-<!--
-order: 8
--->
-
 # 不变量
 
 不变量是应用程序的一个属性，它应该始终为真。在 Cosmos SDK 的上下文中，“不变量”是检查特定不变量的函数。这些功能可用于及早检测错误并对其采取行动以限制其潜在后果(例如，通过停止链)。它们在应用程序的开发过程中也很有用，可以通过模拟检测错误。 {概要}
@@ -83,6 +79,6 @@ func RegisterInvariants(ir sdk.InvariantRegistry, k Keeper) {
 
 在这两种情况下，如果 `Invariant` 之一返回 false，`InvariantRegistry` 可以触发特殊逻辑(例如，让应用程序恐慌并在日志中打印 `Invariant`s 消息)。
 
-## 下一个{hide}
+## 下一个 {hide}
 
 了解 [创世功能](./genesis.md) {hide} 

@@ -1,7 +1,3 @@
-<!--
-order: 13
--->
-
 # Upgrading Modules
 
 [In-Place Store Migrations](../core/upgrade.html) allow your modules to upgrade to new versions that include breaking changes. This document outlines how to build modules to take advantage of this functionality. {synopsis}

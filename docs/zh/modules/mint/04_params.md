@@ -1,10 +1,6 @@
-<!--
-order: 4
--->
+# 参数
 
-# Parameters
-
-The minting module contains the following parameters:
+铸币模块包含以下参数: 
 
 | Key                 | Type            | Example                |
 |---------------------|-----------------|------------------------|

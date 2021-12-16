@@ -1,25 +1,21 @@
-<!--
-order: 3
--->
+# 与节点交互
 
-# Interacting with the Node
+有多种与节点交互的方式:使用 CLI、使用 gRPC 或使用 REST 端点。 {概要}
 
-There are multiple ways to interact with a node: using the CLI, using gRPC or using the REST endpoints. {synopsis}
+## 先决条件阅读
 
-## Pre-requisite Readings
+- [gRPC、REST 和 Tendermint 端点](../core/grpc_rest.md) {prereq}
+- [运行节点](./run-node.md) {prereq}
 
-- [gRPC, REST and Tendermint Endpoints](../core/grpc_rest.md) {prereq}
-- [Running a Node](./run-node.md) {prereq}
+## 使用 CLI
 
-## Using the CLI
-
-Now that your chain is running, it is time to try sending tokens from the first account you created to a second account. In a new terminal window, start by running the following query command:
+现在您的链正在运行，是时候尝试将代币从您创建的第一个帐户发送到第二个帐户了。 在新的终端窗口中，首先运行以下查询命令:
 
 ```bash
 simd query bank balances $MY_VALIDATOR_ADDRESS --chain-id my-test-chain
 ```
 
-You should see the current balance of the account you created, equal to the original balance of `stake` you granted it minus the amount you delegated via the `gentx`. Now, create a second account:
+您应该看到您创建的帐户的当前余额，等于您授予它的原始“stake”余额减去您通过“gentx”委托的金额。 现在，创建第二个帐户: 
 
 ```bash
 simd keys add recipient --keyring-backend test
@@ -28,7 +24,7 @@ simd keys add recipient --keyring-backend test
 RECIPIENT=$(simd keys show recipient -a --keyring-backend test)
 ```
 
-The command above creates a local key-pair that is not yet registered on the chain. An account is created the first time it receives tokens from another account. Now, run the following command to send tokens to the `recipient` account:
+上面的命令创建了一个尚未在链上注册的本地密钥对。 第一次从另一个账户接收代币时会创建一个账户。 现在，运行以下命令将令牌发送到“收件人”帐户: 
 
 ```bash
 simd tx bank send $MY_VALIDATOR_ADDRESS $RECIPIENT 1000000stake --chain-id my-test-chain --keyring-backend test
@@ -48,29 +44,29 @@ simd query staking delegations-to $(simd keys show my_validator --bech val -a --
 
 You should see two delegations, the first one made from the `gentx`, and the second one you just performed from the `recipient` account.
 
-## Using gRPC
+## 使用 gRPC
 
-The Protobuf ecosystem developed tools for different use cases, including code-generation from `*.proto` files into various languages. These tools allow the building of clients easily. Often, the client connection (i.e. the transport) can be plugged and replaced very easily. Let's explore one of the most popular transport: [gRPC](../core/grpc_rest.md).
+Protobuf 生态系统为不同的用例开发了工具，包括从 `*.proto` 文件到各种语言的代码生成。 这些工具允许轻松构建客户端。 通常，客户端连接(即传输)可以很容易地插入和替换。 让我们探索一种最流行的传输方式:[gRPC](../core/grpc_rest.md)。
 
-Since the code generation library largely depends on your own tech stack, we will only present three alternatives:
+由于代码生成库很大程度上取决于您自己的技术堆栈，我们将仅提供三种替代方案: 
 
-- `grpcurl` for generic debugging and testing,
-- programmatically via Go,
-- CosmJS for JavaScript/TypeScript developers.
+- `grpcurl` 用于通用调试和测试，
+- 通过 Go 编程，
+- 适用于 JavaScript/TypeScript 开发人员的 CosmJS。
 
 ### grpcurl
 
-[grpcurl](https://github.com/fullstorydev/grpcurl) is like `curl` but for gRPC. It is also available as a Go library, but we will use it only as a CLI command for debugging and testing purposes. Follow the instructions in the previous link to install it.
+[grpcurl](https://github.com/fullstorydev/grpcurl) 类似于 `curl` 但对于 gRPC。 它也可用作 Go 库，但我们将仅将其用作 CLI 命令以进行调试和测试。 按照上一个链接中的说明进行安装。
 
-Assuming you have a local node running (either a localnet, or connected a live network), you should be able to run the following command to list the Protobuf services available (you can replace `localhost:9000` by the gRPC server endpoint of another node, which is configured under the `grpc.address` field inside [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml)):
+假设您有一个本地节点正在运行(本地网络或连接的实时网络)，您应该能够运行以下命令来列出可用的 Protobuf 服务(您可以将 `localhost:9000` 替换为另一个的 gRPC 服务器端点 节点，在 [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml)) 中的 `grpc.address` 字段下配置: 
 
 ```bash
 grpcurl -plaintext localhost:9090 list
 ```
 
-You should see a list of gRPC services, like `cosmos.bank.v1beta1.Query`. This is called reflection, which is a Protobuf endpoint returning a description of all available endpoints. Each of these represents a different Protobuf service, and each service exposes multiple RPC methods you can query against.
+您应该会看到一个 gRPC 服务列表，例如 `cosmos.bank.v1beta1.Query`。 这称为反射，它是一个 Protobuf 端点，返回所有可用端点的描述。 每一个都代表一个不同的 Protobuf 服务，每个服务都公开了多个可以查询的 RPC 方法。
 
-In order to get a description of the service you can run the following command:
+为了获得服务的描述，您可以运行以下命令: 
 
 ```bash
 grpcurl \
@@ -88,11 +84,11 @@ grpcurl \
     cosmos.bank.v1beta1.Query/AllBalances
 ```
 
-The list of all available gRPC query endpoints is [coming soon](https://github.com/cosmos/cosmos-sdk/issues/7786).
+所有可用 gRPC 查询端点的列表[即将推出](https://github.com/cosmos/cosmos-sdk/issues/7786)。
 
-#### Query for historical state using grpcurl
+#### 使用 grpcurl 查询历史状态
 
-You may also query for historical data by passing some [gRPC metadata](https://github.com/grpc/grpc-go/blob/master/Documentation/grpc-metadata.md) to the query: the `x-cosmos-block-height` metadata should contain the block to query. Using grpcurl as above, the command looks like:
+您还可以通过将一些 [gRPC 元数据](https://github.com/grpc/grpc-go/blob/master/Documentation/grpc-metadata.md) 传递给查询来查询历史数据:`x-cosmos -block-height` 元数据应包含要查询的块。 如上使用 grpcurl，命令如下所示: 
 
 ```bash
 grpcurl \
@@ -103,12 +99,11 @@ grpcurl \
     cosmos.bank.v1beta1.Query/AllBalances
 ```
 
-Assuming the state at that block has not yet been pruned by the node, this query should return a non-empty response.
+假设该块的状态尚未被节点修剪，此查询应返回非空响应。
 
-### Programmatically via Go
+### 通过 Go 编程
 
-The following snippet shows how to query the state using gRPC inside a Go program. The idea is to create a gRPC connection, and use the Protobuf-generated client code to query the gRPC server.
-
+以下代码段展示了如何在 Go 程序中使用 gRPC 查询状态。 这个想法是创建一个gRPC连接，并使用Protobuf生成的客户端代码来查询gRPC服务器。 
 ```go
 import (
     "context"
@@ -149,11 +144,11 @@ func queryState() error {
 }
 ```
 
-You can replace the query client (here we are using `x/bank`'s) with one generated from any other Protobuf service. The list of all available gRPC query endpoints is [coming soon](https://github.com/cosmos/cosmos-sdk/issues/7786).
+您可以使用从任何其他 Protobuf 服务生成的客户端替换查询客户端(这里我们使用的是“x/bank”)。 所有可用 gRPC 查询端点的列表[即将推出](https://github.com/cosmos/cosmos-sdk/issues/7786)。
 
-#### Query for historical state using Go
+#### 使用 Go 查询历史状态
 
-Querying for historical blocks is done by adding the block height metadata in the gRPC request.
+历史区块的查询是通过在 gRPC 请求中添加区块高度元数据来完成的。 
 
 ```go
 import (
@@ -189,13 +184,13 @@ func queryState() error {
 
 ### CosmJS
 
-CosmJS documentation can be found at [https://cosmos.github.io/cosmjs](https://cosmos.github.io/cosmjs). As of January 2021, CosmJS documentation is still work in progress.
+CosmJS 文档可以在 [https://cosmos.github.io/cosmjs](https://cosmos.github.io/cosmjs) 找到。 截至 2021 年 1 月，CosmJS 文档仍在进行中。
 
-## Using the REST Endpoints
+## 使用 REST 端点
 
-As described in the [gRPC guide](../core/grpc_rest.md), all gRPC services on the Cosmos SDK are made available for more convenient REST-based queries through gRPC-gateway. The format of the URL path is based on the Protobuf service method's full-qualified name, but may contain small customizations so that final URLs look more idiomatic. For example, the REST endpoint for the `cosmos.bank.v1beta1.Query/AllBalances` method is `GET /cosmos/bank/v1beta1/balances/{address}`. Request arguments are passed as query parameters.
+如 [gRPC 指南](../core/grpc_rest.md) 中所述，Cosmos SDK 上的所有 gRPC 服务都可用于通过 gRPC 网关进行更方便的基于 REST 的查询。 URL 路径的格式基于 Protobuf 服务方法的完全限定名称，但可能包含小的自定义，以便最终 URL 看起来更地道。 例如，`cosmos.bank.v1beta1.Query/AllBalances` 方法的 REST 端点是 `GET /cosmos/bank/v1beta1/balances/{address}`。 请求参数作为查询参数传递。
 
-As a concrete example, the `curl` command to make balances request is:
+作为一个具体的例子，发出余额请求的 `curl` 命令是: 
 
 ```bash
 curl \
@@ -204,13 +199,13 @@ curl \
     http://localhost:1317/cosmos/bank/v1beta1/balances/$MY_VALIDATOR
 ```
 
-Make sure to replace `localhost:1317` with the REST endpoint of your node, configured under the `api.address` field.
+确保将“localhost:1317”替换为您节点的 REST 端点，在“api.address”字段下配置。
 
-The list of all available REST endpoints is available as a Swagger specification file, it can be viewed at `localhost:1317/swagger`. Make sure that the `api.swagger` field is set to true in your [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml) file.
+所有可用 REST 端点的列表可作为 Swagger 规范文件提供，可以在 `localhost:1317/swagger` 中查看。 确保在您的 [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml) 文件中将 `api.swagger` 字段设置为 true。
 
-### Query for historical state using REST
+### 使用 REST 查询历史状态
 
-Querying for historical state is done using the HTTP header `x-cosmos-block-height`. For example, a curl command would look like:
+查询历史状态是使用 HTTP 标头 `x-cosmos-block-height` 完成的。 例如，curl 命令如下所示: 
 
 ```bash
 curl \
@@ -220,12 +215,12 @@ curl \
     http://localhost:1317/cosmos/bank/v1beta1/balances/$MY_VALIDATOR
 ```
 
-Assuming the state at that block has not yet been pruned by the node, this query should return a non-empty response.
+假设该块的状态尚未被节点修剪，此查询应返回非空响应。
 
-### Cross-Origin Resource Sharing (CORS)
+### 跨域资源共享(CORS)
 
-[CORS policies](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) are not enabled by default to help with security. If you would like to use the rest-server in a public environment we recommend you provide a reverse proxy, this can be done with [nginx](https://www.nginx.com/). For testing and development purposes there is an `enabled-unsafe-cors` field inside [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml).
+[CORS 政策](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) 默认未启用以帮助提高安全性。 如果您想在公共环境中使用 rest-server，我们建议您提供反向代理，这可以通过 [nginx](https://www.nginx.com/) 来完成。 出于测试和开发目的，[`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml) 中有一个“enabled-unsafe-cors”字段。
 
-## Next {hide}
+## 下一个 {hide}
 
-Sending transactions using gRPC and REST requires some additional steps: generating the transaction, signing it, and finally broadcasting it. Read about [generating and signing transactions](./txs.md). {hide}
+使用 gRPC 和 REST 发送交易需要一些额外的步骤:生成交易、签名，最后广播它。 阅读[生成和签署交易](./txs.md)。 {hide} 

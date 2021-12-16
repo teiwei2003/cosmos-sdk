@@ -1,30 +1,30 @@
-# ADR 034: Account Rekeying
+# ADR 034:帐户重新生成密钥
 
-## Changelog
+## 变更日志
 
-- 30-09-2020: Initial Draft
+- 30-09-2020:初稿
 
-## Status
+## 地位
 
-PROPOSED
+建议的
 
-## Abstract
+## 摘要
 
-Account rekeying is a process hat allows an account to replace its authentication pubkey with a new one.
+帐户重新加密是一种允许帐户用新的公钥替换其身份验证公钥的过程。
 
-## Context
+## 语境
 
-Currently, in the Cosmos SDK, the address of an auth `BaseAccount` is based on the hash of the public key.  Once an account is created, the public key for the account is set in stone, and cannot be changed.  This can be a problem for users, as key rotation is a useful security practice, but is not possible currently.  Furthermore, as multisigs are a type of pubkey, once a multisig for an account is set, it can not be updated.  This is problematic, as multisigs are often used by organizations or companies, who may need to change their set of multisig signers for internal reasons.
+目前，在 Cosmos SDK 中，auth `BaseAccount` 的地址是基于公钥的哈希值。创建帐户后，该帐户的公钥是一成不变的，无法更改。这对用户来说可能是一个问题，因为密钥轮换是一种有用的安全实践，但目前是不可能的。此外，由于多重签名是一种公钥，一旦设置了帐户的多重签名，就无法更新。这是有问题的，因为组织或公司经常使用多重签名，由于内部原因，他们可能需要更改他们的多重签名集。
 
-Transferring all the assets of an account to a new account with the updated pubkey is not sufficient, because some "engagements" of an account are not easily transferable.  For example, in staking, to transfer bonded Atoms, an account would have to unbond all delegations and wait the three week unbonding period.  Even more significantly, for validator operators, ownership over a validator is not transferrable at all, meaning that the operator key for a validator can never be updated, leading to poor operational security for validators.
+使用更新的公钥将账户的所有资产转移到新账户是不够的，因为账户的某些“参与”不容易转移。例如，在 staking 中，要转移绑定的 Atom，一个账户必须解除所有委托并等待三周的解除绑定期。更重要的是，对于验证者运营商而言，验证者的所有权根本不可转让，这意味着验证者的运营商密钥永远无法更新，从而导致验证者的运营安全性较差。
 
-## Decision
+## 决定
 
-We propose the addition of a new feature to `x/auth` that allows accounts to update the public key associated with their account, while keeping the address the same.
+我们建议为 `x/auth` 添加一个新功能，允许账户更新与其账户关联的公钥，同时保持地址不变。
 
-This is possible because the Cosmos SDK `BaseAccount` stores the public key for an account in state, instead of making the assumption that the public key is included in the transaction (whether explicitly or implicitly through the signature) as in other blockchains such as Bitcoin and Ethereum.  Because the public key is stored on chain, it is okay for the public key to not hash to the address of an account, as the address is not pertinent to the signature checking process.
+这是可能的，因为 Cosmos SDK `BaseAccount` 将帐户的公钥存储在状态中，而不是像在其他区块链(例如比特币)中那样假设公钥包含在交易中(无论是显式还是隐式通过签名)和以太坊。因为公钥存储在链上，公钥不哈希到账户地址是可以的，因为地址与签名检查过程无关。
 
-To build this system, we design a new Msg type as follows:
+为了构建这个系统，我们设计了一个新的 Msg 类型如下:
 
 ```protobuf
 service Msg {
@@ -39,37 +39,36 @@ message MsgChangePubKey {
 message MsgChangePubKeyResponse {}
 ```
 
-The MsgChangePubKey transaction needs to be signed by the existing pubkey in state.
+MsgChangePubKey 事务需要由 state 中的现有公钥签名。
 
-Once, approved, the handler for this message type, which takes in the AccountKeeper, will update the in-state pubkey for the account and replace it with the pubkey from the Msg.
+一旦获得批准，此消息类型的处理程序(接受 AccountKeeper)将更新帐户的状态公钥并将其替换为消息中的公钥。
 
-An account that has had its pubkey changed cannot be automatically pruned from state.  This is because if pruned, the original pubkey of the account would be needed to recreate the same address, but the owner of the address may not have the original pubkey anymore.  Currently, we do not automatically prune any accounts anyways, but we would like to keep this option open the road (this is the purpose of account numbers).  To resolve this, we charge an additional gas fee for this operation to compensate for this this externality (this bound gas amount is configured as parameter `PubKeyChangeCost`). The bonus gas is charged inside the handler, using the `ConsumeGas` function.  Furthermore, in the future, we can allow accounts that have rekeyed manually prune themselves using a new Msg type such as `MsgDeleteAccount`.  Manually pruning accounts can give a gas refund as an incentive for performing the action.
+已更改其公钥的帐户不能自动从状态中删除。这是因为如果被修剪，则需要帐户的原始公钥来重新创建相同的地址，但地址的所有者可能不再拥有原始公钥。目前，无论如何我们不会自动修剪任何帐户，但我们希望保持此选项畅通无阻(这是帐号的目的)。为了解决这个问题，我们为此操作收取额外的 gas 费用来补偿这种外部性(这个绑定的 gas 数量被配置为参数 `PubKeyChangeCost`)。使用 `ConsumeGas` 函数在处理程序内部收取额外的 gas。此外，将来，我们可以允许使用新的 Msg 类型(例如“MsgDeleteAccount”)手动重新生成密钥的帐户进行自我修剪。手动修剪帐户可以提供 gas 退款作为执行操作的激励。 
 
 ```go
 	amount := ak.GetParams(ctx).PubKeyChangeCost
 	ctx.GasMeter().ConsumeGas(amount, "pubkey change fee")
 ```
 
-Everytime a key for an address is changed, we will store a log of this change in the state of the chain, thus creating a stack of all previous keys for an address and the time intervals for which they were active.  This allows dapps and clients to easily query past keys for an account which may be useful for features such as verifying timestamped off-chain signed messages.
+每次更改地址的密钥时，我们都会在链的状态中存储此更改的日志，从而创建一个地址的所有先前密钥的堆栈以及它们处于活动状态的时间间隔。 这允许 dapps 和客户端轻松查询帐户的过去密钥，这可能对验证带时间戳的链外签名消息等功能有用。 
 
 ## Consequences
 
 ### Positive
 
-* Will allow users and validator operators to employ better operational security practices with key rotation.
-* Will allow organizations or groups to easily change and add/remove multisig signers.
+* 将允许用户和验证器操作员通过密钥轮换采用更好的操作安全实践。
+* 将允许组织或团体轻松更改和添加/删除多重签名者。 
 
 ### Negative
 
-Breaks the current assumed relationship between address and pubkeys as H(pubkey) = address. This has a couple of consequences.
+打破当前假定的地址和公钥之间的关系，因为 H(pubkey) = address。 这有几个后果。
 
-* This makes wallets that support this feature more complicated. For example, if an address on chain was updated, the corresponding key in the CLI wallet also needs to be updated.
-* Cannot automatically prune accounts with 0 balance that have had their pubkey changed.
-
+* 这使得支持此功能的钱包变得更加复杂。 例如，如果链上的地址被更新，则 CLI 钱包中的相应密钥也需要更新。
+* 无法自动修剪已更改公钥的余额为 0 的帐户。 
 ### Neutral
 
-* While the purpose of this is intended to allow the owner of an account to update to a new pubkey they own, this could technically also be used to transfer ownership of an account to a new owner.  For example, this could be use used to sell a staked position without unbonding or an account that has vesting tokens.  However, the friction of this is very high as this would essentially have to be done as a very specific OTC trade. Furthermore, additional constraints could be added to prevent accouns with Vesting tokens to use this feature.
-* Will require that PubKeys for an account are included in the genesis exports.
+* 虽然这样做的目的是为了让账户所有者更新到他们拥有的新公钥，但从技术上讲，这也可以用于将账户的所有权转移给新的所有者。 例如，这可用于在不解除绑定的情况下出售抵押头寸或具有归属代币的账户。 然而，这种摩擦非常高，因为这基本上必须作为非常具体的场外交易来完成。 此外，可以添加额外的约束以防止拥有归属令牌的账户使用此功能。
+* 将要求一个帐户的公钥包含在创世导出中。 
 
 ## References
 

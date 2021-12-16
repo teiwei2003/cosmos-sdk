@@ -1,10 +1,6 @@
-<!--
-order: 6
--->
+# 参数
 
-# Parameters
-
-The governance module contains the following parameters:
+治理模块包含以下参数: 
 
 | Key           | Type   | Example                                                                                            |
 |---------------|--------|----------------------------------------------------------------------------------------------------|

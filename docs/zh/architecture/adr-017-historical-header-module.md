@@ -1,19 +1,19 @@
-# ADR 17: Historical Header Module
+# ADR 17:历史标题模块
 
-## Changelog
+## 变更日志
 
-- 26 November 2019: Start of first version
-- 2 December 2019: Final draft of first version
+- 2019 年 11 月 26 日:第一个版本开始
+- 2019 年 12 月 2 日:第一版的最终稿
 
-## Context
+## 语境
 
-In order for the Cosmos SDK to implement the [IBC specification](https://github.com/cosmos/ics), modules within the Cosmos SDK must have the ability to introspect recent consensus states (validator sets & commitment roots) as proofs of these values on other chains must be checked during the handshakes.
+为了让 Cosmos SDK 实现 [IBC 规范](https://github.com/cosmos/ics)，Cosmos SDK 中的模块必须能够自省最近的共识状态(验证器集和承诺根)作为证明 在握手期间必须检查其他链上的这些值。
 
-## Decision
+## 决定
 
-The application MUST store the most recent `n` headers in a persistent store. At first, this store MAY be the current Merklised store. A non-Merklised store MAY be used later as no proofs are necessary.
+应用程序必须在持久存储中存储最新的 `n` 个标头。 起初，这家存储可能是当前的 Merklised存储。 以后可以使用非 Merklised 存储，因为不需要证明。
 
-The application MUST store this information by storing new headers immediately when handling `abci.RequestBeginBlock`:
+应用程序必须在处理 `abci.RequestBeginBlock` 时立即通过存储新标头来存储此信息: 
 
 ```golang
 func BeginBlock(ctx sdk.Context, keeper HistoricalHeaderKeeper, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
@@ -28,11 +28,11 @@ func BeginBlock(ctx sdk.Context, keeper HistoricalHeaderKeeper, req abci.Request
 }
 ```
 
-Alternatively, the application MAY store only the hash of the validator set.
+或者，应用程序可以只存储验证器集的哈希值。
 
-The application MUST make these past `n` committed headers available for querying by Cosmos SDK modules through the `Keeper`'s `GetHistoricalInfo` function. This MAY be implemented in a new module, or it MAY also be integrated into an existing one (likely `x/staking` or `x/ibc`).
+应用程序必须通过 `Keeper` 的 `GetHistoricalInfo` 函数使这些过去的 `n` 个提交的标头可供 Cosmos SDK 模块查询。 这可以在新模块中实现，或者也可以集成到现有模块中(可能是 `x/staking` 或 `x/ibc`)。
 
-`n` MAY be configured as a parameter store parameter, in which case it could be changed by `ParameterChangeProposal`s, although it will take some blocks for the stored information to catch up if `n` is increased.
+`n` 可以被配置为参数存储参数，在这种情况下，它可以通过 `ParameterChangeProposal`s 更改，尽管如果增加 `n`，它会需要一些块才能赶上存储的信息。 
 
 ## Status
 
@@ -40,17 +40,17 @@ Proposed.
 
 ## Consequences
 
-Implementation of this ADR will require changes to the Cosmos SDK. It will not require changes to Tendermint.
+实施此 ADR 将需要更改 Cosmos SDK。 它不需要对 Tendermint 进行更改。
 
 ### Positive
 
-- Easy retrieval of headers & state roots for recent past heights by modules anywhere in the Cosmos SDK.
-- No RPC calls to Tendermint required.
-- No ABCI alterations required.
+- 通过 Cosmos SDK 中任何位置的模块轻松检索最近过去高度的标头和状态根。
+- 不需要对 Tendermint 进行 RPC 调用。
+- 无需 ABCI 更改。 
 
 ### Negative
 
-- Duplicates `n` headers data in Tendermint & the application (additional disk usage) - in the long term, an approach such as [this](https://github.com/tendermint/tendermint/issues/4210) might be preferable.
+- 在 Tendermint 和应用程序中复制 `n` 个标头数据(额外的磁盘使用)- 从长远来看，像 [this](https://github.com/tendermint/tendermint/issues/4210) 这样的方法可能更可取 . 
 
 ### Neutral
 

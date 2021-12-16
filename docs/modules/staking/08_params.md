@@ -1,7 +1,3 @@
-<!--
-order: 8
--->
-
 # Parameters
 
 The staking module contains the following parameters:

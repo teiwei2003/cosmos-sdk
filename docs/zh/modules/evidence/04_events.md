@@ -1,10 +1,6 @@
-<!--
-order: 4
--->
+# 事件
 
-# Events
-
-The `x/evidence` module emits the following events:
+`x/evidence` 模块发出以下事件: 
 
 ## Handlers
 

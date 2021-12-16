@@ -1,7 +1,3 @@
-<!--
-order: 2
--->
-
 # Keepers
 
 The bank module provides these exported keeper interfaces that can be

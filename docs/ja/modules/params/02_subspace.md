@@ -1,7 +1,3 @@
-<!--
-order: 2
--->
-
 # Subspace
 
 `Subspace` is a prefixed subspace of the parameter store. Each module which uses the

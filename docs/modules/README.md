@@ -1,7 +1,3 @@
-<!--
-order: 0
--->
-
 # List of Modules
 
 Here are some production-grade modules that can be used in Cosmos SDK applications, along with their respective documentation:

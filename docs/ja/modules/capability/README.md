@@ -1,10 +1,3 @@
-<!--
-order: 0
-title: Capability Overview
-parent:
-  title: "capability"
--->
-
 # `capability`
 
 ## Overview

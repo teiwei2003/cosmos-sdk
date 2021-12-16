@@ -1,55 +1,54 @@
-# ADR 14: Proportional Slashing
+# ADR 14:比例削减
 
-## Changelog
+## 变更日志
 
-- 2019-10-15: Initial draft
-- 2020-05-25: Removed correlation root slashing
-- 2020-07-01: Updated to include S-curve function instead of linear
+- 2019-10-15:初稿
+- 2020-05-25:删除了相关根削减
+- 2020-07-01:更新以包含 S 曲线函数而不是线性函数
 
-## Context
+## 语境
 
-In Proof of Stake-based chains, centralization of consensus power amongst a small set of validators can cause harm to the network due to increased risk of censorship, liveness failure, fork attacks, etc.  However, while this centralization causes a negative externality to the network, it is not directly felt by the delegators contributing towards delegating towards already large validators.  We would like a way to pass on the negative externality cost of centralization onto those large validators and their delegators.
+在基于权益证明的链中，由于审查、活性失败、分叉攻击等风险的增加，将共识权力集中在一小部分验证者之间可能会对网络造成损害。网络，委托人不会直接感受到它为委托给已经很大的验证人做出贡献。我们希望有一种方法可以将中心化的负外部性成本转嫁给那些大型验证者及其委托人。
 
-## Decision
+## 决定
 
-### Design
+### 设计
 
-To solve this problem, we will implement a procedure called Proportional Slashing.  The desire is that the larger a validator is, the more they should be slashed.  The first naive attempt is to make a validator's slash percent proportional to their share of consensus voting power.
+为了解决这个问题，我们将实施一个称为比例削减的程序。我们希望验证器越大，他们应该被削减的越多。第一个天真的尝试是使验证者的斜线百分比与其共识投票权的份额成正比。 
 
 ```
 slash_amount = k * power // power is the faulting validator's voting power and k is some on-chain constant
 ```
 
-However, this will incentivize validators with large amounts of stake to split up their voting power amongst accounts (sybil attack), so that if they fault, they all get slashed at a lower percent.  The solution to this is to take into account not just a validator's own voting percentage, but also the voting percentage of all the other validators who get slashed in a specified time frame.
+然而，这将激励拥有大量权益的验证者在账户之间分配他们的投票权(女巫攻击)，这样如果他们出错，他们都会被削减到较低的百分比。 对此的解决方案是不仅要考虑验证者自己的投票百分比，还要考虑在指定时间范围内被削减的所有其他验证者的投票百分比。 
 
 ```
 slash_amount = k * (power_1 + power_2 + ... + power_n) // where power_i is the voting power of the ith validator faulting in the specified time frame and k is some on-chain constant
 ```
 
-Now, if someone splits a validator of 10% into two validators of 5% each which both fault, then they both fault in the same time frame, they both will get slashed at the sum 10% amount.
+现在，如果有人将一个 10% 的验证器分成两个 5% 的验证器，每个验证器都出错，那么他们都在同一时间范围内出错，他们都将被削减 10% 的金额。
 
-However in practice, we likely don't want a linear relation between amount of stake at fault, and the percentage of stake to slash. In particular, solely 5% of stake double signing effectively did nothing to majorly threaten security, whereas 30% of stake being at fault clearly merits a large slashing factor, due to being very close to the point at which Tendermint security is threatened. A linear relation would require a factor of 6 gap between these two, whereas the difference in risk posed to the network is much larger. We propose using S-curves (formally [logistic functions](https://en.wikipedia.org/wiki/Logistic_function) to solve this). S-Curves capture the desired criterion quite well. They allow the slashing factor to be minimal for small values, and then grow very rapidly near some threshold point where the risk posed becomes notable.
+然而，在实践中，我们可能不希望发生错误的权益数量与要削减的权益百分比之间存在线性关系。特别是，只有 5% 的股权双重签名实际上没有对安全造成重大威胁，而 30% 的股权有错显然值得大幅削减，因为非常接近 Tendermint 安全受到威胁的点。线性关系将需要这两者之间的 6 倍差距，而对网络构成的风险差异要大得多。我们建议使用 S 曲线(正式的[逻辑函数](https://en.wikipedia.org/wiki/Logistic_function)来解决这个问题)。 S 曲线很好地捕捉了所需的标准。它们允许对小值的削减因子最小，然后在某个阈值点附近迅速增长，在该点所构成的风险变得显着。 
+#### 参数化
 
-#### Parameterization
+这需要参数化逻辑函数。很好地理解如何对此进行参数化。它有四个参数:
 
-This requires parameterizing a logistic function. It is very well understood how to parameterize this. It has four parameters:
+1) 最小削减系数
+2) 最大削减系数
+3)S曲线的拐点(本质上你想把S放在什么地方)
+4) S 曲线的增长率(S 的拉长程度)
 
-1) A minimum slashing factor
-2) A maximum slashing factor
-3) The inflection point of the S-curve (essentially where do you want to center the S)
-4) The rate of growth of the S-curve (How elongated is the S)
+#### 非女巫验证器之间的相关性
 
-#### Correlation across non-sybil validators
+人们会注意到，该模型不会区分由相同运营商运行的多个验证器与由不同运营商运行的验证器。这实际上可以看作是一个额外的好处。它激励验证者将他们的设置与其他验证者区分开来，以避免与他们相关的错误，否则他们将面临更高的削减风险。因此，例如，运营商应避免使用相同的流行云托管平台或使用相同的 Staking 作为服务提供商。这将导致一个更具弹性和去中心化的网络。
 
-One will note, that this model doesn't differentiate between multiple validators run by the same operators vs validators run by different operators.  This can be seen as an additional benefit in fact.  It incentivizes validators to differentiate their setups from other validators, to avoid having correlated faults with them or else they risk a higher slash.  So for example, operators should avoid using the same popular cloud hosting platforms or using the same Staking as a Service providers.  This will lead to a more resilient and decentralized network.
+#### 悲伤
 
-#### Griefing
+悲伤，故意让自己被砍伤以让别人的砍伤变得更糟的行为，在这里可能是一个问题。然而，使用这里描述的协议，攻击者也受到与受害者同等的悲痛影响，因此它不会给悲痛者带来太多好处。
 
-Griefing, the act of intentionally getting oneself slashed in order to make another's slash worse, could be a concern here.  However, using the protocol described here, the attacker also gets equally impacted by the grief as the victim, so it would not provide much benefit to the griefer.
+### 执行
 
-### Implementation
-
-In the slashing module, we will add two queues that will track all of the recent slash events.  For double sign faults, we will define "recent slashes" as ones that have occurred within the last `unbonding period`.  For liveness faults, we will define "recent slashes" as ones that have occurred withing the last `jail period`.
+在 slashing 模块中，我们将添加两个队列来跟踪所有最近的 slash 事件。对于双符号故障，我们将“最近的斜线”定义为在最后一个“解除绑定期”内发生的斜线。对于活性错误，我们将“最近的斜线”定义为在最后一个“监禁期”内发生的斜线。 
 
 ```
 type SlashEvent struct {
@@ -59,14 +58,13 @@ type SlashEvent struct {
 }
 ```
 
-These slash events will be pruned from the queue once they are older than their respective "recent slash period".
+一旦这些斜线事件早于它们各自的“最近斜线周期”，就会从队列中删除它们。
 
-Whenever a new slash occurs, a `SlashEvent` struct is created with the faulting validator's voting percent and a `SlashedSoFar` of 0.  Because recent slash events are pruned before the unbonding period and unjail period expires, it should not be possible for the same validator to have multiple SlashEvents in the same Queue at the same time.
+每当出现新的斜线时，都会创建一个带有故障验证者投票百分比和 0 的 SlashEvent 结构。验证器同时在同一个队列中有多个 SlashEvents。
 
-We then will iterate over all the SlashEvents in the queue, adding their `ValidatorVotingPercent` to calculate the new percent to slash all the validators in the queue at, using the "Square of Sum of Roots" formula introduced above.
+然后我们将迭代队列中的所有 SlashEvents，添加它们的 `ValidatorVotingPercent` 来计算新的百分比以使用上面介绍的“根总和的平方”公式来削减队列中的所有验证器。
 
-Once we have the `NewSlashPercent`, we then iterate over all the `SlashEvent`s in the queue once again, and if `NewSlashPercent > SlashedSoFar` for that SlashEvent, we call the `staking.Slash(slashEvent.Address, slashEvent.Power, Math.Min(Math.Max(minSlashPercent, NewSlashPercent - SlashedSoFar), maxSlashPercent)` (we pass in the power of the validator before any slashes occurred, so that we slash the right amount of tokens).  We then set `SlashEvent.SlashedSoFar` amount to `NewSlashPercent`.
-
+一旦我们有了 `NewSlashPercent`，我们就再次遍历队列中的所有 `SlashEvent`，如果该 SlashEvent 的 `NewSlashPercent > SlashedSoFar`，我们将调用 `staking.Slash(slashEvent.Address, slashEvent.Power , Math.Min(Math.Max(minSlashPercent, NewSlashPercent - SlashedSoFar), maxSlashPercent)`(我们在任何斜线发生之前传递验证器的力量，以便我们削减正确数量的令牌)。然后我们设置`SlashEvent。 SlashedSoFar` 相当于 `NewSlashPercent`。
 ## Status
 
 Proposed
@@ -75,11 +73,11 @@ Proposed
 
 ### Positive
 
-- Increases decentralization by disincentivizing delegating to large validators
-- Incentivizes Decorrelation of Validators
-- More severely punishes attacks than accidental faults
-- More flexibility in slashing rates parameterization
+- 通过不鼓励委托给大型验证者来增加权力下放
+- 激励验证者的去相关性
+- 比意外故障更严厉地惩罚攻击
+- 在削减率参数化方面更加灵活 
 
 ### Negative
 
-- More computationally expensive than current implementation.  Will require more data about "recent slashing events" to be stored on chain.
+- 比当前的实现更昂贵的计算。 将需要更多关于“最近的削减事件”的数据存储在链上。 

@@ -1,7 +1,3 @@
-<!--
-order: 3
--->
-
 # 定制
 
 了解如何配置您的应用程序以使用 IBC 并将数据包发送到其他链。 {概要}
@@ -463,6 +459,6 @@ app.IBCKeeper.SetRouter(ibcRouter)
 [实施IBC
 回调](https://github.com/cosmos/ibc-go/blob/main/modules/apps/transfer/module.go)
 
-## 下一个{hide}
+## 下一个 {hide}
 
 了解 [构建模块](https://github.com/cosmos/cosmos-sdk/blob/master/docs/building-modules/intro.md) {hide} 

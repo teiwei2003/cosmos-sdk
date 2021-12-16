@@ -1,20 +1,16 @@
-<!--
-order: 1
--->
+# 状态
 
-# State
+##消息队列
 
-## Messages queue
+消息在每个纪元结束时排队运行。 排队的消息有一个纪元号，对于每个纪元号，队列被迭代并执行每条消息。
 
-Messages are queued to run at the end of each epoch. Queued messages have an epoch number and for each epoch number, the queues are iterated over and each message is executed.
+### 消息队列
 
-### Message queues
+每个模块都有一个特定于该模块的唯一消息队列。
 
-Each module has one unique message queue that is specific to that module.
+## 行动
 
-## Actions
-
-A module will add a message that implements the `sdk.Msg` interface. These message will be executed at a later time (end of the next epoch).
+一个模块将添加一个实现 `sdk.Msg` 接口的消息。 这些消息将在稍后执行(下一个纪元结束)。 
 
 ```go
 type Msg interface {
@@ -42,17 +38,17 @@ type Msg interface {
  }
 ```
 
-## Buffered Messages Export / Import
+## 缓冲消息导出/导入
 
-For now, the `x/epoching` module is implemented to export all buffered messages without epoch numbers. When state is imported, buffered messages are stored on current epoch to run at the end of current epoch.
+目前，实现了 `x/epoching` 模块以导出所有没有纪元编号的缓冲消息。 导入状态时，缓冲的消息存储在当前纪元上，以在当前纪元结束时运行。
 
-## Genesis Transactions
+##创世交易
 
-We execute epoch after execution of genesis transactions to see the changes instantly before node start.
+我们在执行创世交易后执行 epoch 以在节点启动之前立即查看更改。
 
-## Execution on epochs
+## 在 epoch 上执行
 
-- Try executing the message for the epoch
-- If success, make changes as it is
-- If failure, try making revert extra actions done on handlers (e.g. EpochDelegationPool deposit)
-- If revert fail, panic
+- 尝试执行 epoch 的消息
+- 如果成功，按原样进行更改
+- 如果失败，请尝试在处理程序上执行恢复额外操作(例如 EpochDelegationPool 存款)
+- 如果恢复失败，恐慌 

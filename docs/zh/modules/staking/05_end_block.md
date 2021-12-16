@@ -1,77 +1,73 @@
-<!--
-order: 5
--->
+# 结束块
 
-# End-Block
+每个 abci 结束块调用，更新队列和验证器集的操作
+更改被指定执行。
 
-Each abci end block call, the operations to update queues and validator set
-changes are specified to execute.
+## 验证器集更改
 
-## Validator Set Changes
+在此过程中通过状态转换更新质押验证器集
+在每个块的末尾运行。作为此过程的一部分，任何更新
+验证器也会返回到 Tendermint 以包含在 Tendermint 中
+验证器集，负责验证 Tendermint 消息
+共识层。操作如下:
 
-The staking validator set is updated during this process by state transitions
-that run at the end of every block. As a part of this process any updated
-validators are also returned back to Tendermint for inclusion in the Tendermint
-validator set which is responsible for validating Tendermint messages at the
-consensus layer. Operations are as following:
+- 新的验证器集被视为最高的 `params.MaxValidators` 数量
+  从“ValidatorsByPower”索引中检索的验证器
+- 将先前的验证器集与新的验证器集进行比较:
+    - 缺失的验证者开始解除绑定，他们的“代币”从
+    `BondedPool` 到 `NotBondedPool` `ModuleAccount`
+    - 新的验证者立即绑定，他们的“代币”从
+    `NotBondedPool` 到 `BondedPool` `ModuleAccount`
 
-- the new validator set is taken as the top `params.MaxValidators` number of
-  validators retrieved from the `ValidatorsByPower` index
-- the previous validator set is compared with the new validator set:
-    - missing validators begin unbonding and their `Tokens` are transferred from the
-    `BondedPool` to the `NotBondedPool` `ModuleAccount`
-    - new validators are instantly bonded and their `Tokens` are transferred from the
-    `NotBondedPool` to the `BondedPool` `ModuleAccount`
+在所有情况下，任何离开或进入绑定验证器集的验证器或
+更改余额并留在绑定验证器集合中会导致更新
+消息报告他们新的共识权力，该权力被传递回 Tendermint。
 
-In all cases, any validators leaving or entering the bonded validator set or
-changing balances and staying within the bonded validator set incur an update
-message reporting their new consensus power which is passed back to Tendermint.
+`LastTotalPower` 和 `LastValidatorsPower` 保存总功率的状态
+和来自最后一个区块末尾的验证者权力，用于检查
+`ValidatorsByPower` 中发生的变化和新的总权力，其中
+在“EndBlock”期间计算。
 
-The `LastTotalPower` and `LastValidatorsPower` hold the state of the total power
-and validator power from the end of the last block, and are used to check for
-changes that have occured in `ValidatorsByPower` and the total new power, which
-is calculated during `EndBlock`.
+## 队列
 
-## Queues
+在 staking 中，某些状态转换不是即时的而是发生的
+在一段时间内(通常是解绑期)。当这些
+转换已经成熟，必须进行某些操作才能完成
+状态操作。这是通过使用队列来实现的
+在每个块的末尾检查/处理。
 
-Within staking, certain state-transitions are not instantaneous but take place
-over a duration of time (typically the unbonding period). When these
-transitions are mature certain operations must take place in order to complete
-the state operation. This is achieved through the use of queues which are
-checked/processed at the end of each block.
+### 解除绑定验证器
 
-### Unbonding Validators
+当验证者被踢出绑定验证者集时(通过
+被监禁，或没有足够的绑定代币)它开始解除绑定
+进程及其所有代表团开始解除绑定(同时仍在
+委托给这个验证器)。在这一点上，验证者被认为是一个
+“非绑定验证器”，它将成熟成为“非绑定验证器”
+解绑期过后。
 
-When a validator is kicked out of the bonded validator set (either through
-being jailed, or not having sufficient bonded tokens) it begins the unbonding
-process along with all its delegations begin unbonding (while still being
-delegated to this validator). At this point the validator is said to be an
-"unbonding validator", whereby it will mature to become an "unbonded validator"
-after the unbonding period has passed.
+验证者队列的每个区块都将被检查是否有成熟的解绑验证者
+(即完成时间<=当前时间和完成高度<=当前
+块高度)。在这一点上，任何成熟的验证器没有任何
+剩余的代表团从状态中删除。对于所有其他成熟的解绑
+仍然有剩余委托的验证器，`validator.Status` 是
+从 `types.Unbonding` 切换到
+`types.Unbonded`。
 
-Each block the validator queue is to be checked for mature unbonding validators
-(namely with a completion time <= current time and completion height <= current
-block height). At this point any mature validators which do not have any
-delegations remaining are deleted from state. For all other mature unbonding
-validators that still have remaining delegations, the `validator.Status` is
-switched from `types.Unbonding` to
-`types.Unbonded`.
+### 解除绑定委托
 
-### Unbonding Delegations
+完成所有成熟的`UnbondingDelegations.Entries` 内的解除绑定
+`UnbondingDelegations` 队列具有以下过程:
 
-Complete the unbonding of all mature `UnbondingDelegations.Entries` within the
-`UnbondingDelegations` queue with the following procedure:
+- 将余额币转移到委托人的钱包地址
+- 从`UnbondingDelegation.Entries`中删除成熟的条目
+- 如果没有，则从存储中删除 `UnbondingDelegation` 对象
+  剩余条目。
 
-- transfer the balance coins to the delegator's wallet address
-- remove the mature entry from `UnbondingDelegation.Entries`
-- remove the `UnbondingDelegation` object from the store if there are no
-  remaining entries.
+### 重新授权
 
-### Redelegations
+完成所有成熟的“Redelegation.Entries”的解绑
+`Redelegations` 队列具有以下过程:
 
-Complete the unbonding of all mature `Redelegation.Entries` within the
-`Redelegations` queue with the following procedure:
-
-- remove the mature entry from `Redelegation.Entries`
-- remove the `Redelegation` object from the store if there are no
-  remaining entries.
+- 从`Redelegation.Entries`中删除成熟的条目
+- 如果没有，则从存储中删除 `Redelegation` 对象
+  剩余条目。 

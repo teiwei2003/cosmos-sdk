@@ -1,31 +1,31 @@
-# ADR 038: KVStore state listening
+# ADR 038:KVStore 状态监听
 
-## Changelog
+## 变更日志
 
-- 11/23/2020: Initial draft
+- 11/23/2020:初稿
 
-## Status
+## 地位
 
-Proposed
+建议的
 
-## Abstract
+## 摘要
 
-This ADR defines a set of changes to enable listening to state changes of individual KVStores and exposing these data to consumers.
+此 ADR 定义了一组更改，以启用侦听各个 KVStore 的状态更改并将这些数据公开给消费者。
 
-## Context
+## 语境
 
-Currently, KVStore data can be remotely accessed through [Queries](https://github.com/cosmos/cosmos-sdk/blob/master/docs/building-modules/messages-and-queries.md#queries)
-which proceed either through Tendermint and the ABCI, or through the gRPC server.
-In addition to these request/response queries, it would be beneficial to have a means of listening to state changes as they occur in real time.
+目前，KVStore数据可以通过[查询]远程访问(https://github.com/cosmos/cosmos-sdk/blob/master/docs/building-modules/messages-and-queries.md#queries)
+通过 Tendermint 和 ABCI，或通过 gRPC 服务器进行。
+除了这些请求/响应查询之外，有一种方法可以监听实时发生的状态变化。
 
-## Decision
+## 决定
 
-We will modify the `MultiStore` interface and its concrete (`rootmulti` and `cachemulti`) implementations and introduce a new `listenkv.Store` to allow listening to state changes in underlying KVStores.
-We will introduce a plugin system for configuring and running streaming services that write these state changes and their surrounding ABCI message context to different destinations.
+我们将修改 `MultiStore` 接口及其具体(`rootmulti` 和 `cachemulti`)实现，并引入一个新的 `listenkv.Store` 以允许监听底层 KVStore 的状态变化。
+我们将介绍一个用于配置和运行流服务的插件系统，这些服务将这些状态变化及其周围的 ABCI 消息上下文写入不同的目的地。
 
-### Listening interface
+###收听界面
 
-In a new file, `store/types/listening.go`, we will create a `WriteListener` interface for streaming out state changes from a KVStore.
+在一个新文件 `store/types/listening.go` 中，我们将创建一个 `WriteListener` 接口，用于从 KVStore 流出状态更改。
 
 ```go
 // WriteListener interface for streaming data out from a listenkv.Store
@@ -37,14 +37,14 @@ type WriteListener interface {
 }
 ```
 
-### Listener type
+### 监听器类型
 
-We will create a concrete implementation of the `WriteListener` interface in `store/types/listening.go`, that writes out protobuf
-encoded KV pairs to an underlying `io.Writer`.
+我们将在`store/types/listening.go`中创建`WriteListener`接口的具体实现，它写出protobuf
+编码的 KV 对与底层的 `io.Writer`。
 
-This will include defining a simple protobuf type for the KV pairs. In addition to the key and value fields this message
-will include the StoreKey for the originating KVStore so that we can write out from separate KVStores to the same stream/file
-and determine the source of each KV pair.
+这将包括为 KV 对定义一个简单的 protobuf 类型。 除了键和值字段，这条消息
+将包含原始 KVStore 的 StoreKey，以便我们可以从单独的 KVStore 写出到同一个流/文件
+并确定每个 KV 对的来源。 
 
 ```protobuf
 message StoreKVPair {
@@ -91,8 +91,8 @@ func (wl *StoreKVPairWriteListener) OnWrite(storeKey types.StoreKey, key []byte,
 
 ### ListenKVStore
 
-We will create a new `Store` type `listenkv.Store` that the `MultiStore` wraps around a `KVStore` to enable state listening.
-We can configure the `Store` with a set of `WriteListener`s which stream the output to specific destinations.
+我们将创建一个新的 `Store` 类型 `listenkv.Store`，`MultiStore` 环绕一个 `KVStore` 以启用状态监听。
+我们可以使用一组 `WriteListener` 配置 `Store`，将输出流式传输到特定目的地。 
 
 ```go
 // Store implements the KVStore interface with listening enabled.
@@ -137,8 +137,8 @@ func (s *Store) onWrite(delete bool, key, value []byte) {
 
 ### MultiStore interface updates
 
-We will update the `MultiStore` interface to allow us to wrap a set of listeners around a specific `KVStore`.
-Additionally, we will update the `CacheWrap` and `CacheWrapper` interfaces to enable listening in the caching layer.
+我们将更新 `MultiStore` 接口，以允许我们围绕特定的 `KVStore` 包装一组侦听器。
+此外，我们将更新 `CacheWrap` 和 `CacheWrapper` 接口以启用缓存层中的侦听。 
 
 ```go
 type MultiStore interface {
@@ -171,8 +171,8 @@ type CacheWrapper interface {
 
 ### MultiStore implementation updates
 
-We will modify all of the `Store` and `MultiStore` implementations to satisfy these new interfaces, and adjust the `rootmulti` `GetKVStore` method
-to wrap the returned `KVStore` with a `listenkv.Store` if listening is turned on for that `Store`.
+我们将修改所有 `Store` 和 `MultiStore` 实现以满足这些新接口，并调整 `rootmulti``GetKVStore` 方法
+如果为该“Store”打开了侦听，则用“listenkv.Store”包装返回的“KVStore”。 
 
 ```go
 func (rs *Store) GetKVStore(key types.StoreKey) types.KVStore {
@@ -189,8 +189,8 @@ func (rs *Store) GetKVStore(key types.StoreKey) types.KVStore {
 }
 ```
 
-We will also adjust the `cachemulti` constructor methods and the `rootmulti` `CacheMultiStore` method to forward the listeners
-to and enable listening in the cache layer.
+我们还将调整`cachemulti`构造方法和`rootmulti``CacheMultiStore`方法来转发监听器
+并在缓存层中启用侦听。
 
 ```go
 func (rs *Store) CacheMultiStore() types.CacheMultiStore {
@@ -206,12 +206,12 @@ func (rs *Store) CacheMultiStore() types.CacheMultiStore {
 
 #### Streaming service
 
-We will introduce a new `StreamingService` interface for exposing `WriteListener` data streams to external consumers.
-In addition to streaming state changes as `StoreKVPair`s, the interface satisfies an `ABCIListener` interface that plugs
-into the BaseApp and relays ABCI requests and responses so that the service can group the state changes with the ABCI
-requests that affected them and the ABCI responses they affected. The `ABCIListener` interface also exposes a
-`ListenSuccess` method which is (optionally) used by the `BaseApp` to await positive acknowledgement of message
-receipt from the `StreamingService`.
+我们将引入一个新的 `StreamingService` 接口，用于将 `WriteListener` 数据流暴露给外部消费者。
+除了流状态改变为`StoreKVPair`s，接口满足一个`ABCIListener`接口，插入
+进入 BaseApp 并中继 ABCI 请求和响应，以便服务可以将状态更改与 ABCI 分组
+影响他们的请求以及他们影响的 ABCI 响应。 `ABCIListener` 接口还公开了一个
+`ListenSuccess` 方法(可选)由`BaseApp` 用于等待消息的肯定确认
+来自“StreamingService”的收据。 
 
 ```go
 // ABCIListener interface used to hook into the ABCI message processing of the BaseApp
@@ -242,7 +242,7 @@ type StreamingService interface {
 
 #### BaseApp registration
 
-We will add a new method to the `BaseApp` to enable the registration of `StreamingService`s:
+我们将向`BaseApp` 添加一个新方法以启用`StreamingService`s 的注册:
 
 ```go
 // SetStreamingService is used to set a streaming service into the BaseApp hooks and load the listeners into the multistore
@@ -257,8 +257,8 @@ func (app *BaseApp) SetStreamingService(s StreamingService) {
 }
 ```
 
-We will add a new method to the `BaseApp` that is used to configure a global wait limit for receiving positive acknowledgement
-of message receipt from the integrated `StreamingService`s.
+我们将向“BaseApp”添加一个新方法，用于配置接收肯定确认的全局等待限制
+来自集成的“StreamingService”的消息接收。 
 
 ```go
 func (app *BaseApp) SetGlobalWaitLimit(t time.Duration) {
@@ -266,8 +266,8 @@ func (app *BaseApp) SetGlobalWaitLimit(t time.Duration) {
 }
 ```
 
-We will also modify the `BeginBlock`, `EndBlock`, and `DeliverTx` methods to pass ABCI requests and responses to any streaming service hooks registered
-with the `BaseApp`.
+我们还将修改“BeginBlock”、“EndBlock”和“DeliverTx”方法，以将 ABCI 请求和响应传递给任何已注册的流服务挂钩
+使用`BaseApp`。 
 
 ```go
 func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeginBlock) {
@@ -330,11 +330,11 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 }
 ```
 
-We will also modify the `Commit` method to process `success/failure` signals from the integrated `StreamingService`s using
-the `ABCIListener.ListenSuccess()` method. Each `StreamingService` has an internal wait threshold after which it sends
-`false` to the `ListenSuccess()` channel, and the BaseApp also imposes a configurable global wait limit.
-If the `StreamingService` is operating in a "fire-and-forget" mode, `ListenSuccess()` should immediately return `true`
-off the channel despite the success status of the service.
+我们还将修改 `Commit` 方法以处理来自集成的 `StreamingService` 的 `success/failure` 信号，使用
+`ABCIListener.ListenSuccess()` 方法。 每个“StreamingService”都有一个内部等待阈值，在此阈值之后它会发送
+`ListenSuccess()` 通道为 `false`，并且 BaseApp 还强加了一个可配置的全局等待限制。
+如果 `StreamingService` 以“即发即弃”模式运行，`ListenSuccess()` 应立即返回 `true`
+尽管服务处于成功状态，但仍关闭频道。
 
 ```go
 func (app *BaseApp) Commit() (res abci.ResponseCommit) {
@@ -382,9 +382,9 @@ func (app *BaseApp) Commit() (res abci.ResponseCommit) {
 
 #### Plugin system
 
-We propose a plugin architecture to load and run `StreamingService` implementations. We will introduce a plugin
-loading/preloading system that is used to load, initialize, inject, run, and stop Cosmos-SDK plugins. Each plugin
-must implement the following interface:
+我们提出了一个插件架构来加载和运行 `StreamingService` 实现。 我们将介绍一个插件
+加载/预加载系统，用于加载、初始化、注入、运行和停止 Cosmos-SDK 插件。 每个插件
+必须实现以下接口: 
 
 ```go
 // Plugin is the base interface for all kinds of cosmos-sdk plugins
@@ -406,13 +406,13 @@ type Plugin interface {
 }
 ```
 
-The `Name` method returns a plugin's name.
-The `Version` method returns a plugin's version.
-The `Init` method initializes a plugin with the provided `AppOptions`.
-The io.Closer is used to shut down the plugin service.
+`Name` 方法返回插件的名称。
+`Version` 方法返回插件的版本。
+`Init` 方法使用提供的 `AppOptions` 初始化插件。
+io.Closer 用于关闭插件服务。
 
-For the purposes of this ADR we introduce a single kind of plugin- a state streaming plugin.
-We will define a `StateStreamingPlugin` interface which extends the above `Plugin` interface to support a state streaming service.
+出于此 ADR 的目的，我们引入了一种插件——状态流插件。
+我们将定义一个 `StateStreamingPlugin` 接口，它扩展了上面的 `Plugin` 接口以支持状态流服务。 
 
 ```go
 // StateStreamingPlugin interface for plugins that load a baseapp.StreamingService onto a baseapp.BaseApp
@@ -428,8 +428,8 @@ type StateStreamingPlugin interface {
 }
 ```
 
-The `Register` method is used during App construction to register the plugin's streaming service with an App's BaseApp using the BaseApp's `SetStreamingService` method.
-The `Start` method is used during App construction to start the registered plugin streaming services and maintain synchronization with them.
+`Register` 方法用于在 App 构建期间使用 BaseApp 的 `SetStreamingService` 方法向 App 的 BaseApp 注册插件的流服务。
+在 App 构建过程中使用 `Start` 方法来启动已注册的插件流服务并与其保持同步。 
 
 e.g. in `NewSimApp`:
 
@@ -480,7 +480,7 @@ func NewSimApp(
 
 #### Configuration
 
-The plugin system will be configured within an app's app.toml file.
+插件系统将在应用程序的 app.toml 文件中进行配置。 
 
 ```toml
 [plugins]
@@ -489,19 +489,18 @@ The plugin system will be configured within an app's app.toml file.
     dir = "the directory to load non-preloaded plugins from; defaults to cosmos-sdk/plugin/plugins"
 ```
 
-There will be three parameters for configuring the plugin system: `plugins.on`, `plugins.disabled` and `plugins.dir`.
-`plugins.on` is a bool that turns on or off the plugin system at large, `plugins.dir` directs the system to a directory
-to load plugins from, and `plugins.disabled` is a list of names for the plugins we want to disable (useful for disabling preloaded plugins).
+配置插件系统将有三个参数:`plugins.on`、`plugins.disabled` 和`plugins.dir`。
+`plugins.on` 是一个布尔值，用于打开或关闭整个插件系统，`plugins.dir` 将系统定向到一个目录
+从中加载插件，`plugins.disabled` 是我们要禁用的插件的名称列表(用于禁用预加载的插件)。
 
-Configuration of a given plugin is ultimately specific to the plugin, but we will introduce some standards here:
+给定插件的配置最终是特定于插件的，但我们将在这里介绍一些标准:
 
-Plugin TOML configuration should be split into separate sub-tables for each kind of plugin (e.g. `plugins.streaming`).
-Within these sub-tables, the parameters for a specific plugin of that kind are included in another sub-table (e.g. `plugins.streaming.file`).
-It is generally expected, but not required, that a streaming service plugin can be configured with a set of store keys
-(e.g. `plugins.streaming.file.keys`) for the stores it listens to and a mode (e.g. `plugins.streaming.file.mode`)
-that signifies whether the service operates in a fire-and-forget capacity (`faf`) or the BaseApp should require positive
-acknowledgement of message receipt by the service (`ack`).
-
+插件 TOML 配置应为每种插件(例如`plugins.streaming`)拆分为单独的子表。
+在这些子表中，此类特定插件的参数包含在另一个子表中(例如`plugins.streaming.file`)。
+通常，但不是必需的，可以使用一组存储密钥配置流媒体服务插件
+(例如`plugins.streaming.file.keys`)用于它侦听的存储和模式(例如`plugins.streaming.file.mode`)
+这表示服务是否以即发即忘的能力(`faf`)运行，或者 BaseApp 应该要求正面
+服务对消息接收的确认(`ack`)。 
 e.g.
 
 ```toml
@@ -523,11 +522,11 @@ e.g.
 
 #### Encoding and decoding streams
 
-ADR-038 introduces the interfaces and types for streaming state changes out from KVStores, associating this
-data with their related ABCI requests and responses, and registering a service for consuming this data and streaming it to some destination in a final format.
-Instead of prescribing a final data format in this ADR, it is left to a specific plugin implementation to define and document this format.
-We take this approach because flexibility in the final format is necessary to support a wide range of streaming service plugins. For example,
-the data format for a streaming service that writes the data out to a set of files will differ from the data format that is written to a Kafka topic.
+ADR-038 引入了用于从 KVStores 中流式传输状态更改的接口和类型，关联此
+数据及其相关的 ABCI 请求和响应，并注册一个服务以使用这些数据并将其以最终格式流式传输到某个目的地。
+不是在此 ADR 中规定最终数据格式，而是由特定的插件实现来定义和记录此格式。
+我们采用这种方法是因为最终格式的灵活性对于支持广泛的流媒体服务插件是必要的。 例如，
+将数据写入一组文件的流服务的数据格式与写入 Kafka 主题的数据格式不同。 
 
 ## Consequences
 
@@ -535,17 +534,17 @@ These changes will provide a means of subscribing to KVStore state changes in re
 
 ### Backwards Compatibility
 
-- This ADR changes the `MultiStore`, `CacheWrap`, and `CacheWrapper` interfaces, implementations supporting the previous version of these interfaces will not support the new ones
+- 此 ADR 更改了 `MultiStore`、`CacheWrap` 和 `CacheWrapper` 接口，支持这些接口的先前版本的实现将不支持新的接口 
 
 ### Positive
 
-- Ability to listen to KVStore state changes in real time and expose these events to external consumers
+- 能够实时监听 KVStore 状态变化并将这些事件暴露给外部消费者 
 
 ### Negative
 
-- Changes `MultiStore`, `CacheWrap`, and `CacheWrapper` interfaces
+- 更改了`MultiStore`、`CacheWrap` 和`CacheWrapper` 接口 
 
 ### Neutral
 
-- Introduces additional- but optional- complexity to configuring and running a cosmos application
-- If an application developer opts to use these features to expose data, they need to be aware of the ramifications/risks of that data exposure as it pertains to the specifics of their application
+- 为配置和运行 Cosmos 应用程序引入了额外但可选的复杂性
+- 如果应用程序开发人员选择使用这些功能来公开数据，他们需要了解该数据公开的后果/风险，因为它与他们的应用程序的细节有关 

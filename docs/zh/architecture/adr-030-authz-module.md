@@ -1,52 +1,52 @@
-# ADR 030: Authorization Module
+# ADR 030:授权模块
 
-## Changelog
+## 变更日志
 
-- 2019-11-06: Initial Draft
-- 2020-10-12: Updated Draft
-- 2020-11-13: Accepted
-- 2020-05-06: proto API updates, use `sdk.Msg` instead of `sdk.ServiceMsg` (the latter concept was removed from Cosmos SDK)
+- 2019-11-06:初稿
+- 2020-10-12:更新草案
+- 2020-11-13:接受
+- 2020-05-06:proto API 更新，使用 `sdk.Msg` 而不是 `sdk.ServiceMsg`(后一个概念已从 Cosmos SDK 中删除)
 
-## Status
+## 地位
 
-Accepted
+公认
 
-## Abstract
+## 摘要
 
-This ADR defines the `x/authz` module which allows accounts to grant authorizations to perform actions
-on behalf of that account to other accounts.
+此 ADR 定义了 `x/authz` 模块，该模块允许帐户授予执行操作的权限
+代表该帐户到其他帐户。
 
-## Context
+## 语境
 
-The concrete use cases which motivated this module include:
+激发该模块的具体用例包括:
 
-- the desire to delegate the ability to vote on proposals to other accounts besides the account which one has
-delegated stake
-- "sub-keys" functionality, as originally proposed in [\#4480](https://github.com/cosmos/cosmos-sdk/issues/4480) which
-is a term used to describe the functionality provided by this module together with
-the `fee_grant` module from [ADR 029](./adr-029-fee-grant-module.md) and the [group module](https://github.com/regen-network/cosmos-modules/tree/master/incubator/group).
+- 希望将提案投票权委托给除自己拥有的账户之外的其他账户
+委托权益
+- “子密钥”功能，最初在 [\#4480](https://github.com/cosmos/cosmos-sdk/issues/4480) 中提出
+是一个术语，用于描述此模块提供的功能以及
+[ADR 029](./adr-029-fee-grant-module.md) 和 [group 模块](https://github.com/regen-network/cosmos-modules/tree/) 中的 `fee_grant` 模块主/孵化器/组)。
 
-The "sub-keys" functionality roughly refers to the ability for one account to grant some subset of its capabilities to
-other accounts with possibly less robust, but easier to use security measures. For instance, a master account representing
-an organization could grant the ability to spend small amounts of the organization's funds to individual employee accounts.
-Or an individual (or group) with a multisig wallet could grant the ability to vote on proposals to any one of the member
-keys.
+“子密钥”功能粗略地指的是一个帐户授予其某些功能子集的能力
+其他帐户可能不太强大，但更容易使用安全措施。例如，一个主账户代表
+组织可以授予将组织的少量资金用于个人员工帐户的能力。
+或者拥有多重签名钱包的个人(或团体)可以授予任何成员对提案进行投票的能力
+键。
 
-The current
-implementation is based on work done by the [Gaian's team at Hackatom Berlin 2019](https://github.com/cosmos-gaians/cosmos-sdk/tree/hackatom/x/delegation).
+目前
+实施基于 [Gaian 团队在 Hackatom Berlin 2019](https://github.com/cosmos-gaians/cosmos-sdk/tree/hackatom/x/delegation) 所做的工作。
 
-## Decision
+## 决定
 
-We will create a module named `authz` which provides functionality for
-granting arbitrary privileges from one account (the _granter_) to another account (the _grantee_). Authorizations
-must be granted for a particular `Msg` service methods one by one using an implementation
-of `Authorization` interface.
+我们将创建一个名为 `authz` 的模块，它为
+从一个帐户(_granter_)向另一个帐户(_grantee_)授予任意权限。授权
+必须使用实现为特定的 `Msg` 服务方法一一授予
+“授权”界面。
 
-### Types
+### 类型
 
-Authorizations determine exactly what privileges are granted. They are extensible
-and can be defined for any `Msg` service method even outside of the module where
-the `Msg` method is defined. `Authorization`s reference `Msg`s using their TypeURL.
+授权决定了授予哪些特权。它们是可扩展的
+并且可以为任何 `Msg` 服务方法定义，甚至在模块之外
+定义了 `Msg` 方法。 `Authorization`s 使用它们的 TypeURL 引用 `Msg`s。 
 
 #### Authorization
 
@@ -162,8 +162,8 @@ message MsgExec {
 
 ### Router Middleware
 
-The `authz` `Keeper` will expose a `DispatchActions` method which allows other modules to send `Msg`s
-to the router based on `Authorization` grants:
+`authz` `Keeper` 将公开一个 `DispatchActions` 方法，该方法允许其他模块发送 `Msg`s
+到基于“授权”授权的路由器: 
 
 ```go
 type Keeper interface {
@@ -177,9 +177,9 @@ type Keeper interface {
 
 #### `tx exec` Method
 
-When a CLI user wants to run a transaction on behalf of another account using `MsgExec`, they
-can use the `exec` method. For instance `gaiacli tx gov vote 1 yes --from <grantee> --generate-only | gaiacli tx authz exec --send-as <granter> --from <grantee>`
-would send a transaction like this:
+当 CLI 用户想要使用 `MsgExec` 代表另一个帐户运行事务时，他们
+可以使用`exec`方法。 例如`gaiacli tx gov vote 1 yes --from <grantee> --generate-only | gaiacli tx authz exec --send-as <granter> --from <grantee>`
+会发送这样的交易: 
 
 ```go
 MsgExec {
@@ -196,12 +196,12 @@ MsgExec {
 
 #### `tx grant <grantee> <authorization> --from <granter>`
 
-This CLI command will send a `MsgGrant` transaction. `authorization` should be encoded as
-JSON on the CLI.
+这个 CLI 命令将发送一个 `MsgGrant` 事务。 `authorization` 应该被编码为
+CLI 上的 JSON。 
 
 #### `tx revoke <grantee> <method-name> --from <granter>`
 
-This CLI command will send a `MsgRevoke` transaction.
+这个 CLI 命令将发送一个 `MsgRevoke` 事务。
 
 ### Built-in Authorizations
 
@@ -232,11 +232,11 @@ message GenericAuthorization {
 
 ### Positive
 
-- Users will be able to authorize arbitrary actions on behalf of their accounts to other
-users, improving key management for many use cases
-- The solution is more generic than previously considered approaches and the
-`Authorization` interface approach can be extended to cover other use cases by
-SDK users
+- 用户将能够代表他们的帐户向其他人授权任意操作
+用户，改进了许多用例的密钥管理
+- 该解决方案比以前考虑的方法更通用，并且
+`Authorization` 接口方法可以通过以下方式扩展以涵盖其他用例
+SDK用户 
 
 ### Negative
 
@@ -244,6 +244,6 @@ SDK users
 
 ## References
 
-- Initial Hackatom implementation: https://github.com/cosmos-gaians/cosmos-sdk/tree/hackatom/x/delegation
-- Post-Hackatom spec: https://gist.github.com/aaronc/b60628017352df5983791cad30babe56#delegation-module
-- B-Harvest subkeys spec: https://github.com/cosmos/cosmos-sdk/issues/4480
+- 初始 Hackatom 实施:https://github.com/cosmos-gaians/cosmos-sdk/tree/hackatom/x/delegation
+- 后 Hackatom 规范:https://gist.github.com/aaronc/b60628017352df5983791cad30babe56#delegation-module
+- B-Harvest 子密钥规范:https://github.com/cosmos/cosmos-sdk/issues/4480 

@@ -1,32 +1,28 @@
-<!--
-order: 2
--->
+# 运行一个节点
 
-# Running a Node
+现在应用程序已准备就绪并且密钥环已填充，是时候看看如何运行区块链节点了。 在本节中，我们正在运行的应用程序称为 [`simapp`](https://github.com/cosmos/cosmos-sdk/tree/v0.40.0-rc3/simapp)，以及其对应的 CLI 二进制文件 `simd` . {概要}
 
-Now that the application is ready and the keyring populated, it's time to see how to run the blockchain node. In this section, the application we are running is called [`simapp`](https://github.com/cosmos/cosmos-sdk/tree/v0.40.0-rc3/simapp), and its corresponding CLI binary `simd`. {synopsis}
+## 先决条件阅读
 
-## Pre-requisite Readings
+- [Cosmos SDK 应用剖析](../basics/app-anatomy.md) {prereq}
+- [设置密钥环](./keyring.md) {prereq}
 
-- [Anatomy of a Cosmos SDK Application](../basics/app-anatomy.md) {prereq}
-- [Setting up the keyring](./keyring.md) {prereq}
+## 初始化链
 
-## Initialize the Chain
-
-::: warning
-Make sure you can build your own binary, and replace `simd` with the name of your binary in the snippets.
+::: 警告
+确保您可以构建自己的二进制文件，并在代码段中将“simd”替换为您的二进制文件的名称。
 :::
 
-Before actually running the node, we need to initialize the chain, and most importantly its genesis file. This is done with the `init` subcommand:
+在实际运行节点之前，我们需要初始化链，最重要的是它的创世文件。 这是通过 `init` 子命令完成的: 
 
 ```bash
 # The argument <moniker> is the custom username of your node, it should be human-readable.
 simd init <moniker> --chain-id my-test-chain
 ```
 
-The command above creates all the configuration files needed for your node to run, as well as a default genesis file, which defines the initial state of the network. All these configuration files are in `~/.simapp` by default, but you can overwrite the location of this folder by passing the `--home` flag.
+上面的命令创建了节点运行所需的所有配置文件，以及一个默认的 genesis 文件，它定义了网络的初始状态。 默认情况下，所有这些配置文件都在“~/.simapp”中，但您可以通过传递“--home”标志来覆盖此文件夹的位置。
 
-The `~/.simapp` folder has the following structure:
+`~/.simapp` 文件夹具有以下结构: 
 
 ```bash
 .                                   # ~/.simapp
@@ -39,9 +35,9 @@ The `~/.simapp` folder has the following structure:
       |- priv_validator_key.json    # Private key to use as a validator in the consensus protocol.
 ```
 
-## Updating Some Default Settings
+## 更新一些默认设置
 
-If you want to change any field values in configuration files (for ex: genesis.json) you can use `jq` ([installation](https://stedolan.github.io/jq/download/) & [docs](https://stedolan.github.io/jq/manual/#Assignment)) & `sed` commands to do that. Few examples are listed here.
+如果您想更改配置文件中的任何字段值(例如:genesis.json)，您可以使用 `jq` ([installation](https://stedolan.github.io/jq/download/) & [docs]( https://stedolan.github.io/jq/manual/#Assignment)) 和 `sed` 命令来做到这一点。 这里列出了几个例子。
 
 ```bash
 # to change the chain-id
@@ -57,19 +53,19 @@ jq '.app_state.gov.voting_params.voting_period = "600s"' genesis.json > temp.jso
 jq '.app_state.mint.minter.inflation = "0.300000000000000000"' genesis.json > temp.json && mv temp.json genesis.json
 ```
 
-## Adding Genesis Accounts
+## 添加创世账户
 
-Before starting the chain, you need to populate the state with at least one account. To do so, first [create a new account in the keyring](./keyring.md#adding-keys-to-the-keyring) named `my_validator` under the `test` keyring backend (feel free to choose another name and another backend).
+在启动链之前，您需要使用至少一个帐户填充状态。 为此，首先[在密钥环中创建一个新帐户](./keyring.md#adding-keys-to-the-keyring) 在`test` 密钥环后端下命名为`my_validator`(可以随意选择另一个名称和 另一个后端)。
 
-Now that you have created a local account, go ahead and grant it some `stake` tokens in your chain's genesis file. Doing so will also make sure your chain is aware of this account's existence:
+现在你已经创建了一个本地账户，继续在你的链的创世文件中授予它一些“stake”令牌。 这样做还可以确保您的链知道此帐户的存在: 
 
 ```bash
 simd add-genesis-account $MY_VALIDATOR_ADDRESS 100000000000stake
 ```
 
-Recall that `$MY_VALIDATOR_ADDRESS` is a variable that holds the address of the `my_validator` key in the [keyring](./keyring.md#adding-keys-to-the-keyring). Also note that the tokens in the Cosmos SDK have the `{amount}{denom}` format: `amount` is is a 18-digit-precision decimal number, and `denom` is the unique token identifier with its denomination key (e.g. `atom` or `uatom`). Here, we are granting `stake` tokens, as `stake` is the token identifier used for staking in [`simapp`](https://github.com/cosmos/cosmos-sdk/tree/v0.40.0-rc3/simapp). For your own chain with its own staking denom, that token identifier should be used instead.
+回想一下，`$MY_VALIDATOR_ADDRESS` 是一个变量，它保存了 [keyring](./keyring.md#adding-keys-to-the-keyring) 中 `my_validator` 密钥的地址。另请注意，Cosmos SDK 中的代币具有 `{amount}{denom}` 格式:`amount` 是一个 18 位精度的十进制数，而 `denom` 是唯一的代币标识符及其面额密钥(例如`atom` 或 `uatom`)。在这里，我们授予 `stake` 代币，因为 `stake` 是用于在 [`simapp`](https://github.com/cosmos/cosmos-sdk/tree/v0.40.0-rc3/ simapp)。对于您自己的拥有自己权益的链，应该使用该代币标识符。
 
-Now that your account has some tokens, you need to add a validator to your chain. Validators are special full-nodes that participate in the consensus process (implemented in the [underlying consensus engine](../intro/sdk-app-architecture.md#tendermint)) in order to add new blocks to the chain. Any account can declare its intention to become a validator operator, but only those with sufficient delegation get to enter the active set (for example, only the top 125 validator candidates with the most delegation get to be validators in the Cosmos Hub). For this guide, you will add your local node (created via the `init` command above) as a validator of your chain. Validators can be declared before a chain is first started via a special transaction included in the genesis file called a `gentx`:
+现在您的帐户有一些代币，您需要向链中添加一个验证器。验证者是参与共识过程的特殊全节点(在 [底层共识引擎](../intro/sdk-app-architecture.md#tendermint) 中实现)，以便向链中添加新块。任何账户都可以声明其成为验证者运营商的意图，但只有那些拥有足够委托的人才能进入活跃集(例如，只有拥有最多委托的前 125 名验证者候选人才能成为 Cosmos Hub 中的验证者)。对于本指南，您将添加本地节点(通过上面的 `init` 命令创建)作为链的验证器。验证器可以在链首次启动之前通过创世文件中包含的特殊交易声明，称为“gentx”: 
 
 ```bash
 # Create a gentx.
@@ -79,28 +75,28 @@ simd gentx my_validator 100000000stake --chain-id my-test-chain --keyring-backen
 simd collect-gentxs
 ```
 
-A `gentx` does three things:
+一个 `gentx` 做了三件事:
 
-1. Registers the `validator` account you created as a validator operator account (i.e. the account that controls the validator).
-2. Self-delegates the provided `amount` of staking tokens.
-3. Link the operator account with a Tendermint node pubkey that will be used for signing blocks. If no `--pubkey` flag is provided, it defaults to the local node pubkey created via the `simd init` command above.
+1. 将您创建的 `validator` 帐户注册为验证器操作员帐户(即控制验证器的帐户)。
+2. 自行委托所提供的质押代币的“数量”。
+3. 将操作员帐户与将用于签署区块的 Tendermint 节点公钥相关联。 如果没有提供 `--pubkey` 标志，则默认为通过上面的 `simd init` 命令创建的本地节点公钥。
 
-For more information on `gentx`, use the following command:
+有关 `gentx` 的更多信息，请使用以下命令: 
 
 ```bash
 simd gentx --help
 ```
 
-## Configuring the Node Using `app.toml` and `config.toml`
+## 使用 `app.toml` 和 `config.toml` 配置节点
 
-The Cosmos SDK automatically generates two configuration files inside `~/.simapp/config`:
+Cosmos SDK 在`~/.simapp/config` 中自动生成两个配置文件:
 
-- `config.toml`: used to configure the Tendermint, learn more on [Tendermint's documentation](https://docs.tendermint.com/master/nodes/configuration.html),
-- `app.toml`: generated by the Cosmos SDK, and used to configure your app, such as state pruning strategies, telemetry, gRPC and REST servers configuration, state sync...
+- `config.toml`:用于配置 Tendermint，在 [Tendermint 的文档](https://docs.tendermint.com/master/nodes/configuration.html) 上了解更多信息，
+- `app.toml`:由 Cosmos SDK 生成，用于配置您的应用程序，例如状态修剪策略、遥测、gRPC 和 REST 服务器配置、状态同步...
 
-Both files are heavily commented, please refer to them directly to tweak your node.
+这两个文件都有大量注释，请直接参考它们以调整您的节点。
 
-One example config to tweak is the `minimum-gas-prices` field inside `app.toml`, which defines the minimum gas prices the validator node is willing to accept for processing a transaction. Depending on the chain, it might be an empty string or not. If it's empty, make sure to edit the field with some value, for example `10token`, or else the node will halt on startup. For the purpose of this tutorial, let's set the minimum gas price to 0:
+一个需要调整的示例配置是 `app.toml` 中的 `minimum-gas-prices` 字段，它定义了验证器节点在处理交易时愿意接受的最低 gas 价格。根据链的不同，它可能是空字符串，也可能不是。如果它为空，请确保使用某个值编辑该字段，例如“10token”，否则节点将在启动时停止。出于本教程的目的，让我们将最低汽油价格设置为 0: 
 
 ```toml
  # The minimum gas prices a validator is willing to accept for processing a
@@ -117,12 +113,12 @@ Now that everything is set up, you can finally start your node:
 simd start
 ```
 
-You should see blocks come in.
+你应该看到块进来了。
 
-The previous command allow you to run a single node. This is enough for the next section on interacting with this node, but you may wish to run multiple nodes at the same time, and see how consensus happens between them.
+前面的命令允许您运行单个节点。 这对于下一节关于与此节点交互的内容已经足够了，但您可能希望同时运行多个节点，并查看它们之间如何达成共识。
 
-The naive way would be to run the same commands again in separate terminal windows. This is possible, however in the Cosmos SDK, we leverage the power of [Docker Compose](https://docs.docker.com/compose/) to run a localnet. If you need inspiration on how to set up your own localnet with Docker Compose, you can have a look at the Cosmos SDK's [`docker-compose.yml`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/docker-compose.yml).
+天真的方法是在单独的终端窗口中再次运行相同的命令。 这是可能的，但是在 Cosmos SDK 中，我们利用 [Docker Compose](https://docs.docker.com/compose/) 的强大功能来运行本地网络。 如果您需要有关如何使用 Docker Compose 设置自己的本地网络的灵感，可以查看 Cosmos SDK 的 [`docker-compose.yml`](https://github.com/cosmos/cosmos-sdk/blob /v0.40.0-rc3/docker-compose.yml)。
 
-## Next {hide}
+## 下一个 {hide}
 
-Read about the [Interacting with your Node](./interact-node.md) {hide}
+阅读 [与您的节点交互](./interact-node.md) {hide} 

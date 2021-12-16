@@ -1,16 +1,12 @@
-<!--
-order: 1
--->
+# 概念
 
-# Concepts
+## 证据
 
-## Evidence
-
-Any concrete type of evidence submitted to the `x/evidence` module must fulfill the
-`Evidence` contract outlined below. Not all concrete types of evidence will fulfill
-this contract in the same way and some data may be entirely irrelevant to certain
-types of evidence. An additional `ValidatorEvidence`, which extends `Evidence`,
-has also been created to define a contract for evidence against malicious validators.
+提交给“x/evidence”模块的任何具体类型的证据都必须满足
+“证据”合同概述如下。 并非所有具体类型的证据都能满足
+本合同以同样的方式和某些数据可能与某些完全无关
+证据类型。 一个额外的“ValidatorEvidence”，它扩展了“Evidence”，
+还创建了一个合同，用于针对恶意验证者的证据。 
 
 ```go
 // Evidence defines the contract which concrete evidence types of misbehavior
@@ -44,13 +40,13 @@ type ValidatorEvidence interface {
 }
 ```
 
-## Registration & Handling
+## 注册和处理
 
-The `x/evidence` module must first know about all types of evidence it is expected
-to handle. This is accomplished by registering the `Route` method in the `Evidence`
-contract with what is known as a `Router` (defined below). The `Router` accepts
-`Evidence` and attempts to find the corresponding `Handler` for the `Evidence`
-via the `Route` method.
+`x/evidence` 模块必须首先知道它所期望的所有类型的证据
+处理。 这是通过在 `Evidence` 中注册 `Route` 方法来完成的
+与所谓的“路由器”(定义如下)签订合同。 `Router` 接受
+`Evidence` 并尝试为 `Evidence` 找到相应的 `Handler`
+通过`Route`方法。 
 
 ```go
 type Router interface {
@@ -62,12 +58,12 @@ type Router interface {
 }
 ```
 
-The `Handler` (defined below) is responsible for executing the entirety of the
-business logic for handling `Evidence`. This typically includes validating the
-evidence, both stateless checks via `ValidateBasic` and stateful checks via any
-keepers provided to the `Handler`. In addition, the `Handler` may also perform
-capabilities such as slashing and jailing a validator. All `Evidence` handled
-by the `Handler` should be persisted.
+`Handler`(定义如下)负责执行整个
+处理“证据”的业务逻辑。 这通常包括验证
+证据，通过“ValidateBasic”进行无状态检查和通过任何方式进行的有状态检查
+提供给 `Handler` 的 Keepers。 此外，`Handler` 还可以执行
+诸如削减和监禁验证者之类的功能。 处理所有“证据”
+由`Handler` 应该被持久化。 
 
 ```go
 // Handler defines an agnostic Evidence handler. The handler is responsible

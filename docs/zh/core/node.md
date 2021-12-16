@@ -1,36 +1,32 @@
-<!--
-order: 4
--->
+# 节点客户端(守护进程)
 
-# Node Client (Daemon)
+Cosmos SDK 应用程序的主要端点是守护程序客户端，也称为全节点客户端。全节点运行状态机，从创世文件开始。它连接到运行相同客户端的对等点，以接收和中继交易、区块提案和签名。全节点由使用 Cosmos SDK 定义的应用程序和通过 ABCI 连接到应用程序的共识引擎组成。 {概要}
 
-The main endpoint of a Cosmos SDK application is the daemon client, otherwise known as the full-node client. The full-node runs the state-machine, starting from a genesis file. It connects to peers running the same client in order to receive and relay transactions, block proposals and signatures. The full-node is constituted of the application, defined with the Cosmos SDK, and of a consensus engine connected to the application via the ABCI. {synopsis}
+## 先决条件阅读
 
-## Pre-requisite Readings
+- [SDK 应用剖析](../basics/app-anatomy.md) {prereq}
 
-- [Anatomy of an SDK application](../basics/app-anatomy.md) {prereq}
+## `main` 函数
 
-## `main` function
+任何 Cosmos SDK 应用程序的全节点客户端都是通过运行 `main` 函数来构建的。客户端通常通过在应用程序名称后附加`-d` 后缀来命名(例如`appd` 用于名为`app` 的应用程序)，并且`main` 函数定义在`./appd/cmd/main 中。去`文件。运行此函数会创建一个带有一组命令的可执行文件“appd”。对于名为`app`的应用程序，主要命令是[`appd start`](#start-command)，它启动全节点。
 
-The full-node client of any Cosmos SDK application is built by running a `main` function. The client is generally named by appending the `-d` suffix to the application name (e.g. `appd` for an application named `app`), and the `main` function is defined in a `./appd/cmd/main.go` file. Running this function creates an executable `appd` that comes with a set of commands. For an app named `app`, the main command is [`appd start`](#start-command), which starts the full-node.
+一般情况下，开发者会用以下结构实现`main.go`函数:
 
-In general, developers will implement the `main.go` function with the following structure:
-
-- First, an [`appCodec`](./encoding.md) is instantiated for the application.
-- Then, the `config` is retrieved and config parameters are set. This mainly involves setting the Bech32 prefixes for [addresses](../basics/accounts.md#addresses).
+- 首先，为应用程序实例化一个 [`appCodec`](./encoding.md)。
+- 然后，检索`config`并设置配置参数。这主要涉及为 [addresses](../basics/accounts.md#addresses) 设置 Bech32 前缀。
   +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/types/config.go#L13-L24
-- Using [cobra](https://github.com/spf13/cobra), the root command of the full-node client is created. After that, all the custom commands of the application are added using the `AddCommand()` method of `rootCmd`.
-- Add default server commands to `rootCmd` using the `server.AddCommands()` method. These commands are separated from the ones added above since they are standard and defined at Cosmos SDK level. They should be shared by all Cosmos SDK-based applications. They include the most important command: the [`start` command](#start-command).
-- Prepare and execute the `executor`.
+- 使用[cobra](https://github.com/spf13/cobra)，创建全节点客户端的root命令。之后，使用`rootCmd`的`AddCommand()`方法添加应用程序的所有自定义命令。
+- 使用 `server.AddCommands()` 方法将默认服务器命令添加到 `rootCmd`。这些命令与上面添加的命令分开，因为它们是标准的并在 Cosmos SDK 级别定义。它们应该由所有基于 Cosmos SDK 的应用程序共享。它们包括最重要的命令:[`start` 命令](#start-command)。
+- 准备并执行`executor`。
    +++ https://github.com/tendermint/tendermint/blob/v0.34.0-rc6/libs/cli/setup.go#L74-L78
 
-See an example of `main` function from the `simapp` application, the Cosmos SDK's application for demo purposes:
+请参阅“simapp”应用程序中的“main”函数示例，用于演示目的的 Cosmos SDK 应用程序:
 
-+++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/simd/main.go
++++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/simd/main.go 
 
 ## `start` command
 
-The `start` command is defined in the `/server` folder of the Cosmos SDK. It is added to the root command of the full-node client in the [`main` function](#main-function) and called by the end-user to start their node:
+`start` 命令定义在 Cosmos SDK 的 `/server` 文件夹中。 它被添加到 [`main` 函数](#main-function) 中的全节点客户端的 root 命令中，并由最终用户调用以启动他们的节点: 
 
 ```bash
 # For an example app named "app", the following command starts the full-node.
@@ -40,37 +36,37 @@ appd start
 simd start
 ```
 
-As a reminder, the full-node is composed of three conceptual layers: the networking layer, the consensus layer and the application layer. The first two are generally bundled together in an entity called the consensus engine (Tendermint Core by default), while the third is the state-machine defined with the help of the Cosmos SDK. Currently, the Cosmos SDK uses Tendermint as the default consensus engine, meaning the start command is implemented to boot up a Tendermint node.
+提醒一下，全节点由三个概念层组成:网络层、共识层和应用层。前两个通常捆绑在一个称为共识引擎(默认为 Tendermint Core)的实体中，而第三个是在 Cosmos SDK 的帮助下定义的状态机。目前，Cosmos SDK 使用 Tendermint 作为默认共识引擎，这意味着执行 start 命令来启动 Tendermint 节点。
 
-The flow of the `start` command is pretty straightforward. First, it retrieves the `config` from the `context` in order to open the `db` (a [`leveldb`](https://github.com/syndtr/goleveldb) instance by default). This `db` contains the latest known state of the application (empty if the application is started from the first time.
+`start` 命令的流程非常简单。首先，它从`context` 中检索`config` 以打开`db`(默认为[`leveldb`](https://github.com/syndtr/goleveldb) 实例)。这个 `db` 包含应用程序的最新已知状态(如果应用程序从第一次启动，则为空。
 
-With the `db`, the `start` command creates a new instance of the application using an `appCreator` function:
+使用 `db`，`start` 命令使用 `appCreator` 函数创建应用程序的新实例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/server/start.go#L227-L228
 
-Note that an `appCreator` is a function that fulfills the `AppCreator` signature:
+请注意，`appCreator` 是一个满足 `AppCreator` 签名的函数:
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/server/types/app.go#L48-L50
 
-In practice, the [constructor of the application](../basics/app-anatomy.md#constructor-function) is passed as the `appCreator`.
+在实践中，[应用程序的构造函数](../basics/app-anatomy.md#constructor-function) 作为`appCreator` 传递。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/simd/cmd/root.go#L170-L215
 
-Then, the instance of `app` is used to instanciate a new Tendermint node:
+然后，`app` 的实例用于实例化一个新的 Tendermint 节点:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/server/start.go#L235-L244
 
-The Tendermint node can be created with `app` because the latter satisfies the [`abci.Application` interface](https://github.com/tendermint/tendermint/blob/v0.34.0/abci/types/application.go#L7-L32) (given that `app` extends [`baseapp`](./baseapp.md)). As part of the `NewNode` method, Tendermint makes sure that the height of the application (i.e. number of blocks since genesis) is equal to the height of the Tendermint node. The difference between these two heights should always be negative or null. If it is strictly negative, `NewNode` will replay blocks until the height of the application reaches the height of the Tendermint node. Finally, if the height of the application is `0`, the Tendermint node will call [`InitChain`](./baseapp.md#initchain) on the application to initialize the state from the genesis file.
+Tendermint节点可以用`app`创建，因为后者满足[`abci.Application`接口](https://github.com/tendermint/tendermint/blob/v0.34.0/abci/types/application.go# L7-L32)(假设 `app` 扩展了 [`baseapp`](./baseapp.md))。作为“NewNode”方法的一部分，Tendermint 确保应用程序的高度(即自创世以来的块数)等于 Tendermint 节点的高度。这两个高度之间的差值应始终为负值或为零。如果严格为负，`NewNode` 将重放区块，直到应用程序的高度达到 Tendermint 节点的高度。最后，如果应用程序的高度为`0`，Tendermint 节点将调用应用程序上的[`InitChain`](./baseapp.md#initchain) 以从创世文件中初始化状态。
 
-Once the Tendermint node is instanciated and in sync with the application, the node can be started:
+一旦 Tendermint 节点被实例化并与应用程序同步，就可以启动该节点:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/server/start.go#L250-L252
 
-Upon starting, the node will bootstrap its RPC and P2P server and start dialing peers. During handshake with its peers, if the node realizes they are ahead, it will query all the blocks sequentially in order to catch up. Then, it will wait for new block proposals and block signatures from validators in order to make progress.
+启动后，节点将引导其 RPC 和 P2P 服务器并开始拨号。在与对等方握手期间，如果节点意识到他们领先，它将顺序查询所有块以赶上。然后，它将等待来自验证者的新区块提议和区块签名以取得进展。
 
-## Other commands
+## 其他命令
 
-To discover how to concretely run a node and interact with it, please refer to our [Running a Node, API and CLI](../run-node/README.md) guide.
+要了解如何具体运行节点并与之交互，请参阅我们的 [运行节点、API 和 CLI](../run-node/README.md) 指南。
 
-## Next {hide}
+## 下一个 {hide}
 
-Learn about the [store](./store.md) {hide}
+了解 [store](./store.md) {hide} 

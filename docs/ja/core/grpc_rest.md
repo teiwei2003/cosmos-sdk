@@ -1,7 +1,3 @@
-<!--
-order: 7
--->
-
 # gRPC, REST, and Tendermint Endpoints
 
 This document presents an overview of all the endpoints a node exposes: gRPC, REST as well as some other endpoints. {synopsis}

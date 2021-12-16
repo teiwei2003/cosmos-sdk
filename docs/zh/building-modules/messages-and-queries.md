@@ -1,7 +1,3 @@
-<!--
-order: 3
--->
-
 # 消息和查询
 
 `Msg`s 和 `Queries` 是模块处理的两个主要对象。模块中定义的大多数核心组件，如 `Msg` 服务、`keeper`s 和 `Query` 服务，都用于处理 `message`s 和 `queries`。 {概要}
@@ -110,6 +106,6 @@ queryCategory/queryRoute/queryType/arg1/arg2/...
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/080fcf1df25ccdf97f3029b6b6f83caaf5a235e4/baseapp/abci.go#L722-L749
 
-## 下一个{hide}
+## 下一个 {hide}
 
 了解 [`Msg` 服务](./msg-services.md) {hide} 

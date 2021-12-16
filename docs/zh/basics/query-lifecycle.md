@@ -1,7 +1,3 @@
-<!--
-order: 3
--->
-
 # 查询生命周期
 
 本文档描述了 Cosmos SDK 应用程序中查询的生命周期，从用户界面到应用程序存储再返回。 {概要}
@@ -12,7 +8,7 @@ order: 3
 
 ## 查询创建
 
-[**query**](../building-modules/messages-and-queries.md#queries) 是应用程序的最终用户通过接口发出并由全节点处理的信息请求。用户可以直接从应用程序的商店或模块中查询有关网络、应用程序本身和应用程序状态的信息。请注意，查询不同于 [transactions](../core/transactions.md)(查看生命周期 [here](./tx-lifecycle.md))，特别是它们不需要处理共识(如它们不会触发状态转换)；它们可以由一个全节点完全处理。
+[**query**](../building-modules/messages-and-queries.md#queries) 是应用程序的最终用户通过接口发出并由全节点处理的信息请求。用户可以直接从应用程序的存储或模块中查询有关网络、应用程序本身和应用程序状态的信息。请注意，查询不同于 [transactions](../core/transactions.md)(查看生命周期 [here](./tx-lifecycle.md))，特别是它们不需要处理共识(如它们不会触发状态转换)；它们可以由一个全节点完全处理。
 
 为了解释查询生命周期，假设“MyQuery”正在请求由名为“simapp”的应用程序中的某个委托地址做出的委托列表。正如预期的那样，[`staking`](../../x/staking/spec/README.md) 模块处理这个查询。但首先，用户可以通过几种方式创建“MyQuery”。
 
@@ -147,6 +143,6 @@ Cosmos SDK 利用从 Protobuf 服务生成的代码进行查询。 `staking` 模
 
 这是一个包装！查询结果由 CLI 输出到控制台。
 
-## 下一个{hide}
+## 下一个 {hide}
 
 阅读有关 [accounts](./accounts.md) 的更多信息。 {hide}} 

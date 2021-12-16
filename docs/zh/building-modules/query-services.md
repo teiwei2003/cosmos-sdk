@@ -1,7 +1,3 @@
-<!--
-order: 5
--->
-
 # 查询服务
 
 Protobuf 查询服务处理 [`queries`](./messages-and-queries.md#queries)。查询服务特定于定义它们的模块，并且只处理在所述模块中定义的“查询”。它们是从`BaseApp` 的[`Query` 方法](../core/baseapp.md#query) 调用的。 {概要}
@@ -38,7 +34,7 @@ type QueryServer interface {
 ```
 
 这些自定义查询方法应该由模块的 keeper 实现，通常在 `./keeper/grpc_query.go` 中。这些方法的第一个参数是一个通用的`context.Context`，而查询器方法一般需要一个`sdk.Context`的实例来读取
-从商店。因此，Cosmos SDK 提供了一个函数 `sdk.UnwrapSDKContext` 来从提供的对象中检索 `sdk.Context`
+从存储。因此，Cosmos SDK 提供了一个函数 `sdk.UnwrapSDKContext` 来从提供的对象中检索 `sdk.Context`
 `上下文。上下文`。
 
 这是银行模块的示例实现:
@@ -72,6 +68,6 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 
 要更深入地了解`querier`，请参阅此[`querier` 函数的示例实现](https://github.com/cosmos/cosmos-sdk/blob/7f59723d889b69ca19966167f0b3a7fec7a39e53/x/gov/keeper/querier.go ) 来自银行模块。
 
-## 下一个{hide}
+## 下一个 {hide}
 
 了解 [`BeginBlocker` 和 `EndBlocker`](./beginblock-endblock.md) {hide} 

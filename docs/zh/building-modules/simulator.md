@@ -10,7 +10,7 @@
 与应用程序“SimulationManager”集成。
 
 * [仿真包](#simulation-package)
-    * [商店解码器](#store-decoders)
+    * [存储解码器](#store-decoders)
     * [随机起源](#randomized-genesis)
     * [随机参数](#randomized-parameters)
     * [随机加权操作](#random-weighted-operations)
@@ -28,12 +28,12 @@
 
 ### 存储解码器
 
-`AppImportExport` 需要注册商店解码器。这允许
-来自要解码的商店的键值对(_i.e_ unmarshalled)
+`AppImportExport` 需要注册存储解码器。这允许
+来自要解码的存储的键值对(_i.e_ unmarshalled)
 到它们对应的类型。特别是，它将键匹配到具体类型
 然后将 `KVPair` 中的值解组为提供的类型。
 
-您可以使用分发模块中的示例 [此处](https://github.com/cosmos/cosmos-sdk/blob/v0.42.0/x/distribution/simulation/decoder.go) 来实现您的商店解码器。
+您可以使用分发模块中的示例 [此处](https://github.com/cosmos/cosmos-sdk/blob/v0.42.0/x/distribution/simulation/decoder.go) 来实现您的存储解码器。
 
 ### 随机起源
 

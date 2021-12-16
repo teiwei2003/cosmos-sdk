@@ -1,10 +1,3 @@
-<!--
-order: 0
-title: Evidence Overview
-parent:
-  title: "evidence"
--->
-
 # `x/evidence`
 
 ## Table of Contents

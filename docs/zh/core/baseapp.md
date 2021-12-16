@@ -1,27 +1,23 @@
-<!--
-order: 1
--->
+# 基础应用
 
-# BaseApp
+本文档描述了“BaseApp”，它是实现 Cosmos SDK 应用程序核心功能的抽象。 {概要}
 
-This document describes `BaseApp`, the abstraction that implements the core functionalities of a Cosmos SDK application. {synopsis}
+## 先决条件阅读
 
-## Pre-requisite Readings
+- [Cosmos SDK 应用剖析](../basics/app-anatomy.md) {prereq}
+- [Cosmos SDK 交易的生命周期](../basics/tx-lifecycle.md) {prereq}
 
-- [Anatomy of a Cosmos SDK application](../basics/app-anatomy.md) {prereq}
-- [Lifecycle of a Cosmos SDK transaction](../basics/tx-lifecycle.md) {prereq}
+## 介绍
 
-## Introduction
+`BaseApp` 是一个基本类型，它实现了 Cosmos SDK 应用程序的核心，即:
 
-`BaseApp` is a base type that implements the core of a Cosmos SDK application, namely:
+- [应用区块链接口](#abci)，用于状态机与底层共识引擎(例如 Tendermint)进行通信。
+- [服务路由器](#service-routers)，将消息和查询路由到适当的模块。
+- 不同的 [states](#states)，因为状态机可以根据收到的 ABCI 消息更新不同的易失性状态。
 
-- The [Application Blockchain Interface](#abci), for the state-machine to communicate with the underlying consensus engine (e.g. Tendermint).
-- [Service Routers](#service-routers), to route messages and queries to the appropriate module.
-- Different [states](#states), as the state-machine can have different volatile states updated based on the ABCI message received.
-
-The goal of `BaseApp` is to provide the fundamental layer of a Cosmos SDK application
-that developers can easily extend to build their own custom application. Usually,
-developers will create a custom type for their application, like so:
+BaseApp 的目标是提供 Cosmos SDK 应用程序的基础层
+开发人员可以轻松扩展以构建自己的自定义应用程序。通常，
+开发人员将为他们的应用程序创建自定义类型，如下所示: 
 
 ```go
 type App struct {
@@ -36,71 +32,71 @@ type App struct {
 }
 ```
 
-Extending the application with `BaseApp` gives the former access to all of `BaseApp`'s methods.
-This allows developers to compose their custom application with the modules they want, while not
-having to concern themselves with the hard work of implementing the ABCI, the service routers and state
-management logic.
+使用“BaseApp”扩展应用程序可以让前者访问“BaseApp”的所有方法。
+这允许开发人员使用他们想要的模块组合他们的自定义应用程序，而不是
+必须关心实施 ABCI、服务路由器和状态的艰苦工作
+管理逻辑。
 
-## Type Definition
+## 类型定义
 
-The `BaseApp` type holds many important parameters for any Cosmos SDK based application.
+“BaseApp”类型为任何基于 Cosmos SDK 的应用程序保存了许多重要参数。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/baseapp/baseapp.go#L46-L131
 
-Let us go through the most important components.
+让我们来看看最重要的组件。
 
-> **Note**: Not all parameters are described, only the most important ones. Refer to the
-> type definition for the full list.
+> **注意**:没有描述所有参数，仅描述最重要的参数。参考
+> 完整列表的类型定义。
 
-First, the important parameters that are initialized during the bootstrapping of the application:
+首先，在应用程序引导期间初始化的重要参数:
 
-- [`CommitMultiStore`](./store.md#commitmultistore): This is the main store of the application,
-  which holds the canonical state that is committed at the [end of each block](#commit). This store
-  is **not** cached, meaning it is not used to update the application's volatile (un-committed) states.
-  The `CommitMultiStore` is a multi-store, meaning a store of stores. Each module of the application
-  uses one or multiple `KVStores` in the multi-store to persist their subset of the state.
-- Database: The `db` is used by the `CommitMultiStore` to handle data persistence.
-- [`Msg` Service Router](#msg-service-router): The `msgServiceRouter` facilitates the routing of `sdk.Msg` requests to the appropriate
-  module `Msg` service for processing. Here a `sdk.Msg` refers to the transaction component that needs to be
-  processed by a service in order to update the application state, and not to ABCI message which implements
-  the interface between the application and the underlying consensus engine.
-- [gRPC Query Router](#grpc-query-router): The `grpcQueryRouter` facilitates the routing of gRPC queries to the
-  appropriate module for it to be processed. These queries are not ABCI messages themselves, but they
-  are relayed to the relevant module's gRPC `Query` service.
-- [`TxDecoder`](https://godoc.org/github.com/cosmos/cosmos-sdk/types#TxDecoder): It is used to decode
-  raw transaction bytes relayed by the underlying Tendermint engine.
-- [`ParamStore`](#paramstore): The parameter store used to get and set application consensus parameters.
-- [`AnteHandler`](#antehandler): This handler is used to handle signature verification, fee payment,
-  and other pre-message execution checks when a transaction is received. It's executed during
-  [`CheckTx/RecheckTx`](#checktx) and [`DeliverTx`](#delivertx).
+- [`CommitMultiStore`](./store.md#commitmultistore):这是应用程序的主存储，
+  它保存在 [每个块的结尾](#commit) 提交的规范状态。这家存储
+  **不** 缓存，这意味着它不用于更新应用程序的易失性(未提交)状态。
+  `CommitMultiStore` 是一个多存储，意思是存储的存储。应用程序的每个模块
+  在 multi-store 中使用一个或多个 `KVStores` 来持久化它们的状态子集。
+- 数据库:`commitMultiStore` 使用 `db` 来处理数据持久性。
+- [`Msg` 服务路由器](#msg-service-router):`msgServiceRouter` 有助于将 `sdk.Msg` 请求路由到适当的
+  用于处理的模块 `Msg` 服务。这里的 `sdk.Msg` 指的是需要被处理的事务组件
+  由服务处理以更新应用程序状态，而不是实现 ABCI 消息
+  应用程序和底层共识引擎之间的接口。
+- [gRPC 查询路由器](#grpc-query-router):`grpcQueryRouter` 有助于将 gRPC 查询路由到
+  适当的模块进行处理。这些查询本身不是 ABCI 消息，但它们
+  被中继到相关模块的 gRPC `Query` 服务。
+- [`TxDecoder`](https://godoc.org/github.com/cosmos/cosmos-sdk/types#TxDecoder):用于解码
+  由底层 Tendermint 引擎中继的原始交易字节。
+- [`ParamStore`](#paramstore):用于获取和设置应​​用程序共识参数的参数存储。
+- [`AnteHandler`](#antehandler):这个handler用于处理签名验证，费用支付，
+  和其他消息前执行检查何时收到交易。它在执行期间
+  [`CheckTx/RecheckTx`](#checktx) 和 [`DeliverTx`](#delivertx)。
 - [`InitChainer`](../basics/app-anatomy.md#initchainer),
-  [`BeginBlocker` and `EndBlocker`](../basics/app-anatomy.md#beginblocker-and-endblocker): These are
-  the functions executed when the application receives the `InitChain`, `BeginBlock` and `EndBlock`
-  ABCI messages from the underlying Tendermint engine.
+  [`BeginBlocker` 和 `EndBlocker`](../basics/app-anatomy.md#beginblocker-and-endblocker):这些是
+  当应用程序收到 `InitChain`、`BeginBlock` 和 `EndBlock` 时执行的函数
+  来自底层 Tendermint 引擎的 ABCI 消息。
 
-Then, parameters used to define [volatile states](#volatile-states) (i.e. cached states):
+然后，用于定义 [易失性状态](#volatile-states)(即缓存状态)的参数:
 
-- `checkState`: This state is updated during [`CheckTx`](#checktx), and reset on [`Commit`](#commit).
-- `deliverState`: This state is updated during [`DeliverTx`](#delivertx), and set to `nil` on
-  [`Commit`](#commit) and gets re-initialized on BeginBlock.
+- `checkState`:此状态在 [`CheckTx`](#checktx) 期间更新，并在 [`Commit`](#commit) 时重置。
+- `deliverState`:此状态在 [`DeliverTx`](#delivertx) 期间更新，并在上设置为 `nil`
+  [`Commit`](#commit) 并在 BeginBlock 上重新初始化。
 
-Finally, a few more important parameterd:
+最后，几个比较重要的参数:
 
-- `voteInfos`: This parameter carries the list of validators whose precommit is missing, either
-  because they did not vote or because the proposer did not include their vote. This information is
-  carried by the [Context](#context) and can be used by the application for various things like
-  punishing absent validators.
-- `minGasPrices`: This parameter defines the minimum gas prices accepted by the node. This is a
-  **local** parameter, meaning each full-node can set a different `minGasPrices`. It is used in the
-  `AnteHandler` during [`CheckTx`](#checktx), mainly as a spam protection mechanism. The transaction
-  enters the [mempool](https://tendermint.com/docs/tendermint-core/mempool.html#transaction-ordering)
-  only if the gas prices of the transaction are greater than one of the minimum gas price in
-  `minGasPrices` (e.g. if `minGasPrices == 1uatom,1photon`, the `gas-price` of the transaction must be
-  greater than `1uatom` OR `1photon`).
-- `appVersion`: Version of the application. It is set in the
-  [application's constructor function](../basics/app-anatomy.md#constructor-function).
+- `voteInfos`:此参数携带缺少预提交的验证器列表，或者
+  因为他们没有投票或因为提议者没有包括他们的投票。这个信息是
+  由 [Context](#context) 携带，应用程序可以将其用于各种事情，例如
+  惩罚缺席的验证者。
+- `minGasPrices`:该参数定义了节点接受的最低汽油价格。这是一个
+  **local** 参数，意味着每个全节点可以设置不同的 `minGasPrices`。它用于
+  [`CheckTx`](#checktx)期间的`AnteHandler`，主要作为垃圾邮件防护机制。交易
+  进入[mempool](https://tendermint.com/docs/tendermint-core/mempool.html#transaction-ordering)
+  仅当交易的 gas 价格大于其中之一的最低 gas 价格时
+  `minGasPrices`(例如，如果`minGasPrices == 1uatom,1photon`，则交易的`gas-price` 必须为
+  大于“1uatom”或“1photon”)。
+- `appVersion`:应用程序的版本。它设置在
+  [应用程序的构造函数](../basics/app-anatomy.md#constructor-function)。
 
-## Constructor
+## 构造函数 
 
 ```go
 func NewBaseApp(
@@ -111,288 +107,288 @@ func NewBaseApp(
 }
 ```
 
-The `BaseApp` constructor function is pretty straightforward. The only thing worth noting is the
-possibility to provide additional [`options`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/baseapp/options.go)
-to the `BaseApp`, which will execute them in order. The `options` are generally `setter` functions
-for important parameters, like `SetPruning()` to set pruning options or `SetMinGasPrices()` to set
-the node's `min-gas-prices`.
+`BaseApp` 构造函数非常简单。唯一值得注意的是
+可能提供额外的 [`options`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/baseapp/options.go)
+到`BaseApp`，它将按顺序执行它们。 `options` 通常是 `setter` 函数
+对于重要参数，例如`SetPruning()` 设置修剪选项或`SetMinGasPrices()` 设置
+节点的`min-gas-prices`。
 
-Naturally, developers can add additional `options` based on their application's needs.
+当然，开发人员可以根据应用程序的需要添加额外的“选项”。
 
-## State Updates
+## 状态更新
 
-The `BaseApp` maintains two primary volatile states and a root or main state. The main state
-is the canonical state of the application and the volatile states, `checkState` and `deliverState`,
-are used to handle state transitions in-between the main state made during [`Commit`](#commit).
+`BaseApp` 维护两个主要的 volatile 状态和一个根或主状态。主要状态
+是应用程序的规范状态和易失状态，`checkState` 和 `deliverState`，
+用于处理在 [`Commit`](#commit) 期间所做的主状态之间的状态转换。
 
-Internally, there is only a single `CommitMultiStore` which we refer to as the main or root state.
-From this root state, we derive two volatile states by using a mechanism called _store branching_ (performed by `CacheWrap` function).
-The types can be illustrated as follows:
+在内部，只有一个 `CommitMultiStore`，我们将其称为主状态或根状态。
+从这个根状态，我们通过使用一种称为 _store 分支_(由`CacheWrap` 函数执行)的机制派生出两个易失性状态。
+这些类型可以说明如下:
 
-![Types](./baseapp_state_types.png)
+![类型](./baseapp_state_types.png)
 
-### InitChain State Updates
+### InitChain 状态更新
 
-During `InitChain`, the two volatile states, `checkState` and `deliverState` are set by branching
-the root `CommitMultiStore`. Any subsequent reads and writes happen on branched versions of the `CommitMultiStore`.
-To avoid unnecessary roundtrip to the main state, all reads to the branched store are cached.
+在 InitChain 期间，通过分支设置了两个 volatile 状态，即 checkState 和 deliverState
+根`CommitMultiStore`。任何后续的读取和写入都发生在 `CommitMultiStore` 的分支版本上。
+为了避免不必要的主状态往返，所有对分支存储的读取都被缓存。
 
 ![InitChain](./baseapp_state-initchain.png)
 
-### CheckTx State Updates
+### CheckTx 状态更新
 
-During `CheckTx`, the `checkState`, which is based off of the last committed state from the root
-store, is used for any reads and writes. Here we only execute the `AnteHandler` and verify a service router
-exists for every message in the transaction. Note, when we execute the `AnteHandler`, we branch
-the already branched `checkState`. This has the side effect that if the `AnteHandler` fails,
-the state transitions won't be reflected in the `checkState` -- i.e. `checkState` is only updated on
-success.
+在 `CheckTx` 期间，`checkState`，它基于来自根的最后提交的状态
+存储，用于任何读取和写入。这里我们只执行 `AnteHandler` 并验证一个服务路由器
+交易中的每条消息都存在。注意，当我们执行 `AnteHandler` 时，我们分支
+已经分支的`checkState`。这有副作用，如果 `AnteHandler` 失败，
+状态转换不会反映在`checkState`中——即`checkState`仅在
+成功。
 
 ![CheckTx](./baseapp_state-checktx.png)
 
-### BeginBlock State Updates
+### BeginBlock 状态更新
 
-During `BeginBlock`, the `deliverState` is set for use in subsequent `DeliverTx` ABCI messages. The
-`deliverState` is based off of the last committed state from the root store and is branched.
-Note, the `deliverState` is set to `nil` on [`Commit`](#commit).
+在`BeginBlock` 期间，`deliverState` 被设置为在随后的`DeliverTx` ABCI 消息中使用。这
+`deliverState` 基于来自根存储的最后提交的状态并且是分支的。
+请注意，在 [`Commit`](#commit) 上，`deliverState` 设置为 `nil`。
 
 ![BeginBlock](./baseapp_state-begin_block.png)
 
-### DeliverTx State Updates
+### DeliverTx 状态更新
 
-The state flow for `DeliverTx` is nearly identical to `CheckTx` except state transitions occur on
-the `deliverState` and messages in a transaction are executed. Similarly to `CheckTx`, state transitions
-occur on a doubly branched state -- `deliverState`. Successful message execution results in
-writes being committed to `deliverState`. Note, if message execution fails, state transitions from
-the AnteHandler are persisted.
+“DeliverTx”的状态流与“CheckTx”几乎相同，除了状态转换发生在
+执行交易中的 `deliverState` 和消息。与“CheckTx”类似，状态转换
+发生在双分支状态 - `deliverState`。成功的消息执行结果
+写入致力于`deliverState`。注意，如果消息执行失败，状态从
+AnteHandler 被持久化。
 
 ![DeliverTx](./baseapp_state-deliver_tx.png)
 
-### Commit State Updates
+### 提交状态更新
 
-During `Commit` all the state transitions that occurred in the `deliverState` are finally written to
-the root `CommitMultiStore` which in turn is committed to disk and results in a new application
-root hash. These state transitions are now considered final. Finally, the `checkState` is set to the
-newly committed state and `deliverState` is set to `nil` to be reset on `BeginBlock`.
+在 `Commit` 期间，发生在 `deliverState` 中的所有状态转换最终都会写入
+根 `CommitMultiStore` 反过来提交到磁盘并产生一个新的应用程序
+根哈希。这些状态转换现在被认为是最终的。最后，`checkState` 被设置为
+新提交的状态和 `deliverState` 设置为 `nil` 以在 `BeginBlock` 上重置。
 
-![Commit](./baseapp_state-commit.png)
+![提交](./baseapp_state-commit.png)
 
-## ParamStore
+## 参数存储
 
-During `InitChain`, the `RequestInitChain` provides `ConsensusParams` which contains parameters
-related to block execution such as maximum gas and size in addition to evidence parameters. If these
-parameters are non-nil, they are set in the BaseApp's `ParamStore`. Behind the scenes, the `ParamStore`
-is actually managed by an `x/params` module `Subspace`. This allows the parameters to be tweaked via
-on-chain governance.
+在 `InitChain` 期间，`RequestInitChain` 提供包含参数的 `ConsensusParams`
+除了证据参数之外，还与块执行相关，例如最大气体和大小。如果这些
+参数非 nil，它们在 BaseApp 的 `ParamStore` 中设置。在幕后，`ParamStore`
+实际上由一个 `x/params` 模块 `Subspace` 管理。这允许通过调整参数
+链上治理。
 
-## Service Routers
+## 服务路由器
 
-When messages and queries are received by the application, they must be routed to the appropriate module in order to be processed. Routing is done via `BaseApp`, which holds a `msgServiceRouter` for messages, and a `grpcQueryRouter` for queries.
+当应用程序接收到消息和查询时，它们必须被路由到适当的模块以进行处理。路由是通过“BaseApp”完成的，它包含一个用于消息的“msgServiceRouter”和一个用于查询的“grpcQueryRouter”。
 
-### `Msg` Service Router
+### `Msg` 服务路由器
 
-[`sdk.Msg`s](#../building-modules/messages-and-queries.md#messages) need to be routed after they are extracted from transactions, which are sent from the underlying Tendermint engine via the [`CheckTx`](#checktx) and [`DeliverTx`](#delivertx) ABCI messages. To do so, `BaseApp` holds a `msgServiceRouter` which maps fully-qualified service methods (`string`, defined in each module's Protobuf  `Msg` service) to the appropriate module's `MsgServer` implementation.
+[`sdk.Msg`s](#../building-modules/messages-and-queries.md#messages) 从交易中提取出来后需要路由，这些交易是通过 [` CheckTx`](#checktx) 和 [`DeliverTx`](#delivertx) ABCI 消息。为此，`BaseApp` 拥有一个 `msgServiceRouter`，它将完全限定的服务方法(`string`，在每个模块的 Protobuf `Msg` 服务中定义)映射到相应模块的 `MsgServer` 实现。
 
-The [default `msgServiceRouter` included in `BaseApp`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/baseapp/msg_service_router.go) is stateless. However, some applications may want to make use of more stateful routing mechanisms such as allowing governance to disable certain routes or point them to new modules for upgrade purposes. For this reason, the `sdk.Context` is also passed into each [route handler inside `msgServiceRouter`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/baseapp/msg_service_router.go#L31-L32). For a stateless router that doesn't want to make use of this, you can just ignore the `ctx`.
+[`BaseApp` 中包含的默认 `msgServiceRouter`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/baseapp/msg_service_router.go) 是无状态的。但是，某些应用程序可能希望使用更多有状态的路由机制，例如允许治理禁用某些路由或将它们指向新模块以进行升级。出于这个原因，`sdk.Context` 也被传递到每个 
 
-The application's `msgServiceRouter` is initialized with all the routes using the application's [module manager](../building-modules/module-manager.md#manager) (via the `RegisterServices` method), which itself is initialized with all the application's modules in the application's [constructor](../basics/app-anatomy.md#app-constructor).
+应用程序的 `msgServiceRouter` 使用应用程序的 [module manager](../building-modules/module-manager.md#manager)(通过 `RegisterServices` 方法)使用所有路由进行初始化，它本身使用所有路由进行初始化应用程序的 [constructor](../basics/app-anatomy.md#app-constructor) 中的应用程序模块。
 
-### gRPC Query Router
+### gRPC 查询路由器
 
-Similar to `sdk.Msg`s, [`queries`](../building-modules/messages-and-queries.md#queries) need to be routed to the appropriate module's [`Query` service](../building-modules/query-services.md). To do so, `BaseApp` holds a `grpcQueryRouter`, which maps modules' fully-qualified service methods (`string`, defined in their Protobuf `Query` gRPC) to their `QueryServer` implementation. The `grpcQueryRouter` is called during the initial stages of query processing, which can be either by directly sending a gRPC query to the gRPC endpoint, or via the [`Query` ABCI message](#query) on the Tendermint RPC endpoint.
+与`sdk.Msg`s类似，[`queries`](../building-modules/messages-and-queries.md#queries)需要路由到相应模块的[`Query`服务](../建筑模块/查询服务.md)。为此，`BaseApp` 拥有一个 `grpcQueryRouter`，它将模块的完全限定服务方法(`string`，在它们的 Protobuf `Query` gRPC 中定义)映射到它们的 `QueryServer` 实现。 `grpcQueryRouter` 在查询处理的初始阶段被调用，可以通过直接向 gRPC 端点发送 gRPC 查询，也可以通过 Tendermint RPC 端点上的 [`Query` ABCI 消息](#query)。
 
-Just like the `msgServiceRouter`, the `grpcQueryRouter` is initialized with all the query routes using the application's [module manager](../building-modules/module-manager.md) (via the `RegisterServices` method), which itself is initialized with all the application's modules in the application's [constructor](../basics/app-anatomy.md#app-constructor).
+就像 `msgServiceRouter` 一样，`grpcQueryRouter` 使用应用程序的 [module manager](../building-modules/module-manager.md)(通过 `RegisterServices` 方法)使用所有查询路由进行初始化，它本身使用应用程序的 [constructor](../basics/app-anatomy.md#app-constructor) 中的所有应用程序模块进行初始化。
 
-## Main ABCI Messages
+## 主要 ABCI 消息
 
-The [Application-Blockchain Interface](https://tendermint.com/docs/spec/abci/) (ABCI) is a generic interface that connects a state-machine with a consensus engine to form a functional full-node. It can be wrapped in any language, and needs to be implemented by each application-specific blockchain built on top of an ABCI-compatible consensus engine like Tendermint.
+[应用-区块链接口](https://tendermint.com/docs/spec/abci/) (ABCI) 是一个通用接口，将状态机与共识引擎连接起来，形成一个功能齐全的全节点。它可以用任何语言包装，并且需要由每个特定于应用程序的区块链来实现，这些区块链构建在与 ABCI 兼容的共识引擎(如 Tendermint)之上。
 
-The consensus engine handles two main tasks:
+共识引擎处理两个主要任务:
 
-- The networking logic, which mainly consists in gossiping block parts, transactions and consensus votes.
-- The consensus logic, which results in the deterministic ordering of transactions in the form of blocks.
+- 网络逻辑，主要包括八卦区块部分、交易和共识投票。
+- 共识逻辑，导致以区块形式确定的交易顺序。
 
-It is **not** the role of the consensus engine to define the state or the validity of transactions. Generally, transactions are handled by the consensus engine in the form of `[]bytes`, and relayed to the application via the ABCI to be decoded and processed. At keys moments in the networking and consensus processes (e.g. beginning of a block, commit of a block, reception of an unconfirmed transaction, ...), the consensus engine emits ABCI messages for the state-machine to act on.
+**不是**共识引擎的作用来定义交易的状态或有效性。通常，交易由共识引擎以‘[]bytes’的形式处理，并通过 ABCI 中继到应用程序进行解码和处理。在网络和共识过程的关键时刻(例如，一个区块的开始，一个区块的提交，一个未确认的交易的接收，......)，共识引擎发出 ABCI 消息供状态机执行。
 
-Developers building on top of the Cosmos SDK need not implement the ABCI themselves, as `BaseApp` comes with a built-in implementation of the interface. Let us go through the main ABCI messages that `BaseApp` implements: [`CheckTx`](#checktx) and [`DeliverTx`](#delivertx)
+在 Cosmos SDK 之上构建的开发人员不需要自己实现 ABCI，因为 BaseApp 带有接口的内置实现。让我们来看看`BaseApp` 实现的主要 ABCI 消息:[`CheckTx`](#checktx) 和 [`DeliverTx`](#delivertx) 
 
 ### CheckTx
 
-`CheckTx` is sent by the underlying consensus engine when a new unconfirmed (i.e. not yet included in a valid block)
-transaction is received by a full-node. The role of `CheckTx` is to guard the full-node's mempool
-(where unconfirmed transactions are stored until they are included in a block) from spam transactions.
-Unconfirmed transactions are relayed to peers only if they pass `CheckTx`.
+当新的未确认(即尚未包含在有效块中)时，底层共识引擎发送 `CheckTx`
+交易由全节点接收。 `CheckTx`的作用是守护全节点的mempool
+(其中存储未经确认的交易，直到它们被包含在一个块中)来自垃圾邮件交易。
+未经确认的交易仅在通过“CheckTx”时才会转发给对等方。
 
-`CheckTx()` can perform both _stateful_ and _stateless_ checks, but developers should strive to
-make them lightweight. In the Cosmos SDK, after [decoding transactions](./encoding.md), `CheckTx()` is implemented
-to do the following checks:
+`CheckTx()` 可以执行 _stateful_ 和 _stateless_ 检查，但开发人员应该努力
+使它们轻便。在Cosmos SDK中，在[解码交易](./encoding.md)之后，实现了`CheckTx()`
+做以下检查:
 
-1. Extract the `sdk.Msg`s from the transaction.
-2. Perform _stateless_ checks by calling `ValidateBasic()` on each of the `sdk.Msg`s. This is done
-   first, as _stateless_ checks are less computationally expensive than _stateful_ checks. If
-   `ValidateBasic()` fail, `CheckTx` returns before running _stateful_ checks, which saves resources.
-3. Perform non-module related _stateful_ checks on the [account](../basics/accounts.md). This step is mainly about checking
-   that the `sdk.Msg` signatures are valid, that enough fees are provided and that the sending account
-   has enough funds to pay for said fees. Note that no precise [`gas`](../basics/gas-fees.md) counting occurs here,
-   as `sdk.Msg`s are not processed. Usually, the [`AnteHandler`](../basics/gas-fees.md#antehandler) will check that the `gas` provided
-   with the transaction is superior to a minimum reference gas amount based on the raw transaction size,
-   in order to avoid spam with transactions that provide 0 gas.
-4. Ensure that each `sdk.Msg`'s fully-qualified service method matches on of the routes inside the `msgServiceRouter`, but do **not** actually
-   process `sdk.Msg`s. `sdk.Msg`s only need to be processed when the canonical state need to be updated,
-   which happens during `DeliverTx`.
+1. 从交易中提取`sdk.Msg`。
+2. 通过对每个 `sdk.Msg` 调用 `ValidateBasic()` 来执行 _stateless_ 检查。这个完成了
+   首先，因为 _stateless_ 检查比 _stateful_ 检查的计算成本更低。如果
+   `ValidateBasic()` 失败，`CheckTx` 在运行 _stateful_ 检查之前返回，从而节省资源。
+3. 对 [account](../basics/accounts.md) 执行非模块相关的 _stateful_ 检查。这一步主要是检查
+   `sdk.Msg` 签名有效，提供足够的费用并且发送帐户
+   有足够的资金支付上述费用。请注意，这里没有精确的 [`gas`](../basics/gas-fees.md) 计数，
+   因为不处理 `sdk.Msg`。通常，[`AnteHandler`](../basics/gas-fees.md#antehandler) 会检查 `gas` 是否提供
+   交易优于基于原始交易规模的最小参考气体量，
+   为了避免垃圾邮件提供 0 gas 的交易。
+4.确保每个`sdk.Msg`的完全限定服务方法匹配`msgServiceRouter`内的路由，但实际上**不**
+   处理`sdk.Msg`s。 `sdk.Msg`s 只在规范状态需要更新时才需要处理，
+   这发生在`DeliverTx`期间。
 
-Steps 2. and 3. are performed by the [`AnteHandler`](../basics/gas-fees.md#antehandler) in the [`RunTx()`](#runtx-antehandler-and-runmsgs)
-function, which `CheckTx()` calls with the `runTxModeCheck` mode. During each step of `CheckTx()`, a
-special [volatile state](#volatile-states) called `checkState` is updated. This state is used to keep
-track of the temporary changes triggered by the `CheckTx()` calls of each transaction without modifying
-the [main canonical state](#main-state) . For example, when a transaction goes through `CheckTx()`, the
-transaction's fees are deducted from the sender's account in `checkState`. If a second transaction is
-received from the same account before the first is processed, and the account has consumed all its
-funds in `checkState` during the first transaction, the second transaction will fail `CheckTx`() and
-be rejected. In any case, the sender's account will not actually pay the fees until the transaction
-is actually included in a block, because `checkState` never gets committed to the main state. The
-`checkState` is reset to the latest state of the main state each time a blocks gets [committed](#commit).
+步骤 2. 和 3. 由 [`RunTx()`](#runtx-antehandler-and-runmsgs) 中的 [`AnteHandler`](../basics/gas-fees.md#antehandler) 执行
+函数，`CheckTx()` 以 `runTxModeCheck` 模式调用。在`CheckTx()`的每一步中，
+特殊的 [volatile state](#volatile-states) 称为 `checkState` 被更新。该状态用于保持
+跟踪每个事务的 `CheckTx()` 调用触发的临时更改，无需修改
+[主要规范状态](#main-state)。例如，当一个交易通过`CheckTx()`时，
+交易费用从“checkState”中的发件人帐户中扣除。如果第二笔交易是
+在处理第一个之前从同一个帐户收到，并且该帐户已经消耗了所有
+在第一笔交易期间，`checkState` 中的资金，第二笔交易将失败 `CheckTx`() 和
+被拒绝。在任何情况下，发送方的账户在交易之前不会实际支付费用
+实际上包含在一个块中，因为 `checkState` 永远不会提交到主状态。这
+每次一个块被[提交](#commit)时，`checkState` 被重置为主状态的最新状态。
 
-`CheckTx` returns a response to the underlying consensus engine of type [`abci.ResponseCheckTx`](https://tendermint.com/docs/spec/abci/abci.html#messages).
-The response contains:
+`CheckTx` 向 [`abci.ResponseCheckTx`](https://tendermint.com/docs/spec/abci/abci.html#messages) 类型的底层共识引擎返回响应。
+响应包含:
 
-- `Code (uint32)`: Response Code. `0` if successful.
-- `Data ([]byte)`: Result bytes, if any.
-- `Log (string):` The output of the application's logger. May be non-deterministic.
-- `Info (string):` Additional information. May be non-deterministic.
-- `GasWanted (int64)`: Amount of gas requested for transaction. It is provided by users when they generate the transaction.
-- `GasUsed (int64)`: Amount of gas consumed by transaction. During `CheckTx`, this value is computed by multiplying the standard cost of a transaction byte by the size of the raw transaction. Next is an example:
+- `代码(uint32)`:响应代码。 `0` 如果成功。
+- `Data ([]byte)`:结果字节，如果有的话。
+- `Log (string):` 应用程序记录器的输出。可能是不确定的。
+- `信息(字符串):` 附加信息。可能是不确定的。
+- `GasWanted (int64)`:交易请求的燃料量。它由用户在生成交易时提供。
+- `GasUsed (int64)`:交易消耗的气体量。在“CheckTx”期间，该值是通过将交易字节的标准成本乘以原始交易的大小来计算的。接下来是一个例子:
   +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/x/auth/ante/basic.go#L104-L105
-- `Events ([]cmn.KVPair)`: Key-Value tags for filtering and indexing transactions (eg. by account). See [`event`s](./events.md) for more.
-- `Codespace (string)`: Namespace for the Code.
+- `Events ([]cmn.KVPair)`:用于过滤和索引交易(例如按帐户)的键值标签。有关更多信息，请参阅 [`event`s](./events.md)。
+- `代码空间(字符串)`:代码的命名空间。
 
-#### RecheckTx
+#### 重新检查Tx
 
-After `Commit`, `CheckTx` is run again on all transactions that remain in the node's local mempool
-after filtering those included in the block. To prevent the mempool from rechecking all transactions
-every time a block is committed, the configuration option `mempool.recheck=false` can be set. As of
-Tendermint v0.32.1, an additional `Type` parameter is made available to the `CheckTx` function that
-indicates whether an incoming transaction is new (`CheckTxType_New`), or a recheck (`CheckTxType_Recheck`).
-This allows certain checks like signature verification can be skipped during `CheckTxType_Recheck`.
+在`Commit` 之后，`CheckTx` 将在节点本地内存池中剩余的所有交易上再次运行
+在过滤块中包含的那些之后。防止内存池重新检查所有交易
+每次提交块时，都可以设置配置选项`mempool.recheck=false`。作为
+Tendermint v0.32.1，一个额外的 `Type` 参数可用于 `CheckTx` 函数
+指示传入的事务是新的(`CheckTxType_New`)还是重新检查(`CheckTxType_Recheck`)。
+这允许在“CheckTxType_Recheck”期间可以跳过某些检查，例如签名验证。 
 
 ### DeliverTx
 
-When the underlying consensus engine receives a block proposal, each transaction in the block needs to be processed by the application. To that end, the underlying consensus engine sends a `DeliverTx` message to the application for each transaction in a sequential order.
+当底层共识引擎收到区块提议时，区块中的每笔交易都需要由应用程序处理。为此，底层共识引擎按顺序向每个交易的应用程序发送“DeliverTx”消息。
 
-Before the first transaction of a given block is processed, a [volatile state](#volatile-states) called `deliverState` is intialized during [`BeginBlock`](#beginblock). This state is updated each time a transaction is processed via `DeliverTx`, and committed to the [main state](#main-state) when the block is [committed](#commit), after what is is set to `nil`.
+在处理给定块的第一笔交易之前，在 [`BeginBlock`](#beginblock) 期间初始化名为 `deliverState` 的 [volatile state](#volatile-states)。每次通过`DeliverTx`处理交易时都会更新此状态，并在块被[提交](#commit)时提交到[主状态](#main-state)，在设置为“nil”之后.
 
-`DeliverTx` performs the **exact same steps as `CheckTx`**, with a little caveat at step 3 and the addition of a fifth step:
+`DeliverTx` 执行 ** 与 `CheckTx`** 完全相同的步骤，在第 3 步有一点需要注意，并增加了第五步:
 
-1. The `AnteHandler` does **not** check that the transaction's `gas-prices` is sufficient. That is because the `min-gas-prices` value `gas-prices` is checked against is local to the node, and therefore what is enough for one full-node might not be for another. This means that the proposer can potentially include transactions for free, although they are not incentivised to do so, as they earn a bonus on the total fee of the block they propose.
-2. For each `sdk.Msg` in the transaction, route to the appropriate module's Protobuf [`Msg` service](../building-modules/msg-services.md). Additional _stateful_ checks are performed, and the branched multistore held in `deliverState`'s `context` is updated by the module's `keeper`. If the `Msg` service returns successfully, the branched multistore held in `context` is written to `deliverState` `CacheMultiStore`.
+1. `AnteHandler` **不** 检查交易的 `gas-prices` 是否足够。那是因为检查的 `min-gas-prices` 值 `gas-prices` 是节点本地的，因此对于一个完整节点来说足够的可能不适用于另一个。这意味着提议者可能会免费包含交易，尽管他们没有这样做的动力，因为他们会从他们提议的区块的总费用中获得奖金。
+2.对于交易中的每个`sdk.Msg`，路由到相应模块的Protobuf [`Msg`服务](../building-modules/msg-services.md)。执行额外的 _stateful_ 检查，并且在 `deliverState` 的 `context` 中保存的分支多存储由模块的 `keeper` 更新。如果 `Msg` 服务成功返回，则保存在 `context` 中的分支多存储被写入 `deliverState` `CacheMultiStore`。
 
-During the additional fifth step outlined in (2), each read/write to the store increases the value of `GasConsumed`. You can find the default cost of each operation:
+在 (2) 中概述的附加第五步期间，对存储的每次读/写都会增加“GasConsumed”的值。您可以找到每个操作的默认成本:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/store/types/gas.go#L164-L175
 
-At any point, if `GasConsumed > GasWanted`, the function returns with `Code != 0` and `DeliverTx` fails.
+在任何时候，如果 `GasConsumed > GasWanted`，函数返回 `Code != 0` 并且 `DeliverTx` 失败。
 
-`DeliverTx` returns a response to the underlying consensus engine of type [`abci.ResponseDeliverTx`](https://tendermint.com/docs/spec/abci/abci.html#delivertx). The response contains:
+`DeliverTx` 向 [`abci.ResponseDeliverTx`](https://tendermint.com/docs/spec/abci/abci.html#delivertx) 类型的底层共识引擎返回响应。响应包含:
 
-- `Code (uint32)`: Response Code. `0` if successful.
-- `Data ([]byte)`: Result bytes, if any.
-- `Log (string):` The output of the application's logger. May be non-deterministic.
-- `Info (string):` Additional information. May be non-deterministic.
-- `GasWanted (int64)`: Amount of gas requested for transaction. It is provided by users when they generate the transaction.
-- `GasUsed (int64)`: Amount of gas consumed by transaction. During `DeliverTx`, this value is computed by multiplying the standard cost of a transaction byte by the size of the raw transaction, and by adding gas each time a read/write to the store occurs.
-- `Events ([]cmn.KVPair)`: Key-Value tags for filtering and indexing transactions (eg. by account). See [`event`s](./events.md) for more.
-- `Codespace (string)`: Namespace for the Code.
+- `代码(uint32)`:响应代码。 `0` 如果成功。
+- `Data ([]byte)`:结果字节，如果有的话。
+- `Log (string):` 应用程序记录器的输出。可能是不确定的。
+- `信息(字符串):` 附加信息。可能是不确定的。
+- `GasWanted (int64)`:交易请求的燃料量。它由用户在生成交易时提供。
+- `GasUsed (int64)`:交易消耗的气体量。在“DeliverTx”期间，该值的计算方法是将交易字节的标准成本乘以原始交易的大小，并在每次对存储进行读/写时添加 gas。
+- `Events ([]cmn.KVPair)`:用于过滤和索引交易(例如按帐户)的键值标签。有关更多信息，请参阅 [`event`s](./events.md)。
+- `代码空间(字符串)`:代码的命名空间。
 
-## RunTx, AnteHandler and RunMsgs
+## RunTx、AnteHandler 和 RunMsgs 
 
 ### RunTx
 
-`RunTx` is called from `CheckTx`/`DeliverTx` to handle the transaction, with `runTxModeCheck` or `runTxModeDeliver` as parameter to differentiate between the two modes of execution. Note that when `RunTx` receives a transaction, it has already been decoded.
+从 `CheckTx`/`DeliverTx` 调用 `RunTx` 来处理事务，以 `runTxModeCheck` 或 `runTxModeDeliver` 作为参数来区分两种执行模式。请注意，当 `RunTx` 接收到一个交易时，它已经被解码了。
 
-The first thing `RunTx` does upon being called is to retrieve the `context`'s `CacheMultiStore` by calling the `getContextForTx()` function with the appropriate mode (either `runTxModeCheck` or `runTxModeDeliver`). This `CacheMultiStore` is a branch of the main store, with cache functionality (for query requests), instantiated during `BeginBlock` for `DeliverTx` and during the `Commit` of the previous block for `CheckTx`. After that, two `defer func()` are called for [`gas`](../basics/gas-fees.md) management. They are executed when `runTx` returns and make sure `gas` is actually consumed, and will throw errors, if any.
+`RunTx` 在被调用时所做的第一件事是通过以适当的模式(`runTxModeCheck` 或 `runTxModeDeliver`)调用 `getContextForTx()` 函数来检索 `context` 的 `CacheMultiStore`。这个 `CacheMultiStore` 是主存储的一个分支，具有缓存功能(用于查询请求)，在 `BeginBlock` 期间为 `DeliverTx` 实例化，并在前一个块的 `Commit` 期间为 `CheckTx` 实例化。之后，调用两个 `defer func()` 进行 [`gas`](../basics/gas-fees.md) 管理。它们在 `runTx` 返回时执行并确保 `gas` 实际消耗，并且会抛出错误(如果有)。
 
-After that, `RunTx()` calls `ValidateBasic()` on each `sdk.Msg`in the `Tx`, which runs preliminary _stateless_ validity checks. If any `sdk.Msg` fails to pass `ValidateBasic()`, `RunTx()` returns with an error.
+之后，`RunTx()` 在 `Tx` 中的每个 `sdk.Msg` 上调用 `ValidateBasic()`，运行初步的 _stateless_ 有效性检查。如果任何 `sdk.Msg` 未能通过 `ValidateBasic()`，`RunTx()` 将返回一个错误。
 
-Then, the [`anteHandler`](#antehandler) of the application is run (if it exists). In preparation of this step, both the `checkState`/`deliverState`'s `context` and `context`'s `CacheMultiStore` are branched using the `cacheTxContext()` function.
+然后，运行应用程序的 [`anteHandler`](#antehandler)(如果存在)。在准备这一步时，`checkState`/`deliverState` 的`context` 和`context` 的`CacheMultiStore` 都使用`cacheTxContext()` 函数进行了分支。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/baseapp/baseapp.go#L623-L630
 
-This allows `RunTx` not to commit the changes made to the state during the execution of `anteHandler` if it ends up failing. It also prevents the module implementing the `anteHandler` from writing to state, which is an important part of the [object-capabilities](./ocap.md) of the Cosmos SDK.
+这允许 `RunTx` 在 `anteHandler` 执行期间不提交对状态所做的更改，如果它最终失败。它还可以防止实现 `anteHandler` 的模块写入状态，这是 Cosmos SDK [object-capabilities](./ocap.md) 的重要组成部分。
 
-Finally, the [`RunMsgs()`](#runmsgs) function is called to process the `sdk.Msg`s in the `Tx`. In preparation of this step, just like with the `anteHandler`, both the `checkState`/`deliverState`'s `context` and `context`'s `CacheMultiStore` are branched using the `cacheTxContext()` function.
+最后，调用 [`RunMsgs()`](#runmsgs) 函数来处理 `Tx` 中的 `sdk.Msg`。在准备这一步时，就像`anteHandler`一样，`checkState`/`deliverState`的`context`和`context`的`CacheMultiStore`都使用`cacheTxContext()`函数进行分支。
 
-### AnteHandler
+### 前处理程序
 
-The `AnteHandler` is a special handler that implements the `AnteHandler` interface and is used to authenticate the transaction before the transaction's internal messages are processed.
+`AnteHandler` 是一个特殊的处理程序，它实现了 `AnteHandler` 接口，用于在处理事务的内部消息之前对事务进行身份验证。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/types/handler.go#L6-L8
 
-The `AnteHandler` is theoretically optional, but still a very important component of public blockchain networks. It serves 3 primary purposes:
+`AnteHandler` 理论上是可选的，但仍然是公共区块链网络的一个非常重要的组成部分。它有 3 个主要目的:
 
-- Be a primary line of defense against spam and second line of defense (the first one being the mempool) against transaction replay with fees deduction and [`sequence`](./transactions.md#transaction-generation) checking.
-- Perform preliminary _stateful_ validity checks like ensuring signatures are valid or that the sender has enough funds to pay for fees.
-- Play a role in the incentivisation of stakeholders via the collection of transaction fees.
+- 通过费用扣除和 [`sequence`](./transactions.md#transaction-generation) 检查，成为抵御垃圾邮件的主要防线和第二道防线(第一道防线是内存池)以防止交易重播。
+- 执行初步的 _stateful_ 有效性检查，例如确保签名有效或发件人有足够的资金来支付费用。
+- 通过收取交易费用，在激励利益相关者方面发挥作用。
 
-`BaseApp` holds an `anteHandler` as parameter that is initialized in the [application's constructor](../basics/app-anatomy.md#application-constructor). The most widely used `anteHandler` is the [`auth` module](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/auth/ante/ante.go).
+`BaseApp` 持有一个 `anteHandler` 作为参数，该参数在 [应用程序的构造函数](../basics/app-anatomy.md#application-constructor) 中初始化。最广泛使用的`anteHandler`是[`auth`模块](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/auth/ante/ante.go)。
 
-Click [here](../basics/gas-fees.md#antehandler) for more on the `anteHandler`.
+单击 [此处](../basics/gas-fees.md#antehandler) 了解有关 `anteHandler` 的更多信息。
 
 ### RunMsgs
 
-`RunMsgs` is called from `RunTx` with `runTxModeCheck` as parameter to check the existence of a route for each message the transaction, and with `runTxModeDeliver` to actually process the `sdk.Msg`s.
+`RunMsgs` 是从 `RunTx` 调用的，以 `runTxModeCheck` 作为参数来检查交易中每条消息的路由是否存在，并使用 `runTxModeDeliver` 来实际处理 `sdk.Msg`。
 
-First, it retrieves the `sdk.Msg`'s fully-qualified type name, by checking the `type_url` of the Protobuf `Any` representing the `sdk.Msg`. Then, using the application's [`msgServiceRouter`](#msg-service-router), it checks for the existence of `Msg` service method related to that `type_url`. At this point, if `mode == runTxModeCheck`, `RunMsgs` returns. Otherwise, if `mode == runTxModeDeliver`, the [`Msg` service](../building-modules/msg-services.md) RPC is executed, before `RunMsgs` returns.
+首先，它通过检查代表 `sdk.Msg` 的 Protobuf `Any` 的 `type_url` 来检索 `sdk.Msg` 的完全限定类型名称。然后，使用应用程序的 [`msgServiceRouter`](#msg-service-router)，它会检查与该 `type_url` 相关的 `Msg` 服务方法是否存在。此时，如果`mode == runTxModeCheck`，则返回`RunMsgs`。否则，如果 `mode == runTxModeDeliver`，则在 `RunMsgs` 返回之前执行 [`Msg` 服务](../building-modules/msg-services.md) RPC。
 
-## Other ABCI Messages
+## 其他 ABCI 消息
 
-### InitChain
+###初始化链
 
-The [`InitChain` ABCI message](https://tendermint.com/docs/app-dev/abci-spec.html#initchain) is sent from the underlying Tendermint engine when the chain is first started. It is mainly used to **initialize** parameters and state like:
+[`InitChain` ABCI 消息](https://tendermint.com/docs/app-dev/abci-spec.html#initchain) 是在链第一次启动时从底层 Tendermint 引擎发送的。它主要用于**初始化**参数和状态，如:
 
-- [Consensus Parameters](https://tendermint.com/docs/spec/abci/apps.html#consensus-parameters) via `setConsensusParams`.
-- [`checkState` and `deliverState`](#volatile-states) via `setCheckState` and `setDeliverState`.
-- The [block gas meter](../basics/gas-fees.md#block-gas-meter), with infinite gas to process genesis transactions.
+- [共识参数](https://tendermint.com/docs/spec/abci/apps.html#consensus-parameters) 通过`setConsensusParams`。
+- [`checkState` 和`deliverState`](#volatile-states) 通过`setCheckState` 和`setDeliverState`。
+- [block gas meter](../basics/gas-fees.md#block-gas-meter)，用无限的gas来处理创世交易。
 
-Finally, the `InitChain(req abci.RequestInitChain)` method of `BaseApp` calls the [`initChainer()`](../basics/app-anatomy.md#initchainer) of the application in order to initialize the main state of the application from the `genesis file` and, if defined, call the [`InitGenesis`](../building-modules/genesis.md#initgenesis) function of each of the application's modules.
+最后，`BaseApp` 的`InitChain(req abci.RequestInitChain)` 方法调用应用程序的[`initChainer()`](../basics/app-anatomy.md#initchainer) 以初始化主状态从“创世文件”中获取应用程序的名称，如果已定义，则调用每个应用程序模块的 [`InitGenesis`](../building-modules/genesis.md#initgenesis) 函数。
 
-### BeginBlock
+### 开始块
 
-The [`BeginBlock` ABCI message](#https://tendermint.com/docs/app-dev/abci-spec.html#beginblock) is sent from the underlying Tendermint engine when a block proposal created by the correct proposer is received, before [`DeliverTx`](#delivertx) is run for each transaction in the block. It allows developers to have logic be executed at the beginning of each block. In the Cosmos SDK, the `BeginBlock(req abci.RequestBeginBlock)` method does the following:
+[`BeginBlock` ABCI 消息](#https://tendermint.com/docs/app-dev/abci-spec.html#beginblock) 当收到正确提议者创建的区块提议时从底层 Tendermint 引擎发送, 在为块中的每个事务运行 [`DeliverTx`](#delivertx) 之前。它允许开发人员在每个块的开头执行逻辑。在 Cosmos SDK 中，`BeginBlock(req abci.RequestBeginBlock)` 方法执行以下操作:
 
-- Initialize [`deliverState`](#volatile-states) with the latest header using the `req abci.RequestBeginBlock` passed as parameter via the `setDeliverState` function.
+- 使用通过`setDeliverState` 函数作为参数传递的`req abci.RequestBeginBlock` 使用最新的标头初始化[`deliverState`](#volatile-states)。
   +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/baseapp/baseapp.go#L387-L397
-  This function also resets the [main gas meter](../basics/gas-fees.md#main-gas-meter).
-- Initialize the [block gas meter](../basics/gas-fees.md#block-gas-meter) with the `maxGas` limit. The `gas` consumed within the block cannot go above `maxGas`. This parameter is defined in the application's consensus parameters.
-- Run the application's [`beginBlocker()`](../basics/app-anatomy.md#beginblocker-and-endblock), which mainly runs the [`BeginBlocker()`](../building-modules/beginblock-endblock.md#beginblock) method of each of the application's modules.
-- Set the [`VoteInfos`](https://tendermint.com/docs/app-dev/abci-spec.html#voteinfo) of the application, i.e. the list of validators whose _precommit_ for the previous block was included by the proposer of the current block. This information is carried into the [`Context`](./context.md) so that it can be used during `DeliverTx` and `EndBlock`.
+  此功能还会重置 [主燃气表](../basics/gas-fees.md#main-gas-meter)。
+- 使用 `maxGas` 限制初始化 [block gas meter](../basics/gas-fees.md#block-gas-meter)。块内消耗的“gas”不能超过“maxGas”。该参数在应用程序的共识参数中定义。
+- 运行应用程序的[`beginBlocker()`](../basics/app-anatomy.md#beginblocker-and-endblock)，主要运行[`BeginBlocker()`](../building-modules/beginblock) -endblock.md#beginblock) 每个应用程序模块的方法。
+- 设置应用程序的 [`VoteInfos`](https://tendermint.com/docs/app-dev/abci-spec.html#voteinfo)，即前一个区块的 _precommit_ 被包含在当前区块的提议者。此信息被携带到 [`Context`](./context.md) 中，以便它可以在 `DeliverTx` 和 `EndBlock` 期间使用。 
 
 ### EndBlock
 
-The [`EndBlock` ABCI message](#https://tendermint.com/docs/app-dev/abci-spec.html#endblock) is sent from the underlying Tendermint engine after [`DeliverTx`](#delivertx) as been run for each transaction in the block. It allows developers to have logic be executed at the end of each block. In the Cosmos SDK, the bulk `EndBlock(req abci.RequestEndBlock)` method is to run the application's [`EndBlocker()`](../basics/app-anatomy.md#beginblocker-and-endblock), which mainly runs the [`EndBlocker()`](../building-modules/beginblock-endblock.md#beginblock) method of each of the application's modules.
+[`EndBlock` ABCI 消息](#https://tendermint.com/docs/app-dev/abci-spec.html#endblock) 在 [`DeliverTx`](#delivertx) 之后从底层 Tendermint 引擎发送为为块中的每个事务运行。它允许开发人员在每个块的末尾执行逻辑。在Cosmos SDK中，批量`EndBlock(req abci.RequestEndBlock)`方法是运行应用程序的[`EndBlocker()`](../basics/app-anatomy.md#beginblocker-and-endblock)，主要是运行每个应用程序模块的 [`EndBlocker()`](../building-modules/beginblock-endblock.md#beginblock) 方法。
 
-### Commit
+### 犯罪
 
-The [`Commit` ABCI message](https://tendermint.com/docs/app-dev/abci-spec.html#commit) is sent from the underlying Tendermint engine after the full-node has received _precommits_ from 2/3+ of validators (weighted by voting power). On the `BaseApp` end, the `Commit(res abci.ResponseCommit)` function is implemented to commit all the valid state transitions that occured during `BeginBlock`, `DeliverTx` and `EndBlock` and to reset state for the next block.
+[`Commit` ABCI 消息](https://tendermint.com/docs/app-dev/abci-spec.html#commit) 是在全节点从 2/3 收到 _precommits_ 后从底层 Tendermint 引擎发送的+ 验证者(按投票权加权)。在 BaseApp 端，实现了 Commit(res abci.ResponseCommit) 函数以提交在 BeginBlock、DeliverTx 和 EndBlock 期间发生的所有有效状态转换，并为下一个块重置状态。
 
-To commit state-transitions, the `Commit` function calls the `Write()` function on `deliverState.ms`, where `deliverState.ms` is a branched multistore of the main store `app.cms`. Then, the `Commit` function sets `checkState` to the latest header (obtbained from `deliverState.ctx.BlockHeader`) and `deliverState` to `nil`.
+为了提交状态转换，`Commit` 函数调用 `deliverState.ms` 上的 `Write()` 函数，其中 `deliverState.ms` 是主存储 `app.cms` 的分支多存储。然后，`Commit` 函数将`checkState` 设置为最新的头部(从`deliverState.ctx.BlockHeader` 获得)，将`deliverState` 设置为`nil`。
 
-Finally, `Commit` returns the hash of the commitment of `app.cms` back to the underlying consensus engine. This hash is used as a reference in the header of the next block.
+最后，`Commit` 将 `app.cms` 的承诺的哈希返回给底层的共识引擎。该散列用作下一个块的标头中的参考。
 
-### Info
+### 信息
 
-The [`Info` ABCI message](https://tendermint.com/docs/app-dev/abci-spec.html#info) is a simple query from the underlying consensus engine, notably used to sync the latter with the application during a handshake that happens on startup. When called, the `Info(res abci.ResponseInfo)` function from `BaseApp` will return the application's name, version and the hash of the last commit of `app.cms`.
+[`Info` ABCI 消息](https://tendermint.com/docs/app-dev/abci-spec.html#info) 是来自底层共识引擎的简单查询，特别是用于将后者与应用程序同步在启动时发生的握手期间。调用时，来自 BaseApp 的 Info(res abci.ResponseInfo) 函数将返回应用程序的名称、版本和 app.cms 上次提交的哈希值。
 
-### Query
+### 询问
 
-The [`Query` ABCI message](https://tendermint.com/docs/app-dev/abci-spec.html#query) is used to serve queries received from the underlying consensus engine, including queries received via RPC like Tendermint RPC. It used to be the main entrypoint to build interfaces with the application, but with the introduction of [gRPC queries](../building-modules/query-services.md) in Cosmos SDK v0.40, its usage is more limited. The application must respect a few rules when implementing the `Query` method, which are outlined [here](https://tendermint.com/docs/app-dev/abci-spec.html#query).
+[`Query` ABCI 消息](https://tendermint.com/docs/app-dev/abci-spec.html#query) 用于服务从底层共识引擎接收的查询，包括通过 RPC 接收的查询，如 Tendermint RPC。它曾经是与应用程序构建接口的主要入口点，但随着 Cosmos SDK v0.40 中[gRPC 查询](../building-modules/query-services.md) 的引入，它的使用受到了更多限制。应用程序在实现 `Query` 方法时必须遵守一些规则，这些规则在 [here](https://tendermint.com/docs/app-dev/abci-spec.html#query) 中进行了概述。
 
-Each Tendermint `query` comes with a `path`, which is a `string` which denotes what to query. If the `path` matches a gRPC fully-qualified service method, then `BaseApp` will defer the query to the `grpcQueryRouter` and let it handle it like explained [above](#grpc-query-router). Otherwise, the `path` represents a query that is not (yet) handled by the gRPC router. `BaseApp` splits the `path` string with the `/` delimiter. By convention, the first element of the splitted string (`splitted[0]`) contains the category of `query` (`app`, `p2p`, `store` or `custom` ). The `BaseApp` implementation of the `Query(req abci.RequestQuery)` method is a simple dispatcher serving these 4 main categories of queries:
+每个 Tendermint `query` 都带有一个 `path`，它是一个 `string`，表示要查询的内容。如果 `path` 匹配一个 gRPC 完全限定的服务方法，那么 `BaseApp` 会将查询推迟到 `grpcQueryRouter` 并让它按照 [above](#grpc-query-router) 的解释进行处理。否则，`path` 表示 gRPC 路由器(尚未)处理的查询。 `BaseApp` 用 `/` 分隔符分割 `path` 字符串。按照惯例，拆分字符串的第一个元素 (`splitted[0]`) 包含 `query` 的类别(`app`、`p2p`、`​​store` 或 `custom`)。 `Query(req abci.RequestQuery)` 方法的 `BaseApp` 实现是一个简单的调度程序，为这 4 种主要查询类别提供服务:
 
-- Application-related queries like querying the application's version, which are served via the `handleQueryApp` method.
-- Direct queries to the multistore, which are served by the `handlerQueryStore` method. These direct queries are different from custom queries which go through `app.queryRouter`, and are mainly used by third-party service provider like block explorers.
-- P2P queries, which are served via the `handleQueryP2P` method. These queries return either `app.addrPeerFilter` or `app.ipPeerFilter` that contain the list of peers filtered by address or IP respectively. These lists are first initialized via `options` in `BaseApp`'s [constructor](#constructor).
-- Custom queries, which encompass legacy queries (before the introduction of gRPC queries), are served via the `handleQueryCustom` method. The `handleQueryCustom` branches the multistore before using the `queryRoute` obtained from `app.queryRouter` to map the query to the appropriate module's [legacy `querier`](../building-modules/query-services.md#legacy-queriers).
+- 与应用程序相关的查询，例如查询应用程序的版本，通过 `handleQueryApp` 方法提供。
+- 对 multistore 的直接查询，由 `handlerQueryStore` 方法提供服务。这些直接查询不同于通过`app.queryRouter`的自定义查询，主要由第三方服务提供商使用，如区块浏览器。
+- P2P 查询，通过`handleQueryP2P` 方法提供服务。这些查询返回“app.addrPeerFilter”或“app.ipPeerFilter”，其中包含分别按地址或 IP 过滤的对等点列表。这些列表首先通过`BaseApp` 的[constructor](#constructor) 中的`options` 初始化。
+- 自定义查询，包括遗留查询(在引入 gRPC 查询之前)，通过 `handleQueryCustom` 方法提供。 `handleQueryCustom` 在使用从 `app.queryRouter` 获得的 `queryRoute` 将查询映射到相应模块的 [legacy `querier`](../building-modules/query-services.md#legacy-查询者)。
 
-## Next {hide}
+## 下一个 {hide}
 
-Learn more about [transactions](./transactions.md) {hide}
+详细了解 [transactions](./transactions.md) {hide} 

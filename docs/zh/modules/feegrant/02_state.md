@@ -1,15 +1,11 @@
-<!--
-order: 2
--->
+# 状态
 
-# State
+## 费用津贴
 
-## FeeAllowance
+费用津贴通过将“受赠人”(费用津贴受赠人的帐户地址)与“赠与人”(费用津贴授予人的帐户地址)组合在一起来识别。
 
-Fee Allowances are identified by combining `Grantee` (the account address of fee allowance grantee) with the `Granter` (the account address of fee allowance granter).
+费用津贴补助金在州中存储如下:
 
-Fee allowance grants are stored in the state as follows:
+- 授予:`0x00 | grantee_addr_len (1 字节) | grantee_addr_bytes | granter_addr_len (1 字节) | granter_addr_bytes -> ProtocolBuffer(Grant)`
 
-- Grant: `0x00 | grantee_addr_len (1 byte) | grantee_addr_bytes |  granter_addr_len (1 byte) | granter_addr_bytes -> ProtocolBuffer(Grant)`
-
-+++ https://github.com/cosmos/cosmos-sdk/blob/691032b8be0f7539ec99f8882caecefc51f33d1f/x/feegrant/feegrant.pb.go#L221-L229
++++ https://github.com/cosmos/cosmos-sdk/blob/691032b8be0f7539ec99f8882caecefc51f33d1f/x/feegrant/feegrant.pb.go#L221-L229 

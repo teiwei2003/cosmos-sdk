@@ -1,7 +1,3 @@
-<!--
-order: 5
--->
-
 # Hooks
 
 This section contains a description of the module's `hooks`. Hooks are operations that are executed automatically when events are raised.

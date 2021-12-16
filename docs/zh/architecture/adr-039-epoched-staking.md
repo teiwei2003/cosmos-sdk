@@ -1,122 +1,121 @@
-# ADR 039: Epoched Staking
+# ADR 039:划时代的赌注
 
-## Changelog
+## 变更日志
 
-- 10-Feb-2021: Initial Draft
+- 2021 年 2 月 10 日:初稿
 
-## Authors
+##作者
 
 - Dev Ojha (@valardragon)
 - Sunny Aggarwal (@sunnya97)
 
-## Status
+## 地位
 
-Proposed
+建议的
 
-## Abstract
+## 摘要
 
-This ADR updates the proof of stake module to buffer the staking weight updates for a number of blocks before updating the consensus' staking weights. The length of the buffer is dubbed an epoch. The prior functionality of the staking module is then a special case of the abstracted module, with the epoch being set to 1 block.
+该 ADR 更新权益证明模块以在更新共识的权益权重之前缓冲多个区块的权益证明权重更新。缓冲区的长度被称为一个纪元。 staking 模块的先验功能是抽象模块的一个特例，epoch 被设置为 1 个区块。
 
-## Context
+## 语境
 
-The current proof of stake module takes the design decision to apply staking weight changes to the consensus engine immediately. This means that delegations and unbonds get applied immediately to the validator set. This decision was primarily done as it was implementationally simplest, and because we at the time believed that this would lead to better UX for clients.
+当前的权益证明模块采用设计决策，立即将权益权重更改应用于共识引擎。这意味着委托和解除绑定会立即应用于验证器集。这个决定主要是因为它在实现上最简单，并且因为我们当时相信这将为客户带来更好的用户体验。
 
-An alternative design choice is to allow buffering staking updates (delegations, unbonds, validators joining) for a number of blocks. This 'epoch'd proof of stake consensus provides the guarantee that the consensus weights for validators will not change mid-epoch, except in the event of a slash condition.
+另一种设计选择是允许缓冲多个区块的质押更新(委托、解除绑定、验证者加入)。这种 'epoch'd 的股权共识证明提供了验证者的共识权重不会在中期改变的保证，除非出现斜线条件。
 
-Additionally, the UX hurdle may not be as significant as was previously thought. This is because it is possible to provide users immediate acknowledgement that their bond was recorded and will be executed.
+此外，用户体验障碍可能不像以前想象的那么重要。这是因为可以让用户立即确认他们的保证金已被记录并将被执行。
 
-Furthermore, it has become clearer over time that immediate execution of staking events comes with limitations, such as:
+此外，随着时间的推移，立即执行 Staking 事件的局限性越来越明显，例如:
 
-* Threshold based cryptography. One of the main limitations is that because the validator set can change so regularly, it makes the running of multiparty computation by a fixed validator set difficult. Many threshold-based cryptographic features for blockchains such as randomness beacons and threshold decryption require a computationally-expensive DKG process (will take much longer than 1 block to create). To productively use these, we need to guarantee that the result of the DKG will be used for a reasonably long time. It wouldn't be feasible to rerun the DKG every block. By epoching staking, it guarantees we'll only need to run a new DKG once every epoch.
+* 基于阈值的密码学。主要限制之一是，由于验证器集可以定期更改，这使得由固定验证器集运行多方计算变得困难。区块链的许多基于阈值的加密功能，例如随机信标和阈值解密，都需要计算成本高昂的 DKG 过程(创建时间比创建 1 个区块要长得多)。为了有效地使用这些，我们需要保证 DKG 的结果将被使用相当长的时间。每个块都重新运行 DKG 是不可行的。通过 epoching staking，它保证我们每个 epoch 只需要运行一次新的 DKG。
 
-* Light client efficiency. This would lessen the overhead for IBC when there is high churn in the validator set. In the Tendermint light client bisection algorithm, the number of headers you need to verify is related to bounding the difference in validator sets between a trusted header and the latest header. If the difference is too great, you verify more header in between the two. By limiting the frequency of validator set changes, we can reduce the worst case size of IBC lite client proofs, which occurs when a validator set has high churn.
+* 轻客户端效率。当验证器集合中存在大量流失时，这将减少 IBC 的开销。在 Tendermint 轻客户端二分算法中，您需要验证的标头数量与限定可信标头和最新标头之间验证器集差异的界限有关。如果差异太大，则验证两者之间的更多标头。通过限制验证器集更改的频率，我们可以减少 IBC lite 客户端证明的最坏情况大小，这种情况发生在验证器集具有高流失率时。
 
-* Fairness of deterministic leader election. Currently we have no ways of reasoning of fairness of deterministic leader election in the presence of staking changes without epochs (tendermint/spec#217). Breaking fairness of leader election is profitable for validators, as they earn additional rewards from being the proposer. Adding epochs at least makes it easier for our deterministic leader election to match something we can prove secure. (Albeit, we still haven’t proven if our current algorithm is fair with > 2 validators in the presence of stake changes)
+* 确定性领导人选举的公平性。目前我们没有办法在没有 epochs 的情况下推理确定性领导人选举的公平性(tendermint/spec#217)。打破领导者选举的公平性对验证者来说是有利可图的，因为他们从成为提议者中获得了额外的奖励。添加 epochs 至少可以让我们的确定性领导人选举更容易匹配我们可以证明安全的东西。 (尽管如此，我们仍然没有证明我们当前的算法在存在权益变更的情况下是否对 > 2 个验证者公平) 
 
-* Staking derivative design. Currently, reward distribution is done lazily using the F1 fee distribution. While saving computational complexity, lazy accounting requires a more stateful staking implementation. Right now, each delegation entry has to track the time of last withdrawal. Handling this can be a challenge for some staking derivatives designs that seek to provide fungibility for all tokens staked to a single validator. Force-withdrawing rewards to users can help solve this, however it is infeasible to force-withdraw rewards to users on a per block basis. With epochs, a chain could more easily alter the design to have rewards be forcefully withdrawn (iterating over delegator accounts only once per-epoch), and can thus remove delegation timing from state. This may be useful for certain staking derivative designs.
+* Staking衍生设计。 目前，奖励分配是使用 F1 费用分配延迟完成的。 在节省计算复杂度的同时，懒惰记账需要更有状态的 staking 实现。 现在，每个代表团条目都必须跟踪上次撤回的时间。 对于一些试图为所有质押到单个验证者的代币提供可替代性的质押衍生品设计来说，处理这个问题可能是一个挑战。 对用户强制撤回奖励可以帮助解决这个问题，但是在每个区块的基础上强制撤回给用户的奖励是不可行的。 使用 epochs，链可以更容易地改变设计以强制撤回奖励(每个 epoch 仅迭代一次委托人帐户)，从而可以从状态中删除委托时间。 这对于某些抵押衍生设计可能很有用。 
 
 ## Design considerations
 
 ### Slashing
 
-There is a design consideration for whether to apply a slash immediately or at the end of an epoch. A slash event should apply to only members who are actually staked during the time of the infraction, namely during the epoch the slash event occured.
+是否立即应用斜线或在一个纪元结束时应用斜线有一个设计考虑。斜线事件应仅适用于在违规期间实际下注的成员，即在斜线事件发生的时期内。
 
-Applying it immediately can be viewed as offering greater consensus layer security, at potential costs to the aforementioned usecases. The benefits of immediate slashing for consensus layer security can be all be obtained by executing the validator jailing immediately (thus removing it from the validator set), and delaying the actual slash change to the validator's weight until the epoch boundary. For the use cases mentioned above, workarounds can be integrated to avoid problems, as follows:
+立即应用它可以被视为提供更高的共识层安全性，但对上述用例有潜在成本。立即削减对共识层安全的好处都可以通过立即执行验证人监狱(从而将其从验证人集合中移除)，并将实际削减对验证人权重的更改延迟到纪元边界来获得。对于上面提到的用例，可以集成变通方法来避免出现问题，如下所示:
 
-- For threshold based cryptography, this setting will have the threshold cryptography use the original epoch weights, while consensus has an update that lets it more rapidly benefit from additional security. If the threshold based cryptography blocks liveness of the chain, then we have effectively raised the liveness threshold of the remaining validators for the rest of the epoch. (Alternatively, jailed nodes could still contribute shares) This plan will fail in the extreme case that more than 1/3rd of the validators have been jailed within a single epoch. For such an extreme scenario, the chain already have its own custom incident response plan, and defining how to handle the threshold cryptography should be a part of that.
-- For light client efficiency, there can be a bit included in the header indicating an intra-epoch slash (ala https://github.com/tendermint/spec/issues/199).
-- For fairness of deterministic leader election, applying a slash or jailing within an epoch would break the guarantee we were seeking to provide. This then re-introduces a new (but significantly simpler) problem for trying to provide fairness guarantees. Namely, that validators can adversarially elect to remove themself from the set of proposers. From a security perspective, this could potentially be handled by two different mechanisms (or prove to still be too difficult to achieve). One is making a security statement acknowledging the ability for an adversary to force an ahead-of-time fixed threshold of users to drop out of the proposer set within an epoch. The second method would be to  parameterize such that the cost of a slash within the epoch far outweights benefits due to being a proposer. However, this latter criterion is quite dubious, since being a proposer can have many advantageous side-effects in chains with complex state machines. (Namely, DeFi games such as Fomo3D)
-- For staking derivative design, there is no issue introduced. This does not increase the state size of staking records, since whether a slash has occured is fully queryable given the validator address.
-
+- 对于基于阈值的密码学，此设置将使阈值密码学使用原始时代权重，而共识具有更新，使其更快地受益于额外的安全性。如果基于阈值的密码学阻止了链的活跃度，那么我们已经有效地提高了剩余验证者的活跃度阈值。 (或者，被监禁的节点仍然可以贡献份额)在极端情况下，该计划将失败，即超过 1/3 的验证者在单个 epoch 内被监禁。对于这种极端情况，链上已经有自己的自定义事件响应计划，定义如何处理阈值密码应该是其中的一部分。
+- 为了轻客户端的效率，标头中可以包含一点，指示一个时期内的斜线(ala https://github.com/tendermint/spec/issues/199)。
+- 为了确定性领导人选举的公平性，在一个纪元内应用斜线或监禁会破坏我们试图提供的保证。然后，这会重新引入一个新的(但明显更简单的)问题来尝试提供公平性保证。也就是说，验证者可以对抗性地选择将自己从提议者集合中移除。从安全角度来看，这可能会通过两种不同的机制来处理(或者证明仍然太难实现)。一个是做出安全声明，承认攻击者有能力强制用户提前设定一个固定的阈值，以在一个时期内退出提议者集。第二种方法是参数化，使得由于是提议者，在 epoch 内的斜线成本远远超过收益。然而，后一个标准是相当可疑的，因为在具有复杂状态机的链中，作为提议者可能会产生许多有利的副作用。 (即Fomo3D等DeFi游戏)
+- staking 衍生设计，没有引入问题。这不会增加 staking 记录的状态大小，因为在给定验证器地址的情况下，是否发生斜线是完全可查询的。 
 ### Token lockup
 
-When someone makes a transaction to delegate, even though they are not immediately staked, their tokens should be moved into a pool managed by the staking module which will then be used at the end of an epoch. This prevents concerns where they stake, and then spend those tokens not realizing they were already allocated for staking, and thus having their staking tx fail.
+当有人进行委托交易时，即使他们没有立即被质押，他们的代币也应该被转移到由质押模块管理的池中，然后在一个时期结束时使用。 这可以防止担心他们在哪里质押，然后花费这些代币而没有意识到它们已经被分配用于质押，从而导致他们的质押交易失败。 
 
 ### Pipelining the epochs
 
-For threshold based cryptography in particular, we need a pipeline for epoch changes. This is because when we are in epoch N, we want the epoch N+1 weights to be fixed so that the validator set can do the DKG accordingly. So if we are currently in epoch N, the stake weights for epoch N+1 should already be fixed, and new stake changes should be getting applied to epoch N + 2.
+特别是对于基于阈值的密码学，我们需要一个用于纪元变化的管道。这是因为当我们处于 epoch N 时，我们希望 epoch N+1 的权重是固定的，以便验证器集可以相应地做 DKG。因此，如果我们目前处于第 N 个时期，则第 N+1 个时期的权益权重应该已经固定，并且新的权益变更应该应用于第 N+2 个时期。
 
-This can be handled by making a parameter for the epoch pipeline length. This parameter should not be alterable except during hard forks, to mitigate implementation complexity of switching the pipeline length.
+这可以通过为 epoch 管道长度设置参数来处理。除了在硬分叉期间，此参数不应更改，以减轻切换管道长度的实现复杂性。
 
-With pipeline length 1, if I redelegate during epoch N, then my redelegation is applied prior to the beginning of epoch N+1.
-With pipeline length 2, if I redelegate during epoch N, then my redelegation is applied prior to the beginning of epoch N+2.
+管道长度为 1 时，如果我在纪元 N 期间重新委派，那么我的重新委派将在纪元 N+1 开始之前应用。
+管道长度为 2 时，如果我在第 N 个时期重新委派，那么我的重新委派将在第 N+2 个时期开始之前应用。
 
-### Rewards
+### 奖励
 
-Even though all staking updates are applied at epoch boundaries, rewards can still be distributed immediately when they are claimed. This is because they do not affect the current stake weights, as we do not implement auto-bonding of rewards. If such a feature were to be implemented, it would have to be setup so that rewards are auto-bonded at the epoch boundary.
+即使所有 staking 更新都应用在 epoch 边界，奖励仍然可以在被领取时立即分配。这是因为它们不会影响当前的股权权重，因为我们没有实现奖励的自动绑定。如果要实现这样的功能，则必须对其进行设置，以便在纪元边界自动绑定奖励。
 
-### Parameterizing the epoch length
+### 参数化纪元长度
 
-When choosing the epoch length, there is a trade-off queued state/computation buildup, and countering the previously discussed limitations of immediate execution if they apply to a given chain.
+在选择 epoch 长度时，需要权衡排队状态/计算构建，并抵消前面讨论的立即执行限制(如果它们适用于给定链)。
 
-Until an ABCI mechanism for variable block times is introduced, it is ill-advised to be using high epoch lengths due to the computation buildup. This is because when a block's execution time is greater than the expected block time from Tendermint, rounds may increment.
+在引入可变块时间的 ABCI 机制之前，由于计算积累，使用高时期长度是不明智的。这是因为当一个区块的执行时间大于 Tendermint 的预期区块时间时，轮次可能会增加。
 
-## Decision
+## 决定
 
-__Step-1__:  Implement buffering of all staking and slashing messages.
+__Step-1__:实现所有质押和削减消息的缓冲。
 
-First we create a pool for storing tokens that are being bonded, but should be applied at the epoch boundary called the `EpochDelegationPool`. Then, we have two separate queues, one for staking, one for slashing. We describe what happens on each message being delivered below:
+首先，我们创建一个用于存储正在绑定的令牌的池，但应在称为“EpochDelegationPool”的纪元边界处应用。然后，我们有两个单独的队列，一个用于 staking，一个用于 slash。我们在下面描述了每条消息传递时会发生什么:
 
-### Staking messages
+### 质押消息
 
-- **MsgCreateValidator**: Move user's self-bond to `EpochDelegationPool` immediately. Queue a message for the epoch boundary to handle the self-bond, taking the funds from the `EpochDelegationPool`. If Epoch execution fail, return back funds from `EpochDelegationPool` to user's account.
-- **MsgEditValidator**: Validate message and if valid queue the message for execution at the end of the Epoch.
-- **MsgDelegate**: Move user's funds to `EpochDelegationPool` immediately. Queue a message for the epoch boundary to handle the delegation, taking the funds from the `EpochDelegationPool`. If Epoch execution fail, return back funds from `EpochDelegationPool` to user's account.
-- **MsgBeginRedelegate**: Validate message and if valid queue the message for execution at the end of the Epoch.
-- **MsgUndelegate**: Validate message and if valid queue the message for execution at the end of the Epoch.
+- **MsgCreateValidator**:立即将用户的自绑定移动到`EpochDelegationPool`。为纪元边界排队消息以处理自绑定，从“EpochDelegationPool”中获取资金。如果 Epoch 执行失败，则将资金从 EpochDelegationPool 退回用户账户。
+- **MsgEditValidator**:验证消息，如果有效则将消息放入队列以在 Epoch 结束时执行。
+- **MsgDelegate**:立即将用户的资金转移到`EpochDelegationPool`。为纪元边界排队消息以处理委托，从“EpochDelegationPool”中获取资金。如果 Epoch 执行失败，则将资金从 EpochDelegationPool 退回用户账户。
+- **MsgBeginRedelegate**:验证消息，如果有效则将消息放入队列以在 Epoch 结束时执行。
+- **MsgUndelegate**:验证消息，如果有效则将消息放入队列以在 Epoch 结束时执行。 
 
-### Slashing messages
+### 削减消息
 
-- **MsgUnjail**: Validate message and if valid queue the message for execution at the end of the Epoch.
-- **Slash Event**: Whenever a slash event is created, it gets queued in the slashing module to apply at the end of the epoch. The queues should be setup such that this slash applies immediately.
+- **MsgUnjail**:验证消息，如果有效则将消息放入队列以在 Epoch 结束时执行。
+- **斜线事件**:每当创建斜线事件时，它都会在斜线模块中排队以在纪元结束时应用。应设置队列，以便立即应用此斜线。
 
-### Evidence Messages
+### 证据消息
 
-- **MsgSubmitEvidence**: This gets executed immediately, and the validator gets jailed immediately. However in slashing, the actual slash event gets queued.
+- **MsgSubmitEvidence**:立即执行，验证器立即入狱。然而，在斜线中，实际的斜线事件被排队。
 
-Then we add methods to the end blockers, to ensure that at the epoch boundary the queues are cleared and delegation updates are applied.
+然后我们向结束阻塞器添加方法，以确保在纪元边界清除队列并应用委托更新。
 
-__Step-2__: Implement querying of queued staking txs.
+__Step-2__:实现排队质押交易的查询。
 
-When querying the staking activity of a given address, the status should return not only the amount of tokens staked, but also if there are any queued stake events for that address. This will require more work to be done in the querying logic, to trace the queued upcoming staking events.
+在查询给定地址的质押活动时，状态不仅应返回质押的代币数量，还应返回该地址是否有任何排队的质押事件。这将需要在查询逻辑中完成更多工作，以跟踪排队的即将到来的 staking 事件。
 
-As an initial implementation, this can be implemented as a linear search over all queued staking events. However, for chains that need long epochs, they should eventually build additional support for nodes that support querying to be able to produce results in constant time. (This is do-able by maintaining an auxilliary hashmap for indexing upcoming staking events by address)
+作为初始实现，这可以实现为对所有排队的抵押事件的线性搜索。但是，对于需要长 epoch 的链，它们最终应该为支持查询的节点构建额外的支持，以便能够在恒定的时间内产生结果。 (这是可以通过维护一个辅助哈希图来按地址索引即将发生的 staking 事件来实现的)
 
-__Step-3__: Adjust gas
+__Step-3__:调整气体
 
-Currently gas represents the cost of executing a transaction when its done immediately. (Merging together costs of p2p overhead, state access overhead, and computational overhead) However, now a transaction can cause computation in a future block, namely at the epoch boundary.
+目前，gas 表示交易立即完成时执行交易的成本。 (将 p2p 开销、状态访问开销和计算开销的成本合并在一起)但是，现在交易可以在未来的块中引起计算，即在纪元边界。
 
-To handle this, we should initially include parameters for estimating the amount of future computation (denominated in gas), and add that as a flat charge needed for the message.
-We leave it as out of scope for how to weight future computation versus current computation in gas pricing, and have it set such that the are weighted equally for now.
+为了解决这个问题，我们最初应该包括用于估计未来计算量(以 gas 计价)的参数，并将其添加为消息所需的固定费用。
+我们将其排除在如何在 gas 定价中加权未来计算与当前计算的范围之外，并将其设置为现在权重相等。 
 
 ## Consequences
 
 ### Positive
 
-* Abstracts the proof of stake module that allows retaining the existing functionality
-* Enables new features such as validator-set based threshold cryptography
+* 抽象了允许保留现有功能的权益证明模块
+* 启用新功能，例如基于验证器集的阈值加密
 
 ### Negative
 
-* Increases complexity of integrating more complex gas pricing mechanisms, as they now have to consider future execution costs as well.
-* When epoch > 1, validators can no longer leave the network immediately, and must wait until an epoch boundary.
+* 增加了整合更复杂的 gas 定价机制的复杂性，因为他们现在还必须考虑未来的执行成本。
+* 当 epoch > 1 时，验证者不能再立即离开网络，必须等到一个 epoch 边界。 

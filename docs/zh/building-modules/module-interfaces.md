@@ -1,7 +1,3 @@
-<!--
-order: 11
--->
-
 # 模块接口
 
 本文档详细介绍了如何为模块构建 CLI 和 REST 接口。包括来自各种 Cosmos SDK 模块的示例。 {概要}
@@ -133,6 +129,6 @@ gRPC 网关与应用程序和 Tendermint 一起在进程内启动。可以通过
 
 Cosmos SDK 提供了用于生成 [Swagger](https://swagger.io/) 文档 (`protoc-gen-swagger`) 的命令。在 [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml) 中设置 `swagger` 定义是否应该自动注册 swagger 文档。
 
-## 下一个{hide}
+## 下一个 {hide}
 
 阅读推荐的 [模块结构](./structure.md) {hide} 

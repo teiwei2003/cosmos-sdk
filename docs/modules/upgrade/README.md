@@ -1,10 +1,3 @@
-<!--
-order: 0
-title: Upgrade Overview
-parent:
-  title: "upgrade"
--->
-
 # `upgrade`
 
 ## Abstract

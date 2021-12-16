@@ -1,7 +1,3 @@
-<!--
-order: 2
--->
-
 # 模块管理器
 
 Cosmos SDK 模块需要实现[`AppModule` 接口](#application-module-interfaces)，以便由应用程序的[模块管理器](#module-manager) 进行管理。模块管理器在 [`message` 和 `query` 路由](../core/baseapp.md#routing) 中扮演着重要的角色，并允许应用程序开发者设置各种函数的执行顺序，例如 [`BeginBlocker ` 和 `EndBlocker`](../basics/app-anatomy.md#begingblocker-and-endblocker)。 {概要}
@@ -145,6 +141,6 @@ type AppModuleBasic struct{}
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/2323f1ac0e9a69a0da6b43693061036134193464/simapp/app.go#L315-L362
 
-## 下一个{hide}
+## 下一个 {hide}
 
 详细了解 [`message`s 和 `queries`](./messages-and-queries.md) {hide} 

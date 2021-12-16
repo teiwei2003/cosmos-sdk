@@ -1,16 +1,12 @@
-<!--
-order: 6
--->
+# 客户
 
-# Client
+##命令行界面
 
-## CLI
+用户可以使用 CLI 查询“mint”模块并与之交互。
 
-A user can query and interact with the `mint` module using the CLI.
+### 询问
 
-### Query
-
-The `query` commands allow users to query `mint` state.
+`query` 命令允许用户查询 `mint` 状态。 
 
 ```
 simd query mint --help

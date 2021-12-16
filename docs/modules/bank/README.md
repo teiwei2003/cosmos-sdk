@@ -1,10 +1,3 @@
-<!--
-order: 0
-title: Bank Overview
-parent:
-  title: "bank"
--->
-
 # `x/bank`
 
 ## Abstract

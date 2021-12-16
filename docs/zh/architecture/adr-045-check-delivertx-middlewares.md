@@ -1,29 +1,29 @@
-# ADR 045: BaseApp `{Check,Deliver}Tx` as Middlewares
+# ADR 045:BaseApp `{Check,Deliver}Tx` 作为中间件
 
-## Changelog
+## 变更日志
 
-- 20.08.2021: Initial draft.
-- 07.12.2021: Update `tx.Handler` interface ([\#10693](https://github.com/cosmos/cosmos-sdk/pull/10693)).
+- 20.08.2021:初稿。
+- 07.12.2021: 更新 `tx.Handler` 接口 ([\#10693](https://github.com/cosmos/cosmos-sdk/pull/10693))。
 
-## Status
+## 地位
 
-ACCEPTED
+公认
 
-## Abstract
+## 摘要
 
-This ADR replaces the current BaseApp `runTx` and antehandlers design with a middleware-based design.
+此 ADR 用基于中间件的设计替换了当前的 BaseApp `runTx` 和 antehandlers 设计。
 
-## Context
+## 语境
 
-BaseApp's implementation of ABCI `{Check,Deliver}Tx()` and its own `Simulate()` method call the `runTx` method under the hood, which first runs antehandlers, then executes `Msg`s. However, the [transaction Tips](https://github.com/cosmos/cosmos-sdk/issues/9406) and [refunding unused gas](https://github.com/cosmos/cosmos-sdk/issues/2150) use cases require custom logic to be run after the `Msg`s execution. There is currently no way to achieve this.
+BaseApp 的 ABCI `{Check,Deliver}Tx()` 的实现和它自己的 `Simulate()` 方法调用了底层的 `runTx` 方法，它首先运行 antehandlers，然后执行 `Msg`s。但是，[交易提示](https://github.com/cosmos/cosmos-sdk/issues/9406)和[退还未使用的gas](https://github.com/cosmos/cosmos-sdk/issues/2150 ) 用例要求在执行 `Msg` 后运行自定义逻辑。目前没有办法实现这一点。
 
-An naive solution would be to add post-`Msg` hooks to BaseApp. However, the Cosmos SDK team thinks in parallel about the bigger picture of making app wiring simpler ([#9181](https://github.com/cosmos/cosmos-sdk/discussions/9182)), which includes making BaseApp more lightweight and modular.
+一个简单的解决方案是向 BaseApp 添加 post-`Msg` 钩子。然而，Cosmos SDK 团队同时考虑使应用程序布线更简单的大局([#9181](https://github.com/cosmos/cosmos-sdk/discussions/9182))，其中包括使 BaseApp 更轻量级和模块化。
 
-## Decision
+## 决定
 
-We decide to transform Baseapp's implementation of ABCI `{Check,Deliver}Tx` and its own `Simulate` methods to use a middleware-based design.
+我们决定将 Baseapp 的 ABCI `{Check,Deliver}Tx` 实现及其自己的 `Simulate` 方法转换为使用基于中间件的设计。
 
-The two following interfaces are the base of the middleware design, and are defined in `types/tx`:
+以下两个接口是中间件设计的基础，并在 `types/tx` 中定义: 
 
 ```go
 type Handler interface {
@@ -35,7 +35,7 @@ type Handler interface {
 type Middleware func(Handler) Handler
 ```
 
-where we define the following arguments and return types:
+我们在这里定义了以下参数和返回类型: 
 
 ```go
 type Request struct {
@@ -63,9 +63,9 @@ type ResponseCheckTx struct {
 }
 ```
 
-Please note that because CheckTx handles separate logic related to mempool priotization, its signature is different than DeliverTx and SimulateTx.
+请注意，由于 CheckTx 处理与内存池优先化相关的单独逻辑，因此其签名与 DeliverTx 和 SimulateTx 不同。 
 
-BaseApp holds a reference to a `tx.Handler`:
+BaseApp 持有对 `tx.Handler` 的引用: 
 
 ```go
 type BaseApp  struct {
@@ -74,7 +74,7 @@ type BaseApp  struct {
 }
 ```
 
-Baseapp's ABCI `{Check,Deliver}Tx()` and `Simulate()` methods simply call `app.txHandler.{Check,Deliver,Simulate}Tx()` with the relevant arguments. For example, for `DeliverTx`:
+Baseapp 的 ABCI `{Check,Deliver}Tx()` 和 `Simulate()` 方法简单地调用带有相关参数的 `app.txHandler.{Check,Deliver,Simulate}Tx()`。 例如，对于`DeliverTx`: 
 
 ```go
 func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx {
@@ -114,15 +114,15 @@ func makeABCIData(txRes tx.Response) ([]byte, error) {
 }
 ```
 
-The implementations are similar for `BaseApp.CheckTx` and `BaseApp.Simulate`.
+“BaseApp.CheckTx”和“BaseApp.Simulate”的实现类似。
 
-`baseapp.txHandler`'s three methods' implementations can obviously be monolithic functions, but for modularity we propose a middleware composition design, where a middleware is simply a function that takes a `tx.Handler`, and returns another `tx.Handler` wrapped around the previous one.
+`baseapp.txHandler` 的三个方法的实现显然可以是单体函数，但是为了模块化我们提出了中间件组合设计，其中中间件只是一个函数，它接受一个 `tx.Handler`，并返回另一个 `tx.Handler` ` 包裹在前一个。
 
-### Implementing a Middleware
+### 实现中间件
 
-In practice, middlewares are created by Go function that takes as arguments some parameters needed for the middleware, and returns a `tx.Middleware`.
+实际上，中间件是由 Go 函数创建的，该函数将中间件所需的一些参数作为参数，并返回一个 `tx.Middleware`。
 
-For example, for creating an arbitrary `MyMiddleware`, we can implement:
+例如，为了创建一个任意的`MyMiddleware`，我们可以实现: 
 
 ```go
 // myTxHandler is the tx.Handler of this middleware. Note that it holds a
@@ -180,11 +180,11 @@ func (h myTxHandler) SimulateTx(ctx context.Context, req Request) (Response, err
 }
 ```
 
-### Composing Middlewares
+### 组合中间件
 
-While BaseApp simply holds a reference to a `tx.Handler`, this `tx.Handler` itself is defined using a middleware stack. The Cosmos SDK exposes a base (i.e. innermost) `tx.Handler` called `RunMsgsTxHandler`, which executes messages.
+虽然 BaseApp 只是持有对 `tx.Handler` 的引用，但这个 `tx.Handler` 本身是使用中间件堆栈定义的。 Cosmos SDK 公开了一个基础的(即最里面的)`tx.Handler`，称为 `RunMsgsTxHandler`，它执行消息。
 
-Then, the app developer can compose multiple middlewares on top on the base `tx.Handler`. Each middleware can run pre-and-post-processing logic around its next middleware, as described in the section above. Conceptually, as an example, given the middlewares `A`, `B`, and `C` and the base `tx.Handler` `H` the stack looks like:
+然后，应用程序开发人员可以在基础 `tx.Handler` 之上组合多个中间件。 每个中间件都可以围绕其下一个中间件运行预处理和后处理逻辑，如上一节所述。 从概念上讲，作为一个例子，给定中间件 `A`、`B` 和 `C` 以及基础 `tx.Handler` `H`，堆栈看起来像: 
 
 ```
 A.pre
@@ -196,13 +196,13 @@ A.pre
 A.post
 ```
 
-We define a `ComposeMiddlewares` function for composing middlewares. It takes the base handler as first argument, and middlewares in the "outer to inner" order. For the above stack, the final `tx.Handler` is:
+我们定义了一个 `ComposeMiddlewares` 函数来组合中间件。 它将基本处理程序作为第一个参数，并按照“从外到内”的顺序使用中间件。 对于上面的堆栈，最终的 `tx.Handler` 是: 
 
 ```go
 txHandler := middleware.ComposeMiddlewares(H, A, B, C)
 ```
 
-The middleware is set in BaseApp via its `SetTxHandler` setter:
+中间件通过其“SetTxHandler”设置器在 BaseApp 中设置: 
 
 ```go
 // simapp/app.go
@@ -211,11 +211,11 @@ txHandler := middleware.ComposeMiddlewares(...)
 app.SetTxHandler(txHandler)
 ```
 
-The app developer can define their own middlewares, or use the Cosmos SDK's pre-defined middlewares from `middleware.NewDefaultTxHandler()`.
+应用程序开发人员可以定义自己的中间件，或使用 Cosmos SDK 的来自 `middleware.NewDefaultTxHandler()` 的预定义中间件。
 
-### Middlewares Maintained by the Cosmos SDK
+### 中间件由 Cosmos SDK 维护
 
-While the app developer can define and compose the middlewares of their choice, the Cosmos SDK provides a set of middlewares that caters for the ecosystem's most common use cases. These middlewares are:
+虽然应用程序开发人员可以定义和组合他们选择的中间件，但 Cosmos SDK 提供了一组满足生态系统最常见用例的中间件。 这些中间件是:
 
 | Middleware              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -226,29 +226,29 @@ While the app developer can define and compose the middlewares of their choice, 
 | RecoveryTxMiddleware    | This index recovers from panics. It replaces baseapp.runTx's panic recovery described in [ADR-022](./adr-022-custom-panic-handling.md).                                                                                                                                                                                                                                                                                                                                                  |
 | GasTxMiddleware         | This replaces the [`Setup`](https://github.com/cosmos/cosmos-sdk/blob/v0.43.0/x/auth/ante/setup.go) Antehandler. It sets a GasMeter on sdk.Context. Note that before, GasMeter was set on sdk.Context inside the antehandlers, and there was some mess around the fact that antehandlers had their own panic recovery system so that the GasMeter could be read by baseapp's recovery system. Now, this mess is all removed: one middleware sets GasMeter, another one handles recovery. |
 
-### Similarities and Differences between Antehandlers and Middlewares
+### Antehandlers 和 Middlewares 之间的异同
 
-The middleware-based design builds upon the existing antehandlers design described in [ADR-010](./adr-010-modular-antehandler.md). Even though the final decision of ADR-010 was to go with the "Simple Decorators" approach, the middleware design is actually very similar to the other [Decorator Pattern](./adr-010-modular-antehandler.md#decorator-pattern) proposal, also used in [weave](https://github.com/iov-one/weave).
+基于中间件的设计建立在 [ADR-010](./adr-010-modular-antehandler.md) 中描述的现有处理程序设计之上。尽管 ADR-010 的最终决定是采用“简单装饰器”方法，但中间件设计实际上与其他 [装饰器模式](./adr-010-modular-antehandler.md#decorator-pattern ) 提案，也用于 [weave](https://github.com/iov-one/weave)。
 
-#### Similarities with Antehandlers
+####与Antehandlers的相似之处
 
-- Designed as chaining/composing small modular pieces.
-- Allow code reuse for `{Check,Deliver}Tx` and for `Simulate`.
-- Set up in `app.go`, and easily customizable by app developers.
-- Order is important.
+- 设计为链接/组合小型模块化部件。
+- 允许对`{Check,Deliver}Tx` 和`Simulate` 进行代码重用。
+- 在`app.go` 中设置，并由应用程序开发人员轻松定制。
+- 顺序很重要。
 
-#### Differences with Antehandlers
+####与Antehandlers的差异
 
-- The Antehandlers are run before `Msg` execution, whereas middlewares can run before and after.
-- The middleware approach uses separate methods for `{Check,Deliver,Simulate}Tx`, whereas the antehandlers pass a `simulate bool` flag and uses the `sdkCtx.Is{Check,Recheck}Tx()` flags to determine in which transaction mode we are.
-- The middleware design lets each middleware hold a reference to the next middleware, whereas the antehandlers pass a `next` argument in the `AnteHandle` method.
-- The middleware design use Go's standard `context.Context`, whereas the antehandlers use `sdk.Context`.
+- Antehandlers 在 `Msg` 执行之前运行，而中间件可以在之前和之后运行。
+- 中间件方法对 `{Check,Deliver,Simulate}Tx` 使用单独的方法，而 antehandlers 传递一个 `simulate bool` 标志并使用 `sdkCtx.Is{Check,Recheck}Tx()` 标志来确定在哪个我们是交易模式。
+- 中间件设计让每个中间件都持有对下一个中间件的引用，而处理程序在 `AnteHandle` 方法中传递一个 `next` 参数。
+- 中间件设计使用 Go 的标准 `context.Context`，而 antehandlers 使用 `sdk.Context`。 
 
 ## Consequences
 
 ### Backwards Compatibility
 
-Since this refactor removes some logic away from BaseApp and into middlewares, it introduces API-breaking changes for app developers. Most notably, instead of creating an antehandler chain in `app.go`, app developers need to create a middleware stack:
+由于此重构将一些逻辑从 BaseApp 移到中间件中，因此它为应用程序开发人员引入了 API 破坏性更改。 最值得注意的是，应用程序开发人员不需要在 `app.go` 中创建一个 antehandler 链，而是需要创建一个中间件堆栈: 
 
 ```diff
 - anteHandler, err := ante.NewAnteHandler(
@@ -275,37 +275,36 @@ if err != nil {
 + app.SetTxHandler(txHandler)
 ```
 
-Other more minor API breaking changes will also be provided in the CHANGELOG. As usual, the Cosmos SDK will provide a release migration document for app developers.
+CHANGELOG 中还将提供其他更小的 API 中断更改。 像往常一样，Cosmos SDK 将为应用程序开发人员提供版本迁移文档。
 
-This ADR does not introduce any state-machine-, client- or CLI-breaking changes.
+此 ADR 不会引入任何状态机、客户端或 CLI 破坏性更改。 
 
 ### Positive
 
-- Allow custom logic to be run before an after `Msg` execution. This enables the [tips](https://github.com/cosmos/cosmos-sdk/issues/9406) and [gas refund](https://github.com/cosmos/cosmos-sdk/issues/2150) uses cases, and possibly other ones.
-- Make BaseApp more lightweight, and defer complex logic to small modular components.
-- Separate paths for `{Check,Deliver,Simulate}Tx` with different returns types. This allows for improved readability (replace `if sdkCtx.IsRecheckTx() && !simulate {...}` with separate methods) and more flexibility (e.g. returning a `priority` in `ResponseCheckTx`).
-
+- 允许自定义逻辑在“消息”执行之后运行。 这使 [tips](https://github.com/cosmos/cosmos-sdk/issues/9406) 和 [gas 退款](https://github.com/cosmos/cosmos-sdk/issues/2150) 使用 案件，可能还有其他案件。
+- 使 BaseApp 更加轻量级，将复杂的逻辑交给小型模块化组件。
+- 不同返回类型的`{Check,Deliver,Simulate}Tx` 的单独路径。 这允许提高可读性(用单独的方法替换 `if sdkCtx.IsRecheckTx() && !simulate {...}`)和更大的灵活性(例如在 `ResponseCheckTx` 中返回 `priority`)。
 ### Negative
 
-- It is hard to understand at first glance the state updates that would occur after a middleware runs given the `sdk.Context` and `tx`. A middleware can have an arbitrary number of nested middleware being called within its function body, each possibly doing some pre- and post-processing before calling the next middleware on the chain. Thus to understand what a middleware is doing, one must also understand what every other middleware further along the chain is also doing, and the order of middlewares matters. This can get quite complicated to understand.
-- API-breaking changes for app developers.
+- 乍一看很难理解在给定 `sdk.Context` 和 `tx` 的情况下中间件运行后会发生的状态更新。 中间件可以在其函数体内调用任意数量的嵌套中间件，每个中间件都可能在调用链上的下一个中间件之前进行一些预处理和后处理。 因此，要了解中间件在做什么，还必须了解链上其他中间件也在做什么，中间件的顺序很重要。 这可能会变得非常难以理解。
+- 应用程序开发人员的 API 突破性更改。 
 
 ### Neutral
 
 No neutral consequences.
 
-## Further Discussions
+## 进一步讨论
 
-- [#9934](https://github.com/cosmos/cosmos-sdk/discussions/9934) Decomposing BaseApp's other ABCI methods into middlewares.
-- Replace `sdk.Tx` interface with the concrete protobuf Tx type in the `tx.Handler` methods signature.
+- [#9934](https://github.com/cosmos/cosmos-sdk/discussions/9934) 将 BaseApp 的其他 ABCI 方法分解为中间件。
+- 用`tx.Handler` 方法签名中的具体protobuf Tx 类型替换`sdk.Tx` 接口。
 
-## Test Cases
+## 测试用例
 
-We update the existing baseapp and antehandlers tests to use the new middleware API, but keep the same test cases and logic, to avoid introducing regressions. Existing CLI tests will also be left untouched.
+我们更新现有的 baseapp 和 antehandlers 测试以使用新的中间件 API，但保持相同的测试用例和逻辑，以避免引入回归。 现有的 CLI 测试也将保持不变。
 
-For new middlewares, we introduce unit tests. Since middlewares are purposefully small, unit tests suit well.
+对于新的中间件，我们引入了单元测试。 由于中间件很小，因此单元测试非常适合。
 
-## References
+## 参考
 
-- Initial discussion: https://github.com/cosmos/cosmos-sdk/issues/9585
-- Implementation: [#9920 BaseApp refactor](https://github.com/cosmos/cosmos-sdk/pull/9920) and [#10028 Antehandlers migration](https://github.com/cosmos/cosmos-sdk/pull/10028)
+- 初步讨论:https://github.com/cosmos/cosmos-sdk/issues/9585
+- 实现:[#9920 BaseApp 重构](https://github.com/cosmos/cosmos-sdk/pull/9920) 和 [#10028 Antehandlers 迁移](https://github.com/cosmos/cosmos-sdk/ 拉/10028) 

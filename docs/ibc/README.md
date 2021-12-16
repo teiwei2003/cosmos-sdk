@@ -1,9 +1,3 @@
-<!--
-order: false
-parent:
-  order: 5
--->
-
 # IBC
 
 This repository contains reference documentation for the IBC protocol integration and concepts:

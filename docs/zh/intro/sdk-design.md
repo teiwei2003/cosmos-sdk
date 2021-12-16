@@ -1,7 +1,3 @@
-<!--
-order: 4
--->
-
 # Cosmos SDK 的主要组成部分
 
 Cosmos SDK 是一个框架，可促进在 Tendermint 之上开发安全状态机。 Cosmos SDK 的核心是 Golang 中 [ABCI](./sdk-app-architecture.md#abci) 的样板实现。它带有一个 [`multistore`](../core/store.md#multistore) 来持久化数据和一个 [`router`](../core/baseapp.md#routing) 来处理事务。
@@ -13,17 +9,17 @@ Cosmos SDK 是一个框架，可促进在 Tendermint 之上开发安全状态机
 3. 将每条消息路由到适当的模块，以便对其进行处理。
 4. 提交状态更改。
 
-##`基础应用`
+## `基础应用`
 
 `baseapp` 是 Cosmos SDK 应用程序的样板实现。它带有 ABCI 的实现，用于处理与底层共识引擎的连接。通常，Cosmos SDK 应用程序通过将“baseapp”嵌入到 [`app.go`](../basics/app-anatomy.md#core-application-file) 中来扩展它。请参阅 Cosmos SDK 应用程序教程中的示例:
 
 +++ https://github.com/cosmos/sdk-tutorials/blob/c6754a1e313eb1ed973c5c91dcc606f2fd288811/app.go#L72-L92
 
-`baseapp` 的目标是在商店和可扩展状态机之间提供一个安全的接口，同时尽可能少地定义状态机(忠于 ABCI)。
+`baseapp` 的目标是在存储和可扩展状态机之间提供一个安全的接口，同时尽可能少地定义状态机(忠于 ABCI)。
 
 有关`baseapp`的更多信息，请单击[此处](../core/baseapp.md)。
 
-## 多店
+## 多存储
 
 Cosmos SDK 提供了一个 [`multistore`](../core/store.md#multistore) 用于持久化状态。 multistore 允许开发者声明任意数量的 [`KVStores`](../core/store.md#base-layer-kvstores)。这些 `KVStores` 只接受 `[]byte` 类型作为值，因此任何自定义结构都需要在存储之前使用 [a codec](../core/encoding.md) 进行编组。
 
@@ -90,6 +86,6 @@ Cosmos SDK 模块定义在 Cosmos SDK 的 `x/` 文件夹中。一些核心模块
 
 除了 `x/` 中已经存在的模块，任何人都可以在他们的应用程序中使用，Cosmos SDK 允许您构建自己的自定义模块。您可以查看 [教程中的示例](https://tutorials.cosmos.network/)。
 
-## 下一个{hide}
+## 下一个 {hide}
 
 详细了解 [Cosmos SDK 应用程序剖析](../basics/app-anatomy.md) {hide} 

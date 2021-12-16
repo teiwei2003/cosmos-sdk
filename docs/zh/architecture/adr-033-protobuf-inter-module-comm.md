@@ -1,69 +1,69 @@
-# ADR 033: Protobuf-based Inter-Module Communication
+# ADR 033:基于 Protobuf 的模块间通信
 
-## Changelog
+## 变更日志
 
-- 2020-10-05: Initial Draft
+- 2020-10-05:初稿
 
-## Status
+## 地位
 
-Proposed
+建议的
 
-## Abstract
+## 摘要
 
-This ADR introduces a system for permissioned inter-module communication leveraging the protobuf `Query` and `Msg`
-service definitions defined in [ADR 021](./adr-021-protobuf-query-encoding.md) and
-[ADR 031](./adr-031-msg-service.md) which provides:
+该 ADR 引入了一个系统，用于利用 protobuf `Query` 和 `Msg` 进行许可的模块间通信
+[ADR 021](./adr-021-protobuf-query-encoding.md) 中定义的服务定义和
+[ADR 031](./adr-031-msg-service.md) 提供:
 
-- stable protobuf based module interfaces to potentially later replace the keeper paradigm
-- stronger inter-module object capabilities (OCAPs) guarantees
-- module accounts and sub-account authorization
+- 稳定的基于 protobuf 的模块接口可能会在以后取代 keeper 范式
+- 更强的模块间对象能力(OCAPs)保证
+- 模块账号和子账号授权
 
-## Context
+## 语境
 
-In the current Cosmos SDK documentation on the [Object-Capability Model](../core/ocap.md), it is stated that:
+在当前的 Cosmos SDK 文档中关于 [Object-Capability Model](../core/ocap.md)，它指出:
 
-> We assume that a thriving ecosystem of Cosmos SDK modules that are easy to compose into a blockchain application will contain faulty or malicious modules.
+> 我们假设一个繁荣的 Cosmos SDK 模块生态系统很容易组合成区块链应用程序，将包含有缺陷或恶意的模块。
 
-There is currently not a thriving ecosystem of Cosmos SDK modules. We hypothesize that this is in part due to:
+目前没有一个蓬勃发展的 Cosmos SDK 模块生态系统。我们假设这部分是由于:
 
-1. lack of a stable v1.0 Cosmos SDK to build modules off of. Module interfaces are changing, sometimes dramatically, from
-point release to point release, often for good reasons, but this does not create a stable foundation to build on.
-2. lack of a properly implemented object capability or even object-oriented encapsulation system which makes refactors
-of module keeper interfaces inevitable because the current interfaces are poorly constrained.
+1. 缺乏稳定的 v1.0 Cosmos SDK 来构建模块。模块接口正在发生变化，有时是戏剧性的，从
+点发布到点发布，通常有充分的理由，但这并不能建立稳定的基础。
+2. 缺乏正确实现的对象能力甚至面向对象的封装系统，导致重构
+模块保持器接口的数量不可避免，因为当前接口的约束很差。
 
-### `x/bank` Case Study
+### `x/bank` 案例研究
 
-Currently the `x/bank` keeper gives pretty much unrestricted access to any module which references it. For instance, the
-`SetBalance` method allows the caller to set the balance of any account to anything, bypassing even proper tracking of supply.
+目前，`x/bank` keeper 几乎可以不受限制地访问任何引用它的模块。例如，
+`SetBalance` 方法允许调用者将任何帐户的余额设置为任何内容，甚至绕过适当的供应跟踪。
 
-There appears to have been some later attempts to implement some semblance of OCAPs using module-level minting, staking
-and burning permissions. These permissions allow a module to mint, burn or delegate tokens with reference to the module’s
-own account. These permissions are actually stored as a `[]string` array on the `ModuleAccount` type in state.
+后来似乎有一些尝试使用模块级铸造、抵押来实现一些 OCAP 的外观
+和刻录权限。这些权限允许模块参考模块的
+自己的账户。这些权限实际上存储在状态中的“ModuleAccount”类型上的“[]string”数组中。
 
-However, these permissions don’t really do much. They control what modules can be referenced in the `MintCoins`,
-`BurnCoins` and `DelegateCoins***` methods, but for one there is no unique object capability token that controls access —
-just a simple string. So the `x/upgrade` module could mint tokens for the `x/staking` module simple by calling
-`MintCoins(“staking”)`. Furthermore, all modules which have access to these keeper methods, also have access to
-`SetBalance` negating any other attempt at OCAPs and breaking even basic object-oriented encapsulation.
+但是，这些权限实际上并没有多大作用。它们控制可以在“MintCoins”中引用哪些模块，
+`BurnCoins` 和 `DelegateCoins***` 方法，但其中一个没有唯一的对象能力令牌来控制访问——
+只是一个简单的字符串。因此，`x/upgrade` 模块可以通过调用简单地为 `x/staking` 模块铸造令牌
+`MintCoins(“staking”)`。此外，所有可以访问这些 keeper 方法的模块也可以访问
+`SetBalance` 否定了 OCAP 的任何其他尝试，甚至破坏了基本的面向对象封装。
 
-## Decision
+## 决定
 
-Based on [ADR-021](./adr-021-protobuf-query-encoding.md) and [ADR-031](./adr-031-msg-service.md), we introduce the
-Inter-Module Communication framework for secure module authorization and OCAPs.
-When implemented, this could also serve as an alternative to the existing paradigm of passing keepers between
-modules. The approach outlined here-in is intended to form the basis of a Cosmos SDK v1.0 that provides the necessary
-stability and encapsulation guarantees that allow a thriving module ecosystem to emerge.
+基于[ADR-021](./adr-021-protobuf-query-encoding.md)和[ADR-031](./adr-031-msg-service.md)，我们引入了
+用于安全模块授权和 OCAP 的模块间通信框架。
+实施后，这也可以作为现有范式的替代方案，即在
+模块。此处概述的方法旨在构成 Cosmos SDK v1.0 的基础，提供必要的
+稳定性和封装保证，使蓬勃发展的模块生态系统得以出现。
 
-Of particular note — the decision is to _enable_ this functionality for modules to adopt at their own discretion.
-Proposals to migrate existing modules to this new paradigm will have to be a separate conversation, potentially
-addressed as amendments to this ADR.
+特别值得注意的是 - 决定_启用_此功能，以便模块自行决定采用。
+将现有模块迁移到这种新范式的建议必须是一个单独的对话，可能
+作为对本 ADR 的修正处理。
 
-### New "Keeper" Paradigm
+### 新的“守护者”范式
 
-In [ADR 021](./adr-021-protobuf-query-encoding.md), a mechanism for using protobuf service definitions to define queriers
-was introduced and in [ADR 31](./adr-031-msg-service.md), a mechanism for using protobuf service to define `Msg`s was added.
-Protobuf service definitions generate two golang interfaces representing the client and server sides of a service plus
-some helper code. Here is a minimal example for the bank `cosmos.bank.Msg/Send` message type:
+在[ADR 021](./adr-021-protobuf-query-encoding.md)中，一种使用protobuf服务定义来定义查询器的机制
+引入并在 [ADR 31](./adr-031-msg-service.md) 中，添加了使用 protobuf 服务定义 `Msg` 的机制。
+Protobuf 服务定义生成两个 golang 接口，分别代表服务的客户端和服务器端加上
+一些帮助代码。以下是银行 `cosmos.bank.Msg/Send` 消息类型的最小示例: 
 
 ```go
 package bank
@@ -77,49 +77,49 @@ type MsgServer interface {
 }
 ```
 
-[ADR 021](./adr-021-protobuf-query-encoding.md) and [ADR 31](./adr-031-msg-service.md) specifies how modules can implement the generated `QueryServer`
-and `MsgServer` interfaces as replacements for the legacy queriers and `Msg` handlers respectively.
+[ADR 021](./adr-021-protobuf-query-encoding.md) 和 [ADR 31](./adr-031-msg-service.md) 指定模块如何实现生成的`QueryServer`
+和 `MsgServer` 接口分别作为旧查询器和 `Msg` 处理程序的替代品。
 
-In this ADR we explain how modules can make queries and send `Msg`s to other modules using the generated `QueryClient`
-and `MsgClient` interfaces and propose this mechanism as a replacement for the existing `Keeper` paradigm. To be clear,
-this ADR does not necessitate the creation of new protobuf definitions or services. Rather, it leverages the same proto
-based service interfaces already used by clients for inter-module communication.
+在这个 ADR 中，我们解释了模块如何使用生成的 `QueryClient` 进行查询和发送 `Msg` 到其他模块
+和 `MsgClient` 接口，并提出这种机制来替代现有的 `Keeper` 范式。要清楚，
+此 ADR 不需要创建新的 protobuf 定义或服务。相反，它利用相同的原型
+基于客户端已经用于模块间通信的服务接口。
 
-Using this `QueryClient`/`MsgClient` approach has the following key benefits over exposing keepers to external modules:
+使用这种 `QueryClient`/`MsgClient` 方法比将 Keepers 暴露给外部模块有以下主要好处:
 
-1. Protobuf types are checked for breaking changes using [buf](https://buf.build/docs/breaking-overview) and because of
-the way protobuf is designed this will give us strong backwards compatibility guarantees while allowing for forward
-evolution.
-2. The separation between the client and server interfaces will allow us to insert permission checking code in between
-the two which checks if one module is authorized to send the specified `Msg` to the other module providing a proper
-object capability system (see below).
-3. The router for inter-module communication gives us a convenient place to handle rollback of transactions,
-enabling atomicy of operations ([currently a problem](https://github.com/cosmos/cosmos-sdk/issues/8030)). Any failure within a module-to-module call would result in a failure of the entire
-transaction
+1. 使用 [buf](https://buf.build/docs/break-overview) 检查 Protobuf 类型的破坏性更改，因为
+protobuf 的设计方式将为我们提供强大的向后兼容性保证，同时允许向前
+进化。
+2. 客户端和服务器接口之间的分离将允许我们在两者之间插入权限检查代码
+这两个检查一个模块是否被授权将指定的 `Msg` 发送到另一个模块提供适当的
+对象能力系统(见下文)。
+3. 用于模块间通信的路由器为我们提供了一个方便的地方来处理事务的回滚，
+启用操作原子性([目前有问题](https://github.com/cosmos/cosmos-sdk/issues/8030))。模块到模块调用中的任何故障都将导致整个模块的故障
+交易
 
-This mechanism has the added benefits of:
+这种机制具有以下额外好处:
 
-- reducing boilerplate through code generation, and
-- allowing for modules in other languages either via a VM like CosmWasm or sub-processes using gRPC
+- 通过代码生成减少样板，以及
+- 允许通过像 CosmWasm 这样的 VM 或使用 gRPC 的子进程使用其他语言的模块
 
-### Inter-module Communication
+### 模块间通信
 
-To use the `Client` generated by the protobuf compiler we need a `grpc.ClientConn` [interface](https://github.com/regen-network/protobuf/blob/cosmos/grpc/types.go#L12)
-implementation. For this we introduce
-a new type, `ModuleKey`, which implements the `grpc.ClientConn` interface. `ModuleKey` can be thought of as the "private
-key" corresponding to a module account, where authentication is provided through use of a special `Invoker()` function,
-described in more detail below.
+要使用 protobuf 编译器生成的 `Client`，我们需要一个 `grpc.ClientConn` [接口](https://github.com/regen-network/protobuf/blob/cosmos/grpc/types.go#L12)
+执行。为此我们介绍
+一个新类型，`ModuleKey`，它实现了`grpc.ClientConn` 接口。 `ModuleKey` 可以被认为是“私有的
+密钥”对应于模块帐户，其中通过使用特殊的`Invoker()` 函数提供身份验证，
+下面更详细地描述。
 
-Blockchain users (external clients) use their account's private key to sign transactions containing `Msg`s where they are listed as signers (each
-message specifies required signers with `Msg.GetSigner`). The authentication checks is performed by `AnteHandler`.
+区块链用户(外部客户)使用他们帐户的私钥来签署包含“消息”的交易，其中他们被列为签名者(每个
+消息使用`Msg.GetSigner`指定所需的签名者)。身份验证检查由 `AnteHandler` 执行。
 
-Here, we extend this process, by allowing modules to be identified in `Msg.GetSigners`. When a module wants to trigger the execution a `Msg` in another module,
-its `ModuleKey` acts as the sender (through the `ClientConn` interface we describe below) and is set as a sole "signer". It's worth to note
-that we don't use any cryptographic signature in this case.
-For example, module `A` could use its `A.ModuleKey` to create `MsgSend` object for `/cosmos.bank.Msg/Send` transaction. `MsgSend` validation
-will assure that the `from` account (`A.ModuleKey` in this case) is the signer.
+在这里，我们通过允许在 `Msg.GetSigners` 中识别模块来扩展这个过程。当一个模块想要触发另一个模块中的 `Msg` 执行时，
+它的 `ModuleKey` 作为发送者(通过我们在下面描述的 `ClientConn` 接口)并被设置为唯一的“签名者”。值得注意的是
+在这种情况下我们不使用任何加密签名。
+例如，模块`A`可以使用它的`A.ModuleKey`为`/cosmos.bank.Msg/Send`交易创建`MsgSend`对象。 `MsgSend` 验证
+将确保 `from` 帐户(在本例中为 `A.ModuleKey`)是签名者。
 
-Here's an example of a hypothetical module `foo` interacting with `x/bank`:
+下面是一个假设模块 `foo` 与 `x/bank` 交互的示例: 
 
 ```go
 package foo
@@ -154,18 +154,18 @@ func (foo *FooMsgServer) Bar(ctx context.Context, req *MsgBarRequest) (*MsgBarRe
 }
 ```
 
-This design is also intended to be extensible to cover use cases of more fine grained permissioning like minting by
-denom prefix being restricted to certain modules (as discussed in
-[#7459](https://github.com/cosmos/cosmos-sdk/pull/7459#discussion_r529545528)).
+此设计还旨在可扩展以涵盖更细粒度的许可的用例，例如通过以下方式进行铸造
+denom 前缀仅限于某些模块(如在
+[#7459](https://github.com/cosmos/cosmos-sdk/pull/7459#discussion_r529545528))。
 
-### `ModuleKey`s and `ModuleID`s
+### `ModuleKey`s 和 `ModuleID`s
 
-A `ModuleKey` can be thought of as a "private key" for a module account and a `ModuleID` can be thought of as the
-corresponding "public key". From the [ADR 028](./adr-028-public-key-addresses.md), modules can have both a root module account and any number of sub-accounts
-or derived accounts that can be used for different pools (ex. staking pools) or managed accounts (ex. group
-accounts). We can also think of module sub-accounts as similar to derived keys - there is a root key and then some
-derivation path. `ModuleID` is a simple struct which contains the module name and optional "derivation" path,
-and forms its address based on the `AddressHash` method from [the ADR-028](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-028-public-key-addresses.md):
+`ModuleKey` 可以被认为是模块帐户的“私钥”，而 `ModuleID` 可以被认为是
+对应的“公钥”。从 [ADR 028](./adr-028-public-key-addresses.md)，模块可以有一个根模块账户和任意数量的子账户
+或可用于不同池(例如质押池)或管理帐户(例如组
+帐户)。我们也可以认为模块子账户类似于派生密钥——有一个根密钥，然后是一些
+派生路径。 `ModuleID` 是一个简单的结构体，它包含模块名称和可选的“派生”路径，
+并根据 [ADR-028](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-028-public-key-addresses) 中的`AddressHash` 方法形成其地址.md): 
 
 ```go
 type ModuleID struct {
@@ -178,15 +178,15 @@ func (key ModuleID) Address() []byte {
 }
 ```
 
-In addition to being able to generate a `ModuleID` and address, a `ModuleKey` contains a special function called
-`Invoker` which is the key to safe inter-module access. The `Invoker` creates an `InvokeFn` closure which is used as an `Invoke` method in
-the `grpc.ClientConn` interface and under the hood is able to route messages to the appropriate `Msg` and `Query` handlers
-performing appropriate security checks on `Msg`s. This allows for even safer inter-module access than keeper's whose
-private member variables could be manipulated through reflection. Golang does not support reflection on a function
-closure's captured variables and direct manipulation of memory would be needed for a truly malicious module to bypass
-the `ModuleKey` security.
+除了能够生成“ModuleID”和地址之外，“ModuleKey”还包含一个名为
+`Invoker` 是安全模块间访问的关键。 `Invoker` 创建了一个 `InvokeFn` 闭包，在
+`grpc.ClientConn` 接口和引擎盖下能够将消息路由到适当的 `Msg` 和 `Query` 处理程序
+对“消息”执行适当的安全检查。 这允许比 keeper 的更安全的模块间访问
+私有成员变量可以通过反射进行操作。 Golang 不支持对函数的反射
+真正的恶意模块需要绕过捕获的变量和内存的直接操作
+`ModuleKey` 安全性。
 
-The two `ModuleKey` types are `RootModuleKey` and `DerivedModuleKey`:
+两个 `ModuleKey` 类型是 `RootModuleKey` 和 `DerivedModuleKey`: 
 
 ```go
 type Invoker func(callInfo CallInfo) func(ctx context.Context, request, response interface{}, opts ...interface{}) error
@@ -210,8 +210,8 @@ type DerivedModuleKey struct {
 }
 ```
 
-A module can get access to a `DerivedModuleKey`, using the `Derive(path []byte)` method on `RootModuleKey` and then
-would use this key to authenticate `Msg`s from a sub-account. Ex:
+一个模块可以访问一个 `DerivedModuleKey`，使用 `RootModuleKey` 上的 `Derive(path []byte)` 方法，然后
+将使用此密钥来验证来自子帐户的“消息”。 Ex:
 
 ```go
 package foo
@@ -224,20 +224,20 @@ func (fooMsgServer *MsgServer) Bar(ctx context.Context, req *MsgBar) (*MsgBarRes
 }
 ```
 
-In this way, a module can gain permissioned access to a root account and any number of sub-accounts and send
-authenticated `Msg`s from these accounts. The `Invoker` `callInfo.Caller` parameter is used under the hood to
-distinguish between different module accounts, but either way the function returned by `Invoker` only allows `Msg`s
-from either the root or a derived module account to pass through.
+通过这种方式，模块可以获得对 root 帐户和任意数量的子帐户的许可访问权并发送
+来自这些帐户的经过身份验证的“消息”。 `Invoker` `callInfo.Caller` 参数在后台使用
+区分不同的模块帐户，但无论哪种方式，`Invoker` 返回的函数都只允许`Msg`s
+从根或派生模块帐户中通过。
 
-Note that `Invoker` itself returns a function closure based on the `CallInfo` passed in. This will allow client implementations
-in the future that cache the invoke function for each method type avoiding the overhead of hash table lookup.
-This would reduce the performance overhead of this inter-module communication method to the bare minimum required for
-checking permissions.
+请注意，`Invoker` 本身根据传入的 `CallInfo` 返回一个函数闭包。这将允许客户端实现
+将来缓存每个方法类型的调用函数，避免哈希表查找的开销。
+这会将这种模块间通信方法的性能开销减少到最低限度
+检查权限。
 
-To re-iterate, the closure only allows access to authorized calls. There is no access to anything else regardless of any
-name impersonation.
+重申一遍，闭包只允许访问授权调用。无论如何都无法访问其他任何东西
+名字冒充。
 
-Below is a rough sketch of the implementation of `grpc.ClientConn.Invoke` for `RootModuleKey`:
+下面是“RootModuleKey”的“grpc.ClientConn.Invoke”实现的粗略草图: 
 
 ```go
 func (key RootModuleKey) Invoke(ctx context.Context, method string, args, reply interface{}, opts ...grpc.CallOption) error {
@@ -246,11 +246,11 @@ func (key RootModuleKey) Invoke(ctx context.Context, method string, args, reply 
 }
 ```
 
-### `AppModule` Wiring and Requirements
+### `AppModule` 接线和要求
 
-In [ADR 031](./adr-031-msg-service.md), the `AppModule.RegisterService(Configurator)` method was introduced. To support
-inter-module communication, we extend the `Configurator` interface to pass in the `ModuleKey` and to allow modules to
-specify their dependencies on other modules using `RequireServer()`:
+在 [ADR 031](./adr-031-msg-service.md) 中，引入了 `AppModule.RegisterService(Configurator)` 方法。 支持
+模块间通信，我们扩展了 `Configurator` 接口以传入 `ModuleKey` 并允许模块
+使用 `RequireServer()` 指定它们对其他模块的依赖: 
 
 ```go
 type Configurator interface {
@@ -262,15 +262,15 @@ type Configurator interface {
 }
 ```
 
-The `ModuleKey` is passed to modules in the `RegisterService` method itself so that `RegisterServices` serves as a single
-entry point for configuring module services. This is intended to also have the side-effect of greatly reducing boilerplate in
-`app.go`. For now, `ModuleKey`s will be created based on `AppModuleBasic.Name()`, but a more flexible system may be
-introduced in the future. The `ModuleManager` will handle creation of module accounts behind the scenes.
+`ModuleKey` 被传递给 `RegisterService` 方法本身中的模块，以便 `RegisterServices` 作为单个
+配置模块服务的入口点。 这也旨在具有大大减少样板文件的副作用
+`app.go`。 目前，`ModuleKey`s 将基于 `AppModuleBasic.Name()` 创建，但更灵活的系统可能是
+将来推出。 `ModuleManager` 将在后台处理模块帐户的创建。
 
-Because modules do not get direct access to each other anymore, modules may have unfulfilled dependencies. To make sure
-that module dependencies are resolved at startup, the `Configurator.RequireServer` method should be added. The `ModuleManager`
-will make sure that all dependencies declared with `RequireServer` can be resolved before the app starts. An example
-module `foo` could declare it's dependency on `x/bank` like this:
+由于模块不再能够直接相互访问，因此模块可能具有未满足的依赖关系。 确保;确定
+如果模块依赖在启动时解决，则应添加 `Configurator.RequireServer` 方法。 `模块管理器`
+将确保在应用程序启动之前可以解决所有使用 RequireServer 声明的依赖项。 一个例子
+模块 `foo` 可以像这样声明它对 `x/bank` 的依赖: 
 
 ```go
 package foo
@@ -281,31 +281,31 @@ func (am AppModule) RegisterServices(cfg Configurator) {
 }
 ```
 
-### Security Considerations
+### 安全注意事项
 
-In addition to checking for `ModuleKey` permissions, a few additional security precautions will need to be taken by
-the underlying router infrastructure.
+除了检查“ModuleKey”权限外，还需要采取一些额外的安全预防措施
+底层路由器基础设施。
 
-#### Recursion and Re-entry
+####递归和重入
 
-Recursive or re-entrant method invocations pose a potential security threat. This can be a problem if Module A
-calls Module B and Module B calls module A again in the same call.
+递归或可重入方法调用构成潜在的安全威胁。如果模块 A，这可能是一个问题
+在同一个调用中调用模块 B 和模块 B 再次调用模块 A。
 
-One basic way for the router system to deal with this is to maintain a call stack which prevents a module from
-being referenced more than once in the call stack so that there is no re-entry. A `map[string]interface{}` table
-in the router could be used to perform this security check.
+路由器系统处理此问题的一种基本方法是维护一个调用堆栈，以防止模块
+在调用堆栈中被多次引用，因此不会重新进入。一个 `map[string]interface{}` 表
+在路由器中可用于执行此安全检查。
 
-#### Queries
+#### 查询
 
-Queries in Cosmos SDK are generally un-permissioned so allowing one module to query another module should not pose
-any major security threats assuming basic precautions are taken. The basic precaution that the router system will
-need to take is making sure that the `sdk.Context` passed to query methods does not allow writing to the store. This
-can be done for now with a `CacheMultiStore` as is currently done for `BaseApp` queries.
+Cosmos SDK 中的查询通常是未经许可的，因此允许一个模块查询另一个模块不应构成
+在采取基本预防措施的情况下，任何重大的安全威胁。路由器系统的基本注意事项
+需要确保传递给查询方法的 `sdk.Context` 不允许写入存储。这
+现在可以使用“CacheMultiStore”来完成，就像目前为“BaseApp”查询所做的那样。
 
-### Internal Methods
+### 内部方法
 
-In many cases, we may wish for modules to call methods on other modules which are not exposed to clients at all. For this
-purpose, we add the `InternalServer` method to `Configurator`:
+在许多情况下，我们可能希望模块调用其他模块上的方法，而这些模块根本没有暴露给客户端。为了这
+为了达到目的，我们将 `InternalServer` 方法添加到 `Configurator` 中: 
 
 ```go
 type Configurator interface {
@@ -315,77 +315,76 @@ type Configurator interface {
 }
 ```
 
-As an example, x/slashing's Slash must call x/staking's Slash, but we don't want to expose x/staking's Slash to end users
-and clients.
+比如x/staking的Slash必须调用x/staking的Slash，但是我们不想把x/staking的Slash暴露给终端用户
+和客户。
 
-Internal protobuf services will be defined in a corresponding `internal.proto` file in the given module's
-proto package.
+内部 protobuf 服务将在给定模块的相应“internal.proto”文件中定义
+原型包。
 
-Services registered against `InternalServer` will be callable from other modules but not by external clients.
+针对“InternalServer”注册的服务可以从其他模块调用，但不能被外部客户端调用。
 
-An alternative solution to internal-only methods could involve hooks / plugins as discussed [here](https://github.com/cosmos/cosmos-sdk/pull/7459#issuecomment-733807753).
-A more detailed evaluation of a hooks / plugin system will be addressed later in follow-ups to this ADR or as a separate
-ADR.
+内部方法的另一种解决方案可能涉及 [here](https://github.com/cosmos/cosmos-sdk/pull/7459#issuecomment-733807753) 中讨论的钩子/插件。
+钩子/插件系统的更详细评估将在此 ADR 的后续跟进中或作为单独的
+ADR。
 
-### Authorization
+### 授权
 
-By default, the inter-module router requires that messages are sent by the first signer returned by `GetSigners`. The
-inter-module router should also accept authorization middleware such as that provided by [ADR 030](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-030-authz-module.md).
-This middleware will allow accounts to otherwise specific module accounts to perform actions on their behalf.
-Authorization middleware should take into account the need to grant certain modules effectively "admin" privileges to
-other modules. This will be addressed in separate ADRs or updates to this ADR.
+默认情况下，模块间路由器要求消息由 GetSigners 返回的第一个签名者发送。这
+模块间路由器还应接受授权中间件，例如 [ADR 030](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-030-authz-module.md )。
+该中间件将允许帐户以其他方式代表特定模块帐户执行操作。
+授权中间件应考虑有效授予某些模块“管理员”权限的需要
+其他模块。这将在单独的 ADR 或此 ADR 的更新中解决。
 
-### Future Work
+### 未来的工作
 
-Other future improvements may include:
+未来的其他改进可能包括:
 
-* custom code generation that:
-    * simplifies interfaces (ex. generates code with `sdk.Context` instead of `context.Context`)
-    * optimizes inter-module calls - for instance caching resolved methods after first invocation
-* combining `StoreKey`s and `ModuleKey`s into a single interface so that modules have a single OCAPs handle
-* code generation which makes inter-module communication more performant
-* decoupling `ModuleKey` creation from `AppModuleBasic.Name()` so that app's can override root module account names
-* inter-module hooks and plugins
+* 自定义代码生成:
+    * 简化接口(例如，使用 `sdk.Context` 而不是 `context.Context` 生成代码)
+    * 优化模块间调用 - 例如在第一次调用后缓存解析的方法
+* 将`StoreKey`s 和`ModuleKey`s 组合到一个接口中，以便模块有一个单独的 OCAPs 句柄
+* 代码生成，使模块间通信更高效
+* 将 `ModuleKey` 创建与 `AppModuleBasic.Name()` 解耦，以便应用程序可以覆盖根模块帐户名称
+* 模块间挂钩和插件
 
-## Alternatives
+## 备择方案
 
-### MsgServices vs `x/capability`
+### MsgServices 与`x/capability`
 
-The `x/capability` module does provide a proper object-capability implementation that can be used by any module in the
-Cosmos SDK and could even be used for inter-module OCAPs as described in [\#5931](https://github.com/cosmos/cosmos-sdk/issues/5931).
+`x/capability` 模块确实提供了一个合适的对象能力实现，可以被
+Cosmos SDK，甚至可以用于模块间 OCAP，如 [\#5931](https://github.com/cosmos/cosmos-sdk/issues/5931) 中所述。
 
-The advantages of the approach described in this ADR are mostly around how it integrates with other parts of the Cosmos SDK,
-specifically:
+本 ADR 中描述的方法的优势主要在于它如何与 Cosmos SDK 的其他部分集成，
+具体来说:
 
-* protobuf so that:
-    * code generation of interfaces can be leveraged for a better dev UX
-    * module interfaces are versioned and checked for breakage using [buf](https://docs.buf.build/breaking-overview)
-* sub-module accounts as per ADR 028
-* the general `Msg` passing paradigm and the way signers are specified by `GetSigners`
+* protobuf 以便:
+    * 可以利用接口的代码生成来获得更好的开发用户体验
+    * 使用 [buf](https://docs.buf.build/break-overview) 对模块接口进行版本控制和检查是否损坏
+* 根据 ADR 028 的子模块帐户
+* 一般的 `Msg` 传递范式和签名者的方式由 `GetSigners` 指定
 
-Also, this is a complete replacement for keepers and could be applied to _all_ inter-module communication whereas the
-`x/capability` approach in #5931 would need to be applied method by method.
+此外，这是对 Keepers 的完全替代，可以应用于 _all_ 模块间通信，而
+#5931 中的`x/capability` 方法需要逐个应用。 
 
 ## Consequences
 
 ### Backwards Compatibility
 
-This ADR is intended to provide a pathway to a scenario where there is greater long term compatibility between modules.
-In the short-term, this will likely result in breaking certain `Keeper` interfaces which are too permissive and/or
-replacing `Keeper` interfaces altogether.
-
+此 ADR 旨在为模块之间具有更大长期兼容性的场景提供途径。
+在短期内，这可能会导致某些过于宽松和/或
+完全替换 `Keeper` 接口。 
 ### Positive
 
-- an alternative to keepers which can more easily lead to stable inter-module interfaces
-- proper inter-module OCAPs
-- improved module developer DevX, as commented on by several particpants on
-    [Architecture Review Call, Dec 3](https://hackmd.io/E0wxxOvRQ5qVmTf6N_k84Q)
-- lays the groundwork for what can be a greatly simplified `app.go`
-- router can be setup to enforce atomic transactions for module-to-module calls
+- 可以更轻松地实现稳定的模块间接口的 Keepers 的替代方案
+- 适当的模块间 OCAP
+- 改进的模块开发者 DevX，正如一些参与者所评论的
+     [架构审查电话会议，12 月 3 日](https://hackmd.io/E0wxxOvRQ5qVmTf6N_k84Q)
+- 为可以大大简化的“app.go”奠定基础
+- 可以设置路由器来强制执行模块到模块调用的原子事务 
 
 ### Negative
 
-- modules which adopt this will need significant refactoring
+- 采用这种方式的模块将需要大量重构 
 
 ### Neutral
 

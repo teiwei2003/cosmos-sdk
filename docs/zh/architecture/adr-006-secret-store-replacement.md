@@ -1,54 +1,54 @@
-# ADR 006: Secret Store Replacement
+# ADR 006:秘密存储更换
 
-## Changelog
+## 变更日志
 
-- July 29th, 2019: Initial draft
-- September 11th, 2019: Work has started
-- November 4th: Cosmos SDK changes merged in
-- November 18th: Gaia changes merged in
+- 2019 年 7 月 29 日:初稿
+- 2019 年 9 月 11 日:工作已经开始
+- 11 月 4 日:Cosmos SDK 更改合并
+- 11 月 18 日:Gaia 更改合并
 
-## Context
+## 语境
 
-Currently, a Cosmos SDK application's CLI directory stores key material and metadata in a plain text database in the user’s home directory.  Key material is encrypted by a passphrase, protected by bcrypt hashing algorithm. Metadata (e.g. addresses, public keys, key storage details) is available in plain text.
+目前，Cosmos SDK 应用程序的 CLI 目录将密钥材料和元数据存储在用户主目录中的纯文本数据库中。密钥材料由密码加密，由 bcrypt 散列算法保护。元数据(例如地址、公钥、密钥存储详细信息)以纯文本形式提供。
 
-This is not desirable for a number of reasons. Perhaps the biggest reason is insufficient security protection of key material and metadata. Leaking the plain text allows an attacker to surveil what keys a given computer controls via a number of techniques, like compromised dependencies without any privilege execution. This could be followed by a more targeted attack on a particular user/computer.
+出于多种原因，这是不可取的。也许最大的原因是关键材料和元数据的安全保护不足。泄露纯文本允许攻击者通过多种技术监视给定计算机控制的密钥，例如在没有任何特权执行的情况下破坏依赖项。随后可能会对特定用户/计算机进行更有针对性的攻击。
 
-All modern desktop computers OS (Ubuntu, Debian, MacOS, Windows) provide a built-in secret store that is designed to allow applications to store information that is isolated from all other applications and requires passphrase entry to access the data.
+所有现代台式计算机操作系统(Ubuntu、Debian、MacOS、Windows)都提供了一个内置的秘密存储，旨在允许应用程序存储与所有其他应用程序隔离的信息，并且需要输入密码才能访问数据。
 
-We are seeking solution that provides a common abstraction layer to the many different backends and reasonable fallback for minimal platforms that don’t provide a native secret store.
+我们正在寻求解决方案，为许多不同的后端提供通用抽象层，并为不提供本机秘密存储的最小平台提供合理的回退。
 
-## Decision
+## 决定
 
-We recommend replacing the current Keybase backend based on LevelDB with [Keyring](https://github.com/99designs/keyring) by 99 designs. This application is designed to provide a common abstraction and uniform interface between many secret stores and is used by AWS Vault application by 99-designs application.
+我们建议将当前基于 LevelDB 的 Keybase 后端替换为 [Keyring](https://github.com/99designs/keyring) by 99 design。此应用程序旨在提供许多秘密存储之间的通用抽象和统一接口，并由 AWS Vault 应用程序由 99-designs 应用程序使用。
 
-This appears to fulfill the requirement of protecting both key material and metadata from rouge software on a user’s machine.
+这似乎满足了保护密钥材料和元数据免受用户机器上恶意软件攻击的要求。
 
-## Status
+## 状态
 
-Accepted
+公认
 
-## Consequences
+## 结果
 
-### Positive
+### 目的
 
-Increased safety for users.
+为用户增加安全性。
 
-### Negative
+### 消极的
 
-Users must manually migrate.
+用户必须手动迁移。
 
-Testing against all supported backends is difficult.
+针对所有支持的后端进行测试很困难。
 
-Running tests locally on a Mac require numerous repetitive password entries.
+在 Mac 上本地运行测试需要多次重复输入密码。
 
-### Neutral
+### 中性的
 
-{neutral consequences}
+{中立后果}
 
-## References
+## 参考
 
-- #4754 Switch secret store to the keyring secret store (original PR by @poldsam) [__CLOSED__]
-- #5029 Add support for github.com/99designs/keyring-backed keybases [__MERGED__]
-- #5097 Add keys migrate command [__MERGED__]
-- #5180 Drop on-disk keybase in favor of keyring [_PENDING_REVIEW_]
-- cosmos/gaia#164 Drop on-disk keybase in favor of keyring (gaia's changes) [_PENDING_REVIEW_]
+- #4754 将秘密存储切换到密钥环秘密存储(@poldsam 的原始 PR)[__CLOSED__]
+- #5029 添加对 github.com/99designs/keyring-backed 密钥库的支持 [__MERGED__]
+- #5097 添加密钥迁移命令 [__MERGED__]
+- #5180 删除磁盘密钥库以支持密钥环 [_PENDING_REVIEW_]
+- cosmos/gaia#164 删除磁盘密钥库以支持密钥环(gaia 的更改)[_PENDING_REVIEW_] 

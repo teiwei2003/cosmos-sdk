@@ -1,212 +1,1177 @@
 module.exports = {
-    theme: "cosmos",
     locales: {
-        "/": {
-            lang: "en-US",
-            title: "Cosmos SDK"
+        '/': {
+            title: "Cosmos Docs",
+            description: "Cosmos is an open source, public blockchain protocol that provides fundamental infrastructure for a decentralized economy and enables open participation in the creation of new financial primitives to power the innovation of money.",
         },
-        ko: {
-            lang: "ko",
-            title: "Cosmos SDK 문서 "
+        '/zh/': {
+            title: "Cosmos 文档",
+            description: "Cosmos is an open source, public blockchain protocol that provides fundamental infrastructure for a decentralized economy and enables open participation in the creation of new financial primitives to power the innovation of money.",
         },
-        ru: {
-            lang: "ru",
-            title: "Cosmos SDK документ"
-        },
-        zh: {
-            lang: "zh-CN",
-            title: "Cosmos SDK 文档"
-        },
-        ja: {
-            lang: "ja-JP",
-            title: "Cosmos SDK ドキュメント"
+        '/ja/': {
+            title: "Cosmos ドキュメント",
+            description: "Cosmos is an open source, public blockchain protocol that provides fundamental infrastructure for a decentralized economy and enables open participation in the creation of new financial primitives to power the innovation of money.",
         }
     },
-    base: process.env.VUEPRESS_BASE || "/",
-    head: [
-        ['link', { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" }],
-        ['link', { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" }],
-        ['link', { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" }],
-        ['link', { rel: "manifest", href: "/site.webmanifest" }],
-        ['meta', { name: "msapplication-TileColor", content: "#2e3148" }],
-        ['meta', { name: "theme-color", content: "#ffffff" }],
-        ['link', { rel: "icon", type: "image/svg+xml", href: "/favicon-svg.svg" }],
-        ['link', { rel: "apple-touch-icon-precomposed", href: "/apple-touch-icon-precomposed.png" }],
-    ],
-    themeConfig: {
-        repo: "cosmos/cosmos-sdk",
-        docsRepo: "cosmos/cosmos-sdk",
-        docsDir: "docs",
-        editLinks: true,
-        label: "sdk",
-        algolia: {
-            id: "BH4D9OD16A",
-            key: "ac317234e6a42074175369b2f42e9754",
-            index: "cosmos-sdk"
+    markdown: {
+        extendMarkdown: (md) => {
+            md.use(require("markdown-it-footnote"));
         },
-        versions: [{
-                "label": "한국어",
-                "key": "ko"
-            },
-            {
-                "label": "розия",
-                "key": "ru"
-            },
-            {
-                "label": "简体中文",
-                "key": "zh"
-            },
-            {
-                "label": "日本語",
-                "key": "ja"
-            }
-        ],
-        topbar: {
-            banner: false
-        },
-        sidebar: {
-            auto: true,
-            nav: [{
-                    title: "Using the SDK",
-                    children: [{
-                        title: "Modules",
-                        directory: true,
-                        path: "./modules"
-                    }]
-                },
-                {
-                    title: "Resources",
-                    children: [{
-                            title: "Tutorials",
-                            path: "https://tutorials.cosmos.network"
-                        },
-                        {
-                            title: "SDK API Reference",
-                            path: "https://godoc.org/github.com/cosmos/cosmos-sdk"
-                        },
-                        {
-                            title: "REST API Spec",
-                            path: "https://cosmos.network/rpc/"
-                        }
-                    ]
-                }
-            ]
-        },
-        gutter: {
-            title: "Help & Support",
-            editLink: true,
-            chat: {
-                title: "Discord",
-                text: "Chat with Cosmos developers on Discord.",
-                url: "https://discordapp.com/channels/669268347736686612",
-                bg: "linear-gradient(225.11deg, #2E3148 0%, #161931 95.68%)"
-            },
-            forum: {
-                title: "Cosmos SDK Forum",
-                text: "Join the SDK Developer Forum to learn more.",
-                url: "https://forum.cosmos.network/",
-                bg: "linear-gradient(225deg, #46509F -1.08%, #2F3564 95.88%)",
-                logo: "cosmos"
-            },
-            github: {
-                title: "Found an Issue?",
-                text: "Help us improve this page by suggesting edits on GitHub."
-            }
-        },
-        footer: {
-            question: {
-                text: "Chat with Cosmos developers in <a href='https://discord.gg/cosmosnetwork' target='_blank'>Discord</a> or reach out on the <a href='https://forum.cosmos.network/c/tendermint' target='_blank'>SDK Developer Forum</a> to learn more."
-            },
-            logo: "/logo-bw.svg",
-            textLink: {
-                text: "cosmos.network",
-                url: "https://cosmos.network"
-            },
-            services: [{
-                    service: "medium",
-                    url: "https://blog.cosmos.network/"
-                },
-                {
-                    service: "twitter",
-                    url: "https://twitter.com/cosmos"
-                },
-                {
-                    service: "linkedin",
-                    url: "https://www.linkedin.com/company/tendermint/"
-                },
-                {
-                    service: "reddit",
-                    url: "https://reddit.com/r/cosmosnetwork"
-                },
-                {
-                    service: "telegram",
-                    url: "https://t.me/cosmosproject"
-                },
-                {
-                    service: "youtube",
-                    url: "https://www.youtube.com/c/CosmosProject"
-                }
-            ],
-            smallprint: "This website is maintained by Tendermint Inc. The contents and opinions of this website are those of Tendermint Inc.",
-            links: [{
-                    title: "Documentation",
-                    children: [{
-                            title: "Cosmos SDK",
-                            url: "https://docs.cosmos.network"
-                        },
-                        {
-                            title: "Cosmos Hub",
-                            url: "https://hub.cosmos.network"
-                        },
-                        {
-                            title: "Tendermint Core",
-                            url: "https://docs.tendermint.com"
-                        }
-                    ]
-                },
-                {
-                    title: "Community",
-                    children: [{
-                            title: "Cosmos blog",
-                            url: "https://blog.cosmos.network"
-                        },
-                        {
-                            title: "Forum",
-                            url: "https://forum.cosmos.network"
-                        },
-                        {
-                            title: "Chat",
-                            url: "https://discord.gg/cosmosnetwork"
-                        }
-                    ]
-                },
-                {
-                    title: "Contributing",
-                    children: [{
-                            title: "Contributing to the docs",
-                            url: "https://github.com/cosmos/cosmos-sdk/blob/master/docs/DOCS_README.md"
-                        },
-                        {
-                            title: "Source code on GitHub",
-                            url: "https://github.com/cosmos/cosmos-sdk/"
-                        }
-                    ]
-                }
-            ]
-        }
     },
     plugins: [
         [
-            "@vuepress/google-analytics",
+            "@vuepress/register-components",
             {
-                ga: "UA-51029217-2"
-            }
+                componentsDir: "theme/components",
+            },
         ],
         [
-            "sitemap",
+            "vuepress-plugin-mathjax",
             {
-                hostname: "https://docs.cosmos.network"
-            }
-        ]
-    ]
+                target: "svg",
+                macros: {
+                    "*": "\\times",
+                },
+            },
+        ],
+    ],
+    head: [
+        [
+            "link",
+            {
+                rel: "stylesheet",
+                type: "text/css",
+                href: "https://cloud.typography.com/7420256/6416592/css/fonts.css",
+            },
+        ],
+        [
+            "link",
+            {
+                rel: "stylesheet",
+                type: "text/css",
+                href: "https://www.terra.money/static/fonts/jetbrainsMono.css?updated=190220"
+            },
+        ],
+        [
+            "link",
+            {
+                rel: "stylesheet",
+                type: "text/css",
+                href: "https://fonts.googleapis.com/css?family=Material+Icons|Material+Icons+Outlined",
+            },
+        ],
+
+        [
+            "link",
+            {
+                rel: "stylesheet",
+                type: "text/css",
+                href: "https://fonts.googleapis.com/css?family=Noto+Sans+KR:400,500,700&display=swap",
+            },
+        ],
+        [
+            "link",
+            {
+                rel: "icon",
+                type: "image/png",
+                href: "/img/favicon.png",
+            },
+        ],
+        [
+            "script",
+            {},
+            `window.onload = function() {
+requestAnimationFrame(function() {
+    if (location.hash) {
+    const element = document.getElementById(location.hash.slice(1))
+
+    if (element) {
+        element.scrollIntoView()
+    }
+    }
+})
+}`,
+        ],
+    ],
+    themeConfig: {
+        locales: {
+            '/': {
+                selectText: 'Languages',
+                label: 'English',
+                nav: [
+                    { text: "Top", link: "/" },
+                    { text: "Intro", link: "/intro/" },
+                    { text: "Basics", link: "/basics/" },
+                    { text: "Core", link: "/core/" },
+                    { text: "Architecture", link: "/architecture/" },
+                    { text: "modules", link: "/modules/" },
+                    { text: "IBC", link: "/ibc/" },
+                    { text: "Spec", link: "/spec/" },
+                    { text: "Building modules", link: "/building-modules/" },
+                    { text: "Run Node", link: "/run-node/" },
+                    {
+                        text: "GitHub",
+                        link: "https://github.com/highwayns/cosmos-sdk",
+                        icon: "/img/github.svg",
+                    },
+                ],
+                sidebar: {
+                    "/intro/": [
+                        "/intro/",
+                        "/intro/overview",
+                        "/intro/sdk-app-architecture",
+                        "/intro/sdk-design",
+                        "/intro/why-app-specific",
+                    ],
+                    "/basics/": [
+                        "/basics/",
+                        "/basics/accounts",
+                        "/basics/app-anatomy",
+                        "/basics/gas-fees",
+                        "/basics/query-lifecycle",
+                    ],
+                    "/core/": [
+                        "/core/",
+                        "/core/baseapp",
+                        "/core/cli",
+                        "/core/context",
+                        "/core/encoding",
+                        "/core/events",
+                        "/core/grpc_rest",
+                        "/core/node",
+                        "/core/ocap",
+                        "/core/proto-docs",
+                        "/core/runtx_middleware",
+                        "/core/simulation",
+                        "/core/store",
+                        "/core/telemetry",
+                        "/core/transactions",
+                        "/core/upgrade",
+                    ],
+                    "/architecture/": [
+                        "/architecture/",
+                        "/architecture/adr-002-docs-structure",
+                        "/architecture/adr-003-dynamic-capability-store",
+                        "/architecture/adr-004-split-denomination-keys",
+                        "/architecture/adr-006-secret-store-replacement",
+                        "/architecture/adr-007-specialization-groups",
+                        "/architecture/adr-008-dCERT-group",
+                        "/architecture/adr-009-evidence-module",
+                        "/architecture/adr-010-modular-antehandler",
+                        "/architecture/adr-011-generalize-genesis-accounts",
+                        "/architecture/adr-012-state-accessors",
+                        "/architecture/adr-013-metrics",
+                        "/architecture/adr-014-proportional-slashing",
+                        "/architecture/adr-016-validator-consensus-key-rotation",
+                        "/architecture/adr-017-historical-header-module",
+                        "/architecture/adr-018-extendable-voting-period",
+                        "/architecture/adr-019-protobuf-state-encoding",
+                        "/architecture/adr-020-protobuf-transaction-encoding",
+                        "/architecture/adr-021-protobuf-query-encoding",
+                        "/architecture/adr-022-custom-panic-handling",
+                        "/architecture/adr-023-protobuf-naming",
+                        "/architecture/adr-024-coin-metadata",
+                        "/architecture/adr-027-deterministic-protobuf-serialization",
+                        "/architecture/adr-028-public-key-addresses",
+                        "/architecture/adr-029-fee-grant-module",
+                        "/architecture/adr-030-authz-module",
+                        "/architecture/adr-031-msg-service",
+                        "/architecture/adr-032-typed-events",
+                        "/architecture/adr-033-protobuf-inter-module-comm",
+                        "/architecture/adr-034-account-rekeying",
+                        "/architecture/adr-035-rosetta-api-support",
+                        "/architecture/adr-036-arbitrary-signature",
+                        "/architecture/adr-037-gov-split-vote",
+                        "/architecture/adr-038-state-listening",
+                        "/architecture/adr-039-epoched-staking",
+                        "/architecture/adr-040-storage-and-smt-state-commitments",
+                        "/architecture/adr-041-in-place-store-migrations",
+                        "/architecture/adr-042-group-module",
+                        "/architecture/adr-043-nft-module",
+                        "/architecture/adr-044-protobuf-updates-guidelines",
+                        "/architecture/adr-045-check-delivertx-middlewares",
+                        "/architecture/adr-046-module-params",
+                        "/architecture/adr-template",
+                    ],
+                    "/modules/": [
+                        "/modules/",
+                        {
+                            title: "auth",
+                            children: [
+                                "/modules/auth/01_concepts",
+                                "/modules/auth/02_state",
+                                "/modules/auth/03_antehandlers",
+                                "/modules/auth/04_keepers",
+                                "/modules/auth/05_vesting",
+                                "/modules/auth/06_params",
+                                "/modules/auth/07_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "authz",
+                            children: [
+                                "/modules/authz/01_concepts",
+                                "/modules/authz/02_state",
+                                "/modules/authz/03_messages",
+                                "/modules/authz/04_events",
+                                "/modules/authz/05_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "bank",
+                            children: [
+                                "/modules/bank/01_state",
+                                "/modules/bank/02_keepers",
+                                "/modules/bank/03_messages",
+                                "/modules/bank/04_events",
+                                "/modules/bank/05_params",
+                                "/modules/bank/06_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "capability",
+                            children: [
+                                "/modules/capability/01_concepts",
+                                "/modules/capability/02_state",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "crisis",
+                            children: [
+                                "/modules/crisis/01_state",
+                                "/modules/crisis/02_messages",
+                                "/modules/crisis/03_events",
+                                "/modules/crisis/04_params",
+                                "/modules/crisis/05_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "distribution",
+                            children: [
+                                "/modules/distribution/01_concepts",
+                                "/modules/distribution/02_state",
+                                "/modules/distribution/03_begin_block",
+                                "/modules/distribution/04_messages",
+                                "/modules/distribution/05_hooks",
+                                "/modules/distribution/06_events",
+                                "/modules/distribution/07_params",
+                                "/modules/distribution/08_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "epoching",
+                            children: [
+                                "/modules/epoching/01_state",
+                                "/modules/epoching/03_to_improve",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "evidence",
+                            children: [
+                                "/modules/evidence/01_concepts",
+                                "/modules/evidence/02_state",
+                                "/modules/evidence/03_messages",
+                                "/modules/evidence/04_events",
+                                "/modules/evidence/05_params",
+                                "/modules/evidence/06_begin_block",
+                                "/modules/evidence/07_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "feegrant",
+                            children: [
+                                "/modules/feegrant/01_concepts",
+                                "/modules/feegrant/02_state",
+                                "/modules/feegrant/03_messages",
+                                "/modules/feegrant/04_events",
+                                "/modules/feegrant/05_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "gov",
+                            children: [
+                                "/modules/gov/01_concepts",
+                                "/modules/gov/02_state",
+                                "/modules/gov/03_messages",
+                                "/modules/gov/04_events",
+                                "/modules/gov/05_future_improvements",
+                                "/modules/gov/06_params",
+                                "/modules/gov/07_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "mint",
+                            children: [
+                                "/modules/mint/01_concepts",
+                                "/modules/mint/02_state",
+                                "/modules/mint/03_begin_block",
+                                "/modules/mint/04_params",
+                                "/modules/mint/05_events",
+                                "/modules/mint/06_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "params",
+                            children: [
+                                "/modules/params/01_keeper",
+                                "/modules/params/02_subspace",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "slashing",
+                            children: [
+                                "/modules/slashing/01_concepts",
+                                "/modules/slashing/02_state",
+                                "/modules/slashing/03_messages",
+                                "/modules/slashing/04_begin_block",
+                                "/modules/slashing/05_hooks",
+                                "/modules/slashing/06_events",
+                                "/modules/slashing/07_tombstone",
+                                "/modules/slashing/08_params",
+                                "/modules/slashing/09_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "staking",
+                            children: [
+                                "/modules/staking/01_state",
+                                "/modules/staking/02_state_transitions",
+                                "/modules/staking/03_messages",
+                                "/modules/staking/04_begin_block",
+                                "/modules/staking/05_end_block",
+                                "/modules/staking/06_hooks",
+                                "/modules/staking/07_events",
+                                "/modules/staking/08_params",
+                                "/modules/staking/09_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "upgrade",
+                            children: [
+                                "/modules/upgrade/01_concepts",
+                                "/modules/upgrade/02_state",
+                                "/modules/upgrade/03_events",
+                                "/modules/upgrade/04_client",
+                            ],
+                            collapsable: true,
+                        },
+                    ],
+                    "/ibc/": [
+                        "/ibc/",
+                        {
+                            title: "upgrades",
+                            children: [
+                                "/ibc/upgrades/developer-guide",
+                                "/ibc/upgrades/quick-guide",
+                            ],
+                            collapsable: true,
+                        },
+                        "/ibc/overview",
+                        "/ibc/custom",
+                        "/ibc/integration",
+                        "/ibc/proposals",
+                        "/ibc/relayer",
+                    ],
+                    "/spec/": [
+                        "/spec/",
+                        {
+                            title: "_ics",
+                            children: [
+                                "/spec/_ics/ics-030-signed-messages",
+                            ],
+                            collapsable: false,
+                        },
+                        {
+                            title: "addresses",
+                            children: [
+                                "/spec/addresses/bech32",
+                            ],
+                            collapsable: false,
+                        },
+                        {
+                            title: "circuit-breaker",
+                            children: [
+                                "/spec/circuit-breaker/01-concepts",
+                            ],
+                            collapsable: false,
+                        },
+                        "/spec/SPEC-SPEC",
+                    ],
+                    "/building-modules/": [
+                        "/building-modules/",
+                        "/building-modules/beginblock-endblock",
+                        "/building-modules/errors",
+                        "/building-modules/genesis",
+                        "/building-modules/intro",
+                        "/building-modules/invariants",
+                        "/building-modules/keeper",
+                        "/building-modules/messages-and-queries",
+                        "/building-modules/module-interfaces",
+                        "/building-modules/module-manager",
+                        "/building-modules/msg-services",
+                        "/building-modules/query-services",
+                        "/building-modules/simulator",
+                        "/building-modules/structure",
+                        "/building-modules/upgrade",
+                    ],
+                    "/run-node/": [
+                        "/run-node/",
+                        "/run-node/cosmovisor",
+                        "/run-node/interact-node",
+                        "/run-node/keyring",
+                        "/run-node/rosetta",
+                        "/run-node/run-node",
+                        "/run-node/run-testnet",
+                        "/run-node/txs",
+                    ],
+                    "/": [{
+                        title: "Overview",
+                        children: [
+                            "/DOC_WRITING_GUIDELINES",
+                            "/DOCS_README",
+                        ],
+                        collapsable: false,
+                    }, ],
+                },
+            },
+            '/zh/': {
+                selectText: '选择语言',
+                // 该语言在下拉菜单中的标签
+                label: '简体中文',
+                nav: [
+                    { text: "首页", link: "/zh/" },
+                    { text: "简介", link: "/zh/intro/" },
+                    { text: "基础", link: "/zh/basics/" },
+                    { text: "核心", link: "/zh/core/" },
+                    { text: "系统架构", link: "/zh/architecture/" },
+                    { text: "模块参考", link: "/zh/modules/" },
+                    { text: "IBC", link: "/zh/ibc/" },
+                    { text: "规格", link: "/zh/spec/" },
+                    { text: "模块构筑", link: "/zh/building-modules/" },
+                    { text: "运行节点", link: "/zh/run-node/" },
+                    {
+                        text: "GitHub",
+                        link: "https://github.com/highwayns/cosmos-sdk",
+                        icon: "/img/github.svg",
+                    },
+                ],
+                sidebar: {
+                    "/zh/intro/": [
+                        "/zh/intro/",
+                        "/zh/intro/overview",
+                        "/intro/sdk-app-architecture",
+                        "/zh/intro/sdk-design",
+                        "/zh/intro/why-app-specific",
+                    ],
+                    "/zh/basics/": [
+                        "/zh/basics/",
+                        "/zh/basics/accounts",
+                        "/zh/basics/app-anatomy",
+                        "/zh/basics/gas-fees",
+                        "/zh/basics/query-lifecycle",
+                    ],
+                    "/zh/core/": [
+                        "/zh/core/",
+                        "/zh/core/baseapp",
+                        "/zh/core/cli",
+                        "/zh/core/context",
+                        "/zh/core/encoding",
+                        "/zh/core/events",
+                        "/zh/core/grpc_rest",
+                        "/zh/core/node",
+                        "/zh/core/ocap",
+                        "/zh/core/proto-docs",
+                        "/zh/core/runtx_middleware",
+                        "/zh/core/simulation",
+                        "/zh/core/store",
+                        "/zh/core/telemetry",
+                        "/zh/core/transactions",
+                        "/zh/core/upgrade",
+                    ],
+                    "/zh/architecture/": [
+                        "/zh/architecture/",
+                        "/zh/architecture/adr-002-docs-structure",
+                        "/zh/architecture/adr-003-dynamic-capability-store",
+                        "/zh/architecture/adr-004-split-denomination-keys",
+                        "/zh/architecture/adr-006-secret-store-replacement",
+                        "/zh/architecture/adr-007-specialization-groups",
+                        "/zh/architecture/adr-008-dCERT-group",
+                        "/zh/architecture/adr-009-evidence-module",
+                        "/zh/architecture/adr-010-modular-antehandler",
+                        "/zh/architecture/adr-011-generalize-genesis-accounts",
+                        "/zh/architecture/adr-012-state-accessors",
+                        "/zh/architecture/adr-013-metrics",
+                        "/zh/architecture/adr-014-proportional-slashing",
+                        "/zh/architecture/adr-016-validator-consensus-key-rotation",
+                        "/zh/architecture/adr-017-historical-header-module",
+                        "/zh/architecture/adr-018-extendable-voting-period",
+                        "/zh/architecture/adr-019-protobuf-state-encoding",
+                        "/zh/architecture/adr-020-protobuf-transaction-encoding",
+                        "/zh/architecture/adr-021-protobuf-query-encoding",
+                        "/zh/architecture/adr-022-custom-panic-handling",
+                        "/zh/architecture/adr-023-protobuf-naming",
+                        "/zh/architecture/adr-024-coin-metadata",
+                        "/zh/architecture/adr-027-deterministic-protobuf-serialization",
+                        "/zh/architecture/adr-028-public-key-addresses",
+                        "/zh/architecture/adr-029-fee-grant-module",
+                        "/zh/architecture/adr-030-authz-module",
+                        "/zh/architecture/adr-031-msg-service",
+                        "/zh/architecture/adr-032-typed-events",
+                        "/zh/architecture/adr-033-protobuf-inter-module-comm",
+                        "/zh/architecture/adr-034-account-rekeying",
+                        "/zh/architecture/adr-035-rosetta-api-support",
+                        "/zh/architecture/adr-036-arbitrary-signature",
+                        "/zh/architecture/adr-037-gov-split-vote",
+                        "/zh/architecture/adr-038-state-listening",
+                        "/zh/architecture/adr-039-epoched-staking",
+                        "/zh/architecture/adr-040-storage-and-smt-state-commitments",
+                        "/zh/architecture/adr-041-in-place-store-migrations",
+                        "/zh/architecture/adr-042-group-module",
+                        "/zh/architecture/adr-043-nft-module",
+                        "/zh/architecture/adr-044-protobuf-updates-guidelines",
+                        "/zh/architecture/adr-045-check-delivertx-middlewares",
+                        "/zh/architecture/adr-046-module-params",
+                        "/zh/architecture/adr-template",
+                    ],
+                    "/zh/modules/": [
+                        "/zh/modules/",
+                        {
+                            title: "auth",
+                            children: [
+                                "/zh/modules/auth/01_concepts",
+                                "/zh/modules/auth/02_state",
+                                "/zh/modules/auth/03_antehandlers",
+                                "/zh/modules/auth/04_keepers",
+                                "/zh/modules/auth/05_vesting",
+                                "/zh/modules/auth/06_params",
+                                "/zh/modules/auth/07_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "authz",
+                            children: [
+                                "/zh/modules/authz/01_concepts",
+                                "/zh/modules/authz/02_state",
+                                "/zh/modules/authz/03_messages",
+                                "/zh/modules/authz/04_events",
+                                "/zh/modules/authz/05_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "bank",
+                            children: [
+                                "/zh/modules/bank/01_state",
+                                "/zh/modules/bank/02_keepers",
+                                "/zh/modules/bank/03_messages",
+                                "/zh/modules/bank/04_events",
+                                "/zh/modules/bank/05_params",
+                                "/zh/modules/bank/06_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "capability",
+                            children: [
+                                "/zh/modules/capability/01_concepts",
+                                "/zh/modules/capability/02_state",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "crisis",
+                            children: [
+                                "/zh/modules/crisis/01_state",
+                                "/zh/modules/crisis/02_messages",
+                                "/zh/modules/crisis/03_events",
+                                "/zh/modules/crisis/04_params",
+                                "/zh/modules/crisis/05_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "distribution",
+                            children: [
+                                "/zh/modules/distribution/01_concepts",
+                                "/zh/modules/distribution/02_state",
+                                "/zh/modules/distribution/03_begin_block",
+                                "/zh/modules/distribution/04_messages",
+                                "/zh/modules/distribution/05_hooks",
+                                "/zh/modules/distribution/06_events",
+                                "/zh/modules/distribution/07_params",
+                                "/zh/modules/distribution/08_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "epoching",
+                            children: [
+                                "/zh/modules/epoching/01_state",
+                                "/zh/modules/epoching/03_to_improve",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "evidence",
+                            children: [
+                                "/zh/modules/evidence/01_concepts",
+                                "/zh/modules/evidence/02_state",
+                                "/zh/modules/evidence/03_messages",
+                                "/zh/modules/evidence/04_events",
+                                "/zh/modules/evidence/05_params",
+                                "/zh/modules/evidence/06_begin_block",
+                                "/zh/modules/evidence/07_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "feegrant",
+                            children: [
+                                "/zh/modules/feegrant/01_concepts",
+                                "/zh/modules/feegrant/02_state",
+                                "/zh/modules/feegrant/03_messages",
+                                "/zh/modules/feegrant/04_events",
+                                "/zh/modules/feegrant/05_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "gov",
+                            children: [
+                                "/zh/modules/gov/01_concepts",
+                                "/zh/modules/gov/02_state",
+                                "/zh/modules/gov/03_messages",
+                                "/zh/modules/gov/04_events",
+                                "/zh/modules/gov/05_future_improvements",
+                                "/zh/modules/gov/06_params",
+                                "/zh/modules/gov/07_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "mint",
+                            children: [
+                                "/zh/modules/mint/01_concepts",
+                                "/zh/modules/mint/02_state",
+                                "/zh/modules/mint/03_begin_block",
+                                "/zh/modules/mint/04_params",
+                                "/zh/modules/mint/05_events",
+                                "/zh/modules/mint/06_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "params",
+                            children: [
+                                "/zh/modules/params/01_keeper",
+                                "/zh/modules/params/02_subspace",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "slashing",
+                            children: [
+                                "/zh/modules/slashing/01_concepts",
+                                "/zh/modules/slashing/02_state",
+                                "/zh/modules/slashing/03_messages",
+                                "/zh/modules/slashing/04_begin_block",
+                                "/zh/modules/slashing/05_hooks",
+                                "/zh/modules/slashing/06_events",
+                                "/zh/modules/slashing/07_tombstone",
+                                "/zh/modules/slashing/08_params",
+                                "/zh/modules/slashing/09_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "staking",
+                            children: [
+                                "/zh/modules/staking/01_state",
+                                "/zh/modules/staking/02_state_transitions",
+                                "/zh/modules/staking/03_messages",
+                                "/zh/modules/staking/04_begin_block",
+                                "/zh/modules/staking/05_end_block",
+                                "/zh/modules/staking/06_hooks",
+                                "/zh/modules/staking/07_events",
+                                "/zh/modules/staking/08_params",
+                                "/zh/modules/staking/09_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "upgrade",
+                            children: [
+                                "/zh/modules/upgrade/01_concepts",
+                                "/zh/modules/upgrade/02_state",
+                                "/zh/modules/upgrade/03_events",
+                                "/zh/modules/upgrade/04_client",
+                            ],
+                            collapsable: true,
+                        },
+                    ],
+                    "/zh/ibc/": [
+                        "/zh/ibc/",
+                        {
+                            title: "upgrades",
+                            children: [
+                                "/zh/ibc/upgrades/developer-guide",
+                                "/zh/ibc/upgrades/quick-guide",
+                            ],
+                            collapsable: true,
+                        },
+                        "/zh/ibc/overview",
+                        "/zh/ibc/custom",
+                        "/zh/ibc/integration",
+                        "/zh/ibc/proposals",
+                        "/zh/ibc/relayer",
+                    ],
+                    "/zh/spec/": [
+                        "/zh/spec/",
+                        {
+                            title: "_ics",
+                            children: [
+                                "/zh/spec/_ics/ics-030-signed-messages",
+                            ],
+                            collapsable: false,
+                        },
+                        {
+                            title: "addresses",
+                            children: [
+                                "/zh/spec/addresses/bech32",
+                            ],
+                            collapsable: false,
+                        },
+                        {
+                            title: "circuit-breaker",
+                            children: [
+                                "/zh/spec/circuit-breaker/01-concepts",
+                            ],
+                            collapsable: false,
+                        },
+                        "/zh/spec/SPEC-SPEC",
+                    ],
+                    "/zh/building-modules/": [
+                        "/zh/building-modules/",
+                        "/zh/building-modules/beginblock-endblock",
+                        "/zh/building-modules/errors",
+                        "/zh/building-modules/genesis",
+                        "/zh/building-modules/intro",
+                        "/zh/building-modules/invariants",
+                        "/zh/building-modules/keeper",
+                        "/zh/building-modules/messages-and-queries",
+                        "/zh/building-modules/module-interfaces",
+                        "/zh/building-modules/module-manager",
+                        "/zh/building-modules/msg-services",
+                        "/zh/building-modules/query-services",
+                        "/zh/building-modules/simulator",
+                        "/zh/building-modules/structure",
+                        "/zh/building-modules/upgrade",
+                    ],
+                    "/zh/run-node/": [
+                        "/zh/run-node/",
+                        "/zh/run-node/cosmovisor",
+                        "/zh/run-node/interact-node",
+                        "/zh/run-node/keyring",
+                        "/zh/run-node/rosetta",
+                        "/zh/run-node/run-node",
+                        "/zh/run-node/run-testnet",
+                        "/zh/run-node/txs",
+                    ],
+                    "/zh/": [{
+                        title: "Overview",
+                        children: [
+                            "/zh/DOC_WRITING_GUIDELINES",
+                            "/zh/DOCS_README",
+                        ],
+                        collapsable: false,
+                    }, ],
+                },
+            },
+            '/ja/': {
+                selectText: '言語選択',
+                // 该语言在下拉菜单中的标签
+                label: '日本語',
+                nav: [
+                    { text: "トップ", link: "/ja/" },
+                    { text: "紹介", link: "/ja/intro/" },
+                    { text: "基本", link: "/ja/basics/" },
+                    { text: "コア", link: "/ja/core/" },
+                    { text: "アーキテクチャ", link: "/ja/architecture/" },
+                    { text: "モジュール参考", link: "/ja/modules/" },
+                    { text: "IBC", link: "/ja/ibc/" },
+                    { text: "スペック", link: "/ja/spec/" },
+                    { text: "モジュール作成", link: "/ja/building-modules/" },
+                    { text: "ノード稼働する", link: "/ja/run-node/" },
+                    {
+                        text: "GitHub",
+                        link: "https://github.com/highwayns/cosmos-sdk",
+                        icon: "/img/github.svg",
+                    },
+                ],
+                sidebar: {
+                    "/ja/intro/": [
+                        "/ja/intro/",
+                        "/ja/intro/overview",
+                        "/intro/sdk-app-architecture",
+                        "/ja/intro/sdk-design",
+                        "/ja/intro/why-app-specific",
+                    ],
+                    "/ja/basics/": [
+                        "/ja/basics/",
+                        "/ja/basics/accounts",
+                        "/ja/basics/app-anatomy",
+                        "/ja/basics/gas-fees",
+                        "/ja/basics/query-lifecycle",
+                    ],
+                    "/ja/core/": [
+                        "/ja/core/",
+                        "/ja/core/baseapp",
+                        "/ja/core/cli",
+                        "/ja/core/context",
+                        "/ja/core/encoding",
+                        "/ja/core/events",
+                        "/ja/core/grpc_rest",
+                        "/ja/core/node",
+                        "/ja/core/ocap",
+                        "/ja/core/proto-docs",
+                        "/ja/core/runtx_middleware",
+                        "/ja/core/simulation",
+                        "/ja/core/store",
+                        "/ja/core/telemetry",
+                        "/ja/core/transactions",
+                        "/ja/core/upgrade",
+                    ],
+                    "/ja/architecture/": [
+                        "/ja/architecture/",
+                        "/ja/architecture/adr-002-docs-structure",
+                        "/ja/architecture/adr-003-dynamic-capability-store",
+                        "/ja/architecture/adr-004-split-denomination-keys",
+                        "/ja/architecture/adr-006-secret-store-replacement",
+                        "/ja/architecture/adr-007-specialization-groups",
+                        "/ja/architecture/adr-008-dCERT-group",
+                        "/ja/architecture/adr-009-evidence-module",
+                        "/ja/architecture/adr-010-modular-antehandler",
+                        "/ja/architecture/adr-011-generalize-genesis-accounts",
+                        "/ja/architecture/adr-012-state-accessors",
+                        "/ja/architecture/adr-013-metrics",
+                        "/ja/architecture/adr-014-proportional-slashing",
+                        "/ja/architecture/adr-016-validator-consensus-key-rotation",
+                        "/ja/architecture/adr-017-historical-header-module",
+                        "/ja/architecture/adr-018-extendable-voting-period",
+                        "/ja/architecture/adr-019-protobuf-state-encoding",
+                        "/ja/architecture/adr-020-protobuf-transaction-encoding",
+                        "/ja/architecture/adr-021-protobuf-query-encoding",
+                        "/ja/architecture/adr-022-custom-panic-handling",
+                        "/ja/architecture/adr-023-protobuf-naming",
+                        "/ja/architecture/adr-024-coin-metadata",
+                        "/ja/architecture/adr-027-deterministic-protobuf-serialization",
+                        "/ja/architecture/adr-028-public-key-addresses",
+                        "/ja/architecture/adr-029-fee-grant-module",
+                        "/ja/architecture/adr-030-authz-module",
+                        "/ja/architecture/adr-031-msg-service",
+                        "/ja/architecture/adr-032-typed-events",
+                        "/ja/architecture/adr-033-protobuf-inter-module-comm",
+                        "/ja/architecture/adr-034-account-rekeying",
+                        "/ja/architecture/adr-035-rosetta-api-support",
+                        "/ja/architecture/adr-036-arbitrary-signature",
+                        "/ja/architecture/adr-037-gov-split-vote",
+                        "/ja/architecture/adr-038-state-listening",
+                        "/ja/architecture/adr-039-epoched-staking",
+                        "/ja/architecture/adr-040-storage-and-smt-state-commitments",
+                        "/ja/architecture/adr-041-in-place-store-migrations",
+                        "/ja/architecture/adr-042-group-module",
+                        "/ja/architecture/adr-043-nft-module",
+                        "/ja/architecture/adr-044-protobuf-updates-guidelines",
+                        "/ja/architecture/adr-045-check-delivertx-middlewares",
+                        "/ja/architecture/adr-046-module-params",
+                        "/ja/architecture/adr-template",
+                    ],
+                    "/ja/modules/": [
+                        "/ja/modules/",
+                        {
+                            title: "auth",
+                            children: [
+                                "/ja/modules/auth/01_concepts",
+                                "/ja/modules/auth/02_state",
+                                "/ja/modules/auth/03_antehandlers",
+                                "/ja/modules/auth/04_keepers",
+                                "/ja/modules/auth/05_vesting",
+                                "/ja/modules/auth/06_params",
+                                "/ja/modules/auth/07_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "authz",
+                            children: [
+                                "/ja/modules/authz/01_concepts",
+                                "/ja/modules/authz/02_state",
+                                "/ja/modules/authz/03_messages",
+                                "/ja/modules/authz/04_events",
+                                "/ja/modules/authz/05_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "bank",
+                            children: [
+                                "/ja/modules/bank/01_state",
+                                "/ja/modules/bank/02_keepers",
+                                "/ja/modules/bank/03_messages",
+                                "/ja/modules/bank/04_events",
+                                "/ja/modules/bank/05_params",
+                                "/ja/modules/bank/06_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "capability",
+                            children: [
+                                "/ja/modules/capability/01_concepts",
+                                "/ja/modules/capability/02_state",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "crisis",
+                            children: [
+                                "/ja/modules/crisis/01_state",
+                                "/ja/modules/crisis/02_messages",
+                                "/ja/modules/crisis/03_events",
+                                "/ja/modules/crisis/04_params",
+                                "/ja/modules/crisis/05_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "distribution",
+                            children: [
+                                "/ja/modules/distribution/01_concepts",
+                                "/ja/modules/distribution/02_state",
+                                "/ja/modules/distribution/03_begin_block",
+                                "/ja/modules/distribution/04_messages",
+                                "/ja/modules/distribution/05_hooks",
+                                "/ja/modules/distribution/06_events",
+                                "/ja/modules/distribution/07_params",
+                                "/ja/modules/distribution/08_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "epoching",
+                            children: [
+                                "/ja/modules/epoching/01_state",
+                                "/ja/modules/epoching/03_to_improve",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "evidence",
+                            children: [
+                                "/ja/modules/evidence/01_concepts",
+                                "/ja/modules/evidence/02_state",
+                                "/ja/modules/evidence/03_messages",
+                                "/ja/modules/evidence/04_events",
+                                "/ja/modules/evidence/05_params",
+                                "/ja/modules/evidence/06_begin_block",
+                                "/ja/modules/evidence/07_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "feegrant",
+                            children: [
+                                "/ja/modules/feegrant/01_concepts",
+                                "/ja/modules/feegrant/02_state",
+                                "/ja/modules/feegrant/03_messages",
+                                "/ja/modules/feegrant/04_events",
+                                "/ja/modules/feegrant/05_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "gov",
+                            children: [
+                                "/ja/modules/gov/01_concepts",
+                                "/ja/modules/gov/02_state",
+                                "/ja/modules/gov/03_messages",
+                                "/ja/modules/gov/04_events",
+                                "/ja/modules/gov/05_future_improvements",
+                                "/ja/modules/gov/06_params",
+                                "/ja/modules/gov/07_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "mint",
+                            children: [
+                                "/ja/modules/mint/01_concepts",
+                                "/ja/modules/mint/02_state",
+                                "/ja/modules/mint/03_begin_block",
+                                "/ja/modules/mint/04_params",
+                                "/ja/modules/mint/05_events",
+                                "/ja/modules/mint/06_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "params",
+                            children: [
+                                "/ja/modules/params/01_keeper",
+                                "/ja/modules/params/02_subspace",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "slashing",
+                            children: [
+                                "/ja/modules/slashing/01_concepts",
+                                "/ja/modules/slashing/02_state",
+                                "/ja/modules/slashing/03_messages",
+                                "/ja/modules/slashing/04_begin_block",
+                                "/ja/modules/slashing/05_hooks",
+                                "/ja/modules/slashing/06_events",
+                                "/ja/modules/slashing/07_tombstone",
+                                "/ja/modules/slashing/08_params",
+                                "/ja/modules/slashing/09_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "staking",
+                            children: [
+                                "/ja/modules/staking/01_state",
+                                "/ja/modules/staking/02_state_transitions",
+                                "/ja/modules/staking/03_messages",
+                                "/ja/modules/staking/04_begin_block",
+                                "/ja/modules/staking/05_end_block",
+                                "/ja/modules/staking/06_hooks",
+                                "/ja/modules/staking/07_events",
+                                "/ja/modules/staking/08_params",
+                                "/ja/modules/staking/09_client",
+                            ],
+                            collapsable: true,
+                        },
+                        {
+                            title: "upgrade",
+                            children: [
+                                "/ja/modules/upgrade/01_concepts",
+                                "/ja/modules/upgrade/02_state",
+                                "/ja/modules/upgrade/03_events",
+                                "/ja/modules/upgrade/04_client",
+                            ],
+                            collapsable: true,
+                        },
+                    ],
+                    "/ja/ibc/": [
+                        "/ja/ibc/",
+                        {
+                            title: "upgrades",
+                            children: [
+                                "/ja/ibc/upgrades/developer-guide",
+                                "/ja/ibc/upgrades/quick-guide",
+                            ],
+                            collapsable: true,
+                        },
+                        "/ja/ibc/overview",
+                        "/ja/ibc/custom",
+                        "/ja/ibc/integration",
+                        "/ja/ibc/proposals",
+                        "/ja/ibc/relayer",
+                    ],
+                    "/ja/spec/": [
+                        "/ja/spec/",
+                        {
+                            title: "_ics",
+                            children: [
+                                "/ja/spec/_ics/ics-030-signed-messages",
+                            ],
+                            collapsable: false,
+                        },
+                        {
+                            title: "addresses",
+                            children: [
+                                "/ja/spec/addresses/bech32",
+                            ],
+                            collapsable: false,
+                        },
+                        {
+                            title: "circuit-breaker",
+                            children: [
+                                "/ja/spec/circuit-breaker/01-concepts",
+                            ],
+                            collapsable: false,
+                        },
+                        "/ja/spec/SPEC-SPEC",
+                    ],
+                    "/ja/building-modules/": [
+                        "/ja/building-modules/",
+                        "/ja/building-modules/beginblock-endblock",
+                        "/ja/building-modules/errors",
+                        "/ja/building-modules/genesis",
+                        "/ja/building-modules/intro",
+                        "/ja/building-modules/invariants",
+                        "/ja/building-modules/keeper",
+                        "/ja/building-modules/messages-and-queries",
+                        "/ja/building-modules/module-interfaces",
+                        "/ja/building-modules/module-manager",
+                        "/ja/building-modules/msg-services",
+                        "/ja/building-modules/query-services",
+                        "/ja/building-modules/simulator",
+                        "/ja/building-modules/structure",
+                        "/ja/building-modules/upgrade",
+                    ],
+                    "/ja/run-node/": [
+                        "/ja/run-node/",
+                        "/ja/run-node/cosmovisor",
+                        "/ja/run-node/interact-node",
+                        "/ja/run-node/keyring",
+                        "/ja/run-node/rosetta",
+                        "/ja/run-node/run-node",
+                        "/ja/run-node/run-testnet",
+                        "/ja/run-node/txs",
+                    ],
+                    "/ja/": [{
+                        title: "Overview",
+                        children: [
+                            "/ja/DOC_WRITING_GUIDELINES",
+                            "/ja/DOCS_README",
+                        ],
+                        collapsable: false,
+                    }, ],
+                },
+            },
+        },
+        sidebarDepth: 3,
+        // overrideTheme: 'dark',
+        // prefersTheme: 'dark',
+        // overrideTheme: { light: [6, 18], dark: [18, 6] },
+        // theme: 'default-prefers-color-scheme',
+        logo: "/img/logo-cosmos.svg",
+        lastUpdated: "Updated on",
+        repo: "highwayns/docs",
+        editLinks: true,
+        editLinkText: "Edit this page on GitHub",
+        docsBranch: 'main',
+        docsDir: "docs",
+        algolia: {
+            apiKey: "5957091e293f7b97f2994bde312aed99",
+            indexName: "terra-project",
+        },
+    },
 };

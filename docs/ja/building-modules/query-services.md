@@ -1,7 +1,3 @@
-<!--
-order: 5
--->
-
 # Query Services
 
 A Protobuf Query service processes [`queries`](./messages-and-queries.md#queries). Query services are specific to the module in which they are defined, and only process `queries` defined within said module. They are called from `BaseApp`'s [`Query` method](../core/baseapp.md#query). {synopsis}

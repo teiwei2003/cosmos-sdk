@@ -1,10 +1,6 @@
-<!--
-order: 5
--->
+# 事件
 
-# Events
-
-The minting module emits the following events:
+铸造模块发出以下事件: 
 
 ## BeginBlocker
 

@@ -1,7 +1,3 @@
-<!--
-order: 1
--->
-
 # 高级概述
 
 ## 什么是 Cosmos SDK？
@@ -32,6 +28,6 @@ Cosmos SDK 是当今构建自定义应用程序特定区块链的最先进框架
 - 详细了解 [Cosmos SDK 应用程序的架构](./sdk-app-architecture.md)
 - 通过 [Cosmos SDK 教程](https://cosmos.network/docs/tutorial) 了解如何从头开始构建特定于应用程序的区块链
 
-## 下一个{hide}
+## 下一个 {hide}
 
 了解 [特定于应用程序的区块链](./why-app-specific.md) {hide} 

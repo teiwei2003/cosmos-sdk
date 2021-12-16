@@ -57,13 +57,13 @@ docs/
 
 `architecture` 不需要显示在网站上。
 
-## 地位
+## 状态
 
 公认
 
 ## 结果
 
-### 积极的
+### 目的
 
 - Cosmos SDK 文档的组织更加清晰。
 - `/docs` 文件夹现在只包含 Cosmos SDK 和 gaia 相关材料。稍后，它将只包含 Cosmos SDK 相关资料。

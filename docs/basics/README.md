@@ -1,9 +1,3 @@
-<!--
-order: false
-parent:
-  order: 2
--->
-
 # Basics
 
 This repository contains reference documentation on the basic concepts of the Cosmos SDK.

@@ -1,56 +1,56 @@
-# ADR 046: Module Params
+# ADR 046:模块参数
 
-## Changelog
+## 变更日志
 
-- Sep 22, 2021: Initial Draft
+- 2021 年 9 月 22 日:初稿
 
-## Status
+## 地位
 
-Proposed
+建议的
 
-## Abstract
+## 摘要
 
-This ADR describes an alternative approach to how Cosmos SDK modules use, interact,
-and store their respective parameters.
+此 ADR 描述了 Cosmos SDK 模块如何使用、交互、
+并存储它们各自的参数。
 
-## Context
+## 语境
 
-Currently, in the Cosmos SDK, modules that require the use of parameters use the
-`x/params` module. The `x/params` works by having modules define parameters,
-typically via a simple `Params` structure, and registering that structure in
-the `x/params` module via a unique `Subspace` that belongs to the respective
-registering module. The registering module then has unique access to its respective
-`Subspace`. Through this `Subspace`, the module can get and set its `Params`
-structure.
+目前，在 Cosmos SDK 中，需要使用参数的模块使用
+`x/params` 模块。 `x/params` 通过让模块定义参数来工作，
+通常通过一个简单的“Params”结构，并将该结构注册到
+`x/params` 模块通过属于各自的唯一 `Subspace`
+注册模块。然后，注册模块可以唯一地访问其各自的
+`子空间`。通过这个`Subspace`，模块可以获取和设置它的`Params`
+结构体。
 
-In addition, the Cosmos SDK's `x/gov` module has direct support for changing
-parameters on-chain via a `ParamChangeProposal` governance proposal type, where
-stakeholders can vote on suggested parameter changes.
+此外，Cosmos SDK 的`x/gov` 模块直接支持更改
+通过“ParamChangeProposal”治理提案类型在链上设置参数，其中
+利益相关者可以对建议的参数更改进行投票。
 
-There are various tradeoffs to using the `x/params` module to manage individual
-module parameters. Namely, managing parameters essentially comes for "free" in
-that developers only need to define the `Params` struct, the `Subspace`, and the
-various auxiliary functions, e.g. `ParamSetPairs`, on the `Params` type. However,
-there are some notable drawbacks. These drawbacks include the fact that parameters
-are serialized in state via JSON which is extremely slow. In addition, parameter
-changes via `ParamChangeProposal` governance proposals have no way of reading from
-or writing to state. In other words, it is currently not possible to have any
-state transitions in the application during an attempt to change param(s).
+使用 `x/params` 模块来管理单个
+模块参数。也就是说，管理参数本质上是“免费”的
+开发人员只需要定义`Params`结构、`Subspace`和
+各种辅助功能，例如`ParamSetPairs`，在 `Params` 类型上。然而，
+有一些明显的缺点。这些缺点包括参数
+通过非常慢的 JSON 在状态中序列化。此外，参数
+通过 `ParamChangeProposal` 治理提案进行的更改无法读取
+或写信给国家。换句话说，目前不可能有任何
+尝试更改参数期间应用程序中的状态转换。
 
-## Decision
+## 决定
 
-We will build off of the alignment of `x/gov` and `x/authz` work per
-[#9810](https://github.com/cosmos/cosmos-sdk/pull/9810). Namely, module developers
-will create one or more unique parameter data structures that must be serialized
-to state. The Param data structures must implement `sdk.Msg` interface with respective
-Protobuf Msg service method which will validate and update the parameters with all
-necessary changes. The `x/gov` module via the work done in
-[#9810](https://github.com/cosmos/cosmos-sdk/pull/9810), will dispatch Param
-messages, which will be handled by Protobuf Msg services.
+我们将建立在 `x/gov` 和 `x/authz` 的对齐基础上
+[#9810](https://github.com/cosmos/cosmos-sdk/pull/9810)。即模块开发者
+将创建一个或多个必须序列化的唯一参数数据结构
+陈述。 Param 数据结构必须实现`sdk.Msg` 接口与各自的
+Protobuf Msg 服务方法，它将验证和更新所有参数
+必要的改变。 `x/gov` 模块通过在
+[#9810](https://github.com/cosmos/cosmos-sdk/pull/9810)，会调度Param
+消息，将由 Protobuf Msg 服务处理。
 
-Note, it is up to developers to decide how to structure their parameters and
-the respective `sdk.Msg` messages. Consider the parameters currently defined in
-`x/auth` using the `x/params` module for parameter management:
+请注意，由开发人员决定如何构建他们的参数和
+相应的 `sdk.Msg` 消息。考虑当前定义的参数
+`x/auth` 使用 `x/params` 模块进行参数管理: 
 
 ```protobuf
 message Params {
@@ -62,22 +62,21 @@ message Params {
 }
 ```
 
-Developers can choose to either create a unique data structure for every field in
-`Params` or they can create a single `Params` structure as outlined above in the
-case of `x/auth`.
+开发人员可以选择为每个字段创建唯一的数据结构
+`Params` 或者他们可以创建一个单一的 `Params` 结构，如上所述
+“x/auth”的情况。
 
-In the former, `x/params`, approach, a `sdk.Msg` would need to be created for every single
-field along with a handler. This can become burdensome if there are a lot of
-parameter fields. In the latter case, there is only a single data structure and
-thus only a single message handler, however, the message handler might have to be
-more sophisticated in that it might need to understand what parameters are being
-changed vs what parameters are untouched.
+在前者中，`x/params` 方法，需要为每个单独的创建一个 `sdk.Msg`
+字段以及处理程序。 如果有很多，这可能会成为负担
+参数字段。 在后一种情况下，只有一个数据结构和
+因此只有一个消息处理程序，但是，消息处理程序可能必须是
+更复杂，因为它可能需要了解正在使用的参数
+更改与未更改的参数。
 
-Params change proposals are made using the `x/gov` module. Execution is done through
-`x/authz` authorization to the root `x/gov` module's account.
+参数更改建议是使用 `x/gov` 模块提出的。 执行是通过
+`x/authz` 授权给根 `x/gov` 模块的帐户。
 
-Continuing to use `x/auth`, we demonstrate a more complete example:
-
+继续使用`x/auth`，我们演示一个更完整的例子: 
 ```go
 type Params struct {
 	MaxMemoCharacters      uint64
@@ -114,7 +113,7 @@ func ParamsFromMsg(msg *types.MsgUpdateParams) Params {
 }
 ```
 
-A gRPC `Service` query should also be provided, for example:
+还应提供 gRPC `Service` 查询，例如: 
 
 ```protobuf
 service Query {
@@ -132,40 +131,38 @@ message QueryParamsResponse {
 
 ## Consequences
 
-As a result of implementing the module parameter methodology, we gain the ability
-for module parameter changes to be stateful and extensible to fit nearly every
-application's use case. We will be able to emit events (and trigger hooks registered
-to that events using the work proposed in [even hooks](https://github.com/cosmos/cosmos-sdk/discussions/9656)),
-call other Msg service methods or perform migration.
-In addition, there will be significant gains in performance when it comes to reading
-and writing parameters from and to state, especially if a specific set of parameters
-are read on a consistent basis.
+作为实施模块参数方法的结果，我们获得了能力
+使模块参数更改有状态且可扩展以适应几乎所有
+应用程序的用例。我们将能够发出事件(并触发注册的钩子
+使用 [even hooks](https://github.com/cosmos/cosmos-sdk/discussions/9656)) 中提出的工作的那些事件，
+调用其他消息服务方法或执行迁移。
+此外，在阅读方面会有显着的性能提升
+以及从状态和向状态写入参数，特别是如果一组特定的参数
+在一致的基础上阅读。
 
-However, this methodology will require developers to implement more types and
-Msg service metohds which can become burdensome if many parameters exist. In addition,
-developers are required to implement persistance logics of module parameters.
-However, this should be trivial.
+但是，这种方法将需要开发人员实现更多类型和
+如果存在许多参数，消息服务方法可能会变得很麻烦。此外，
+需要开发者实现模块参数的持久化逻辑。
+然而，这应该是微不足道的。
 
-### Backwards Compatibility
+### 向后兼容性
 
-The new method for working with module parameters is naturally not backwards
-compatible with the existing `x/params` module. However, the `x/params` will
-remain in the Cosmos SDK and will be marked as deprecated with no additional
-functionality being added apart from potential bug fixes. Note, the `x/params`
-module may be removed entirely in a future release.
-
+处理模块参数的新方法自然不会倒退
+与现有的`x/params` 模块兼容。但是，`x/params` 将
+保留在 Cosmos SDK 中，并且将被标记为已弃用，不再添加
+除了潜在的错误修复之外，还添加了功能。注意，`x/params`
+模块可能会在未来的版本中完全删除。 
 ### Positive
 
-- Module parameters are serialized more efficiently
-- Modules are able to react on parameters changes and perform additional actions.
-- Special events can be emitted, allowing hooks to be triggered.
-
+- 更有效地序列化模块参数
+- 模块能够对参数更改做出反应并执行其他操作。
+- 可以发出特殊事件，允许触发钩子。 
 ### Negative
 
-- Module parameters becomes slightly more burdensome for module developers:
-    - Modules are now responsible for persisting and retrieving parameter state
-    - Modules are now required to have unique message handlers to handle parameter
-      changes per unique parameter data structure.
+- 模块参数对于模块开发者来说变得稍微有些负担:
+     - 模块现在负责持久化和检索参数状态
+     - 现在需要模块具有唯一的消息处理程序来处理参数
+       每个唯一参数数据结构的变化。 
 
 ### Neutral
 

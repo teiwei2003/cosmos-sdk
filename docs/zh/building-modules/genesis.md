@@ -1,7 +1,3 @@
-<!--
-order: 9
--->
-
 # 模块创世纪
 
 模块通常处理状态的一个子集，因此，它们需要定义创世文件的相关子集以及初始化、验证和导出它的方法。 {概要}
@@ -37,7 +33,7 @@ order: 9
 
 除了与 `GenesisState` 直接相关的方法，模块开发者需要实现另外两个方法作为 [`AppModuleGenesis` 接口](./module-manager.md#appmodulegenesis) 的一部分(仅当模块需要初始化一个创世中状态的子集)。这些方法是 [`InitGenesis`](#initgenesis) 和 [`ExportGenesis`](#exportgenesis)。
 
-###`InitGenesis`
+### `InitGenesis`
 
 `InitGenesis` 方法在应用程序第一次启动时在 [`InitChain`](../core/baseapp.md#initchain) 期间执行。给定一个 `GenesisState`，它通过对 `GenesisState` 中的每个参数使用模块的 [`keeper`](./keeper.md) setter 函数来初始化模块管理的状态子集。
 
@@ -47,7 +43,7 @@ order: 9
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/genesis.go#L13-L28
 
-###`ExportGenesis`
+### `ExportGenesis`
 
 每当进行状态导出时，都会执行“ExportGenesis”方法。它采用模块管理的状态子集的最新已知版本，并从中创建一个新的“GenesisState”。这主要用于需要通过硬分叉升级链时。
 
@@ -55,6 +51,6 @@ order: 9
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/genesis.go#L31-L42
 
-## 下一个{hide}
+## 下一个 {hide}
 
 了解 [模块接口](module-interfaces.md) {hide} 

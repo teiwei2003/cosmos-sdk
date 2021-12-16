@@ -1,9 +1,3 @@
-<!--
-order: false
-parent:
-  order: 3
--->
-
 # Core Concepts
 
 This repository contains reference documentation on the core concepts of the Cosmos SDK.

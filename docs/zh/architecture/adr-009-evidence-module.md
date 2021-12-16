@@ -1,55 +1,55 @@
-# ADR 009: Evidence Module
+# ADR 009:证据模块
 
-## Changelog
+## 变更日志
 
-- 2019 July 31: Initial draft
-- 2019 October 24: Initial implementation
+- 2019 年 7 月 31 日:初稿
+- 2019 年 10 月 24 日:初步实施
 
-## Status
+## 地位
 
-Accepted
+公认
 
-## Context
+## 语境
 
-In order to support building highly secure, robust and interoperable blockchain
-applications, it is vital for the Cosmos SDK to expose a mechanism in which arbitrary
-evidence can be submitted, evaluated and verified resulting in some agreed upon
-penalty for any misbehavior committed by a validator, such as equivocation (double-voting),
-signing when unbonded, signing an incorrect state transition (in the future), etc.
-Furthermore, such a mechanism is paramount for any
-[IBC](https://github.com/cosmos/ics/blob/master/ibc/2_IBC_ARCHITECTURE.md) or
-cross-chain validation protocol implementation in order to support the ability
-for any misbehavior to be relayed back from a collateralized chain to a primary
-chain so that the equivocating validator(s) can be slashed.
+为了支持构建高度安全、健壮和可互操作的区块链
+应用程序，Cosmos SDK 公开一种机制至关重要，其中任意
+可以提交、评估和验证证据，从而达成一些共识
+对验证者的任何不当行为的惩罚，例如模棱两可(双重投票)，
+未绑定时签名，签名不正确的状态转换(将来)等。
+此外，这种机制对于任何
+[IBC](https://github.com/cosmos/ics/blob/master/ibc/2_IBC_ARCHITECTURE.md) 或
+跨链验证协议实现以支持能力
+将任何不当行为从抵押链传递回主链
+链，以便可以削减模棱两可的验证器。
 
-## Decision
+## 决定
 
-We will implement an evidence module in the Cosmos SDK supporting the following
-functionality:
+我们将在 Cosmos SDK 中实现一个支持以下功能的证据模块
+功能:
 
-- Provide developers with the abstractions and interfaces necessary to define
-  custom evidence messages, message handlers, and methods to slash and penalize
-  accordingly for misbehavior.
-- Support the ability to route evidence messages to handlers in any module to
-  determine the validity of submitted misbehavior.
-- Support the ability, through governance, to modify slashing penalties of any
-  evidence type.
-- Querier implementation to support querying params, evidence types, params, and
-  all submitted valid misbehavior.
+- 为开发人员提供定义所需的抽象和接口
+  自定义证据消息、消息处理程序以及削减和惩罚的方法
+  相应地为不当行为。
+- 支持将证据消息路由到任何模块中的处理程序的能力
+  确定提交的不当行为的有效性。
+- 通过治理支持修改任何惩罚的能力
+  证据类型。
+- 查询器实现以支持查询参数、证据类型、参数和
+  所有提交的有效不当行为。
 
-### Types
+### 类型
 
-First, we define the `Evidence` interface type. The `x/evidence` module may implement
-its own types that can be used by many chains (e.g. `CounterFactualEvidence`).
-In addition, other modules may implement their own `Evidence` types in a similar
-manner in which governance is extensible. It is important to note any concrete
-type implementing the `Evidence` interface may include arbitrary fields such as
-an infraction time. We want the `Evidence` type to remain as flexible as possible.
+首先，我们定义了`Evidence` 接口类型。 `x/evidence` 模块可以实现
+它自己的类型可以被许多链使用(例如`CounterFactualEvidence`)。
+此外，其他模块可能会以类似的方式实现自己的“证据”类型
+治理可扩展的方式。重要的是要注意任何具体的
+实现 `Evidence` 接口的类型可能包括任意字段，例如
+违规时间。我们希望 `Evidence` 类型尽可能保持灵活。
 
-When submitting evidence to the `x/evidence` module, the concrete type must provide
-the validator's consensus address, which should be known by the `x/slashing`
-module (assuming the infraction is valid), the height at which the infraction
-occurred and the validator's power at same height in which the infraction occurred.
+当向`x/evidence` 模块提交证据时，具体类型必须提供
+验证者的共识地址，应该由`x/slashing` 知道
+模块(假设违规有效)，违规的高度
+发生并且验证者的权力与违规发生的高度相同。
 
 ```go
 type Evidence interface {
@@ -73,10 +73,10 @@ type Evidence interface {
 }
 ```
 
-### Routing & Handling
+### 路由和处理
 
-Each `Evidence` type must map to a specific unique route and be registered with
-the `x/evidence` module. It accomplishes this through the `Router` implementation.
+每个“证据”类型必须映射到特定的唯一路线并注册
+`x/evidence` 模块。 它通过`Router` 实现来实现这一点。 
 
 ```go
 type Router interface {
@@ -87,16 +87,16 @@ type Router interface {
 }
 ```
 
-Upon successful routing through the `x/evidence` module, the `Evidence` type
-is passed through a `Handler`. This `Handler` is responsible for executing all
-corresponding business logic necessary for verifying the evidence as valid. In
-addition, the `Handler` may execute any necessary slashing and potential jailing.
-Since slashing fractions will typically result from some form of static functions,
-allow the `Handler` to do this provides the greatest flexibility. An example could
-be `k * evidence.GetValidatorPower()` where `k` is an on-chain parameter controlled
-by governance. The `Evidence` type should provide all the external information
-necessary in order for the `Handler` to make the necessary state transitions.
-If no error is returned, the `Evidence` is considered valid.
+通过 `x/evidence` 模块成功路由后，`Evidence` 类型
+通过`Handler`传递。 这个`Handler`负责执行所有
+验证证据有效所需的相应业务逻辑。 在
+此外，`Handler` 可以执行任何必要的削减和潜在的监禁。
+由于斜线分数通常由某种形式的静态函数产生，
+允许 `Handler` 这样做提供了最大的灵活性。 一个例子可以
+是 `k * evidence.GetValidatorPower()` 其中 `k` 是一个受控的链上参数
+通过治理。 `Evidence` 类型应该提供所有的外部信息
+为了让“处理程序”进行必要的状态转换，这是必要的。
+如果没有返回错误，则“证据”被认为是有效的。 
 
 ```go
 type Handler func(Context, Evidence) error
@@ -104,8 +104,8 @@ type Handler func(Context, Evidence) error
 
 ### Submission
 
-`Evidence` is submitted through a `MsgSubmitEvidence` message type which is internally
-handled by the `x/evidence` module's `SubmitEvidence`.
+`Evidence` 通过内部的 `MsgSubmitEvidence` 消息类型提交
+由 `x/evidence` 模块的 `SubmitEvidence` 处理。
 
 ```go
 type MsgSubmitEvidence struct {
@@ -125,9 +125,9 @@ func handleMsgSubmitEvidence(ctx Context, keeper Keeper, msg MsgSubmitEvidence) 
 }
 ```
 
-The `x/evidence` module's keeper is responsible for matching the `Evidence` against
-the module's router and invoking the corresponding `Handler` which may include
-slashing and jailing the validator. Upon success, the submitted evidence is persisted.
+`x/evidence` 模块的 keeper 负责将 `Evidence` 与
+模块的路由器并调用相应的`Handler`，其中可能包括
+削减和监禁验证器。 成功后，提交的证据将被保留。
 
 ```go
 func (k Keeper) SubmitEvidence(ctx Context, evidence Evidence) error {
@@ -141,13 +141,13 @@ func (k Keeper) SubmitEvidence(ctx Context, evidence Evidence) error {
 }
 ```
 
-### Genesis
+###创世纪
 
-Finally, we need to represent the genesis state of the `x/evidence` module. The
-module only needs a list of all submitted valid infractions and any necessary params
-for which the module needs in order to handle submitted evidence. The `x/evidence`
-module will naturally define and route native evidence types for which it'll most
-likely need slashing penalty constants for.
+最后，我们需要表示 `x/evidence` 模块的创世状态。 这
+模块只需要所有提交的有效违规和任何必要参数的列表
+模块需要处理提交的证据。 `x/证据`
+模块将自然地定义和路由它最需要的本地证据类型
+可能需要削减惩罚常数。 
 
 ```go
 type GenesisState struct {
@@ -160,20 +160,19 @@ type GenesisState struct {
 
 ### Positive
 
-- Allows the state machine to process misbehavior submitted on-chain and penalize
-  validators based on agreed upon slashing parameters.
-- Allows evidence types to be defined and handled by any module. This further allows
-  slashing and jailing to be defined by more complex mechanisms.
-- Does not solely rely on Tendermint to submit evidence.
-
+- 允许状态机处理链上提交的不当行为并进行惩罚
+   基于商定的削减参数的验证器。
+- 允许任何模块定义和处理证据类型。 这进一步允许
+   削减和监禁由更复杂的机制定义。
+- 不完全依赖 Tendermint 提交证据。 
 ### Negative
 
-- No easy way to introduce new evidence types through governance on a live chain
-  due to the inability to introduce the new evidence type's corresponding handler
+- 通过实时链上的治理来引入新的证据类型并不容易
+   由于无法引入新证据类型的相应处理程序 
 
 ### Neutral
 
-- Should we persist infractions indefinitely? Or should we rather rely on events?
+- 我们应该无限期地坚持违规吗？ 还是我们应该更依赖于事件？ 
 
 ## References
 

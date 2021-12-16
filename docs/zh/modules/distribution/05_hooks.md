@@ -1,59 +1,55 @@
-<!--
-order: 5
--->
+# 钩子
 
-# Hooks
+可以由此模块调用和从中调用的可用钩子。
 
-Available hooks that can be called by and from this module.
+## 创建或修改委托分配
 
-## Create or modify delegation distribution
+- 触发:`staking.MsgDelegate`、`staking.MsgBeginRedelegate`、`staking.MsgUndelegate`
 
-- triggered-by: `staking.MsgDelegate`, `staking.MsgBeginRedelegate`, `staking.MsgUndelegate`
+### 前
 
-### Before
+- 委托奖励提现到委托人提现地址。
+  奖励包括当期，不包括起始期。
+- 验证器周期增加。
+  验证者周期增加是因为验证者的权力和份额分配可能已经改变。
+- 委托人开始期间的引用计数递减。
 
-- The delegation rewards are withdrawn to the withdraw address of the delegator.
-  The rewards include the current period and exclude the starting period.
-- The validator period is incremented.
-  The validator period is incremented because the validator's power and share distribution might have changed.
-- The reference count for the delegator's starting period is decremented.
+### 后
 
-### After
+代表团的起始高度设置为上一期。
+由于“Before”挂钩，这个时期是委托人获得奖励的最后时期。
 
-The starting height of the delegation is set to the previous period.
-Because of the `Before`-hook, this period is the last period for which the delegator was rewarded.
+## 验证器已创建
 
-## Validator created
+- 触发:`staking.MsgCreateValidator`
 
-- triggered-by: `staking.MsgCreateValidator`
+创建验证器时，将初始化以下验证器变量:
 
-When a validator is created, the following validator variables are initialized:
+- 历史奖励
+- 当前累积奖励
+- 累计佣金
+- 未完成的总奖励
+- 时期
 
-- Historical rewards
-- Current accumulated rewards
-- Accumulated commission
-- Total outstanding rewards
-- Period
+默认情况下，所有值都设置为“0”，但句点设置为“1”。
 
-By default, all values are set to a `0`, except period, which is set to `1`.
+## 验证器已删除
 
-## Validator removed
+- 触发:`staking.RemoveValidator`
 
-- triggered-by: `staking.RemoveValidator`
+未完成的佣金被发送到验证者的自委托提款地址。
+剩余的委托人奖励被发送到社区费用池。
 
-Outstanding commission is sent to the validator's self-delegation withdrawal address.
-Remaining delegator rewards get sent to the community fee pool.
+注意:只有当它没有剩余的委托时，验证器才会被删除。
+届时，所有优秀的委托人奖励将被收回。
+任何剩余的奖励都是灰尘量。
 
-Note: The validator gets removed only when it has no remaining delegations.
-At that time, all outstanding delegator rewards will have been withdrawn.
-Any remaining rewards are dust amounts.
+## 验证器被削减
 
-## Validator is slashed
-
-- triggered-by: `staking.Slash`
+- 触发:`staking.Slash`
   
-- The current validator period reference count is incremented.
-  The reference count is incremented because the slash event has created a reference to it.
-- The validator period is incremented.
-- The slash event is stored for later use.
-  The slash event will be referenced when calculating delegator rewards.
+- 当前验证器周期引用计数增加。
+  引用计数增加是因为斜线事件已经创建了对它的引用。
+- 验证器周期增加。
+- 存储斜线事件以备后用。
+  计算委托人奖励时将参考斜线事件。 

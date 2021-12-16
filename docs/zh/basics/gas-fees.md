@@ -1,7 +1,3 @@
-<!--
-order: 5
--->
-
 # 汽油和费用
 
 本文档描述了在 Cosmos SDK 应用程序中处理 gas 和费用的默认策略。 {概要}
@@ -84,6 +80,6 @@ type AnteHandler func(ctx Context, tx Tx, simulate bool) (newCtx Context, result
 
 如上所述，`anteHandler` 返回交易在执行期间可以消耗的最大 `gas` 限制，称为 `GasWanted`。最终消耗的实际数量以`GasUsed`计价，因此我们必须有`GasUsed =< GasWanted`。当 [`DeliverTx`](../core/baseapp.md#delivertx) 返回时，`GasWanted` 和 `GasUsed` 都被中继到底层共识引擎。
 
-## 下一个{hide}
+## 下一个 {hide}
 
 了解 [baseapp](../core/baseapp.md) {hide} 

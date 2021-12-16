@@ -1,10 +1,3 @@
-<!--
-order: 0
-title: Params Overview
-parent:
-  title: "params"
--->
-
 # `params`
 
 ## Abstract

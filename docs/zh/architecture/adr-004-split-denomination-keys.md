@@ -92,13 +92,13 @@ func (k Keeper) SetBalance(ctx Context, addr AccAddress, balance Coin) error {
 扫描所有账户并使用 `x/bank` Keeper 调用 `GetAllBalances`，然后求和
 余额并检查它们是否与预期的总供应量相匹配。
 
-## 地位
+## 状态
 
 公认。
 
 ## 结果
 
-### 积极的
+### 目的
 
 - O(1) 读取和写入余额(关于面额数量)
 其中一个帐户具有非零余额)。请注意，这与实际情况无关

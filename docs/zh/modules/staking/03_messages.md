@@ -1,154 +1,150 @@
-<!--
-order: 3
--->
+# 消息
 
-# Messages
-
-In this section we describe the processing of the staking messages and the corresponding updates to the state. All created/modified state objects specified by each message are defined within the [state](./02_state_transitions.md) section.
+在本节中，我们描述了 staking 消息的处理和相应的状态更新。每个消息指定的所有创建/修改状态对象都在 [state](./02_state_transitions.md) 部分中定义。
 
 ## MsgCreateValidator
 
-A validator is created using the `MsgCreateValidator` message.
-The validator must be created with an initial delegation from the operator.
+使用 `MsgCreateValidator` 消息创建验证器。
+必须使用运营商的初始委托来创建验证器。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L16-L17
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L35-L51
 
-This message is expected to fail if:
+如果出现以下情况，此消息预计会失败:
 
-- another validator with this operator address is already registered
-- another validator with this pubkey is already registered
-- the initial self-delegation tokens are of a denom not specified as the bonding denom
-- the commission parameters are faulty, namely:
-    - `MaxRate` is either > 1 or < 0
-    - the initial `Rate` is either negative or > `MaxRate`
-    - the initial `MaxChangeRate` is either negative or > `MaxRate`
-- the description fields are too large
+- 另一个具有此操作员地址的验证器已注册
+- 另一个使用此公钥的验证器已经注册
+- 初始自委托代币的面额未指定为绑定面额
+- 佣金参数有问题，即:
+    - `MaxRate` 是 > 1 或 < 0
+    - 初始 `Rate` 为负数或 > `MaxRate`
+    - 初始 `MaxChangeRate` 为负数或 > `MaxRate`
+- 描述字段太大
 
-This message creates and stores the `Validator` object at appropriate indexes.
-Additionally a self-delegation is made with the initial tokens delegation
-tokens `Delegation`. The validator always starts as unbonded but may be bonded
-in the first end-block.
+此消息在适当的索引处创建并存储“验证器”对象。
+此外，通过初始代币委托进行自我委托
+令牌`委托`。验证器始终以未绑定状态开始，但可能已绑定
+在第一个结束块中。
 
 ## MsgEditValidator
 
-The `Description`, `CommissionRate` of a validator can be updated using the
-`MsgEditValidator` message.
+验证器的 `Description`、`CommissionRate` 可以使用
+`MsgEditValidator` 消息。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L19-L20
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L56-L76
 
-This message is expected to fail if:
+如果出现以下情况，此消息预计会失败:
 
-- the initial `CommissionRate` is either negative or > `MaxRate`
-- the `CommissionRate` has already been updated within the previous 24 hours
-- the `CommissionRate` is > `MaxChangeRate`
-- the description fields are too large
+- 初始`CommissionRate` 为负数或> `MaxRate`
+- `CommissionRate` 已在过去 24 小时内更新
+- `CommissionRate` 是 > `MaxChangeRate`
+- 描述字段太大
 
-This message stores the updated `Validator` object.
+此消息存储更新的“验证器”对象。
 
 ## MsgDelegate
 
-Within this message the delegator provides coins, and in return receives
-some amount of their validator's (newly created) delegator-shares that are
-assigned to `Delegation.Shares`.
+在此消息中，委托人提供硬币，并作为回报收到
+一定数量的验证者(新创建的)委托人股份
+分配给`Delegation.Shares`。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L22-L24
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L81-L90
 
-This message is expected to fail if:
+如果出现以下情况，此消息预计会失败:
 
-- the validator does not exist
-- the `Amount` `Coin` has a denomination different than one defined by `params.BondDenom`
-- the exchange rate is invalid, meaning the validator has no tokens (due to slashing) but there are outstanding shares
-- the amount delegated is less than the minimum allowed delegation
+- 验证器不存在
+- `Amount` `Coin` 的面额与 `params.BondDenom` 定义的面额不同
+- 汇率无效，这意味着验证者没有代币(由于削减)但有流通股
+- 委托金额低于允许的最低委托金额
 
-If an existing `Delegation` object for provided addresses does not already
-exist then it is created as part of this message otherwise the existing
-`Delegation` is updated to include the newly received shares.
+如果提供的地址的现有“委托”对象还没有
+存在然后它被创建作为此消息的一部分，否则现有的
+`Delegation` 更新为包括新收到的共享。 
 
-The delegator receives newly minted shares at the current exchange rate.
-The exchange rate is the number of existing shares in the validator divided by
-the number of currently delegated tokens.
+委托人以当前汇率接收新铸造的股票。
+汇率是验证器中现有股份的数量除以
+当前委托代币的数量。
 
-The validator is updated in the `ValidatorByPower` index, and the delegation is
-tracked in validator object in the `Validators` index.
+验证器在`ValidatorByPower`索引中更新，委托是
+在“验证器”索引中的验证器对象中进行跟踪。
 
-It is possible to delegate to a jailed validator, the only difference being it
-will not be added to the power index until it is unjailed.
+可以委托给被监禁的验证者，唯一的区别是
+不会被添加到力量指数中，直到它被释放。
 
-![Delegation sequence](../../../docs/uml/svg/delegation_sequence.svg)
+![委托序列](../../../docs/uml/svg/delegation_sequence.svg)
 
 ## MsgUndelegate
 
-The `MsgUndelegate` message allows delegators to undelegate their tokens from
-validator.
+`MsgUndelegate` 消息允许委托人取消委托他们的代币
+验证器。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L30-L32
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L112-L121
 
-This message returns a response containing the completion time of the undelegation:
+此消息返回一个响应，其中包含取消委派的完成时间:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L123-L126
 
-This message is expected to fail if:
+如果出现以下情况，此消息预计会失败:
 
-- the delegation doesn't exist
-- the validator doesn't exist
-- the delegation has less shares than the ones worth of `Amount`
-- existing `UnbondingDelegation` has maximum entries as defined by `params.MaxEntries`
-- the `Amount` has a denomination different than one defined by `params.BondDenom`
+- 代表团不存在
+- 验证器不存在
+- 代表团的份额少于“金额”的份额
+- 现有的“UnbondingDelegation”具有由“params.MaxEntries”定义的最大条目
+- `Amount` 的面额与 `params.BondDenom` 定义的面额不同
 
-When this message is processed the following actions occur:
+处理此消息时，会发生以下操作:
 
-- validator's `DelegatorShares` and the delegation's `Shares` are both reduced by the message `SharesAmount`
-- calculate the token worth of the shares remove that amount tokens held within the validator
-- with those removed tokens, if the validator is:
-    - `Bonded` - add them to an entry in `UnbondingDelegation` (create `UnbondingDelegation` if it doesn't exist) with a completion time a full unbonding period from the current time. Update pool shares to reduce BondedTokens and increase NotBondedTokens by token worth of the shares.
-    - `Unbonding` - add them to an entry in `UnbondingDelegation` (create `UnbondingDelegation` if it doesn't exist) with the same completion time as the validator (`UnbondingMinTime`).
-    - `Unbonded` - then send the coins the message `DelegatorAddr`
-- if there are no more `Shares` in the delegation, then the delegation object is removed from the store
-    - under this situation if the delegation is the validator's self-delegation then also jail the validator.
+- 验证者的`DelegatorShares`和委托的`Shares`都被消息`SharesAmount`减少
+- 计算股票的代币价值，删除验证器中持有的代币数量
+- 使用那些已删除的令牌，如果验证器是:
+    - `Bonded` - 将它们添加到 `UnbondingDelegation` 中的条目(如果它不存在，则创建 `UnbondingDelegation`)，完成时间从当前时间开始一个完整的解绑期。更新池份额以减少 BondedTokens 并通过份额的代币价值增加 NotBondedTokens。
+    - `Unbonding` - 将它们添加到 `UnbondingDelegation` 中的条目(如果它不存在，则创建 `UnbondingDelegation`)与验证器(`UnbondingMinTime`)具有相同的完成时间。
+    - `Unbonded` - 然后向硬币发送消息`DelegatorAddr`
+- 如果委托中没有更多的`Shares`，那么委托对象将从存储中删除
+    - 在这种情况下，如果委托是验证者的自我委托，那么也会监禁验证者。
 
-![Unbond sequence](../../../docs/uml/svg/unbond_sequence.svg)
+![解绑序列](../../../docs/uml/svg/unbond_sequence.svg)
 
 ## MsgBeginRedelegate
 
-The redelegation command allows delegators to instantly switch validators. Once
-the unbonding period has passed, the redelegation is automatically completed in
-the EndBlocker.
+重新委托命令允许委托人立即切换验证人。一次
+解绑期已过，转授权自动完成
+终结者。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L26-L28
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L95-L105
 
-This message returns a response containing the completion time of the redelegation:
+此消息返回一个响应，其中包含重新授权的完成时间:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/tx.proto#L107-L110
 
-This message is expected to fail if:
+如果出现以下情况，此消息预计会失败:
 
-- the delegation doesn't exist
-- the source or destination validators don't exist
-- the delegation has less shares than the ones worth of `Amount`
-- the source validator has a receiving redelegation which is not matured (aka. the redelegation may be transitive)
-- existing `Redelegation` has maximum entries as defined by `params.MaxEntries`
-- the `Amount` `Coin` has a denomination different than one defined by `params.BondDenom`
+- 代表团不存在
+- 源或目标验证器不存在
+- 代表团的份额少于“金额”的份额
+- 源验证器有一个未成熟的接收重新委托(又名，重新委托可能是可传递的)
+- 现有的“重新委托”具有由“params.MaxEntries”定义的最大条目
+- `Amount` `Coin` 的面额与 `params.BondDenom` 定义的面额不同
 
-When this message is processed the following actions occur:
+处理此消息时，会发生以下操作:
 
-- the source validator's `DelegatorShares` and the delegations `Shares` are both reduced by the message `SharesAmount`
-- calculate the token worth of the shares remove that amount tokens held within the source validator.
-- if the source validator is:
-    - `Bonded` - add an entry to the `Redelegation` (create `Redelegation` if it doesn't exist) with a completion time a full unbonding period from the current time. Update pool shares to reduce BondedTokens and increase NotBondedTokens by token worth of the shares (this may be effectively reversed in the next step however).
-    - `Unbonding` - add an entry to the `Redelegation` (create `Redelegation` if it doesn't exist) with the same completion time as the validator (`UnbondingMinTime`).
-    - `Unbonded` - no action required in this step
-- Delegate the token worth to the destination validator, possibly moving tokens back to the bonded state.
-- if there are no more `Shares` in the source delegation, then the source delegation object is removed from the store
-    - under this situation if the delegation is the validator's self-delegation then also jail the validator.
+- 源验证器的`DelegatorShares`和委托`Shares`都被消息`SharesAmount`减少
+- 计算股票的代币价值，删除源验证器中持有的代币数量。
+- 如果源验证器是:
+    - `Bonded` - 将一个条目添加到 `Redelegation`(如果它不存在，则创建 `Redelegation`)，完成时间从当前时间开始一个完整的解除绑定期。更新池份额以减少 BondedTokens 并通过份额的代币价值增加 NotBondedTokens(然而，这可能在下一步中有效地逆转)。
+    - `Unbonding` - 将一个条目添加到 `Redelegation`(如果它不存在，则创建 `Redelegation`)，其完成时间与验证器(`UnbondingMinTime`)相同。
+    - `Unbonded` - 这一步不需要任何操作
+- 将代币价值委托给目标验证器，可能会将代币移回绑定状态。
+- 如果源委托中没有更多的`Shares`，那么源委托对象将从存储中删除
+    - 在这种情况下，如果委托是验证者的自我委托，那么也会监禁验证者。
 
-![Begin redelegation sequence](../../../docs/uml/svg/begin_redelegation_sequence.svg)
+![开始重新委托序列](../../../docs/uml/svg/begin_redelegation_sequence.svg) 
