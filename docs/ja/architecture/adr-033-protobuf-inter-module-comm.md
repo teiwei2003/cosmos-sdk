@@ -1,69 +1,69 @@
-# ADR 033: Protobuf-based Inter-Module Communication
+# ADR 033:Protobufに基づくモジュール間の通信
 
-## Changelog
+## 変更ログ
 
-- 2020-10-05: Initial Draft
+-2020-10-05:最初のドラフト
 
-## Status
+## 状態
 
-Proposed
+提案
 
-## Abstract
+## 概要
 
-This ADR introduces a system for permissioned inter-module communication leveraging the protobuf `Query` and `Msg`
-service definitions defined in [ADR 021](./adr-021-protobuf-query-encoding.md) and
-[ADR 031](./adr-031-msg-service.md) which provides:
+ADRは、protobuf`Query`と `Msg`を使用して許可されたモジュール間で通信するためのシステムを導入します
+[ADR 021](..adr-021-protobuf-query-encoding.md)サービス定義と
+[ADR 031](..adr-031-msg-service.md)は以下を提供します:
 
-- stable protobuf based module interfaces to potentially later replace the keeper paradigm
-- stronger inter-module object capabilities (OCAPs) guarantees
-- module accounts and sub-account authorization
+-安定したprotobufベースのモジュールインターフェイスは、将来的にキーパーパラダイムに取って代わる可能性があります
+-モジュール間オブジェクト機能(OCAP)のより強力な保証
+-モジュールアカウントとサブアカウントの承認
 
-## Context
+## 環境
 
-In the current Cosmos SDK documentation on the [Object-Capability Model](../core/ocap.md), it is stated that:
+現在のCosmosSDKドキュメントの[Object-CapabilityModel](...core .ocap.md)については、次のように述べられています。
 
-> We assume that a thriving ecosystem of Cosmos SDK modules that are easy to compose into a blockchain application will contain faulty or malicious modules.
+>繁栄しているCosmosSDKモジュールエコシステムは、ブロックチェーンアプリケーションに簡単に組み合わせることができ、欠陥のあるモジュールや悪意のあるモジュールが含まれていると想定しています。
 
-There is currently not a thriving ecosystem of Cosmos SDK modules. We hypothesize that this is in part due to:
+現在、繁栄しているCosmosSDKモジュールエコシステムはありません。これは部分的に次の理由によるものと想定しています。
 
-1. lack of a stable v1.0 Cosmos SDK to build modules off of. Module interfaces are changing, sometimes dramatically, from
-point release to point release, often for good reasons, but this does not create a stable foundation to build on.
-2. lack of a properly implemented object capability or even object-oriented encapsulation system which makes refactors
-of module keeper interfaces inevitable because the current interfaces are poorly constrained.
+1.モジュールを構築するための安定したv1.0CosmosSDKの欠如。モジュールインターフェイスは、から、時には劇的に変化しています
+通常、ポイントリリースからポイントリリースへの正当な理由がありますが、これは安定した基盤を確立しません。
+2.正しく実装されたオブジェクト機能またはオブジェクト指向のパッケージングシステムの欠如、リファクタリングにつながる
+現在のインターフェースの制約は非常に貧弱であるため、モジュールホルダーインターフェースの数は避けられません。
 
-### `x/bank` Case Study
+### `x .bank`のケーススタディ
 
-Currently the `x/bank` keeper gives pretty much unrestricted access to any module which references it. For instance, the
-`SetBalance` method allows the caller to set the balance of any account to anything, bypassing even proper tracking of supply.
+現在、 `x .bank`キーパーは、それを参照するすべてのモジュールにほぼ無制限にアクセスできます。例えば、
+`SetBalance`メソッドを使用すると、呼び出し元は、適切な供給追跡をバイパスする場合でも、任意のアカウントの残高を任意に設定できます。
 
-There appears to have been some later attempts to implement some semblance of OCAPs using module-level minting, staking
-and burning permissions. These permissions allow a module to mint, burn or delegate tokens with reference to the module’s
-own account. These permissions are actually stored as a `[]string` array on the `ModuleAccount` type in state.
+その後、いくつかのOCAPの外観を実現するために、モジュールレベルのキャスティングと住宅ローンを使用する試みがいくつかあったようです。
+そして、許可を焼きます。これらの権限により、モジュールはモジュールの
+自分のアカウント。これらの権限は、実際には、状態の「ModuleAccount」タイプの「[] string」配列に格納されます。
 
-However, these permissions don’t really do much. They control what modules can be referenced in the `MintCoins`,
-`BurnCoins` and `DelegateCoins***` methods, but for one there is no unique object capability token that controls access —
-just a simple string. So the `x/upgrade` module could mint tokens for the `x/staking` module simple by calling
-`MintCoins(“staking”)`. Furthermore, all modules which have access to these keeper methods, also have access to
-`SetBalance` negating any other attempt at OCAPs and breaking even basic object-oriented encapsulation.
+ただし、これらの権限は実際にはあまり効果がありません。これらは、「MintCoins」で参照できるモジュールを制御します。
+`BurnCoins`メソッドと` DelegateCoins *** `メソッドがありますが、そのうちの1つには、アクセスを制御するための一意のオブジェクト機能トークンがありません-
+単純な文字列。したがって、 `x .upgrade`モジュールは、を呼び出すことで、` x .stakeing`モジュールのトークンを単純に作成できます。
+`MintCoins("ステーキング ")`。さらに、これらのキーパーメソッドにアクセスできるすべてのモジュールもアクセスできます
+`SetBalance`は、OCAPによる他の試みを無効にし、基本的なオブジェクト指向のカプセル化さえも破壊します。
 
-## Decision
+## 決定
 
-Based on [ADR-021](./adr-021-protobuf-query-encoding.md) and [ADR-031](./adr-031-msg-service.md), we introduce the
-Inter-Module Communication framework for secure module authorization and OCAPs.
-When implemented, this could also serve as an alternative to the existing paradigm of passing keepers between
-modules. The approach outlined here-in is intended to form the basis of a Cosmos SDK v1.0 that provides the necessary
-stability and encapsulation guarantees that allow a thriving module ecosystem to emerge.
+[ADR-021](..adr-021-protobuf-query-encoding.md)と[ADR-031](..adr-031-msg-service.md)に基づいて、
+セキュリティモジュールの承認とOCAPのためのモジュール間通信フレームワーク。
+実装後、これは既存のパラダイムの代替として使用することもできます。
+モジュール。ここで概説する方法は、Cosmos SDK v1.0の基礎を形成し、必要なものを提供することを目的としています。
+安定性とパッケージングの保証により、繁栄するモジュールエコシステムが出現しました。
 
-Of particular note — the decision is to _enable_ this functionality for modules to adopt at their own discretion.
-Proposals to migrate existing modules to this new paradigm will have to be a separate conversation, potentially
-addressed as amendments to this ADR.
+特に注目に値するのは、モジュールがそれを単独で採用することを決定できるように、この関数を_enable_決定することです。
+既存のモジュールをこの新しいパラダイムに移行するという提案は、別の会話である必要があります。
+このADRの修正として。
 
-### New "Keeper" Paradigm
+### 新しい「ガーディアン」パラダイム
 
-In [ADR 021](./adr-021-protobuf-query-encoding.md), a mechanism for using protobuf service definitions to define queriers
-was introduced and in [ADR 31](./adr-031-msg-service.md), a mechanism for using protobuf service to define `Msg`s was added.
-Protobuf service definitions generate two golang interfaces representing the client and server sides of a service plus
-some helper code. Here is a minimal example for the bank `cosmos.bank.Msg/Send` message type:
+[ADR 021](..adr-021-protobuf-query-encoding.md)では、protobufサービス定義を使用してクエリを定義するためのメカニズム
+[ADR 31](..adr-031-msg-service.md)で導入され、protobufサービスを使用して `Msg`を定義するメカニズムが追加されました。
+Protobufサービス定義は、サービスのクライアント側とサーバー側を表す2つのgolangインターフェースに加えて
+いくつかのヘルプコード。以下は、銀行 `cosmos.bank.Msg .Send`のメッセージタイプの最小限の例です。 
 
 ```go
 package bank
@@ -77,66 +77,66 @@ type MsgServer interface {
 }
 ```
 
-[ADR 021](./adr-021-protobuf-query-encoding.md) and [ADR 31](./adr-031-msg-service.md) specifies how modules can implement the generated `QueryServer`
-and `MsgServer` interfaces as replacements for the legacy queriers and `Msg` handlers respectively.
+[ADR 021](..adr-021-protobuf-query-encoding.md)および[ADR 31](..adr-031-msg-service.md)は、モジュールが生成された `QueryServer`を実装する方法を指定します
+と `MsgServer`インターフェースは、それぞれ古いクエリャーと` Msg`ハンドラーの代わりに使用されます。
 
-In this ADR we explain how modules can make queries and send `Msg`s to other modules using the generated `QueryClient`
-and `MsgClient` interfaces and propose this mechanism as a replacement for the existing `Keeper` paradigm. To be clear,
-this ADR does not necessitate the creation of new protobuf definitions or services. Rather, it leverages the same proto
-based service interfaces already used by clients for inter-module communication.
+このADRでは、モジュールが生成された `QueryClient`を使用して、` Msg`をクエリして他のモジュールに送信する方法について説明しました。
+`MsgClient`とインターフェイスし、既存の` Keeper`パラダイムを置き換えるこのメカニズムを提案します。明確にするために、
+このADRでは、新しいprotobuf定義またはサービスを作成する必要はありません。代わりに、同じプロトタイプを使用します
+クライアントがモジュール間の通信に使用したサービスインターフェイスに基づきます。
 
-Using this `QueryClient`/`MsgClient` approach has the following key benefits over exposing keepers to external modules:
+この `QueryClient`.` MsgClient`メソッドを使用すると、Keepersを外部モジュールに公開するよりも次の主な利点があります。
 
-1. Protobuf types are checked for breaking changes using [buf](https://buf.build/docs/breaking-overview) and because of
-the way protobuf is designed this will give us strong backwards compatibility guarantees while allowing for forward
-evolution.
-2. The separation between the client and server interfaces will allow us to insert permission checking code in between
-the two which checks if one module is authorized to send the specified `Msg` to the other module providing a proper
-object capability system (see below).
-3. The router for inter-module communication gives us a convenient place to handle rollback of transactions,
-enabling atomicy of operations ([currently a problem](https://github.com/cosmos/cosmos-sdk/issues/8030)). Any failure within a module-to-module call would result in a failure of the entire
-transaction
+1. [buf](https://buf.build/docs/break-overview)を使用して、Protobufタイプの重大な変更を確認します。
+protobufの設計により、前方互換性を確保しながら、強力な下位互換性が保証されます。
+進化。
+2.クライアントインターフェイスとサーバーインターフェイスを分離することで、2つの間に権限チェックコードを挿入できるようになります
+これらの2つは、モジュールが指定された `Msg`を別のモジュールに送信して適切なものを提供することを許可されているかどうかを確認します
+オブジェクト能力システム(以下を参照)。
+3.モジュール間の通信に使用されるルーターは、トランザクションのロールバックを処理するための便利な場所を提供します。
+操作のアトミック性を有効にします([現在の問題](https://github.com/cosmos/cosmos-sdk/issues/8030))。モジュール間呼び出しで障害が発生すると、モジュール全体で障害が発生します
+トレード
 
-This mechanism has the added benefits of:
+このメカニズムには、次の追加の利点があります。
 
-- reducing boilerplate through code generation, and
-- allowing for modules in other languages either via a VM like CosmWasm or sub-processes using gRPC
+-コード生成を通じてボイラープレートを削減し、
+-CosmWasmなどのVMまたはgRPCを使用する子プロセスを介して他の言語のモジュールを使用できるようにする
 
-### Inter-module Communication
+### モジュール間通信
 
-To use the `Client` generated by the protobuf compiler we need a `grpc.ClientConn` [interface](https://github.com/regen-network/protobuf/blob/cosmos/grpc/types.go#L12)
-implementation. For this we introduce
-a new type, `ModuleKey`, which implements the `grpc.ClientConn` interface. `ModuleKey` can be thought of as the "private
-key" corresponding to a module account, where authentication is provided through use of a special `Invoker()` function,
-described in more detail below.
+protobufコンパイラによって生成された `Client`を使用するには、` grpc.ClientConn` [interface](https://github.com/regen-network/protobuf/blob/cosmos/grpc/types.go#L12)が必要です。
+埋め込む。このために私たちは紹介します
+`grpc.ClientConn`インターフェースを実装する新しいタイプ` ModuleKey`。 `ModuleKey`は「プライベート」と見なすことができます
+「キー」はモジュールアカウントに対応し、特別な `Invoker()`関数を使用して認証を提供します。
+これについては、以下で詳しく説明します。
 
-Blockchain users (external clients) use their account's private key to sign transactions containing `Msg`s where they are listed as signers (each
-message specifies required signers with `Msg.GetSigner`). The authentication checks is performed by `AnteHandler`.
+ブロックチェーンユーザー(外部クライアント)は、アカウントの秘密鍵を使用して、署名者としてリストされている「メッセージ」を含むトランザクションに署名します(それぞれ
+メッセージは `Msg.GetSigner`を使用して必要な署名者を指定します)。認証チェックは `AnteHandler`によって実行されます。
 
-Here, we extend this process, by allowing modules to be identified in `Msg.GetSigners`. When a module wants to trigger the execution a `Msg` in another module,
-its `ModuleKey` acts as the sender (through the `ClientConn` interface we describe below) and is set as a sole "signer". It's worth to note
-that we don't use any cryptographic signature in this case.
-For example, module `A` could use its `A.ModuleKey` to create `MsgSend` object for `/cosmos.bank.Msg/Send` transaction. `MsgSend` validation
-will assure that the `from` account (`A.ModuleKey` in this case) is the signer.
+ここでは、モジュールを `Msg.GetSigners`で識別できるようにすることで、このプロセスを拡張します。モジュールが別のモジュールで `Msg`の実行をトリガーしたい場合、
+その `ModuleKey`は送信者として機能し(以下で説明する` ClientConn`インターフェースを介して)、唯一の「署名者」として設定されます。注目に値する
+この場合、暗号化署名は使用しません。
+たとえば、モジュール `A`は、その` A.ModuleKey`を使用して、 `.cosmos.bank.Msg .Send`トランザクション用の` MsgSend`オブジェクトを作成できます。 `MsgSend`検証
+これにより、 `from`アカウント(この場合は` A.ModuleKey`)が署名者になります。
 
-Here's an example of a hypothetical module `foo` interacting with `x/bank`:
+以下は、モジュール `foo`が` x .bank`と相互作用すると仮定した例です。 
 
 ```go
 package foo
 
 
 type FooMsgServer {
-  // ...
+ .....
 
   bankQuery bank.QueryClient
   bankMsg   bank.MsgClient
 }
 
 func NewFooMsgServer(moduleKey RootModuleKey, ...) FooMsgServer {
-  // ...
+ .....
 
   return FooMsgServer {
-    // ...
+   .....
     modouleKey: moduleKey,
     bankQuery: bank.NewQueryClient(moduleKey),
     bankMsg: bank.NewMsgClient(moduleKey),
@@ -154,18 +154,18 @@ func (foo *FooMsgServer) Bar(ctx context.Context, req *MsgBarRequest) (*MsgBarRe
 }
 ```
 
-This design is also intended to be extensible to cover use cases of more fine grained permissioning like minting by
-denom prefix being restricted to certain modules (as discussed in
-[#7459](https://github.com/cosmos/cosmos-sdk/pull/7459#discussion_r529545528)).
+この設計は、たとえばキャストによって、よりきめ細かいライセンスのユースケースをカバーするように拡張できることも目的としています。
+denomプレフィックスは、特定のモジュールに制限されています(例:
+[#7459](https://github.com/cosmos/cosmos-sdk/pull/7459#discussion_r529545528))。
 
-### `ModuleKey`s and `ModuleID`s
+### `ModuleKey`sと` ModuleID`s
 
-A `ModuleKey` can be thought of as a "private key" for a module account and a `ModuleID` can be thought of as the
-corresponding "public key". From the [ADR 028](./adr-028-public-key-addresses.md), modules can have both a root module account and any number of sub-accounts
-or derived accounts that can be used for different pools (ex. staking pools) or managed accounts (ex. group
-accounts). We can also think of module sub-accounts as similar to derived keys - there is a root key and then some
-derivation path. `ModuleID` is a simple struct which contains the module name and optional "derivation" path,
-and forms its address based on the `AddressHash` method from [the ADR-028](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-028-public-key-addresses.md):
+`ModuleKey`はモジュールアカウントの「秘密鍵」と見なすことができ、` ModuleID`は次のように見なすことができます
+対応する「公開鍵」。 [ADR 028](..adr-028-public-key-addresses.md)から、モジュールはルートモジュールアカウントと任意の数のサブアカウントを持つことができます
+または、さまざまなプール(例:誓約プール)または管理アカウント(例:グループ)で使用できます
+アカウント)。 モジュールサブアカウントは派生キーに似ていると考えることもできます。ルートキーがあり、次にいくつかあります。
+パスを導き出します。 `ModuleID`は、モジュール名とオプションの「派生」パスを含む単純な構造です。
+そして、[ADR-028](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-028-public-key-addresses)の `AddressHash`メソッドに従ってアドレスを形成します。md): 
 
 ```go
 type ModuleID struct {
@@ -178,15 +178,18 @@ func (key ModuleID) Address() []byte {
 }
 ```
 
-In addition to being able to generate a `ModuleID` and address, a `ModuleKey` contains a special function called
-`Invoker` which is the key to safe inter-module access. The `Invoker` creates an `InvokeFn` closure which is used as an `Invoke` method in
-the `grpc.ClientConn` interface and under the hood is able to route messages to the appropriate `Msg` and `Query` handlers
-performing appropriate security checks on `Msg`s. This allows for even safer inter-module access than keeper's whose
-private member variables could be manipulated through reflection. Golang does not support reflection on a function
-closure's captured variables and direct manipulation of memory would be needed for a truly malicious module to bypass
-the `ModuleKey` security.
+この設計は、たとえばキャストによって、よりきめ細かいライセンスのユースケースをカバーするように拡張できることも目的としています。
+denomプレフィックスは、特定のモジュールに制限されています(例:
+[#7459](https://github.com/cosmos/cosmos-sdk/pull/7459#discussion_r529545528))。
 
-The two `ModuleKey` types are `RootModuleKey` and `DerivedModuleKey`:
+### `ModuleKey`sと` ModuleID`s
+
+`ModuleKey`はモジュールアカウントの「秘密鍵」と見なすことができ、` ModuleID`は次のように見なすことができます
+対応する「公開鍵」。 [ADR 028](..adr-028-public-key-addresses.md)から、モジュールはルートモジュールアカウントと任意の数のサブアカウントを持つことができます
+または、さまざまなプール(例:誓約プール)または管理アカウント(例:グループ)で使用できます
+アカウント)。 モジュールサブアカウントは派生キーに似ていると考えることもできます。ルートキーがあり、次にいくつかあります。
+パスを導き出します。 `ModuleID`は、モジュール名とオプションの「派生」パスを含む単純な構造です。
+そして、[ADR-028](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-028-public-key-addresses)の `AddressHash`メソッドに従ってアドレスを形成します。md): 
 
 ```go
 type Invoker func(callInfo CallInfo) func(ctx context.Context, request, response interface{}, opts ...interface{}) error
@@ -201,7 +204,7 @@ type RootModuleKey struct {
   invoker Invoker
 }
 
-func (rm RootModuleKey) Derive(path []byte) DerivedModuleKey { /* ... */}
+func (rm RootModuleKey) Derive(path []byte) DerivedModuleKey {.* ... */}
 
 type DerivedModuleKey struct {
   moduleName string
@@ -210,8 +213,8 @@ type DerivedModuleKey struct {
 }
 ```
 
-A module can get access to a `DerivedModuleKey`, using the `Derive(path []byte)` method on `RootModuleKey` and then
-would use this key to authenticate `Msg`s from a sub-account. Ex:
+モジュールは、 `RootModuleKey`で` Derive(path [] byte) `メソッドを使用して、` DerivedModuleKey`にアクセスできます。
+このキーは、サブアカウントからの「メッセージ」を確認するために使用されます。 元: 
 
 ```go
 package foo
@@ -224,20 +227,20 @@ func (fooMsgServer *MsgServer) Bar(ctx context.Context, req *MsgBar) (*MsgBarRes
 }
 ```
 
-In this way, a module can gain permissioned access to a root account and any number of sub-accounts and send
-authenticated `Msg`s from these accounts. The `Invoker` `callInfo.Caller` parameter is used under the hood to
-distinguish between different module accounts, but either way the function returned by `Invoker` only allows `Msg`s
-from either the root or a derived module account to pass through.
+このようにして、モジュールはルートアカウントと任意の数のサブアカウントにアクセスして送信するためのアクセス許可を取得できます
+これらのアカウントからの認証された「メッセージ」。 `Invoker``callInfo.Caller`パラメータがバックグラウンドで使用されます
+異なるモジュールアカウントを区別しますが、どちらの方法でも、 `Invoker`によって返される関数は` Msg`のみを許可します
+ルートまたは派生モジュールアカウントから渡します。
 
-Note that `Invoker` itself returns a function closure based on the `CallInfo` passed in. This will allow client implementations
-in the future that cache the invoke function for each method type avoiding the overhead of hash table lookup.
-This would reduce the performance overhead of this inter-module communication method to the bare minimum required for
-checking permissions.
+`Invoker`自体は、渡された` CallInfo`に基づいて関数クロージャを返すことに注意してください。 これにより、クライアントは実装できるようになります
+将来的には、ハッシュテーブルルックアップのオーバーヘッドを回避するために、各メソッドタイプの呼び出し関数がキャッシュされます。
+これにより、このモジュール間通信方式のパフォーマンスオーバーヘッドが最小限に抑えられます。
+権限を確認してください。
 
-To re-iterate, the closure only allows access to authorized calls. There is no access to anything else regardless of any
-name impersonation.
+繰り返しになりますが、クロージャはアクセス許可呼び出しのみを許可します。 他のものにアクセスする方法はありません
+名前になりすます。
 
-Below is a rough sketch of the implementation of `grpc.ClientConn.Invoke` for `RootModuleKey`:
+以下は、「RootModuleKey」の「grpc.ClientConn.Invoke」実装の大まかなスケッチです。 
 
 ```go
 func (key RootModuleKey) Invoke(ctx context.Context, method string, args, reply interface{}, opts ...grpc.CallOption) error {
@@ -246,11 +249,11 @@ func (key RootModuleKey) Invoke(ctx context.Context, method string, args, reply 
 }
 ```
 
-### `AppModule` Wiring and Requirements
+### `AppModule`の配線と要件
 
-In [ADR 031](./adr-031-msg-service.md), the `AppModule.RegisterService(Configurator)` method was introduced. To support
-inter-module communication, we extend the `Configurator` interface to pass in the `ModuleKey` and to allow modules to
-specify their dependencies on other modules using `RequireServer()`:
+[ADR 031](..adr-031-msg-service.md)では、 `AppModule.RegisterService(Configurator)`メソッドが導入されました。 サポート
+モジュール間の通信のために、 `Configurator`インターフェースを拡張して` ModuleKey`を渡し、モジュールを許可します
+`RequireServer()`を使用して、他のモジュールへの依存関係を指定します。 
 
 ```go
 type Configurator interface {
@@ -262,15 +265,15 @@ type Configurator interface {
 }
 ```
 
-The `ModuleKey` is passed to modules in the `RegisterService` method itself so that `RegisterServices` serves as a single
-entry point for configuring module services. This is intended to also have the side-effect of greatly reducing boilerplate in
-`app.go`. For now, `ModuleKey`s will be created based on `AppModuleBasic.Name()`, but a more flexible system may be
-introduced in the future. The `ModuleManager` will handle creation of module accounts behind the scenes.
+`ModuleKey`は` RegisterService`メソッド自体でモジュールに渡されるため、 `RegisterServices`は単一のものとして
+モジュールサービスのエントリポイントを構成します。 これは、ボイラープレートを大幅に削減するという副作用もあります。
+`app.go`。 現在、 `ModuleKey`は` AppModuleBasic.Name() `に基づいて作成されますが、より柔軟なシステムは
+将来。 `ModuleManager`は、バックグラウンドでモジュールアカウントの作成を処理します。
 
-Because modules do not get direct access to each other anymore, modules may have unfulfilled dependencies. To make sure
-that module dependencies are resolved at startup, the `Configurator.RequireServer` method should be added. The `ModuleManager`
-will make sure that all dependencies declared with `RequireServer` can be resolved before the app starts. An example
-module `foo` could declare it's dependency on `x/bank` like this:
+モジュールは相互に直接アクセスできなくなったため、モジュールの依存関係が満たされていない可能性があります。 確実に
+起動時にモジュールの依存関係が解決された場合は、 `Configurator.RequireServer`メソッドを追加する必要があります。 `モジュールマネージャー`
+これにより、アプリケーションが起動する前に、RequireServerで宣言されたすべての依存関係を解決できるようになります。 一例
+モジュール `foo`は、次のように` x .bank`への依存関係を宣言できます。 
 
 ```go
 package foo
@@ -281,31 +284,31 @@ func (am AppModule) RegisterServices(cfg Configurator) {
 }
 ```
 
-### Security Considerations
+### 安全上のご注意
 
-In addition to checking for `ModuleKey` permissions, a few additional security precautions will need to be taken by
-the underlying router infrastructure.
+「ModuleKey」権限の確認に加えて、いくつかの追加のセキュリティ対策を講じる必要があります
+基盤となるルーターインフラストラクチャ。
 
-#### Recursion and Re-entry
+#### 再帰と再入可能
 
-Recursive or re-entrant method invocations pose a potential security threat. This can be a problem if Module A
-calls Module B and Module B calls module A again in the same call.
+再帰的または再入可能なメソッド呼び出しは、潜在的なセキュリティの脅威を構成します。モジュールAの場合、これは問題である可能性があります
+モジュールBとモジュールBを同じ呼び出しで呼び出します。モジュールAが再度呼び出されます。
 
-One basic way for the router system to deal with this is to maintain a call stack which prevents a module from
-being referenced more than once in the call stack so that there is no re-entry. A `map[string]interface{}` table
-in the router could be used to perform this security check.
+ルータシステムがこの問題に対処するための基本的な方法は、モジュールを防ぐためにコールスタックを維持することです。
+コールスタックで複数回参照されるため、再入力されません。 `map [string] interface {}`テーブル
+このセキュリティチェックを実行するためにルータで使用できます。
 
-#### Queries
+#### お問い合わせ
 
-Queries in Cosmos SDK are generally un-permissioned so allowing one module to query another module should not pose
-any major security threats assuming basic precautions are taken. The basic precaution that the router system will
-need to take is making sure that the `sdk.Context` passed to query methods does not allow writing to the store. This
-can be done for now with a `CacheMultiStore` as is currently done for `BaseApp` queries.
+Cosmos SDKのクエリは通常ライセンスがないため、あるモジュールが別のモジュールにクエリを実行できるようにすることは、構成されるべきではありません。
+基本的な予防策を講じる場合、主要なセキュリティ上の脅威。ルーターシステムの基本的な注意事項
+queryメソッドに渡された `sdk.Context`がストレージへの書き込みを許可されていないことを確認する必要があります。この
+これは、「BaseApp」クエリに対して現在実行されているのと同じように、「CacheMultiStore」を使用して実行できるようになりました。
 
-### Internal Methods
+### 内部メソッド
 
-In many cases, we may wish for modules to call methods on other modules which are not exposed to clients at all. For this
-purpose, we add the `InternalServer` method to `Configurator`:
+多くの場合、モジュールが他のモジュールのメソッドを呼び出す必要があり、これらのモジュールはクライアントにまったく公開されません。このため
+目標を達成するために、 `InternalServer`メソッドを` Configurator`に追加します。 
 
 ```go
 type Configurator interface {
@@ -315,86 +318,85 @@ type Configurator interface {
 }
 ```
 
-As an example, x/slashing's Slash must call x/staking's Slash, but we don't want to expose x/staking's Slash to end users
-and clients.
+たとえば、Slash of x .stakeingはSlashof x .stakingを呼び出す必要がありますが、Slash of x .stakeingをエンドユーザーに公開したくありません。
+顧客と。
 
-Internal protobuf services will be defined in a corresponding `internal.proto` file in the given module's
-proto package.
+内部protobufサービスは、指定されたモジュールの対応する「internal.proto」ファイルで定義されます。
+プロトタイプパッケージ。
 
-Services registered against `InternalServer` will be callable from other modules but not by external clients.
+「InternalServer」に登録されているサービスは、他のモジュールから呼び出すことはできますが、外部クライアントから呼び出すことはできません。
 
-An alternative solution to internal-only methods could involve hooks / plugins as discussed [here](https://github.com/cosmos/cosmos-sdk/pull/7459#issuecomment-733807753).
-A more detailed evaluation of a hooks / plugin system will be addressed later in follow-ups to this ADR or as a separate
-ADR.
+内部アプローチの別の解決策には、[ここ](https://github.com/cosmos/cosmos-sdk/pull/7459#issuecomment-733807753)で説明されているフック/プラグインが含まれる場合があります。
+フック/プラグインシステムのより詳細な評価は、このADRのフォローアップで、または個別に行われます。
+ADR。
 
-### Authorization
+### 承認
 
-By default, the inter-module router requires that messages are sent by the first signer returned by `GetSigners`. The
-inter-module router should also accept authorization middleware such as that provided by [ADR 030](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-030-authz-module.md).
-This middleware will allow accounts to otherwise specific module accounts to perform actions on their behalf.
-Authorization middleware should take into account the need to grant certain modules effectively "admin" privileges to
-other modules. This will be addressed in separate ADRs or updates to this ADR.
+デフォルトでは、モジュール間ルーターでは、GetSignersから返された最初の署名者がメッセージを送信する必要があります。この
+モジュール間ルーターは、[ADR 030](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-030-authz-module.md)などの承認されたミドルウェアも受け入れる必要があります。 。
+ミドルウェアは、アカウントが他の方法で特定のモジュールアカウントに代わって操作を実行できるようにします。
+承認ミドルウェアは、特定のモジュールに「管理者」権限を効果的に付与する必要性を考慮する必要があります
+その他のモジュール。これは、別のADRまたはこのADRの更新で解決されます。
 
-### Future Work
+### 将来の仕事
 
-Other future improvements may include:
+その他の将来の改善には、次のものが含まれる可能性があります。
 
-* custom code generation that:
-    * simplifies interfaces (ex. generates code with `sdk.Context` instead of `context.Context`)
-    * optimizes inter-module calls - for instance caching resolved methods after first invocation
-* combining `StoreKey`s and `ModuleKey`s into a single interface so that modules have a single OCAPs handle
-* code generation which makes inter-module communication more performant
-* decoupling `ModuleKey` creation from `AppModuleBasic.Name()` so that app's can override root module account names
-* inter-module hooks and plugins
+*カスタムコード生成:
+    *インターフェイスを簡素化します(たとえば、コードを生成するには、 `context.Context`の代わりに` sdk.Context`を使用します)
+    *モジュール間の呼び出しを最適化する-たとえば、最初の呼び出し後に解決をキャッシュする方法
+* `StoreKey`と` ModuleKey`を1つのインターフェースに結合して、モジュールが個別のOCAPハンドルを持つようにします。
+*モジュール間の通信をより効率的にするためのコード生成
+*アプリケーションがルートモジュールアカウント名を上書きできるように、 `ModuleKey`の作成を` AppModuleBasic.Name() `から切り離します
+*モジュール間フックとプラグイン
 
-## Alternatives
+##代替プラン
 
-### MsgServices vs `x/capability`
+### MsgServicesと `x .capability`
 
-The `x/capability` module does provide a proper object-capability implementation that can be used by any module in the
-Cosmos SDK and could even be used for inter-module OCAPs as described in [\#5931](https://github.com/cosmos/cosmos-sdk/issues/5931).
+`x .capability`モジュールは、適切なオブジェクト機能の実装を提供します。
+[\#5931](https://github.com/cosmos/cosmos-sdk/issues/5931)で説明されているように、CosmosSDKはモジュール間OCAPにも使用できます。
 
-The advantages of the approach described in this ADR are mostly around how it integrates with other parts of the Cosmos SDK,
-specifically:
+このADRで説明されている方法の主な利点は、CosmosSDKの他の部分と統合する方法にあります。
+具体的には:
 
-* protobuf so that:
-    * code generation of interfaces can be leveraged for a better dev UX
-    * module interfaces are versioned and checked for breakage using [buf](https://docs.buf.build/breaking-overview)
-* sub-module accounts as per ADR 028
-* the general `Msg` passing paradigm and the way signers are specified by `GetSigners`
+*次の目的でprotobuf:
+    *インターフェイスのコード生成を使用して、開発ユーザーエクスペリエンスを向上させることができます
+    * [buf](https://docs.buf.build/break-overview)を使用して、モジュールインターフェイスをバージョン管理し、損傷をチェックします
+* ADR028のサブモジュールアカウントによると
+*パラダイムと署名者を渡す一般的な `Msg`メソッドは` GetSigners`によって指定されます
 
-Also, this is a complete replacement for keepers and could be applied to _all_ inter-module communication whereas the
-`x/capability` approach in #5931 would need to be applied method by method.
+さらに、これはキーパーの完全な代替品であり、モジュール間通信のすべてに適用できます。
+#5931の `x .capability`メソッドは1つずつ適用する必要があります。
 
-## Consequences
+## 結果
 
-### Backwards Compatibility
+### 下位互換性
 
-This ADR is intended to provide a pathway to a scenario where there is greater long term compatibility between modules.
-In the short-term, this will likely result in breaking certain `Keeper` interfaces which are too permissive and/or
-replacing `Keeper` interfaces altogether.
+このADRは、モジュール間の長期的な互換性が高いシナリオの方法を提供することを目的としています。
+短期的には、これは過度に寛大なおよび/または
+`Keeper`インターフェースを完全に置き換えます。
+### ポジティブ
 
-### Positive
+-安定したモジュール間インターフェースをより簡単に実装できるKeepersの代替
+-適切なモジュール間OCAP
+-一部の参加者がコメントしたように、モジュール開発者DevXを改善しました
+     [アーキテクチャレビュー電話会議、12月3日](https://hackmd.io/E0wxxOvRQ5qVmTf6N_k84Q)
+-大幅に簡素化された「app.go」の基盤を築く
+-ルーターは、モジュールからモジュールへの呼び出しへのアトミックトランザクションを実施するように設定できます
 
-- an alternative to keepers which can more easily lead to stable inter-module interfaces
-- proper inter-module OCAPs
-- improved module developer DevX, as commented on by several particpants on
-    [Architecture Review Call, Dec 3](https://hackmd.io/E0wxxOvRQ5qVmTf6N_k84Q)
-- lays the groundwork for what can be a greatly simplified `app.go`
-- router can be setup to enforce atomic transactions for module-to-module calls
+### ネガティブ
 
-### Negative
+-この方法のモジュールには、多くのリファクタリングが必要になります
 
-- modules which adopt this will need significant refactoring
+### ニュートラル
 
-### Neutral
+## テストケース[オプション]
 
-## Test Cases [optional]
+## 参照
 
-## References
-
-- [ADR 021](./adr-021-protobuf-query-encoding.md)
-- [ADR 031](./adr-031-msg-service.md)
-- [ADR 028](./adr-028-public-key-addresses.md)
-- [ADR 030 draft](https://github.com/cosmos/cosmos-sdk/pull/7105)
-- [Object-Capability Model](../docs/core/ocap.md)
+-[ADR 021](..adr-021-protobuf-query-encoding.md)
+-[ADR 031](..adr-031-msg-service.md)
+-[ADR 028](..adr-028-public-key-addresses.md)
+-[ADR 030ドラフト](https://github.com/cosmos/cosmos-sdk/pull/7105)
+-[オブジェクト機能モデル](...docs .core .ocap.md) 

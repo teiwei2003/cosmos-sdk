@@ -1,29 +1,27 @@
-# ADR 045: BaseApp `{Check,Deliver}Tx` as Middlewares
+# ADR 045:ミドルウェアとしてのBaseApp `{Check、Deliver} Tx`
 
-## Changelog
+## 変更ログ
 
-- 20.08.2021: Initial draft.
-- 07.12.2021: Update `tx.Handler` interface ([\#10693](https://github.com/cosmos/cosmos-sdk/pull/10693)).
+-20.08.2021:最初のドラフト。
+-07.12.2021: `tx.Handler`インターフェースを更新します([\#10693](https://github.com/cosmos/cosmos-sdk/pull/10693))。
 
-## Status
+## 状態
 
-ACCEPTED
+受け入れられました
 
-## Abstract
+## 概要
 
-This ADR replaces the current BaseApp `runTx` and antehandlers design with a middleware-based design.
+このADRは、現在のBaseApp`runTx`およびアンティハンドラーの設計をミドルウェアベースの設計に置き換えます。
 
-## Context
+## 環境
 
-BaseApp's implementation of ABCI `{Check,Deliver}Tx()` and its own `Simulate()` method call the `runTx` method under the hood, which first runs antehandlers, then executes `Msg`s. However, the [transaction Tips](https://github.com/cosmos/cosmos-sdk/issues/9406) and [refunding unused gas](https://github.com/cosmos/cosmos-sdk/issues/2150) use cases require custom logic to be run after the `Msg`s execution. There is currently no way to achieve this.
+BaseAppのABCI` {Check、Deliver} Tx() `と独自の` Simulate() `メソッドの実装は、基礎となる` runTx`メソッドを呼び出します。このメソッドは、最初にアンティハンドラーを実行し、次に `Msg`を実行します。ただし、[トランザクションのヒント](https://github.com/cosmos/cosmos-sdk/issues/9406)および[未使用のガスの払い戻し](https://github.com/cosmos/cosmos-sdk/issues.2150 )ユースケースでは、 `Msg`の実行後にカスタムロジックを実行する必要があります。現在、これを達成する方法はありません。
 
-An naive solution would be to add post-`Msg` hooks to BaseApp. However, the Cosmos SDK team thinks in parallel about the bigger picture of making app wiring simpler ([#9181](https://github.com/cosmos/cosmos-sdk/discussions/9182)), which includes making BaseApp more lightweight and modular.
+簡単な解決策は、ポスト `Msg`フックをBaseAppに追加することです。ただし、Cosmos SDKチームは、アプリケーションの配線を容易にする全体像も検討しています([#9181](https://github.com/cosmos/cosmos-sdk/discussions/9182))。これには、BaseAppの軽量化とモジュール性。
 
-## Decision
+## 決定
 
-We decide to transform Baseapp's implementation of ABCI `{Check,Deliver}Tx` and its own `Simulate` methods to use a middleware-based design.
-
-The two following interfaces are the base of the middleware design, and are defined in `types/tx`:
+BaseappのABCI` {Check、Deliver} Tx`実装と独自の `Simulate`メソッドを変換して、ミドルウェアベースの設計を使用することにしました。
 
 ```go
 type Handler interface {
@@ -35,7 +33,7 @@ type Handler interface {
 type Middleware func(Handler) Handler
 ```
 
-where we define the following arguments and return types:
+ここでは、次のパラメーターと戻り値のタイプを定義しました。 
 
 ```go
 type Request struct {
@@ -46,9 +44,9 @@ type Request struct {
 type Response struct {
 	GasWanted uint64
 	GasUsed   uint64
-	// MsgResponses is an array containing each Msg service handler's response
-	// type, packed in an Any. This will get proto-serialized into the `Data` field
-	// in the ABCI Check/DeliverTx responses.
+	/.MsgResponses is an array containing each Msg service handler's response
+	/.type, packed in an Any. This will get proto-serialized into the `Data` field
+	/.in the ABCI Check/DeliverTx responses.
 	MsgResponses []*codectypes.Any
 	Log          string
 	Events       []abci.Event
@@ -63,18 +61,18 @@ type ResponseCheckTx struct {
 }
 ```
 
-Please note that because CheckTx handles separate logic related to mempool priotization, its signature is different than DeliverTx and SimulateTx.
+CheckTxはメモリプールの優先順位付けに関連する個別のロジックを処理するため、そのシグネチャはDeliverTxおよびSimulateTxとは異なることに注意してください。
 
-BaseApp holds a reference to a `tx.Handler`:
+BaseAppは `tx.Handler`への参照を保持します: 
 
 ```go
 type BaseApp  struct {
-    // other fields
+   ..other fields
     txHandler tx.Handler
 }
 ```
 
-Baseapp's ABCI `{Check,Deliver}Tx()` and `Simulate()` methods simply call `app.txHandler.{Check,Deliver,Simulate}Tx()` with the relevant arguments. For example, for `DeliverTx`:
+BaseappのABCI` {Check、Deliver} Tx() `および` Simulate() `メソッドは、関連するパラメーターを使用して` app.txHandler。{Check、Deliver、Simulate} Tx() `を呼び出すだけです。 たとえば、 `DeliverTx`の場合: 
 
 ```go
 func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx {
@@ -94,7 +92,7 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 	return abciRes
 }
 
-// convertTxResponseToDeliverTx converts a tx.Response into a abci.ResponseDeliverTx.
+/.convertTxResponseToDeliverTx converts a tx.Response into a abci.ResponseDeliverTx.
 func convertTxResponseToDeliverTx(txRes tx.Response) (abci.ResponseDeliverTx, error) {
 	data, err := makeABCIData(txRes)
 	if err != nil {
@@ -108,83 +106,83 @@ func convertTxResponseToDeliverTx(txRes tx.Response) (abci.ResponseDeliverTx, er
 	}, nil
 }
 
-// makeABCIData generates the Data field to be sent to ABCI Check/DeliverTx.
+/.makeABCIData generates the Data field to be sent to ABCI Check/DeliverTx.
 func makeABCIData(txRes tx.Response) ([]byte, error) {
 	return proto.Marshal(&sdk.TxMsgData{MsgResponses: txRes.MsgResponses})
 }
 ```
 
-The implementations are similar for `BaseApp.CheckTx` and `BaseApp.Simulate`.
+「BaseApp.CheckTx」と「BaseApp.Simulate」の実装は似ています。
 
-`baseapp.txHandler`'s three methods' implementations can obviously be monolithic functions, but for modularity we propose a middleware composition design, where a middleware is simply a function that takes a `tx.Handler`, and returns another `tx.Handler` wrapped around the previous one.
+`baseapp.txHandler`の3つのメソッドの実装は明らかに単一の関数ですが、モジュール化のために、ミドルウェアが単なる関数であるミドルウェアの組み合わせ設計を提案します。ミドルウェアは` tx.Handler`を受け入れ、別の `txを返します。 .Handler``は前のものにラップされています。
 
-### Implementing a Middleware
+### ミドルウェアを実装する
 
-In practice, middlewares are created by Go function that takes as arguments some parameters needed for the middleware, and returns a `tx.Middleware`.
+実際、ミドルウェアはGo関数によって作成されます。この関数は、ミドルウェアに必要ないくつかのパラメーターをパラメーターとして受け取り、 `tx.Middleware`を返します。
 
-For example, for creating an arbitrary `MyMiddleware`, we can implement:
+たとえば、任意の `MyMiddleware`を作成するには、次のように実装できます。 
 
 ```go
-// myTxHandler is the tx.Handler of this middleware. Note that it holds a
-// reference to the next tx.Handler in the stack.
+/.myTxHandler is the tx.Handler of this middleware. Note that it holds a
+/.reference to the next tx.Handler in the stack.
 type myTxHandler struct {
-    // next is the next tx.Handler in the middleware stack.
+   ..next is the next tx.Handler in the middleware stack.
     next tx.Handler
-    // some other fields that are relevant to the middleware can be added here
+   ..some other fields that are relevant to the middleware can be added here
 }
 
-// NewMyMiddleware returns a middleware that does this and that.
+/.NewMyMiddleware returns a middleware that does this and that.
 func NewMyMiddleware(arg1, arg2) tx.Middleware {
     return func (txh tx.Handler) tx.Handler {
         return myTxHandler{
             next: txh,
-            // optionally, set arg1, arg2... if they are needed in the middleware
+           ..optionally, set arg1, arg2... if they are needed in the middleware
         }
     }
 }
 
-// Assert myTxHandler is a tx.Handler.
+/.Assert myTxHandler is a tx.Handler.
 var _ tx.Handler = myTxHandler{}
 
 func (h myTxHandler) CheckTx(ctx context.Context, req Request, checkReq RequestcheckTx) (Response, ResponseCheckTx, error) {
-    // CheckTx specific pre-processing logic
+   ..CheckTx specific pre-processing logic
 
-    // run the next middleware
+   ..run the next middleware
     res, checkRes, err := txh.next.CheckTx(ctx, req, checkReq)
 
-    // CheckTx specific post-processing logic
+   ..CheckTx specific post-processing logic
 
     return res, checkRes, err
 }
 
 func (h myTxHandler) DeliverTx(ctx context.Context, req Request) (Response, error) {
-    // DeliverTx specific pre-processing logic
+   ..DeliverTx specific pre-processing logic
 
-    // run the next middleware
+   ..run the next middleware
     res, err := txh.next.DeliverTx(ctx, tx, req)
 
-    // DeliverTx specific post-processing logic
+   ..DeliverTx specific post-processing logic
 
     return res, err
 }
 
 func (h myTxHandler) SimulateTx(ctx context.Context, req Request) (Response, error) {
-    // SimulateTx specific pre-processing logic
+   ..SimulateTx specific pre-processing logic
 
-    // run the next middleware
+   ..run the next middleware
     res, err := txh.next.SimulateTx(ctx, tx, req)
 
-    // SimulateTx specific post-processing logic
+   ..SimulateTx specific post-processing logic
 
     return res, err
 }
 ```
 
-### Composing Middlewares
+### 複合ミドルウェア
 
-While BaseApp simply holds a reference to a `tx.Handler`, this `tx.Handler` itself is defined using a middleware stack. The Cosmos SDK exposes a base (i.e. innermost) `tx.Handler` called `RunMsgsTxHandler`, which executes messages.
+BaseAppは `tx.Handler`への参照のみを保持しますが、この` tx.Handler`自体はミドルウェアスタックを使用して定義されます。 Cosmos SDKは、メッセージを実行する `RunMsgsTxHandler`と呼ばれる基本的な(つまり最も内側の)` tx.Handler`を公開します。
 
-Then, the app developer can compose multiple middlewares on top on the base `tx.Handler`. Each middleware can run pre-and-post-processing logic around its next middleware, as described in the section above. Conceptually, as an example, given the middlewares `A`, `B`, and `C` and the base `tx.Handler` `H` the stack looks like:
+次に、アプリケーション開発者は、基本的な `tx.Handler`の上に複数のミドルウェアを組み合わせることができます。 前のセクションで説明したように、各ミドルウェアは、次のミドルウェアの周りで前処理ロジックと後処理ロジックを実行できます。 概念的には、例として、ミドルウェア `A`、` B`、および `C`とベース` tx.Handler` `H`を考えると、スタックは次のようになります。 
 
 ```
 A.pre
@@ -196,26 +194,26 @@ A.pre
 A.post
 ```
 
-We define a `ComposeMiddlewares` function for composing middlewares. It takes the base handler as first argument, and middlewares in the "outer to inner" order. For the above stack, the final `tx.Handler` is:
+ミドルウェアをアセンブルするための `ComposeMiddlewares`関数を定義します。 基本的な処理プログラムを最初のパラメータとし、「外部から内部へ」の順にミドルウェアを使用します。 上記のスタックの場合、最終的な `tx.Handler`は次のとおりです。 
 
 ```go
 txHandler := middleware.ComposeMiddlewares(H, A, B, C)
 ```
 
-The middleware is set in BaseApp via its `SetTxHandler` setter:
+ミドルウェアは、「SetTxHandler」セッターを介してBaseAppに設定されます。 
 
 ```go
-// simapp/app.go
+/.simapp/app.go
 
 txHandler := middleware.ComposeMiddlewares(...)
 app.SetTxHandler(txHandler)
 ```
 
-The app developer can define their own middlewares, or use the Cosmos SDK's pre-defined middlewares from `middleware.NewDefaultTxHandler()`.
+アプリケーション開発者は、独自のミドルウェアを定義するか、CosmosSDKの `middleware.NewDefaultTxHandler()`から事前定義されたミドルウェアを使用できます。 
 
-### Middlewares Maintained by the Cosmos SDK
+### ミドルウェアはCosmosSDKによって維持されています
 
-While the app developer can define and compose the middlewares of their choice, the Cosmos SDK provides a set of middlewares that caters for the ecosystem's most common use cases. These middlewares are:
+アプリケーション開発者は選択したミドルウェアを定義して組み合わせることができますが、Cosmos SDKは、エコシステムの最も一般的なユースケースを満たすミドルウェアのセットを提供します。 これらのミドルウェアは次のとおりです。
 
 | Middleware              | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -226,86 +224,85 @@ While the app developer can define and compose the middlewares of their choice, 
 | RecoveryTxMiddleware    | This index recovers from panics. It replaces baseapp.runTx's panic recovery described in [ADR-022](./adr-022-custom-panic-handling.md).                                                                                                                                                                                                                                                                                                                                                  |
 | GasTxMiddleware         | This replaces the [`Setup`](https://github.com/cosmos/cosmos-sdk/blob/v0.43.0/x/auth/ante/setup.go) Antehandler. It sets a GasMeter on sdk.Context. Note that before, GasMeter was set on sdk.Context inside the antehandlers, and there was some mess around the fact that antehandlers had their own panic recovery system so that the GasMeter could be read by baseapp's recovery system. Now, this mess is all removed: one middleware sets GasMeter, another one handles recovery. |
 
-### Similarities and Differences between Antehandlers and Middlewares
+### アンティハンドラーとミドルウェアの類似点と相違点
 
-The middleware-based design builds upon the existing antehandlers design described in [ADR-010](./adr-010-modular-antehandler.md). Even though the final decision of ADR-010 was to go with the "Simple Decorators" approach, the middleware design is actually very similar to the other [Decorator Pattern](./adr-010-modular-antehandler.md#decorator-pattern) proposal, also used in [weave](https://github.com/iov-one/weave).
+ミドルウェアベースの設計は、[ADR-010](..adr-010-modular-antehandler.md)で説明されている既存のハンドラー設計に基づいています。 ADR-010の最終決定は「シンプルデコレータ」方式を採用することですが、ミドルウェアの設計は実際には他の[デコレータパターン](..adr-010-modular-antehandler.md#decorator-pattern)の提案と一致しています。 In [weave](https://github.com/iov-one/weave)も使用します。
 
-#### Similarities with Antehandlers
+#### アンティハンドラーとの類似点
 
-- Designed as chaining/composing small modular pieces.
-- Allow code reuse for `{Check,Deliver}Tx` and for `Simulate`.
-- Set up in `app.go`, and easily customizable by app developers.
-- Order is important.
+-小さなモジュラーパーツをリンク/結合するように設計されています。
+-` {Check、Deliver} Tx`と `Simulate`のコードの再利用を許可します。
+-`app.go`で設定し、アプリ開発者が簡単にカスタマイズできます。
+-順序は重要です。
 
-#### Differences with Antehandlers
+#### アンティハンドラーとの違い
 
-- The Antehandlers are run before `Msg` execution, whereas middlewares can run before and after.
-- The middleware approach uses separate methods for `{Check,Deliver,Simulate}Tx`, whereas the antehandlers pass a `simulate bool` flag and uses the `sdkCtx.Is{Check,Recheck}Tx()` flags to determine in which transaction mode we are.
-- The middleware design lets each middleware hold a reference to the next middleware, whereas the antehandlers pass a `next` argument in the `AnteHandle` method.
-- The middleware design use Go's standard `context.Context`, whereas the antehandlers use `sdk.Context`.
+-アンチハンドラは `Msg`が実行される前に実行され、ミドルウェアは前後に実行できます。
+-ミドルウェアメソッドは `{Check、Deliver、Simulate} Tx`に別のメソッドを使用し、アンティハンドラーは` Simulate bool`フラグを渡し、 `sdkCtx.Is {Check、Recheck} Tx()`フラグを使用してトランザクションモードです。
+-ミドルウェアの設計により、各ミドルウェアは次のミドルウェアへの参照を保持でき、ハンドラーは `AnteHandle`メソッドで` next`パラメーターを渡します。
+-ミドルウェアの設計ではGoの標準の `context.Context`を使用しますが、アンティハンドラーでは` sdk.Context`を使用します。
 
-## Consequences
+## 結果
 
-### Backwards Compatibility
+### 下位互換性
 
-Since this refactor removes some logic away from BaseApp and into middlewares, it introduces API-breaking changes for app developers. Most notably, instead of creating an antehandler chain in `app.go`, app developers need to create a middleware stack:
+このリファクタリングは一部のロジックをBaseAppからミドルウェアに移動するため、アプリケーション開発者向けのAPIに重大な変更が加えられます。特に、アプリケーション開発者は `app.go`にアンティハンドラチェーンを作成する必要はありませんが、ミドルウェアスタックを作成する必要があります。
 
-```diff
-- anteHandler, err := ante.NewAnteHandler(
--    ante.HandlerOptions{
--        AccountKeeper:   app.AccountKeeper,
--        BankKeeper:      app.BankKeeper,
--        SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
--        FeegrantKeeper:  app.FeeGrantKeeper,
--        SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
--    },
+`` `diff
+-anteHandler、err:= ante.NewAnteHandler(
+-ante.HandlerOptions {
+-AccountKeeper:app.AccountKeeper、
+-BankKeeper:app.BankKeeper、
+-SignModeHandler:encodingConfig.TxConfig.SignModeHandler()、
+-FeegrantKeeper:app.FeeGrantKeeper、
+-SigGasConsumer:ante.DefaultSigVerificationGasConsumer、
+-}、
 -)
-+txHandler, err := authmiddleware.NewDefaultTxHandler(authmiddleware.TxHandlerOptions{
-+    Debug:             app.Trace(),
-+    IndexEvents:       indexEvents,
-+    LegacyRouter:      app.legacyRouter,
-+    MsgServiceRouter:  app.msgSvcRouter,
-+    LegacyAnteHandler: anteHandler,
-+    TxDecoder:         encodingConfig.TxConfig.TxDecoder,
++ txHandler、err:= authmiddleware.NewDefaultTxHandler(authmiddleware.TxHandlerOptions {
++デバッグ:app.Trace()、
++ IndexEvents:indexEvents、
++ LegacyRouter:app.legacyRouter、
++ MsgServiceRouter:app.msgSvcRouter、
++ LegacyAnteHandler:anteHandler、
++ TxDecoder:encodingConfig.TxConfig.TxDecoder、
 +})
-if err != nil {
-    panic(err)
+err！= nil {の場合
+    パニック(エラー)
 }
-- app.SetAnteHandler(anteHandler)
+-app.SetAnteHandler(anteHandler)
 + app.SetTxHandler(txHandler)
-```
+`` `
 
-Other more minor API breaking changes will also be provided in the CHANGELOG. As usual, the Cosmos SDK will provide a release migration document for app developers.
+CHANGELOGは、他の小さなAPIの重大な変更も提供します。いつものように、Cosmos SDKは、アプリケーション開発者向けのバージョン移行ドキュメントを提供します。
 
-This ADR does not introduce any state-machine-, client- or CLI-breaking changes.
+このADRは、ステートマシン、クライアント、またはCLIに破壊的な変更を導入しません。
 
-### Positive
+### ポジティブ
 
-- Allow custom logic to be run before an after `Msg` execution. This enables the [tips](https://github.com/cosmos/cosmos-sdk/issues/9406) and [gas refund](https://github.com/cosmos/cosmos-sdk/issues/2150) uses cases, and possibly other ones.
-- Make BaseApp more lightweight, and defer complex logic to small modular components.
-- Separate paths for `{Check,Deliver,Simulate}Tx` with different returns types. This allows for improved readability (replace `if sdkCtx.IsRecheckTx() && !simulate {...}` with separate methods) and more flexibility (e.g. returning a `priority` in `ResponseCheckTx`).
+-「メッセージ」の実行後にカスタムロジックを実行できるようにします。これにより、[ヒント](https://github.com/cosmos/cosmos-sdk/issues/9406)と[ガスの払い戻し](https://github.com/cosmos/cosmos-sdk/issues/2150)のユースケースが作成されます、他の場合もあります。
+-BaseAppをより軽量にし、複雑なロジックを小さなモジュラーコンポーネントに渡します。
+-異なるリターンタイプの `{Check、Deliver、Simulate} Tx`の個別のパス。これにより、読みやすさが向上し( `if sdkCtx.IsRecheckTx()&&！simulate {...}`を別のメソッドに置き換えます)、柔軟性が向上します(たとえば、 `ResponseCheckTx`で` priority`を返します)。
+### ネガティブ
 
-### Negative
+-一見すると、 `sdk.Context`と` tx`を指定してミドルウェアを実行した後に発生する状態の更新を理解するのは困難です。ミドルウェアは、その関数本体でネストされたミドルウェアをいくつでも呼び出すことができ、各ミドルウェアは、チェーン内の次のミドルウェアを呼び出す前に、前処理と後処理を実行する場合があります。したがって、ミドルウェアが何をしているのかを理解するには、チェーン内の他のミドルウェアも何をしているのかを理解する必要があります。ミドルウェアの順序は非常に重要です。これは理解するのが非常に難しくなる可能性があります。
+-アプリケーション開発者向けのAPIへの画期的な変更。
 
-- It is hard to understand at first glance the state updates that would occur after a middleware runs given the `sdk.Context` and `tx`. A middleware can have an arbitrary number of nested middleware being called within its function body, each possibly doing some pre- and post-processing before calling the next middleware on the chain. Thus to understand what a middleware is doing, one must also understand what every other middleware further along the chain is also doing, and the order of middlewares matters. This can get quite complicated to understand.
-- API-breaking changes for app developers.
+### ニュートラル
 
-### Neutral
+中立的な結果はありません。
 
-No neutral consequences.
+## さらなる議論
 
-## Further Discussions
+-[#9934](https://github.com/cosmos/cosmos-sdk/discussions/9934)BaseAppの他のABCIメソッドをミドルウェアに分解します。
+-`sdk.Tx`インターフェースを `tx.Handler`メソッドシグネチャの具象protobufTxタイプに置き換えます。
 
-- [#9934](https://github.com/cosmos/cosmos-sdk/discussions/9934) Decomposing BaseApp's other ABCI methods into middlewares.
-- Replace `sdk.Tx` interface with the concrete protobuf Tx type in the `tx.Handler` methods signature.
+## テストケース
 
-## Test Cases
+新しいミドルウェアAPIを使用するように既存のbaseappテストとantehandlersテストを更新しますが、リグレッションの発生を避けるために同じテストケースとロジックを維持します。既存のCLIテストも変更されません。
 
-We update the existing baseapp and antehandlers tests to use the new middleware API, but keep the same test cases and logic, to avoid introducing regressions. Existing CLI tests will also be left untouched.
+新しいミドルウェアについては、単体テストを導入しました。ミドルウェアは小さいので、単体テストは非常に適しています。
 
-For new middlewares, we introduce unit tests. Since middlewares are purposefully small, unit tests suit well.
+## 参照する
 
-## References
-
-- Initial discussion: https://github.com/cosmos/cosmos-sdk/issues/9585
-- Implementation: [#9920 BaseApp refactor](https://github.com/cosmos/cosmos-sdk/pull/9920) and [#10028 Antehandlers migration](https://github.com/cosmos/cosmos-sdk/pull/10028)
+-予備的なディスカッション:https://github.com/cosmos/cosmos-sdk/issues/9585
+-実装:[#9920 BaseAppリファクタリング](https://github.com/cosmos/cosmos-sdk/pull/9920)および[#10028アンティハンドラーの移行](https://github.com/cosmos/cosmos-sdk.プル.10028) 

@@ -1,105 +1,105 @@
-# Encoding
+# 编码
 
-While encoding in the Cosmos SDK used to be mainly handled by `go-amino` codec, the Cosmos SDK is moving towards using `gogoprotobuf` for both state and client-side encoding. {synopsis}
+虽然 Cosmos SDK 中的编码过去主要由 `go-amino` 编解码器处理，但 Cosmos SDK 正在转向使用 `gogoprotobuf` 进行状态和客户端编码。 {概要}
 
-## Pre-requisite Readings
+## 先决条件阅读
 
-- [Anatomy of a Cosmos SDK application](../basics/app-anatomy.md) {prereq}
+- [Cosmos SDK 应用剖析](../basics/app-anatomy.md) {prereq}
 
-## Encoding
+## 编码
 
-The Cosmos SDK utilizes two binary wire encoding protocols, [Amino](https://github.com/tendermint/go-amino/) which is an object encoding specification and [Protocol Buffers](https://developers.google.com/protocol-buffers), a subset of Proto3 with an extension for
-interface support. See the [Proto3 spec](https://developers.google.com/protocol-buffers/docs/proto3)
-for more information on Proto3, which Amino is largely compatible with (but not with Proto2).
+Cosmos SDK 使用两个二进制线编码协议，[Amino](https://github.com/tendermint/go-amino/) 是一个对象编码规范和 [Protocol Buffers](https://developers.google.com /protocol-buffers)，Proto3 的一个子集，扩展为
+接口支持。请参阅 [Proto3 规范](https://developers.google.com/protocol-buffers/docs/proto3)
+有关 Proto3 的更多信息，Amino 在很大程度上兼容(但不兼容 Proto2)。
 
-Due to Amino having significant performance drawbacks, being reflection-based, and
-not having any meaningful cross-language/client support, Protocol Buffers, specifically
-[gogoprotobuf](https://github.com/gogo/protobuf/), is being used in place of Amino.
-Note, this process of using Protocol Buffers over Amino is still an ongoing process.
+由于 Amino 具有显着的性能缺陷，基于反射，并且
+没有任何有意义的跨语言/客户端支持，协议缓冲区，特别是
+[gogoprotobuf](https://github.com/gogo/protobuf/)，用于代替 Amino。
+请注意，这个在 Amino 上使用 Protocol Buffers 的过程仍然是一个持续的过程。
 
-Binary wire encoding of types in the Cosmos SDK can be broken down into two main
-categories, client encoding and store encoding. Client encoding mainly revolves
-around transaction processing and signing, whereas store encoding revolves around
-types used in state-machine transitions and what is ultimately stored in the Merkle
-tree.
+Cosmos SDK 中类型的二进制线编码可以分为两个主要的
+类别、客户端编码和存储编码。客户端编码主要围绕
+围绕交易处理和签名，而存储编码围绕
+状态机转换中使用的类型以及最终存储在 Merkle 中的内容
+树。
 
-For store encoding, protobuf definitions can exist for any type and will typically
-have an Amino-based "intermediary" type. Specifically, the protobuf-based type
-definition is used for serialization and persistence, whereas the Amino-based type
-is used for business logic in the state-machine where they may converted back-n-forth.
-Note, the Amino-based types may slowly be phased-out in the future so developers
-should take note to use the protobuf message definitions where possible.
+对于存储编码，protobuf 定义可以存在于任何类型，并且通常会
+有一个基于氨基的“中介”类型。具体来说，基于protobuf的类型
+定义用于序列化和持久化，而基于氨基的类型
+用于状态机中的业务逻辑，它们可以来回转换。
+请注意，基于氨基的类型可能会在未来逐渐淘汰，因此开发人员
+应注意尽可能使用 protobuf 消息定义。
 
-In the `codec` package, there exists two core interfaces, `Marshaler` and `ProtoMarshaler`,
-where the former encapsulates the current Amino interface except it operates on
-types implementing the latter instead of generic `interface{}` types.
+在`codec` 包中，存在两个核心接口，`Marshaler` 和`ProtoMarshaler`，
+其中前者封装了当前的 Amino 接口，除了它对
+实现后者而不是通用`interface{}` 类型的类型。
 
-In addition, there exists two implementations of `Marshaler`. The first being
-`AminoCodec`, where both binary and JSON serialization is handled via Amino. The
-second being `ProtoCodec`, where both binary and JSON serialization is handled
-via Protobuf.
+此外，存在两种`Marshaler` 实现。第一个是
+`AminoCodec`，其中二进制和 JSON 序列化都通过 Amino 处理。这
+第二个是 `ProtoCodec`，其中处理二进制和 JSON 序列化
+通过 Protobuf。
 
-This means that modules may use Amino or Protobuf encoding but the types must
-implement `ProtoMarshaler`. If modules wish to avoid implementing this interface
-for their types, they may use an Amino codec directly.
+这意味着模块可以使用 Amino 或 Protobuf 编码，但类型必须
+实现`ProtoMarshaler`。如果模块希望避免实现此接口
+对于他们的类型，他们可以直接使用 Amino 编解码器。 
 
 ### Amino
 
-Every module uses an Amino codec to serialize types and interfaces. This codec typically
-has types and interfaces registered in that module's domain only (e.g. messages),
-but there are exceptions like `x/gov`. Each module exposes a `RegisterLegacyAminoCodec` function
-that allows a user to provide a codec and have all the types registered. An application
-will call this method for each necessary module.
+每个模块都使用 Amino 编解码器来序列化类型和接口。 这种编解码器通常
+仅在该模块的域中注册了类型和接口(例如消息)，
+但也有像 `x/gov` 这样的例外。 每个模块都暴露了一个 `RegisterLegacyAminoCodec` 函数
+允许用户提供编解码器并注册所有类型。 一个应用程序
+将为每个必要的模块调用此方法。
 
-Where there is no protobuf-based type definition for a module (see below), Amino
-is used to encode and decode raw wire bytes to the concrete type or interface:
+如果模块没有基于 protobuf 的类型定义(见下文)，Amino
+用于将原始线字节编码和解码为具体类型或接口: 
 
 ```go
 bz := keeper.cdc.MustMarshal(typeOrInterface)
 keeper.cdc.MustUnmarshal(bz, &typeOrInterface)
 ```
 
-Note, there are length-prefixed variants of the above functionality and this is
-typically used for when the data needs to be streamed or grouped together
-(e.g. `ResponseDeliverTx.Data`)
+请注意，上述功能存在以长度为前缀的变体，这是
+通常用于数据需要流式传输或分组在一起时
+(例如`ResponseDeliverTx.Data`) 
 
 ### Gogoproto
 
-Modules are encouraged to utilize Protobuf encoding for their respective types. In the Cosmos SDK, we use the [Gogoproto](https://github.com/gogo/protobuf) specific implementation of the Protobuf spec that offers speed and DX improvements compared to the official [Google protobuf implementation](https://github.com/protocolbuffers/protobuf).
+鼓励模块对其各自的类型使用 Protobuf 编码。在 Cosmos SDK 中，我们使用 Protobuf 规范的 [Gogoproto](https://github.com/gogo/protobuf) 特定实现，与官方 [Google protobuf 实现](https:// github.com/protocolbuffers/protobuf)。
 
-### Guidelines for protobuf message definitions
+### protobuf 消息定义指南
 
-In addition to [following official Protocol Buffer guidelines](https://developers.google.com/protocol-buffers/docs/proto3#simple), we recommend using these annotations in .proto files when dealing with interfaces:
+除了[遵循官方协议缓冲区指南](https://developers.google.com/protocol-buffers/docs/proto3#simple)，我们建议在处理接口时在 .proto 文件中使用这些注释:
 
-- use `cosmos_proto.accepts_interface` to annote fields that accept interfaces
-- pass the same fully qualified name as `protoName` to `InterfaceRegistry.RegisterInterface`
-- annotate interface implementations with `cosmos_proto.implements_interface`
-- pass the same fully qualified name as `protoName` to `InterfaceRegistry.RegisterInterface`
+- 使用 `cosmos_proto.accepts_interface` 来注释接受接口的字段
+- 将与 `protoName` 相同的完全限定名称传递给 `InterfaceRegistry.RegisterInterface`
+- 使用 `cosmos_proto.implements_interface` 注释接口实现
+- 将与 `protoName` 相同的完全限定名称传递给 `InterfaceRegistry.RegisterInterface`
 
-### Transaction Encoding
+### 交易编码
 
-Another important use of Protobuf is the encoding and decoding of
-[transactions](./transactions.md). Transactions are defined by the application or
-the Cosmos SDK but are then passed to the underlying consensus engine to be relayed to
-other peers. Since the underlying consensus engine is agnostic to the application,
-the consensus engine accepts only transactions in the form of raw bytes.
+Protobuf 的另一个重要用途是编码和解码
+[交易](./transactions.md)。事务由应用程序或
+Cosmos SDK，但随后被传递到底层共识引擎以中继到
+其他同龄人。由于底层共识引擎与应用程序无关，
+共识引擎只接受原始字节形式的交易。
 
-- The `TxEncoder` object performs the encoding.
-- The `TxDecoder` object performs the decoding.
+- `TxEncoder` 对象执行编码。
+- `TxDecoder` 对象执行解码。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc4/types/tx_msg.go#L83-L87
 
-A standard implementation of both these objects can be found in the [`auth` module](../../x/auth/spec/README.md):
+这两个对象的标准实现可以在 [`auth` 模块](../../x/auth/spec/README.md) 中找到:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc4/x/auth/tx/decoder.go
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc4/x/auth/tx/encoder.go
 
-See [ADR-020](../architecture/adr-020-protobuf-transaction-encoding.md) for details of how a transaction is encoded.
+有关交易如何编码的详细信息，请参阅 [ADR-020](../architecture/adr-020-protobuf-transaction-encoding.md)。
 
-### Interface Encoding and Usage of `Any`
+### `Any` 的接口编码和使用
 
-The Protobuf DSL is strongly typed, which can make inserting variable-typed fields difficult. Imagine we want to create a `Profile` protobuf message that serves as a wrapper over [an account](../basics/accounts.md):
+Protobuf DSL 是强类型的，这会使插入变量类型的字段变得困难。想象一下，我们想要创建一个 `Profile` protobuf 消息，作为 [an account](../basics/accounts.md) 的包装器:
 
 ```proto
 message Profile {
@@ -110,11 +110,11 @@ message Profile {
 }
 ```
 
-In this `Profile` example, we hardcoded `account` as a `BaseAccount`. However, there are several other types of [user accounts related to vesting](../../x/auth/spec/05_vesting.md), such as `BaseVestingAccount` or `ContinuousVestingAccount`. All of these accounts are different, but they all implement the `AccountI` interface. How would you create a `Profile` that allows all these types of accounts with an `account` field that accepts an `AccountI` interface?
+在这个 `Profile` 示例中，我们将 `account` 硬编码为 `BaseAccount`。但是，还有其他几种类型的[与归属相关的用户帐户](../../x/auth/spec/05_vesting.md)，例如“BaseVestingAccount”或“ContinuousVestingAccount”。所有这些帐户都不同，但它们都实现了`AccountI` 接口。您将如何创建一个允许所有这些类型帐户的“个人资料”，其中“帐户”字段接受“帐户I”接口？
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/auth/types/account.go#L307-L330
 
-In [ADR-019](../architecture/adr-019-protobuf-state-encoding.md), it has been decided to use [`Any`](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/any.proto)s to encode interfaces in protobuf. An `Any` contains an arbitrary serialized message as bytes, along with a URL that acts as a globally unique identifier for and resolves to that message's type. This strategy allows us to pack arbitrary Go types inside protobuf messages. Our new `Profile` then looks like:
+在 [ADR-019](../architecture/adr-019-protobuf-state-encoding.md) 中，已决定使用 [`Any`](https://github.com/protocolbuffers/protobuf/blob /master/src/google/protobuf/any.proto)s 在 protobuf 中编码接口。 `Any` 包含一个任意序列化的字节消息，以及一个 URL，该 URL 充当全局唯一标识符并解析为该消息的类型。这种策略允许我们在 protobuf 消息中打包任意 Go 类型。我们的新“配置文件”看起来像:
 
 ```protobuf
 message Profile {
@@ -127,7 +127,7 @@ message Profile {
 }
 ```
 
-To add an account inside a profile, we need to "pack" it inside an `Any` first, using `codectypes.NewAnyWithValue`:
+要在配置文件中添加帐户，我们需要先将其“打包”到一个“Any”中，使用“codectypes.NewAnyWithValue”:
 
 ```go
 var myAccount AccountI
@@ -150,9 +150,9 @@ bz, err := cdc.Marshal(profile)
 jsonBz, err := cdc.MarshalJSON(profile)
 ```
 
-To summarize, to encode an interface, you must 1/ pack the interface into an `Any` and 2/ marshal the `Any`. For convenience, the Cosmos SDK provides a `MarshalInterface` method to bundle these two steps. Have a look at [a real-life example in the x/auth module](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/auth/keeper/keeper.go#L218-L221).
+总而言之，要对接口进行编码，您必须 1/ 将接口打包到 `Any` 中，并且 2/ 封送 `Any`。 为方便起见，Cosmos SDK 提供了一个 `MarshalInterface` 方法来捆绑这两个步骤。 看看 [x/auth 模块中的一个真实例子](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/auth/keeper/keeper.go#L218- L221)。
 
-The reverse operation of retrieving the concrete Go type from inside an `Any`, called "unpacking", is done with the `GetCachedValue()` on `Any`.
+从 `Any` 内部检索具体 Go 类型的反向操作称为“解包”，是通过 `Any` 上的 `GetCachedValue()` 完成的。 
 
 ```go
 profileBz := ... // The proto-encoded bytes of a Profile, e.g. retrieved through gRPC.
@@ -168,7 +168,7 @@ fmt.Printf("%T\n", myProfile.Account.GetCachedValue()) // Prints "BaseAccount", 
 accAddr := myProfile.Account.GetCachedValue().(AccountI).GetAddress()
 ```
 
-It is important to note that for `GetCachedValue()` to work, `Profile` (and any other structs embedding `Profile`) must implement the `UnpackInterfaces` method:
+需要注意的是，要让 `GetCachedValue()` 工作，`Profile`(以及任何其他嵌入 `Profile` 的结构)必须实现 `UnpackInterfaces` 方法: 
 
 ```go
 func (p *Profile) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
@@ -181,77 +181,77 @@ func (p *Profile) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 }
 ```
 
-The `UnpackInterfaces` gets called recursively on all structs implementing this method, to allow all `Any`s to have their `GetCachedValue()` correctly populated.
+`UnpackInterfaces` 在实现此方法的所有结构上被递归调用，以允许所有 `Any` 正确填充它们的 `GetCachedValue()`。 
 
-For more information about interface encoding, and especially on `UnpackInterfaces` and how the `Any`'s `type_url` gets resolved using the `InterfaceRegistry`, please refer to [ADR-019](../architecture/adr-019-protobuf-state-encoding.md).
+有关接口编码的更多信息，尤其是关于`UnpackInterfaces` 以及如何使用`InterfaceRegistry` 解析`Any` 的`type_url`，请参阅[ADR-019](../architecture/adr-019- protobuf-state-encoding.md)。
 
-#### `Any` Encoding in the Cosmos SDK
+#### Cosmos SDK 中的`Any` 编码
 
-The above `Profile` example is a fictive example used for educational purposes. In the Cosmos SDK, we use `Any` encoding in several places (non-exhaustive list):
+上面的“配置文件”示例是一个用于教育目的的虚构示例。在 Cosmos SDK 中，我们在几个地方使用了 `Any` 编码(非详尽列表):
 
-- the `cryptotypes.PubKey` interface for encoding different types of public keys,
-- the `sdk.Msg` interface for encoding different `Msg`s in a transaction,
-- the `AccountI` interface for encodinig different types of accounts (similar to the above example) in the x/auth query responses,
-- the `Evidencei` interface for encoding different types of evidences in the x/evidence module,
-- the `AuthorizationI` interface for encoding different types of x/authz authorizations,
-- the [`Validator`](https://github.com/cosmos/cosmos-sdk/blob/v0.42.5/x/staking/types/staking.pb.go#L306-L337) struct that contains information about a validator.
+- 用于编码不同类型公钥的`cryptotypes.PubKey`接口，
+- `sdk.Msg` 接口，用于在交易中编码不同的 `Msg`，
+- 用于在 x/auth 查询响应中编码不同类型帐户(类似于上面的示例)的 `AccountI` 接口，
+- 用于在 x/evidence 模块中编码不同类型证据的 `Evidencei` 接口，
+- 用于对不同类型的 x/authz 授权进行编码的 `AuthorizationI` 接口，
+- [`Validator`](https://github.com/cosmos/cosmos-sdk/blob/v0.42.5/x/staking/types/staking.pb.go#L306-L337) 结构包含有关验证器。
 
-A real-life example of encoding the pubkey as `Any` inside the Validator struct in x/staking is shown in the following example:
+以下示例显示了在 x/staking 中的 Validator 结构内将公钥编码为“Any”的真实示例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/staking/types/validator.go#L40-L61
 
-## FAQ
+## 常问问题
 
-1. How to create modules using protobuf encoding?
+1.如何使用protobuf编码创建模块？
 
-**Defining module types**
+**定义模块类型**
 
-Protobuf types can be defined to encode:
+可以定义 Protobuf 类型来编码:
 
-- state
+- 状态
 - [`Msg`s](../building-modules/messages-and-queries.md#messages)
-- [Query services](../building-modules/query-services.md)
-- [genesis](../building-modules/genesis.md)
+- [查询服务](../building-modules/query-services.md)
+- [创世](../building-modules/genesis.md)
 
-**Naming and conventions**
+**命名和约定**
 
-We encourage developers to follow industry guidelines: [Protocol Buffers style guide](https://developers.google.com/protocol-buffers/docs/style)
-and [Buf](https://buf.build/docs/style-guide), see more details in [ADR 023](../architecture/adr-023-protobuf-naming.md)
+我们鼓励开发者遵循行业指南:[Protocol Buffers style guide](https://developers.google.com/protocol-buffers/docs/style)
+和 [Buf](https://buf.build/docs/style-guide)，请参阅 [ADR 023](../architecture/adr-023-protobuf-naming.md) 中的更多详细信息
 
-2. How to update modules to protobuf encoding?
+2.如何将模块更新为protobuf编码？ 
 
-If modules do not contain any interfaces (e.g. `Account` or `Content`), then they
-may simply migrate any existing types that
-are encoded and persisted via their concrete Amino codec to Protobuf (see 1. for further guidelines) and accept a `Marshaler` as the codec which is implemented via the `ProtoCodec`
-without any further customization.
+如果模块不包含任何接口(例如`Account` 或`Content`)，那么它们
+可以简单地迁移任何现有类型
+通过其具体的 Amino 编解码器编码并持久化到 Protobuf(有关进一步的指导，请参见 1.)并接受“Marshaler”作为通过“ProtoCodec”实现的编解码器
+无需任何进一步的定制。
 
-However, if a module type composes an interface, it must wrap it in the `skd.Any` (from `/types` package) type. To do that, a module-level .proto file must use [`google.protobuf.Any`](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/any.proto) for respective message type interface types.
+然而，如果一个模块类型组成了一个接口，它必须将它包装在 `skd.Any`(来自 `/types` 包)类型中。为此，模块级 .proto 文件必须使用 [`google.protobuf.Any`](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/any.proto)各自的消息类型接口类型。
 
-For example, in the `x/evidence` module defines an `Evidence` interface, which is used by the `MsgSubmitEvidence`. The structure definition must use `sdk.Any` to wrap the evidence file. In the proto file we define it as follows:
+例如，在`x/evidence` 模块中定义了一个`Evidence` 接口，由`MsgSubmitEvidence` 使用。结构定义必须使用`sdk.Any`来包装证据文件。在proto文件中我们定义如下:
 
 ```protobuf
 // proto/cosmos/evidence/v1beta1/tx.proto
 
 message MsgSubmitEvidence {
-  string              submitter = 1;
-  google.protobuf.Any evidence  = 2 [(cosmos_proto.accepts_interface) = "Evidence"];
+  字符串提交者 = 1;
+  google.protobuf.Any evidence = 2 [(cosmos_proto.accepts_interface) = "Evidence"];
 }
-```
+``
 
-The Cosmos SDK `codec.Codec` interface provides support methods `MarshalInterface` and `UnmarshalInterface` to easy encoding of state to `Any`.
+Cosmos SDK `codec.Codec` 接口提供支持方法 `MarshalInterface` 和 `UnmarshalInterface` 以轻松将状态编码为 `Any`。
 
-Module should register interfaces using `InterfaceRegistry` which provides a mechanism for registering interfaces: `RegisterInterface(protoName string, iface interface{})` and implementations: `RegisterImplementations(iface interface{}, impls ...proto.Message)` that can be safely unpacked from Any, similarly to type registration with Amino:
+模块应该使用`InterfaceRegistry`注册接口，它提供了一种注册接口的机制:`RegisterInterface(protoName string, iface interface{})`和实现:`RegisterImplementations(iface interface{}, impls ...proto.Message)`可以从 Any 中安全地解压，类似于使用 Amino 进行类型注册:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc4/codec/types/interface_registry.go#L25-L66
 
-In addition, an `UnpackInterfaces` phase should be introduced to deserialization to unpack interfaces before they're needed. Protobuf types that contain a protobuf `Any` either directly or via one of their members should implement the `UnpackInterfacesMessage` interface:
+此外，应该在反序列化中引入一个 `UnpackInterfaces` 阶段，以便在需要它们之前解压接口。直接或通过其成员之一包含 protobuf `Any` 的 Protobuf 类型应该实现 `UnpackInterfacesMessage` 接口:
 
-```go
-type UnpackInterfacesMessage interface {
-  UnpackInterfaces(InterfaceUnpacker) error
+```Go
+类型 UnpackInterfacesMessage 接口 {
+  UnpackInterfaces(InterfaceUnpacker) 错误
 }
-```
+``
 
-## Next {hide}
+## 下一个 {hide}
 
-Learn about [gRPC, REST and other endpoints](./grpc_rest.md) {hide}
+了解 [gRPC、REST 和其他端点](./grpc_rest.md) {hide} 

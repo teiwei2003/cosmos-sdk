@@ -1,6 +1,6 @@
 # ADR 035:Rosetta API 支持
 
-##作者
+## 作者
 
 - 乔纳森·吉梅诺 (@jgimeno)
 - 大卫格里森(@senormonito)
@@ -191,7 +191,7 @@ type Msg interface {
 
 Rosetta API 服务可以在与应用程序相同的执行过程中运行。这将通过 app.toml 设置启用，如果未启用 gRPC，rosetta 实例将在离线模式下旋转(仅限 tx 构建功能)。
 
-####单独的API服务
+#### 单独的API服务
 
 客户端应用程序开发人员也可以使用包含在`/server/rosetta` 包中的 rosetta 命令编写一个新命令来启动 Rosetta API 服务器作为一个单独的进程。命令的构建取决于 Cosmos SDK 版本。示例可以在“simd”中找到，用于星际之门，在“contrib/rosetta/simapp”中可以找到其他版本系列。 
 

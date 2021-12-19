@@ -1,65 +1,65 @@
-# ADR 43: NFT Module
+# ADR 43:NFTモジュール
 
-## Changelog
+## 変更ログ
 
-- 2021-05-01: Initial Draft
-- 2021-07-02: Review updates
+-2021-05-01:最初のドラフト
+-2021-07-02:レビューの更新
 
-## Status
+## 状態
 
-PROPOSED
+提案
 
-## Abstract
+## 概要
 
-This ADR defines the `x/nft` module which is a generic implementation of NFTs, roughly "compatible" with ERC721. **Applications using the `x/nft` module must implement the following functions**:
+ADRは `x .nft`モジュールを定義します。これは、NFTの一般的な実装であり、ERC721とほぼ「互換性があります」。 ** `x .nft`モジュールを使用するアプリは、次の機能を実装する必要があります**:
 
-- `MsgNewClass` - Receive the user's request to create a class, and call the `NewClass` of the `x/nft` module.
-- `MsgUpdateClass` - Receive the user's request to update a class, and call the `UpdateClass` of the `x/nft` module.
-- `MsgMintNFT` - Receive the user's request to mint a nft, and call the `MintNFT` of the `x/nft` module.
-- `BurnNFT` - Receive the user's request to burn a nft, and call the `BurnNFT` of the `x/nft` module.
-- `UpdateNFT` - Receive the user's request to update a nft, and call the `UpdateNFT` of the `x/nft` module.
+-`MsgNewClass`-クラスを作成するというユーザーのリクエストを受け取り、 `x .nft`モジュールの` NewClass`を呼び出します。
+-`MsgUpdateClass`-ユーザーの更新クラス要求を受け取り、 `x .nft`モジュールの` UpdateClass`を呼び出します。
+-`MsgMintNFT`-nftを作成するユーザーの要求を受け取り、 `x .nft`モジュールの` MintNFT`を呼び出します。
+-`BurnNFT`-ユーザーの書き込みnftリクエストを受信し、 `x .nft`モジュールの` BurnNFT`を呼び出します。
+-`UpdateNFT`-nftを更新するユーザーの要求を受け取り、 `x .nft`モジュールの` UpdateNFT`を呼び出します。
 
-## Context
+## 環境
 
-NFTs are more than just crypto art, which is very helpful for accruing value to the Cosmos ecosystem. As a result, Cosmos Hub should implement NFT functions and enable a unified mechanism for storing and sending the ownership representative of NFTs as discussed in https://github.com/cosmos/cosmos-sdk/discussions/9065.
+NFTは単なる暗号技術ではなく、Cosmosエコシステムの価値を蓄積するのに非常に役立ちます。したがって、https://github.com/cosmos/cosmos-sdk/discussions/9065で説明されているように、Cosmos HubはNFT機能を実装し、統合メカニズムがNFTの所有権を保存して送信できるようにする必要があります。
 
-As discussed in [#9065](https://github.com/cosmos/cosmos-sdk/discussions/9065), several potential solutions can be considered:
+[#9065](https://github.com/cosmos/cosmos-sdk/discussions/9065)で説明されているように、いくつかの考えられる解決策を検討できます。
 
-- irismod/nft and modules/incubator/nft
-- CW721
-- DID NFTs
-- interNFT
+-irismod .nftおよびmodule .incubator .nft
+-CW721
+-NFTを行う
+-クロスNFT
 
-Since functions/use cases of NFTs are tightly connected with their logic, it is almost impossible to support all the NFTs' use cases in one Cosmos SDK module by defining and implementing different transaction types.
+NFTの機能/ユースケースはロジックと密接に関連しているため、さまざまなトランザクションタイプを定義して実装することにより、1つのCosmosSDKモジュールでNFTのすべてのユースケースをサポートすることはほとんど不可能です。
 
-Considering generic usage and compatibility of interchain protocols including IBC and Gravity Bridge, it is preferred to have a generic NFT module design which handles the generic NFTs logic.
-This design idea can enable composability that application-specific functions should be managed by other modules on Cosmos Hub or on other Zones by importing the NFT module.
+IBCやGravityBridgeを含むチェーン間プロトコルの一般的な使用法と互換性を考慮すると、一般的なNFTロジックを処理するために一般的なNFTモジュール設計を採用するのが最善です。
+この設計アイデアは、構成可能性を実現できます。つまり、NFTモジュールをインポートすることにより、特定のアプリケーションの機能をCosmosハブまたは他のゾーンの他のモジュールで管理する必要があります。
 
-The current design is based on the work done by [IRISnet team](https://github.com/irisnet/irismod/tree/master/modules/nft) and an older implementation in the [Cosmos repository](https://github.com/cosmos/modules/tree/master/incubator/nft).
+現在の設計は、[IRISnetチーム](https://github.com/irisnet/irismod/tree/master/modules/nft)と[Cosmosリポジトリ](https://github.com/cosmos/modules/tree)に基づいています。 .master .incubator .nft)。
 
-## Decision
+## 決定
 
-We create a `x/nft` module, which contains the following functionality:
+次の関数を含む `x .nft`モジュールを作成しました。
 
-- Store NFTs and track their ownership.
-- Expose `Keeper` interface for composing modules to transfer, mint and burn NFTs.
-- Expose external `Message` interface for users to transfer ownership of their NFTs.
-- Query NFTs and their supply information.
+-NFTを保存し、その所有権を追跡します。
+-パブリック `Keeper`インターフェース。モジュールを組み合わせて、NFTを送信、キャスト、および書き込むために使用されます。
+-ユーザーがNFTの所有権を譲渡するための外部「メッセージ」インターフェースを開きます。
+-NFTとその供給情報についてお問い合わせください。
 
-The proposed module is a base module for NFT app logic. It's goal it to provide a common layer for storage, basic transfer functionality and IBC. The module should not be used as a standalone.
-Instead an app should create a specialized module to handle app specific logic (eg: NFT ID construction, royalty), user level minting and burning. Moreover an app specialized module should handle auxiliary data to support the app logic (eg indexes, ORM, business data).
+提案されたモジュールは、NFTアプリケーションロジックの基本モジュールです。その目標は、ストレージ、基本的な伝送機能、およびIBCに共通のレイヤーを提供することです。このモジュールは単独で使用しないでください。
+代わりに、アプリケーションは、アプリケーション固有のロジック(NFT IDの構築、使用料など)、ユーザーレベルのキャスト、および書き込みを処理するための専用モジュールを作成する必要があります。さらに、アプリケーション固有のモジュールは、アプリケーションロジック(インデックス、ORM、ビジネスデータなど)をサポートするために補助データを処理する必要があります。
 
-All data carried over IBC must be part of the `NFT` or `Class` type described below. The app specific NFT data should be encoded in `NFT.data` for cross-chain integrity. Other objects related to NFT, which are not important for integrity can be part of the app specific module.
+IBCで伝送されるすべてのデータは、以下で説明する「NFT」または「クラス」タイプの一部である必要があります。クロスチェーンの整合性を実現するには、アプリケーション固有のNFTデータを「NFT.data」にエンコードする必要があります。完全性にとって重要ではないNFTに関連する他のオブジェクトは、アプリケーションの特定のモジュールの一部である可能性があります。
 
-### Types
+### タイプ
 
-We propose two main types:
-+ `Class` -- describes NFT class. We can think about it as a smart contract address.
-+ `NFT` -- object representing unique, non fungible asset. Each NFT is associated with a Class.
+主に2つのタイプをお勧めします。
++ `Class`-NFTクラスについて説明します。スマートコントラクトアドレスと考えることができます。
++ `NFT`-ユニークでかけがえのない資産を表すオブジェクト。各NFTはクラスに関連付けられています。
 
-#### Class
+#### クラス
 
-NFT **Class** is comparable to an ERC-721 smart contract (provides description of a smart contract), under which a collection of NFTs can be created and managed.
+NFT **クラス**はERC-721スマートコントラクト(スマートコントラクトの説明を提供します)に似ており、その下でNFTのコレクションを作成および管理できます。 
 
 ```protobuf
 message Class {
@@ -73,17 +73,17 @@ message Class {
 }
 ```
 
-- `id` is an alphanumeric identifier of the NFT class; it is used as the primary index for storing the class; _required_
-- `name` is a descriptive name of the NFT class; _optional_
-- `symbol` is the symbol usually shown on exchanges for the NFT class; _optional_
-- `description` is a detailed description of the NFT class; _optional_
-- `uri` is a URI for the class metadata stored off chain. It should be a JSON file that contains metadata about the NFT class and NFT data schema ([OpenSea example](https://docs.opensea.io/docs/contract-level-metadata)); _optional_
-- `uri_hash` is a hash of the document pointed by uri; _optional_
-- `data` is app specific metadata of the class; _optional_
+-`id`はNFTクラスの英数字の識別子であり、ストレージクラスのメインインデックスとして使用されます; _Required_
+-`name`はNFTクラスの説明的な名前です; _optional_
+-`symbol`は通常NFT取引所に表示されるシンボルです; _optional_
+-`description`はNFTクラスの詳細な説明です; _optional_
+-`uri`は、チェーンの下に格納されているクラスメタデータのURIです。 NFTクラスとNFTデータモデルに関するメタデータを含むJSONファイルである必要があります([OpenSeaの例](https://docs.opensea.io/docs/contract-level-metadata)); _optional_
+-`uri_hash`は、uriが指すドキュメントのハッシュ値です; _optional_
+-`data`は、クラスのアプリケーション固有のメタデータです。_optional_
 
 #### NFT
 
-We define a general model for `NFT` as follows.
+以下に示すように、「NFT」の一般的なモデルを定義しました。  
 
 ```protobuf
 message NFT {
@@ -95,28 +95,28 @@ message NFT {
 }
 ```
 
-- `class_id` is the identifier of the NFT class where the NFT belongs; _required_
-- `id` is an alphanumeric identifier of the NFT, unique within the scope of its class. It is specified by the creator of the NFT and may be expanded to use DID in the future. `class_id` combined with `id` uniquely identifies an NFT and is used as the primary index for storing the NFT; _required_
+-`class_id`は、NFTが属するNFTクラスの識別子です。_Required_
+-`id`は、NFTの英数字の識別子であり、そのクラス範囲内で一意です。 これはNFTの作成者によって指定され、将来DIDを使用するように拡張される可能性があります。 `class_id`を` id`と組み合わせて、NFTを格納するためのメインインデックスとしてNFTを一意に識別します; _Required_ 
 
   ```
   {class_id}/{id} --> NFT (bytes)
   ```
 
-- `uri` is a URI for the NFT metadata stored off chain. Should point to a JSON file that contains metadata about this NFT (Ref: [ERC721 standard and OpenSea extension](https://docs.opensea.io/docs/metadata-standards)); _required_
-- `uri_hash` is a hash of the document pointed by uri; _optional_
-- `data` is an app specific data of the NFT. CAN be used by composing modules to specify additional properties of the NFT; _optional_
+-`uri`は、チェーンの下に保存されているNFTメタデータのURIです。 このNFTに関するメタデータを含むJSONファイルを指す必要があります(参照:[ERC721標準およびOpenSea拡張機能](https://docs.opensea.io/docs/metadata-standards)); _Required_
+-`uri_hash`は、uriが指すドキュメントのハッシュ値です; _optional_
+-`data`はNFTのアプリケーション固有のデータです。 組み合わせたモジュールを使用して、NFTの追加属性を指定できます; _optional_
 
-This ADR doesn't specify values that `data` can take; however, best practices recommend upper-level NFT modules clearly specify their contents.  Although the value of this field doesn't provide the additional context required to manage NFT records, which means that the field can technically be removed from the specification, the field's existence allows basic informational/UI functionality.
+このADRは、 `data`が取ることができる値を指定しませんが、ベストプラクティスでは、上位レベルのNFTモジュールがその内容を明示的に指定することをお勧めします。 このフィールドの値は、NFTレコードを管理するために必要な追加のコンテキストを提供しません。つまり、このフィールドは仕様から技術的に削除できますが、このフィールドの存在により、基本的な情報.UI機能が可能になります。
 
-### `Keeper` Interface
+### `Keeper`インターフェース 
 
 ```go
 type Keeper interface {
   NewClass(class Class)
   UpdateClass(class Class)
 
-  Mint(nft NFT，receiver sdk.AccAddress)   // updates totalSupply
-  Burn(classId string, nftId string)    // updates totalSupply
+  Mint(nft NFT，receiver sdk.AccAddress)  ..updates totalSupply
+  Burn(classId string, nftId string)   ..updates totalSupply
   Update(nft NFT)
   Transfer(classId string, nftId string, receiver sdk.AccAddress)
 
@@ -133,7 +133,7 @@ type Keeper interface {
 }
 ```
 
-Other business logic implementations should be defined in composing modules that import `x/nft` and use its `Keeper`.
+他のビジネスロジックの実装は、 `x .nft`をインポートし、その` Keeper`を使用する複合モジュールで定義する必要があります。 
 
 ### `Msg` Service
 
@@ -151,9 +151,9 @@ message MsgSend {
 message MsgSendResponse {}
 ```
 
-`MsgSend` can be used to transfer the ownership of an NFT to another address.
+`MsgSend`を使用して、NFTの所有権を別のアドレスに譲渡できます。
 
-The implementation outline of the server is as follows:
+サーバーの実装概要は次のとおりです。 
 
 ```go
 type msgServer struct{
@@ -161,191 +161,189 @@ type msgServer struct{
 }
 
 func (m msgServer) Send(ctx context.Context, msg *types.MsgSend) (*types.MsgSendResponse, error) {
-  // check current ownership
+ ..check current ownership
   assertEqual(msg.Sender, m.k.GetOwner(msg.ClassId, msg.Id))
 
-  // transfer ownership
+ ..transfer ownership
   m.k.Transfer(msg.ClassId, msg.Id, msg.Receiver)
 
   return &types.MsgSendResponse{}, nil
 }
 ```
 
-The query service methods for the `x/nft` module are:
+`x .nft`モジュールのクエリサービスメソッドは次のとおりです。 
 
 ```proto
 service Query {
 
-  // Balance queries the number of NFTs of a given class owned by the owner, same as balanceOf in ERC721
+ ..Balance queries the number of NFTs of a given class owned by the owner, same as balanceOf in ERC721
   rpc Balance(QueryBalanceRequest) returns (QueryBalanceResponse) {
     option (google.api.http).get = "/cosmos/nft/v1beta1/balance/{class_id}/{owner}";
   }
 
-  // Owner queries the owner of the NFT based on its class and id, same as ownerOf in ERC721
+ ..Owner queries the owner of the NFT based on its class and id, same as ownerOf in ERC721
   rpc Owner(QueryOwnerRequest) returns (QueryOwnerResponse) {
     option (google.api.http).get = "/cosmos/nft/v1beta1/owner/{class_id}/{id}";
   }
 
-  // Supply queries the number of NFTs of a given class, same as totalSupply in ERC721Enumerable
+ ..Supply queries the number of NFTs of a given class, same as totalSupply in ERC721Enumerable
   rpc Supply(QuerySupplyRequest) returns (QuerySupplyResponse) {
     option (google.api.http).get = "/cosmos/nft/v1beta1/supply/{class_id}";
   }
 
-  // NFTsOfClassByOwner queries the NFTs of a given class owned by the owner, similar to tokenOfOwnerByIndex in ERC721Enumerable
+ ..NFTsOfClassByOwner queries the NFTs of a given class owned by the owner, similar to tokenOfOwnerByIndex in ERC721Enumerable
   rpc NFTsOfClassByOwner(QueryNFTsOfClassByOwnerRequest) returns (QueryNFTsResponse) {
     option (google.api.http).get = "/cosmos/nft/v1beta1/owned_nfts/{class_id}/{owner}";
   }
 
-  // NFTsOfClass queries all NFTs of a given class, similar to tokenByIndex in ERC721Enumerable
+ ..NFTsOfClass queries all NFTs of a given class, similar to tokenByIndex in ERC721Enumerable
   rpc NFTsOfClass(QueryNFTsOfClassRequest) returns (QueryNFTsResponse) {
     option (google.api.http).get = "/cosmos/nft/v1beta1/nfts/{class_id}";
   }
 
-  // NFT queries an NFT based on its class and id.
+ ..NFT queries an NFT based on its class and id.
   rpc NFT(QueryNFTRequest) returns (QueryNFTResponse) {
     option (google.api.http).get = "/cosmos/nft/v1beta1/nfts/{class_id}/{id}";
   }
 
-  // Class queries an NFT class based on its id
+ ..Class queries an NFT class based on its id
   rpc Class(QueryClassRequest) returns (QueryClassResponse) {
       option (google.api.http).get = "/cosmos/nft/v1beta1/classes/{class_id}";
   }
 
-  // Classes queries all NFT classes
+ ..Classes queries all NFT classes
   rpc Classes(QueryClassesRequest) returns (QueryClassesResponse) {
       option (google.api.http).get = "/cosmos/nft/v1beta1/classes";
   }
 }
 
-// QueryBalanceRequest is the request type for the Query/Balance RPC method
+/.QueryBalanceRequest is the request type for the Query/Balance RPC method
 message QueryBalanceRequest {
   string class_id = 1;
   string owner    = 2;
 }
 
-// QueryBalanceResponse is the response type for the Query/Balance RPC method
+/.QueryBalanceResponse is the response type for the Query/Balance RPC method
 message QueryBalanceResponse{
   uint64 amount = 1;
 }
 
-// QueryOwnerRequest is the request type for the Query/Owner RPC method
+/.QueryOwnerRequest is the request type for the Query/Owner RPC method
 message QueryOwnerRequest {
   string class_id = 1;
   string id       = 2;
 }
 
-// QueryOwnerResponse is the response type for the Query/Owner RPC method
+/.QueryOwnerResponse is the response type for the Query/Owner RPC method
 message QueryOwnerResponse{
   string owner = 1;
 }
 
-// QuerySupplyRequest is the request type for the Query/Supply RPC method
+/.QuerySupplyRequest is the request type for the Query/Supply RPC method
 message QuerySupplyRequest {
   string class_id = 1;
 }
 
-// QuerySupplyResponse is the response type for the Query/Supply RPC method
+/.QuerySupplyResponse is the response type for the Query/Supply RPC method
 message QuerySupplyResponse {
   uint64 amount = 1;
 }
 
-// QueryNFTsOfClassByOwnerRequest is the request type for the Query/NFTsOfClassByOwner RPC method
+/.QueryNFTsOfClassByOwnerRequest is the request type for the Query/NFTsOfClassByOwner RPC method
 message QueryNFTsOfClassByOwnerRequest {
   string                                 class_id   = 1;
   string                                 owner      = 2;
   cosmos.base.query.v1beta1.PageResponse pagination = 3;
 }
 
-// QueryNFTsOfClassRequest is the request type for the Query/NFTsOfClass RPC method
+/.QueryNFTsOfClassRequest is the request type for the Query/NFTsOfClass RPC method
 message QueryNFTsOfClassRequest {
   string                                 class_id   = 1;
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-// QueryNFTsResponse is the response type for the Query/NFTsOfClass and Query/NFTsOfClassByOwner RPC methods
+/.QueryNFTsResponse is the response type for the Query/NFTsOfClass and Query/NFTsOfClassByOwner RPC methods
 message QueryNFTsResponse {
   repeated cosmos.nft.v1beta1.NFT        nfts       = 1;
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 
-// QueryNFTRequest is the request type for the Query/NFT RPC method
+/.QueryNFTRequest is the request type for the Query/NFT RPC method
 message QueryNFTRequest {
   string class_id = 1;
   string id       = 2;
 }
 
-// QueryNFTResponse is the response type for the Query/NFT RPC method
+/.QueryNFTResponse is the response type for the Query/NFT RPC method
 message QueryNFTResponse {
   cosmos.nft.v1beta1.NFT nft = 1;
 }
 
-// QueryClassRequest is the request type for the Query/Class RPC method
+/.QueryClassRequest is the request type for the Query/Class RPC method
 message QueryClassRequest {
   string class_id = 1;
 }
 
-// QueryClassResponse is the response type for the Query/Class RPC method
+/.QueryClassResponse is the response type for the Query/Class RPC method
 message QueryClassResponse {
   cosmos.nft.v1beta1.Class class = 1;
 }
 
-// QueryClassesRequest is the request type for the Query/Classes RPC method
+/.QueryClassesRequest is the request type for the Query/Classes RPC method
 message QueryClassesRequest {
-  // pagination defines an optional pagination for the request.
+ ..pagination defines an optional pagination for the request.
   cosmos.base.query.v1beta1.PageRequest pagination = 1;
 }
 
-// QueryClassesResponse is the response type for the Query/Classes RPC method
+/.QueryClassesResponse is the response type for the Query/Classes RPC method
 message QueryClassesResponse {
   repeated cosmos.nft.v1beta1.Class      classes    = 1;
   cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }
 ```
 
-### Interoperability
+### 相互運用性
 
-Interoperability is all about reusing assets between modules and chains. The former one is achieved by ADR-33: Protobuf client - server communication. At the time of writing ADR-33 is not finalized. The latter is achieved by IBC. Here we will focus on the IBC side.
-IBC is implemented per module. Here, we aligned that NFTs will be recorded and managed in the x/nft. This requires creation of a new IBC standard and implementation of it.
+相互運用性とは、モジュールとチェーンの間でアセットを再利用することです。前者は、ADR-33:Protobufクライアント/サーバー通信によって実現されます。執筆時点では、ADR-33はまだ完成していません。後者はIBCによって実装されています。ここでは、IBCの側面に焦点を当てます。
+IBCはモジュールに実装されています。ここでは、NFTがx .nftで記録および管理されることに同意します。これには、新しいIBC標準を作成して実装する必要があります。
 
-For IBC interoperability, NFT custom modules MUST use the NFT object type understood by the IBC client. So, for x/nft interoperability, custom NFT implementations (example: x/cryptokitty) should use the canonical x/nft module and proxy all NFT balance keeping functionality to x/nft or else re-implement all functionality using the NFT object type understood by the IBC client. In other words: x/nft becomes the standard NFT registry for all Cosmos NFTs (example: x/cryptokitty will register a kitty NFT in x/nft and use x/nft for book keeping). This was [discussed](https://github.com/cosmos/cosmos-sdk/discussions/9065#discussioncomment-873206) in the context of using x/bank as a general asset balance book. Not using x/nft will require implementing another module for IBC.
+IBCの相互運用性のために、NFTカスタムモジュールは、IBCクライアントが理解できるNFTオブジェクトタイプを使用する必要があります。したがって、x .nftの相互運用性のために、カスタムNFT実装(例:x .cryptokitty)は、標準化されたx .nftモジュールを使用し、すべてのNFTバランス維持機能をx .nftにプロキシする必要があります。それ以外の場合は、理解されているNFTオブジェクトタイプを使用してすべての機能を再実行します。 IBCのお客様から提供されています。言い換えると、x .nftはすべてのCosmosNFTの標準NFTレジストリになります(たとえば、x .cryptokittyはキティNFTをx .nftに登録し、簿記にx .nftを使用します)。これは、x .bankを一般的な貸借対照表として使用する場合に使用されます[ディスカッション](https://github.com/cosmos/cosmos-sdk/discussions/9065#discussioncomment-873206)。 x .nftを使用しない場合は、IBC用に別のモジュールを実装する必要があります。
 
-## Consequences
+## 結果
 
-### Backward Compatibility
+### 下位互換性
 
-No backward incompatibilities.
+後方互換性はありません。
 
-### Forward Compatibility
+### 上位互換性
 
-This specification conforms to the ERC-721 smart contract specification for NFT identifiers. Note that ERC-721 defines uniqueness based on (contract address, uint256 tokenId), and we conform to this implicitly because a single module is currently aimed to track NFT identifiers. Note: use of the (mutable) data field to determine uniqueness is not safe.s
+この仕様は、NFT識別子のERC-721スマートコントラクト仕様に準拠しています。 ERC-721は(契約アドレス、uint256 tokenId)に基づいて一意性を定義し、現在単一のモジュールがNFT識別子を追跡するように設計されているため、これに暗黙的に準拠していることに注意してください。注:(変数)データフィールドを使用して一意性を判断することは安全ではありません。
 
-### Positive
+### ポジティブ
 
-- NFT identifiers available on Cosmos Hub.
-- Ability to build different NFT modules for the Cosmos Hub, e.g., ERC-721.
-- NFT module which supports interoperability with IBC and other cross-chain infrastructures like Gravity Bridge
+-Cosmosハブで利用可能なNFT識別子。
+-ERC-721などのCosmosHub用のさまざまなNFTモジュールを構築する機能。
+-NFTモジュール、IBCやGravityBridgeなどの他のクロスチェーンインフラストラクチャとの相互運用性をサポート
 
-### Negative
+### ネガティブ
 
-+ New IBC app is required for x/nft
-+ CW721 adapter is required
++ x .nftには新しいIBCアプリケーションが必要です
++ CW721アダプターが必要
+### ニュートラル
 
-### Neutral
+-他の機能には、より多くのモジュールが必要です。たとえば、NFTトランザクション機能には管理モジュールが必要であり、NFTプロパティの定義には収集モジュールが必要です。
+## さらなる議論
 
-- Other functions need more modules. For example, a custody module is needed for NFT trading function, a collectible module is needed for defining NFT properties.
+ハブ上の他のタイプのアプリケーションについては、将来、より多くのアプリケーション固有のモジュールを開発できます。
 
-## Further Discussions
+-`x .nft .custody`:トランザクション機能をサポートするためのホストNFT。
+-`x .nft .marketplace`:sdk.Coinsを使用してNFTを売買します。
+-`x .fractional`:複数の利害関係者の資産(NFTまたはその他の資産)の所有権を分割するためのモジュール。 `x .group`はほとんどの状況に適しているはずです。
 
-For other kinds of applications on the Hub, more app-specific modules can be developed in the future:
+Cosmosエコシステムの他のネットワークは、特定のNFTアプリケーションおよびユースケース向けに独自のNFTモジュールを設計および実装できます。
 
-- `x/nft/custody`: custody of NFTs to support trading functionality.
-- `x/nft/marketplace`: selling and buying NFTs using sdk.Coins.
-- `x/fractional`: a module to split an ownership of an asset (NFT or other assets) for multiple stakeholder. `x/group`  should work for most of the cases.
+## 参照する
 
-Other networks in the Cosmos ecosystem could design and implement their own NFT modules for specific NFT applications and use cases.
-
-## References
-
-- Initial discussion: https://github.com/cosmos/cosmos-sdk/discussions/9065
-- x/nft: initialize module: https://github.com/cosmos/cosmos-sdk/pull/9174
-- [ADR 033](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-033-protobuf-inter-module-comm.md)
+-予備的なディスカッション:https://github.com/cosmos/cosmos-sdk/discussions/9065
+-x .nft:初期化モジュール:https://github.com/cosmos/cosmos-sdk/pull/9174
+-[ADR 033](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-033-protobuf-inter-module-comm.md) 

@@ -1,18 +1,18 @@
-# Telemetry
+# 遥测
 
-Gather relevant insights about your application and modules with custom metrics and telemetry. {synopsis}
+使用自定义指标和遥测收集有关您的应用程序和模块的相关见解。 {概要}
 
-The Cosmos SDK enables operators and developers to gain insight into the performance and behavior of
-their application through the use of the `telemetry` package. The Cosmos SDK currently supports
-enabling in-memory and prometheus as telemetry sinks. This allows the ability to query for and scrape
-metrics from a single exposed API endpoint -- `/metrics?format={text|prometheus}`, the default being
-`text`.
+Cosmos SDK 使运营商和开发人员能够深入了解
+他们的应用程序通过使用“遥测”包。 Cosmos SDK 目前支持
+启用内存和普罗米修斯作为遥测接收器。 这允许查询和抓取的能力
+来自单个公开 API 端点的指标 -- `/metrics?format={text|prometheus}`，默认值为
+`文本`。
 
-If telemetry is enabled via configuration, a single global metrics collector is registered via the
-[go-metrics](https://github.com/armon/go-metrics) library. This allows emitting and collecting
-metrics through simple API calls.
+如果通过配置启用遥测，则通过以下方式注册单个全局指标收集器
+[go-metrics](https://github.com/armon/go-metrics) 库。 这允许发射和收集
+指标通过简单的 API 调用。
 
-Example:
+例子: 
 
 ```go
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
@@ -22,24 +22,24 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 }
 ```
 
-Developers may use the `telemetry` package directly, which provides wrappers around metric APIs
-that include adding useful labels, or they must use the `go-metrics` library directly. It is preferable
-to add as much context and adequate dimensionality to metrics as possible, so the `telemetry` package
-is advised. Regardless of the package or method used, the Cosmos SDK supports the following metrics
-types:
+开发人员可以直接使用 `telemetry` 包，它提供了指标 API 的包装器
+包括添加有用的标签，或者他们必须直接使用 `go-metrics` 库。 最好
+为度量添加尽可能多的上下文和足够的维度，因此“遥测”包
+建议。 无论使用何种包或方法，Cosmos SDK 都支持以下指标
+类型:
 
-* gauges
-* summaries
-* counters
+* 仪表
+* 总结
+* 计数器
 
-## Labels
+## 标签
 
-Certain components of modules will have their name automatically added as a label (e.g. `BeginBlock`).
-Operators may also supply the application with a global set of labels that will be applied to all
-metrics emitted using the `telemetry` package (e.g. chain-id). Global labels are supplied as a list
-of [name, value] tuples.
+模块的某些组件将自动将其名称添加为标签(例如“BeginBlock”)。
+运营商还可以为应用程序提供一组全局标签，这些标签将应用于所有
+使用`telemetry` 包(例如chain-id)发出的指标。 全局标签以列表形式提供
+[名称，值] 元组。
 
-Example:
+例子: 
 
 ```toml
 global-labels = [
@@ -47,30 +47,30 @@ global-labels = [
 ]
 ```
 
-## Cardinality
+## 基数
 
-Cardinality is key, specifically label and key cardinality. Cardinality is how many unique values of
-something there are. So there is naturally a tradeoff between granularity and how much stress is put
-on the telemetry sink in terms of indexing, scrape, and query performance.
+基数是关键，特别是标签和键基数。 基数是有多少个唯一值
+有的东西。 所以自然要在粒度和施加的压力之间进行权衡
+在索引、抓取和查询性能方面的遥测接收器上。
 
-Developers should take care to support metrics with enough dimensionality and granularity to be
-useful, but not increase the cardinality beyond the sink's limits. A general rule of thumb is to not
-exceed a cardinality of 10.
+开发人员应该注意支持具有足够维度和粒度的指标
+有用，但不会增加超出接收器限制的基数。 一般的经验法则是不要
+超过 10 的基数。
 
-Consider the following examples with enough granularity and adequate cardinality:
+考虑以下具有足够粒度和足够基数的示例:
 
-* begin/end blocker time
-* tx gas used
-* block gas used
-* amount of tokens minted
-* amount of accounts created
+* 开始/结束拦截器时间
+* 使用的 TX 气体
+* 使用块气体
+* 铸造的代币数量
+* 创建的帐户数量
 
-The following examples expose too much cardinality and may not even prove to be useful:
+以下示例暴露了太多的基数，甚至可能没有用处:
 
-* transfers between accounts with amount
-* voting/deposit amount from unique addresses
+* 有金额的账户间转账
+*来自唯一地址的投票/存款金额
 
-## Supported Metrics
+## 支持的指标 
 
 | Metric                          | Description                                                                               | Unit            | Type    |
 |:--------------------------------|:------------------------------------------------------------------------------------------|:----------------|:--------|

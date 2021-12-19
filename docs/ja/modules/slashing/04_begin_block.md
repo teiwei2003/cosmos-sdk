@@ -1,25 +1,25 @@
-# BeginBlock
+# 开始块
 
-## Liveness Tracking
+## 活性跟踪
 
-At the beginning of each block, we update the `ValidatorSigningInfo` for each
-validator and check if they've crossed below the liveness threshold over a
-sliding window. This sliding window is defined by `SignedBlocksWindow` and the
-index in this window is determined by `IndexOffset` found in the validator's
-`ValidatorSigningInfo`. For each block processed, the `IndexOffset` is incremented
-regardless if the validator signed or not. Once the index is determined, the
-`MissedBlocksBitArray` and `MissedBlocksCounter` are updated accordingly.
+在每个块的开始，我们更新每个块的“ValidatorSigningInfo”
+验证器并检查它们是否超过了活跃度阈值
+滑动窗口。这个滑动窗口由`SignedBlocksWindow`和
+此窗口中的索引由验证器中的“IndexOffset”决定
+`验证器签名信息`。对于处理的每个块，“IndexOffset”递增
+无论验证者是否签名。指标确定后，
+`MissedBlocksBitArray` 和 `MissedBlocksCounter` 相应更新。
 
-Finally, in order to determine if a validator crosses below the liveness threshold,
-we fetch the maximum number of blocks missed, `maxMissed`, which is
-`SignedBlocksWindow - (MinSignedPerWindow * SignedBlocksWindow)` and the minimum
-height at which we can determine liveness, `minHeight`. If the current block is
-greater than `minHeight` and the validator's `MissedBlocksCounter` is greater than
-`maxMissed`, they will be slashed by `SlashFractionDowntime`, will be jailed
-for `DowntimeJailDuration`, and have the following values reset:
-`MissedBlocksBitArray`, `MissedBlocksCounter`, and `IndexOffset`.
+最后，为了确定验证器是否低于活跃度阈值，
+我们获取丢失的最大块数，`maxMissed`，即
+`SignedBlocksWindow - (MinSignedPerWindow * SignedBlocksWindow)` 和最小值
+我们可以确定活跃度的高度，`minHeight`。如果当前块是
+大于 `minHeight` 并且验证器的 `MissedBlocksCounter` 大于
+`maxMissed`，他们将被 `SlashFractionDowntime` 削减，将被监禁
+对于`DowntimeJailDuration`，并重置以下值:
+`MissedBlocksBitArray`、`MissedBlocksCounter` 和 `IndexOffset`。
 
-**Note**: Liveness slashes do **NOT** lead to a tombstombing.
+**注意**:活性斜线**不会**导致墓碑。 
 
 ```go
 height := block.Height

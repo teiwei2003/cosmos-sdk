@@ -1,25 +1,25 @@
-# State
+# 状态
 
-## Proposals
+## 提案
 
-`Proposal` objects are used to tally votes and generally track the proposal's state.
-They contain an array of arbitrary `sdk.Msg`'s which the governance module will attempt
-to resolve and then execute if the proposal passes. `Proposal`'s are identified by a
-unique id and contains a series of timestamps: `submit_time`, `deposit_end_time`,
-`voting_start_time`, `voting_end_time` which track the lifecycle of a proposal
+`Proposal` 对象用于统计投票并通常跟踪提案的状态。
+它们包含治理模块将尝试的任意 `sdk.Msg` 数组
+如果提案通过，则解决然后执行。 “提案”由一个标识
+唯一 id 并包含一系列时间戳:`submit_time`、`deposit_end_time`、
+`voting_start_time`, `voting_end_time` 跟踪提案的生命周期
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/4a129832eb16f37a89e97652a669f0cdc9196ca9/proto/cosmos/gov/v1beta2/gov.proto#L42-L52
 
-A proposal will generally require more than just a set of messages to explain its
-purpose but need some greater justification and allow a means for interested participants
-to discuss and debate the proposal. In most cases, it is encouraged to have an off-chain
-system that supports the on-chain governance process. To accommodate for this, a
-proposal contains a special `metadata` field, an array of bytes, which can be used to
-add context to the proposal. The `metadata` field allows custom use for networks, however,
-it is expected that the field contain a URL or some form of CID using a system such as
-[IPFS](https://docs.ipfs.io/concepts/content-addressing/). To support the case of
-interoperability across networks, the SDK recommends that the `metadata` represents
-the following `JSON` template:
+一个提案通常需要的不仅仅是一组消息来解释它的
+目的但需要一些更大的理由并为感兴趣的参与者提供一种手段
+讨论和辩论该提案。在大多数情况下，鼓励有一个链下
+支持链上治理过程的系统。为了适应这种情况，一个
+提案包含一个特殊的“元数据”字段，一个字节数组，可用于
+为提案添加上下文。 `metadata` 字段允许自定义使用网络，但是，
+预计该字段包含 URL 或使用系统的某种形式的 CID，例如
+[IPFS](https://docs.ipfs.io/concepts/content-addressing/)。为了支持的情况
+跨网络的互操作性，SDK 建议“元数据”代表
+以下`JSON`模板: 
 
 ```json
 {
@@ -30,30 +30,30 @@ the following `JSON` template:
 }
 ```
 
-This makes it far easier for clients to support multiple networks.
+这使得客户端更容易支持多个网络。
 
-### Writing a module that uses governance
+### 编写一个使用治理的模块
 
-There are many aspects of a chain, or of the individual modules that you may want to
-use governance to perform such as changing various parameters. This is very simple
-to do. First, write out your message types and `MsgServer` implementation. Add an
-`authority` field to the keeper which will be populated in the constructor with the
-governance module account: `govKeeper.GetGovernanceAccount().GetAddress()`. Then for
-the methods in the `msg_server.go`, perform a check on the message that the signer
-matches `authority`. This will prevent any user from executing that message.
+链或您可能想要的单个模块的许多方面
+使用治理来执行例如更改各种参数。这很简单
+去做。首先，写出你的消息类型和 `MsgServer` 实现。添加一个
+`authority` 字段给 keeper ，它将在构造函数中填充
+治理模块帐户:`govKeeper.GetGovernanceAccount().GetAddress()`。那么对于
+`msg_server.go` 中的方法，对签名者发送的消息执行检查
+匹配“权威”。这将阻止任何用户执行该消息。
 
-## Parameters and base types
+## 参数和基本类型
 
-`Parameters` define the rules according to which votes are run. There can only
-be one active parameter set at any given time. If governance wants to change a
-parameter set, either to modify a value or add/remove a parameter field, a new
-parameter set has to be created and the previous one rendered inactive.
+`Parameters` 定义了运行投票的规则。只能有
+是任何给定时间的一个活动参数集。如果治理想要改变一个
+参数集，用于修改值或添加/删除参数字段，一个新的
+必须创建参数集并且前一个被渲染为非活动状态。
 
-### DepositParams
+### 存款参数
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/gov.proto#L127-L145
 
-### VotingParams
+### 投票参数
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/gov.proto#L147-L156
 
@@ -61,9 +61,9 @@ parameter set has to be created and the previous one rendered inactive.
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/gov.proto#L158-L183
 
-Parameters are stored in a global `GlobalParams` KVStore.
+参数存储在全局`GlobalParams` KVStore 中。
 
-Additionally, we introduce some basic types:
+此外，我们还介绍了一些基本类型: 
 
 ```go
 type Vote byte
@@ -110,36 +110,36 @@ This type is used in a temp map when tallying
   }
 ```
 
-## Stores
+## 存储
 
-_Stores are KVStores in the multi-store. The key to find the store is the first
-parameter in the list_`
+_Stores 是 multi-store 中的 KVStores。找存储的关键是第一
+列表中的参数_`
 
-We will use one KVStore `Governance` to store two mappings:
+我们将使用一个 KVStore `Governance` 来存储两个映射:
 
-- A mapping from `proposalID|'proposal'` to `Proposal`.
-- A mapping from `proposalID|'addresses'|address` to `Vote`. This mapping allows
-  us to query all addresses that voted on the proposal along with their vote by
-  doing a range query on `proposalID:addresses`.
+- 从 `proposalID|'proposal'` 到 `Proposal` 的映射。
+- 从 `proposalID|'addresses'|address` 到 `Vote` 的映射。这种映射允许
+  我们查询所有对该提案进行投票的地址以及他们的投票
+  对 `proposalID:addresses` 进行范围查询。
 
-For pseudocode purposes, here are the two function we will use to read or write in stores:
+出于伪代码的目的，以下是我们将用于在存储中读取或写入的两个函数:
 
-- `load(StoreKey, Key)`: Retrieve item stored at key `Key` in store found at key `StoreKey` in the multistore
-- `store(StoreKey, Key, value)`: Write value `Value` at key `Key` in store found at key `StoreKey` in the multistore
+- `load(StoreKey, Key)`:检索存储在多存储中键`StoreKey`的存储中存储在键`Key`中的项目
+- `store(StoreKey, Key, value)`:在多存储中的键`StoreKey`中找到的存储中的键`Key`中写入值`Value`
 
-## Proposal Processing Queue
+## 提案处理队列
 
-**Store:**
+**存储:**
 
-- `ProposalProcessingQueue`: A queue `queue[proposalID]` containing all the
-  `ProposalIDs` of proposals that reached `MinDeposit`. During each `EndBlock`,
-  all the proposals that have reached the end of their voting period are processed.
-  To process a finished proposal, the application tallies the votes, computes the
-  votes of each validator and checks if every validator in the validator set has
-  voted. If the proposal is accepted, deposits are refunded. Finally, the proposal
-  content `Handler` is executed.
+- `ProposalProcessingQueue`:一个队列 `queue[proposalID]` 包含所有
+  达到“MinDeposit”的提案的“ProposalIDs”。在每个“EndBlock”期间，
+  所有已到投票期结束的提案都将被处理。
+  为了处理完成的提案，应用程序会统计投票数，计算
+  每个验证者的投票，并检查验证者集中的每个验证者是否有
+  投票。如果提案被接受，押金将被退还。最后，提案
+  内容 `Handler` 被执行。
 
-And the pseudocode for the `ProposalProcessingQueue`:
+以及“ProposalProcessingQueue”的伪代码: 
 
 ```go
   in EndBlock do

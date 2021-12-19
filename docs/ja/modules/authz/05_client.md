@@ -1,12 +1,12 @@
-# Client
+# 客户
 
-## CLI
+##命令行界面
 
-A user can query and interact with the `authz` module using the CLI.
+用户可以使用 CLI 查询“authz”模块并与之交互。
 
-### Query
+### 询问
 
-The `query` commands allow users to query `authz` state.
+`query` 命令允许用户查询 `authz` 状态。 
 
 ```bash
 simd query authz --help
@@ -14,7 +14,7 @@ simd query authz --help
 
 #### grants
 
-The `grants` command allows users to query grants for a granter-grantee pair. If the message type URL is set, it selects grants only for that message type.
+`grants` 命令允许用户查询授权者-被授权者对的授权。 如果设置了消息类型 URL，则它只为该消息类型选择授权。 
 
 ```bash
 simd query authz grants [granter-addr] [grantee-addr] [msg-type-url]? [flags]

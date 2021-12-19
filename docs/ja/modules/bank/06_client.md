@@ -1,12 +1,12 @@
-# Client
+# 客户
 
-## CLI
+##命令行界面
 
-A user can query and interact with the `bank` module using the CLI.
+用户可以使用 CLI 查询“bank”模块并与之交互。
 
-### Query
+### 询问
 
-The `query` commands allow users to query `bank` state.
+`query` 命令允许用户查询 `bank` 状态。 
 
 ```
 simd query bank --help
@@ -14,8 +14,7 @@ simd query bank --help
 
 #### balances
 
-The `balances` command allows users to query account balances by address.
-
+`balances` 命令允许用户按地址查询账户余额。 
 ```
 simd query bank balances [address] [flags]
 ```
@@ -39,7 +38,7 @@ pagination:
 
 #### denom-metadata
 
-The `denom-metadata` command allows users to query metadata for coin denominations. A user can query metadata for a single denomination using the `--denom` flag or all denominations without it.
+`denom-metadata` 命令允许用户查询硬币面额的元数据。 用户可以使用 `--denom` 标志查询单个面额的元数据，或者没有它的所有面额。 
 
 ```
 simd query bank denom-metadata [flags]
@@ -68,7 +67,7 @@ metadata:
 
 #### total
 
-The `total` command allows users to query the total supply of coins. A user can query the total supply for a single coin using the `--denom` flag or all coins without it.
+`total` 命令允许用户查询硬币的总供应量。 用户可以使用 `--denom` 标志或没有它的所有硬币查询单个硬币的总供应量。 
 
 ```
 simd query bank total [flags]

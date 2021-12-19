@@ -1,51 +1,51 @@
-# ADR 3: Dynamic Capability Store
+# ADR 3:動的容量ストレージ
 
-## Changelog
+## 変更ログ
 
-- 12 December 2019: Initial version
-- 02 April 2020: Memory Store Revisions
+-2019年12月12日:初期バージョン
+-2020年4月2日:メモリストレージの改訂
 
-## Context
+## 環境
 
-Full implementation of the [IBC specification](https://github.com/cosmos/ibs) requires the ability to create and authenticate object-capability keys at runtime (i.e., during transaction execution),
-as described in [ICS 5](https://github.com/cosmos/ibc/tree/master/spec/core/ics-005-port-allocation#technical-specification). In the IBC specification, capability keys are created for each newly initialised
-port & channel, and are used to authenticate future usage of the port or channel. Since channels and potentially ports can be initialised during transaction execution, the state machine must be able to create
-object-capability keys at this time.
+[IBC仕様](https://github.com/cosmos/ibs)の完全な実装では、実行時(つまり、トランザクションの実行中)にオブジェクト機能キーを作成および検証できる必要があります。
+[ICS 5](https://github.com/cosmos/ibc/tree/master/spec/core/ics-005-port-allocation#technical-specification)で説明されているように。 IBC仕様では、新しく初期化されたものごとに
+ポートとチャネルは、ポートまたはチャネルの将来の使用状況を確認するために使用されます。チャネルと潜在的なポートはトランザクションの実行中に初期化できるため、ステートマシンは作成できる必要があります
+このときのオブジェクトファンクションキー。
 
-At present, the Cosmos SDK does not have the ability to do this. Object-capability keys are currently pointers (memory addresses) of `StoreKey` structs created at application initialisation in `app.go` ([example](https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app.go#L132))
-and passed to Keepers as fixed arguments ([example](https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app.go#L160)). Keepers cannot create or store capability keys during transaction execution — although they could call `NewKVStoreKey` and take the memory address
-of the returned struct, storing this in the Merklised store would result in a consensus fault, since the memory address will be different on each machine (this is intentional — were this not the case, the keys would be predictable and couldn't serve as object capabilities).
+現在、CosmosSDKにはこれを行う機能がありません。オブジェクトファンクションキーは、現在、アプリケーションの初期化時に `app.go`で作成される` StoreKey`構造のポインタ(メモリアドレス)です([例](https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app .go#L132))
+そして、それを固定パラメーターとしてKeepers([example](https://github.com/cosmos/gaia/blob/dcbddd9f04b3086c0ad07ee65de16e7adedc7da4/app/app.go#L160))に渡します。キーパーは、トランザクションの実行中にファンクションキーを作成または保存することはできませんが、 `NewKVStoreKey`を呼び出して、メモリアドレスを取得することはできます。
+返された構造については、各マシンのメモリアドレスが異なるため、Merklisedストレージに保存すると、コンセンサスエラーが発生します(これは意図的なものです。そうでない場合、キーは予測可能であり、使用できません。オブジェクト機能) 。
 
-Keepers need a way to keep a private map of store keys which can be altered during transaction execution, along with a suitable mechanism for regenerating the unique memory addresses (capability keys) in this map whenever the application is started or restarted, along with a mechanism to revert capability creation on tx failure.
-This ADR proposes such an interface & mechanism.
+キーパーには、トランザクションの実行中に変更できるストレージキーのプライベートマッピングを保存する方法、アプリケーションの起動時または再起動時にこのマッピングで一意のメモリアドレス(ファンクションキー)を再生成するための適切なメカニズム、およびメカニズムが必要です。 txが失敗したときに作成する機能を復元します。
+このADRは、そのようなインターフェースとメカニズムを提案します。
 
-## Decision
+## 決定
 
-The Cosmos SDK will include a new `CapabilityKeeper` abstraction, which is responsible for provisioning,
-tracking, and authenticating capabilities at runtime. During application initialisation in `app.go`,
-the `CapabilityKeeper` will be hooked up to modules through unique function references
-(by calling `ScopeToModule`, defined below) so that it can identify the calling module when later
-invoked.
+Cosmos SDKには、新しい「CapabilityKeeper」抽象化が含まれます。
+実行時に機能を追跡および検証します。 app.goでのアプリケーションの初期化中に、
+`CapabilityKeeper`は、一意の関数リファレンスを介してモジュールに接続します
+( `ScopeToModule`を呼び出すことにより、次のように定義されます)後で呼び出し元のモジュールを識別するため
+移行。
 
-When the initial state is loaded from disk, the `CapabilityKeeper`'s `Initialise` function will create
-new capability keys for all previously allocated capability identifiers (allocated during execution of
-past transactions and assigned to particular modes), and keep them in a memory-only store while the
-chain is running.
+ディスクから初期状態をロードする場合、 `CapabilityKeeper`の` Initialise`関数が作成します
+以前に割り当てられたすべての機能識別子の新しい機能キー(実行中に割り当てられた)
+過去のトランザクションと特定のパターンに割り当てられたもの)をメモリのみのストレージに保存し、
+チェーンが実行されています。
 
-The `CapabilityKeeper` will include a persistent `KVStore`, a `MemoryStore`, and an in-memory map.
-The persistent `KVStore` tracks which capability is owned by which modules.
-The `MemoryStore` stores a forward mapping that map from module name, capability tuples to capability names and
-a reverse mapping that map from module name, capability name to the capability index.
-Since we cannot marshal the capability into a `KVStore` and unmarshal without changing the memory location of the capability,
-the reverse mapping in the KVStore will simply map to an index. This index can then be used as a key in the ephemeral
-go-map to retrieve the capability at the original memory location.
+`CapabilityKeeper`には、永続的な` KVStore`、 `MemoryStore`、およびメモリマップが含まれます。
+永続性「KVStore」は、どの機能がどのモジュールによって所有されているかを追跡します。
+`MemoryStore`は、モジュール名、機能タプルから機能名、および
+モジュール名と関数名から関数インデックスへの逆マッピング。
+機能のメモリ位置を変更せずに機能を `KVStore`にグループ化およびグループ解除することはできないため、
+KVStoreの逆マッピングは、単にインデックスにマッピングされます。このインデックスは、一時ファイルのキーとして使用できます
+Go-mapは、元のメモリ位置にある関数を取得します。
 
-The `CapabilityKeeper` will define the following types & functions:
+`CapabilityKeeper`は、次のタイプと関数を定義します。
 
-The `Capability` is similar to `StoreKey`, but has a globally unique `Index()` instead of
-a name. A `String()` method is provided for debugging.
+`Capability`は` StoreKey`に似ていますが、代わりにグローバルに一意の `Index()`を持っています
+名前。デバッグ用に `String()`メソッドが用意されています。
 
-A `Capability` is simply a struct, the address of which is taken for the actual capability.
+`Capability`は単なる構造であり、そのアドレスは実際の機能に使用されます。 
 
 ```golang
 type Capability struct {
@@ -53,7 +53,7 @@ type Capability struct {
 }
 ```
 
-A `CapabilityKeeper` contains a persistent store key, memory store key, and mapping of allocated module names.
+「CapabilityKeeper」には、永続ストレージキー、メモリストレージキー、および割り当てられたモジュール名のマッピングが含まれています。
 
 ```golang
 type CapabilityKeeper struct {
@@ -65,11 +65,11 @@ type CapabilityKeeper struct {
 }
 ```
 
-The `CapabilityKeeper` provides the ability to create *scoped* sub-keepers which are tied to a
-particular module name. These `ScopedCapabilityKeeper`s must be created at application initialisation
-and passed to modules, which can then use them to claim capabilities they receive and retrieve
-capabilities which they own by name, in addition to creating new capabilities & authenticating capabilities
-passed by other modules.
+`CapabilityKeeper`は、*スコープ*サブマネージャーを作成する機能を提供します。
+特定のモジュール名。 これらの `ScopedCapabilityKeeper`は、アプリケーションの初期化時に作成する必要があります
+そしてモジュールに渡されると、モジュールはそれらを使用して、受信および取得する関数を宣言できます
+新しい機能と認証機能を作成することに加えて、それらが名前で所有する機能
+他のモジュールを介して。 
 
 ```golang
 type ScopedCapabilityKeeper struct {
@@ -80,8 +80,8 @@ type ScopedCapabilityKeeper struct {
 }
 ```
 
-`ScopeToModule` is used to create a scoped sub-keeper with a particular name, which must be unique.
-It MUST be called before `InitialiseAndSeal`.
+`ScopeToModule`は、一意である必要がある特定の名前でスコープサブマネージャーを作成するために使用されます。
+`InitialiseAndSeal`の前に呼び出す必要があります。 
 
 ```golang
 func (ck CapabilityKeeper) ScopeToModule(moduleName string) ScopedCapabilityKeeper {
@@ -105,10 +105,10 @@ func (ck CapabilityKeeper) ScopeToModule(moduleName string) ScopedCapabilityKeep
 }
 ```
 
-`InitialiseAndSeal` MUST be called exactly once, after loading the initial state and creating all
-necessary `ScopedCapabilityKeeper`s, in order to populate the memory store with newly-created
-capability keys in accordance with the keys previously claimed by particular modules and prevent the
-creation of any new `ScopedCapabilityKeeper`s.
+`InitialiseAndSeal`は初期状態をロードし、すべてを作成する必要があります
+新しく作成されたメモリで埋めるために必要な「ScopedCapabilityKeeper」
+特定のモジュールによって以前に宣言されたキーの機能キーに従って、
+新しい「ScopedCapabilityKeeper」を作成します。
 
 ```golang
 func (ck CapabilityKeeper) InitialiseAndSeal(ctx Context) {
@@ -119,7 +119,7 @@ func (ck CapabilityKeeper) InitialiseAndSeal(ctx Context) {
   persistentStore := ctx.KVStore(ck.persistentKey)
   map := ctx.KVStore(ck.memKey)
   
-  // initialise memory store for all names in persistent store
+./initialise memory store for all names in persistent store
   for index, value := range persistentStore.Iter() {
     capability = &CapabilityKey{index: index}
 
@@ -136,97 +136,97 @@ func (ck CapabilityKeeper) InitialiseAndSeal(ctx Context) {
 }
 ```
 
-`NewCapability` can be called by any module to create a new unique, unforgeable object-capability
-reference. The newly created capability is automatically persisted; the calling module need not
-call `ClaimCapability`.
+どのモジュールも「NewCapability」を呼び出して、新しい独自の偽造不可能なオブジェクト機能を作成できます
+参照する。 新しく作成された機能は自動的に保持されます。モジュールを呼び出す必要はありません
+`ClaimCapability`を呼び出します。 
 
 ```golang
 func (sck ScopedCapabilityKeeper) NewCapability(ctx Context, name string) (Capability, error) {
-  // check name not taken in memory store
+./check name not taken in memory store
   if capStore.Get("rev/" + name) != nil {
     return nil, errors.New("name already taken")
   }
 
-  // fetch the current index
+./fetch the current index
   index := persistentStore.Get("index")
   
-  // create a new capability
+./create a new capability
   capability := &CapabilityKey{index: index}
   
-  // set persistent store
+./set persistent store
   persistentStore.Set(index, Set.singleton(sck.moduleName + "/" + name))
   
-  // update the index
+./update the index
   index++
   persistentStore.Set("index", index)
   
-  // set forward mapping in memory store from capability to name
+./set forward mapping in memory store from capability to name
   memStore.Set(sck.moduleName + "/fwd/" + capability, name)
   
-  // set reverse mapping in memory store from name to index
+./set reverse mapping in memory store from name to index
   memStore.Set(sck.moduleName + "/rev/" + name, index)
 
-  // set the in-memory mapping from index to capability pointer
+./set the in-memory mapping from index to capability pointer
   capMap[index] = capability
   
-  // return the newly created capability
+./return the newly created capability
   return capability
 }
 ```
 
-`AuthenticateCapability` can be called by any module to check that a capability
-does in fact correspond to a particular name (the name can be untrusted user input)
-with which the calling module previously associated it.
+どのモジュールでもAuthenticateCapabilityを呼び出して、機能を確認できます
+実際には特定の名前に対応しています(名前は信頼できないユーザー入力である可能性があります)
+モジュールを呼び出す前に、モジュールに関連付けられています。 
 
 ```golang
 func (sck ScopedCapabilityKeeper) AuthenticateCapability(name string, capability Capability) bool {
-  // return whether forward mapping in memory store matches name
+./return whether forward mapping in memory store matches name
   return memStore.Get(sck.moduleName + "/fwd/" + capability) === name
 }
 ```
 
-`ClaimCapability` allows a module to claim a capability key which it has received from another module
-so that future `GetCapability` calls will succeed.
+`ClaimCapability`を使用すると、モジュールは別のモジュールから受け取った機能キーを宣言できます
+その後、将来の `GetCapability`呼び出しは成功します。
 
-`ClaimCapability` MUST be called if a module which receives a capability wishes to access it by name
-in the future. Capabilities are multi-owner, so if multiple modules have a single `Capability` reference,
-they will all own it.
+受信機能モジュールが名前でアクセスする場合は、 `ClaimCapability`を呼び出す必要があります
+将来。 機能は複数所有者であるため、複数のモジュールに単一の「機能」参照がある場合、
+彼らは皆それを持っているでしょう。 
 
 ```golang
 func (sck ScopedCapabilityKeeper) ClaimCapability(ctx Context, capability Capability, name string) error {
   persistentStore := ctx.KVStore(sck.persistentKey)
 
-  // set forward mapping in memory store from capability to name
+./set forward mapping in memory store from capability to name
   memStore.Set(sck.moduleName + "/fwd/" + capability, name)
 
-  // set reverse mapping in memory store from name to capability
+./set reverse mapping in memory store from name to capability
   memStore.Set(sck.moduleName + "/rev/" + name, capability)
 
-  // update owner set in persistent store
+./update owner set in persistent store
   owners := persistentStore.Get(capability.Index())
   owners.add(sck.moduleName + "/" + name)
   persistentStore.Set(capability.Index(), owners)
 }
 ```
 
-`GetCapability` allows a module to fetch a capability which it has previously claimed by name.
-The module is not allowed to retrieve capabilities which it does not own.
+`GetCapability`を使用すると、モジュールは以前に宣言された機能を名前で取得できます。
+モジュールは、モジュールに属していない関数を取得することはできません。 
 
 ```golang
 func (sck ScopedCapabilityKeeper) GetCapability(ctx Context, name string) (Capability, error) {
-  // fetch the index of capability using reverse mapping in memstore
+./fetch the index of capability using reverse mapping in memstore
   index := memStore.Get(sck.moduleName + "/rev/" + name)
 
-  // fetch capability from go-map using index
+./fetch capability from go-map using index
   capability := capMap[index]
 
-  // return the capability
+./return the capability
   return capability
 }
 ```
 
-`ReleaseCapability` allows a module to release a capability which it had previously claimed. If no
-more owners exist, the capability will be deleted globally.
+`ReleaseCapability`を使用すると、モジュールは以前に宣言された機能を解放できます。 そうでない場合
+所有者がさらにいる場合、その能力はグローバルに削除されます。 
 
 ```golang
 func (sck ScopedCapabilityKeeper) ReleaseCapability(ctx Context, capability Capability) err {
@@ -237,65 +237,65 @@ func (sck ScopedCapabilityKeeper) ReleaseCapability(ctx Context, capability Capa
     return error("capability not owned by module")
   }
 
-  // delete forward mapping in memory store
+./delete forward mapping in memory store
   memoryStore.Delete(sck.moduleName + "/fwd/" + capability, name)
 
-  // delete reverse mapping in memory store
+./delete reverse mapping in memory store
   memoryStore.Delete(sck.moduleName + "/rev/" + name, capability)
 
-  // update owner set in persistent store
+./update owner set in persistent store
   owners := persistentStore.Get(capability.Index())
   owners.remove(sck.moduleName + "/" + name)
   if owners.size() > 0 {
-    // there are still other owners, keep the capability around
+  ./there are still other owners, keep the capability around
     persistentStore.Set(capability.Index(), owners)
   } else {
-    // no more owners, delete the capability
+  ./no more owners, delete the capability
     persistentStore.Delete(capability.Index())
     delete(capMap[capability.Index()])
   }
 }
 ```
 
-### Usage patterns
+### 使用モード
 
-#### Initialisation
+#### 初期化
 
-Any modules which use dynamic capabilities must be provided a `ScopedCapabilityKeeper` in `app.go`:
+動的関数を使用するモジュールは、app.goでScopedCapabilityKeeperを提供する必要があります。
 
 ```golang
 ck := NewCapabilityKeeper(persistentKey, memoryKey)
 mod1Keeper := NewMod1Keeper(ck.ScopeToModule("mod1"), ....)
 mod2Keeper := NewMod2Keeper(ck.ScopeToModule("mod2"), ....)
 
-// other initialisation logic ...
+//other initialisation logic ...
 
-// load initial state...
+//load initial state...
 
 ck.InitialiseAndSeal(initialContext)
 ```
 
-#### Creating, passing, claiming and using capabilities
+#### 機能の作成、転送、宣言、使用
 
-Consider the case where `mod1` wants to create a capability, associate it with a resource (e.g. an IBC channel) by name, then pass it to `mod2` which will use it later:
+「mod1」が能力を作成し、それを名前でリソース(IBCチャネルなど)に関連付けてから、それを「mod2」に渡し、後でそれを使用する状況を考えてみます。
 
-Module 1 would have the following code:
+モジュール1には次のコードが含まれます。 
 
 ```golang
 capability := scopedCapabilityKeeper.NewCapability(ctx, "resourceABC")
 mod2Keeper.SomeFunction(ctx, capability, args...)
 ```
 
-`SomeFunction`, running in module 2, could then claim the capability:
+`SomeFunction`は、モジュール2で実行され、関数を宣言できます。 
 
 ```golang
 func (k Mod2Keeper) SomeFunction(ctx Context, capability Capability) {
   k.sck.ClaimCapability(ctx, capability, "resourceABC")
-  // other logic...
+./other logic...
 }
 ```
 
-Later on, module 2 can retrieve that capability by name and pass it to module 1, which will authenticate it against the resource:
+後で、モジュール2は名前で関数を取得し、それをモジュール1に渡すことができます。モジュール1は、リソースに基づいて関数を認証します。 
 
 ```golang
 func (k Mod2Keeper) SomeOtherFunction(ctx Context, name string) {
@@ -304,41 +304,41 @@ func (k Mod2Keeper) SomeOtherFunction(ctx Context, name string) {
 }
 ```
 
-Module 1 will then check that this capability key is authenticated to use the resource before allowing module 2 to use it:
+モジュール2にリソースの使用を許可する前に、モジュール1は、この機能キーがリソースを使用するために認証されているかどうかを確認します。
 
 ```golang
 func (k Mod1Keeper) UseResource(ctx Context, capability Capability, resource string) {
   if !k.sck.AuthenticateCapability(name, capability) {
     return errors.New("unauthenticated")
   }
-  // do something with the resource
+./do something with the resource
 }
 ```
 
-If module 2 passed the capability key to module 3, module 3 could then claim it and call module 1 just like module 2 did
-(in which case module 1, module 2, and module 3 would all be able to use this capability).
+モジュール2がファンクションキーをモジュール3に渡すと、モジュール3はそれを宣言し、モジュール2のようにモジュール1を呼び出すことができます。
+(この場合、モジュール1、モジュール2、およびモジュール3はすべてこの機能を使用できます)。
 
-## Status
+## ステータス
 
-Proposed.
+提案しました。
 
-## Consequences
+## 結果
 
-### Positive
+### 目的
 
-- Dynamic capability support.
-- Allows CapabilityKeeper to return same capability pointer from go-map while reverting any writes to the persistent `KVStore` and in-memory `MemoryStore` on tx failure.
+-動的機能のサポート。
+-txが失敗したときに、メモリ内の永続的な「KVStore」および「MemoryStore」への書き込みを回復しながら、CapabilityKeeperがgo-mapから同じ機能ポインタを返すことを許可します。
 
-### Negative
+### ネガティブ
 
-- Requires an additional keeper.
-- Some overlap with existing `StoreKey` system (in the future they could be combined, since this is a superset functionality-wise).
-- Requires an extra level of indirection in the reverse mapping, since MemoryStore must map to index which must then be used as key in a go map to retrieve the actual capability
+-追加のゴールキーパーが必要です。
+-既存の「StoreKey」システムとの重複があります(これはスーパーセット関数であるため、将来的にマージできます)。
+-メモリストアはインデックスにマップする必要があり、実際の関数を取得するためにgoマップのキーとして使用する必要があるため、リバースマッピングでは追加レベルの間接参照が必要です。
 
-### Neutral
+### ニュートラル
 
-(none known)
+(誰も知らない)
 
-## References
+## 参照する
 
-- [Original discussion](https://github.com/cosmos/cosmos-sdk/pull/5230#discussion_r343978513)
+-[元のディスカッション](https://github.com/cosmos/cosmos-sdk/pull/5230#discussion_r343978513) 

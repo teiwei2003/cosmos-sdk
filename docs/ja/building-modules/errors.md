@@ -1,46 +1,46 @@
-# Errors
+# 错误
 
-This document outlines the recommended usage and APIs for error handling in Cosmos SDK modules. {synopsis}
+本文档概述了 Cosmos SDK 模块中用于错误处理的推荐用法和 API。 {概要}
 
-Modules are encouraged to define and register their own errors to provide better
-context on failed message or handler execution. Typically, these errors should be
-common or general errors which can be further wrapped to provide additional specific
-execution context.
+鼓励模块定义和注册自己的错误以提供更好的
+失败消息或处理程序执行的上下文。通常，这些错误应该是
+可以进一步包装以提供额外的特定错误的常见或一般错误
+执行上下文。
 
-## Registration
+## 登记
 
-Modules should define and register their custom errors in `x/{module}/errors.go`. Registration
-of errors is handled via the `types/errors` package.
+模块应该在 `x/{module}/errors.go` 中定义和注册它们的自定义错误。登记
+错误是通过 `types/errors` 包处理的。
 
-Example:
+例子:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.43.0/x/distribution/types/errors.go#L1-L21
 
-Each custom module error must provide the codespace, which is typically the module name
-(e.g. "distribution") and is unique per module, and a uint32 code. Together, the codespace and code
-provide a globally unique Cosmos SDK error. Typically, the code is monotonically increasing but does not
-necessarily have to be. The only restrictions on error codes are the following:
+每个自定义模块错误都必须提供代码空间，通常是模块名称
+(例如“分发”)并且每个模块都是唯一的，以及一个 uint32 代码。一起，代码空间和代码
+提供全球唯一的 Cosmos SDK 错误。通常，代码是单调递增的，但不会
+必须是。错误代码的唯一限制如下:
 
-* Must be greater than one, as a code value of one is reserved for internal errors.
-* Must be unique within the module.
+* 必须大于 1，因为 1 的代码值是为内部错误保留的。
+* 在模块内必须是唯一的。
 
-Note, the Cosmos SDK provides a core set of *common* errors. These errors are defined in `types/errors/errors.go`.
+请注意，Cosmos SDK 提供了一组核心的*常见*错误。这些错误在 `types/errors/errors.go` 中定义。
 
-## Wrapping
+## 包装
 
-The custom module errors can be returned as their concrete type as they already fulfill the `error`
-interface. However, module errors can be wrapped to provide further context and meaning to failed
-execution.
+自定义模块错误可以作为它们的具体类型返回，因为它们已经满足了 `error`
+界面。但是，可以包装模块错误以提供进一步的上下文和含义以失败
+执行。
 
-Example:
+例子:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/b2d48a9e815fe534a7faeec6ca2adb0874252b81/x/bank/keeper/keeper.go#L85-L122
 
-Regardless if an error is wrapped or not, the Cosmos SDK's `errors` package provides an API to determine if
-an error is of a particular kind via `Is`.
+不管错误是否被包装，Cosmos SDK 的 `errors` 包提供了一个 API 来确定是否
+错误是通过`Is` 产生的一种特殊类型。
 
 ## ABCI
 
-If a module error is registered, the Cosmos SDK `errors` package allows ABCI information to be extracted
-through the `ABCIInfo` API. The package also provides `ResponseCheckTx` and `ResponseDeliverTx` as
-auxiliary APIs to automatically get `CheckTx` and `DeliverTx` responses from an error.
+如果注册了模块错误，Cosmos SDK `errors` 包允许提取 ABCI 信息
+通过`ABCIInfo` API。该包还提供了 `ResponseCheckTx` 和 `ResponseDeliverTx` 作为
+辅助 API 可自动从错误中获取 `CheckTx` 和 `DeliverTx` 响应。 

@@ -1,12 +1,12 @@
-# Client
+# 客户
 
-## CLI
+##命令行界面
 
-A user can query and interact with the `upgrade` module using the CLI.
+用户可以使用 CLI 查询“升级”模块并与之交互。
 
-### Query
+### 询问
 
-The `query` commands allow users to query `upgrade` state.
+`query` 命令允许用户查询 `upgrade` 状态。 
 
 ```bash
 simd query upgrade --help
@@ -14,14 +14,14 @@ simd query upgrade --help
 
 #### applied
 
-The `applied` command allows users to query the block header for height at which a completed upgrade was applied.
+`applied` 命令允许用户查询区块头以获取应用完成升级的高度。 
 
 ```bash
 simd query upgrade applied [upgrade-name] [flags]
 ```
 
-If upgrade-name was previously executed on the chain, this returns the header for the block at which it was applied.
-This helps a client determine which binary was valid over a given range of blocks, as well as more context to understand past migrations.
+如果之前在链上执行了 upgrade-name，这将返回应用它的块的标头。
+这有助于客户端确定哪个二进制文件在给定的块范围内有效，以及了解过去迁移的更多上下文。 
 
 Example:
 

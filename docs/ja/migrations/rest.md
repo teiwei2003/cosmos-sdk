@@ -1,20 +1,20 @@
-# REST Endpoints Migration
+# REST 端点迁移
 
-Migrate to gRPC-Gateway REST endpoints. Legacy REST endpoints were marked as deprecated in v0.40 and will be removed in v0.45. {synopsis}
+迁移到 gRPC-Gateway REST 端点。旧版 REST 端点在 v0.40 中被标记为已弃用，并将在 v0.45 中删除。 {概要}
 
-::: warning
-Two Legacy REST endpoints (`POST /txs` and `POST /txs/encode`) were removed ahead of schedule in v0.44 due to a security vulnerability.
+::: 警告
+由于安全漏洞，在 v0.44 中提前删除了两个旧版 REST 端点(`POST /txs` 和 `POST /txs/encode`)。
 :::
 
-## Legacy REST Endpoints
+## 传统 REST 端点
 
-Cosmos SDK versions v0.39 and earlier registered REST endpoints using a package called `gorilla/mux`. These REST endpoints were marked as deprecated in v0.40 and have since been referred to as legacy REST endpoints. Legacy REST endpoints will be officially removed in v0.45.
+Cosmos SDK 版本 v0.39 和更早版本使用名为“gorilla/mux”的包注册了 REST 端点。这些 REST 端点在 v0.40 中被标记为已弃用，此后被称为旧版 REST 端点。传统 REST 端点将在 v0.45 中正式删除。
 
-## gRPC-Gateway REST Endpoints
+## gRPC 网关 REST 端点
 
-Following the Protocol Buffers migration in v0.40, Cosmos SDK has been set to take advantage of a vast number of gRPC tools and solutions. v0.40 introduced new REST endpoints generated from [gRPC `Query` services](../building-modules/query-services.md) using [grpc-gateway](https://grpc-ecosystem.github.io/grpc-gateway/). These new REST endpoints are referred to as gRPC-Gateway REST endpoints.
+随着 v0.40 中的 Protocol Buffers 迁移，Cosmos SDK 已被设置为利用大量 gRPC 工具和解决方案。 v0.40 引入了使用 [grpc-gateway](https://grpc-ecosystem.github.io/grpc) 从 [gRPC `Query` 服务](../building-modules/query-services.md) 生成的新 REST 端点-网关/)。这些新的 REST 端点称为 gRPC-Gateway REST 端点。
 
-## Migrating to New REST Endpoints
+## 迁移到新的 REST 端点 
 
 | Legacy REST Endpoint                                                            | Description                                                         | New gRPC-gateway REST Endpoint                                                                        |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -76,6 +76,6 @@ Following the Protocol Buffers migration in v0.40, Cosmos SDK has been set to ta
 | `GET /upgrade/current`                                                          | Get the current plan                                                | `GET /cosmos/upgrade/v1beta1/current_plan`                                                            |
 | `GET /upgrade/applied_plan/{name}`                                              | Get a previously applied plan                                       | `GET /cosmos/upgrade/v1beta1/applied/{name}`                                                          |
 
-## Migrating to gRPC
+## 迁移到 gRPC
 
-Instead of hitting REST endpoints as described above, the Cosmos SDK also exposes a gRPC server. Any client can use gRPC instead of REST to interact with the node. An overview of different ways to communicate with a node can be found [here](../core/grpc_rest.md), and a concrete tutorial for setting up a gRPC client can be found [here](../run-node/txs.md#programmatically-with-go).
+Cosmos SDK 并没有像上面描述的那样访问 REST 端点，而是公开了一个 gRPC 服务器。 任何客户端都可以使用 gRPC 而不是 REST 与节点进行交互。 可以在 [此处](../core/grpc_rest.md) 中找到与节点通信的不同方式的概述，可以在 [此处](../run-node /txs.md#programmatically-with-go)。

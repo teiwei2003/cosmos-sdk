@@ -1,39 +1,39 @@
-# Concepts
+# 概念
 
-**Note:** The auth module is different from the [authz module](../modules/authz/).
+**注意:** auth 模块与 [authz 模块](../modules/authz/) 不同。
 
-The differences are:
+区别在于:
 
-* `auth` - authentication of accounts and transactions for Cosmos SDK applications and is responsible for specifying the base transaction and account types.
-* `authz` - authorization for accounts to perform actions on behalf of other accounts and enables a granter to grant authorizations to a grantee that allows the grantee to execute messages on behalf of the granter.
+* `auth` - Cosmos SDK 应用程序的账户和交易认证，负责指定基本交易和账户类型。
+* `authz` - 授权账户代表其他账户执行操作，并允许授予者向被授予者授予授权，允许被授予者代表授予者执行消息。
 
-## Gas & Fees
+## 汽油和费用
 
-Fees serve two purposes for an operator of the network.
+费用对网络运营商有两个目的。
 
-Fees limit the growth of the state stored by every full node and allow for
-general purpose censorship of transactions of little economic value. Fees
-are best suited as an anti-spam mechanism where validators are disinterested in
-the use of the network and identities of users.
+费用限制了每个完整节点存储的状态的增长，并允许
+对经济价值不大的交易进行通用审查。费用
+最适合作为验证者不感兴趣的反垃圾邮件机制
+网络的使用和用户的身份。
 
-Fees are determined by the gas limits and gas prices transactions provide, where
-`fees = ceil(gasLimit * gasPrices)`. Txs incur gas costs for all state reads/writes,
-signature verification, as well as costs proportional to the tx size. Operators
-should set minimum gas prices when starting their nodes. They must set the unit
-costs of gas in each token denomination they wish to support:
+费用由交易提供的 gas 限额和 gas 价格决定，其中
+`费用 = ceil(gasLimit * gasPrices)`。 Txs 会为所有状态读/写产生 gas 成本，
+签名验证，以及与 tx 大小成正比的成本。运营商
+应该在启动节点时设置最低 gas 价格。他们必须设置单位
+他们希望支持的每种代币面额的 gas 成本:
 
 `simd start ... --minimum-gas-prices=0.00001stake;0.05photinos`
 
-When adding transactions to mempool or gossipping transactions, validators check
-if the transaction's gas prices, which are determined by the provided fees, meet
-any of the validator's minimum gas prices. In other words, a transaction must
-provide a fee of at least one denomination that matches a validator's minimum
-gas price.
+将交易添加到内存池或八卦交易时，验证器会检查
+如果交易的gas价格(由提供的费用决定)满足
+任何验证者的最低 gas 价格。换句话说，交易必须
+提供至少一种与验证者最低费用相匹配的面额的费用
+气价。
 
-Tendermint does not currently provide fee based mempool prioritization, and fee
-based mempool filtering is local to node and not part of consensus. But with
-minimum gas prices set, such a mechanism could be implemented by node operators.
+Tendermint 目前不提供基于费用的内存池优先排序，并且费用
+基于内存池的过滤是节点本地的，而不是共识的一部分。但是随着
+设置最低gas价格，这种机制可以由节点运营商实施。
 
-Because the market value for tokens will fluctuate, validators are expected to
-dynamically adjust their minimum gas prices to a level that would encourage the
-use of the network.
+由于代币的市场价值会波动，验证者预计
+动态调整他们的最低汽油价格到一个水平，以鼓励
+网络的使用。 

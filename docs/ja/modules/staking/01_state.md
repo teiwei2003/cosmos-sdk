@@ -1,213 +1,213 @@
-# State
+# 状态
 
-## Pool
+## 水池
 
-Pool is used for tracking bonded and not-bonded token supply of the bond denomination.
+池用于跟踪债券面额的保税和非保税代币供应。
 
 ## LastTotalPower
 
-LastTotalPower tracks the total amounts of bonded tokens recorded during the previous end block.
-Store entries prefixed with "Last" must remain unchanged until EndBlock.
+LastTotalPower 跟踪在前一个结束块期间记录的绑定令牌总量。
+以“Last”为前缀的存储条目必须保持不变，直到 EndBlock。
 
 - LastTotalPower: `0x12 -> ProtocolBuffer(sdk.Int)`
 
-## Params
+## 参数
 
-Params is a module-wide configuration structure that stores system parameters
-and defines overall functioning of the staking module.
+params 是一个模块范围的配置结构，用于存储系统参数
+并定义了 staking 模块的整体功能。
 
-- Params: `Paramsspace("staking") -> legacy_amino(params)`
+- 参数:`Paramsspace("staking") -> legacy_amino(params)`
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.1/proto/cosmos/staking/v1beta1/staking.proto#L230-L241
 
-## Validator
+## 验证器
 
-Validators can have one of three statuses
+验证器可以具有以下三种状态之一
 
-- `Unbonded`: The validator is not in the active set. They cannot sign blocks and do not earn
-  rewards. They can receive delegations.
-- `Bonded`": Once the validator receives sufficient bonded tokens they automtically join the
-  active set during [`EndBlock`](./05_end_block.md#validator-set-changes) and their status is updated to `Bonded`.
-  They are signing blocks and receiving rewards. They can receive further delegations.
-  They can be slashed for misbehavior. Delegators to this validator who unbond their delegation
-  must wait the duration of the UnbondingTime, a chain-specific param, during which time
-  they are still slashable for offences of the source validator if those offences were committed
-  during the period of time that the tokens were bonded.
-- `Unbonding`: When a validator leaves the active set, either by choice or due to slashing, jailing or
-  tombstoning, an unbonding of all their delegations begins. All delegations must then wait the UnbondingTime
-  before their tokens are moved to their accounts from the `BondedPool`.
+- `Unbonded`:验证器不在活动集中。他们不能签署区块，也不能赚取
+  奖励。他们可以接待代表团。
+- `Bonded`":一旦验证器收到足够的绑定代币，他们就会自动加入
+  [`EndBlock`](./05_end_block.md#validator-set-changes) 期间的活动集，并且它们的状态更新为“已绑定”。
+  他们正在签署区块并获得奖励。他们可以接待更多的代表团。
+  他们可能会因不当行为而受到惩罚。解除其委托的该验证者的委托人
+  必须等待 UnbondingTime 的持续时间，一个特定于链的参数，在此期间
+  如果犯下这些罪行，它们仍然可以因源验证器的罪行而受到惩罚
+  在代币被绑定的时间段内。
+- `Unbonding`:当验证者离开活动集时，无论是出于选择还是由于削减、监禁或
+  墓碑，开始解除他们所有代表团的束缚。然后所有代表团必须等待 UnbondingTime
+  在他们的代币从“BondedPool”转移到他们的账户之前。
 
-Validators objects should be primarily stored and accessed by the
-`OperatorAddr`, an SDK validator address for the operator of the validator. Two
-additional indices are maintained per validator object in order to fulfill
-required lookups for slashing and validator-set updates. A third special index
-(`LastValidatorPower`) is also maintained which however remains constant
-throughout each block, unlike the first two indices which mirror the validator
-records within a block.
+验证器对象应该主要由
+`OperatorAddr`，验证者操作者的 SDK 验证者地址。二
+每个验证器对象维护额外的索引，以实现
+削减和验证器集更新所需的查找。第三个特殊索引
+(`LastValidatorPower`) 也保持不变，但保持不变
+在每个区块中，与反映验证者的前两个​​索引不同
+块内的记录。 
 
-- Validators: `0x21 | OperatorAddrLen (1 byte) | OperatorAddr -> ProtocolBuffer(validator)`
-- ValidatorsByConsAddr: `0x22 | ConsAddrLen (1 byte) | ConsAddr -> OperatorAddr`
-- ValidatorsByPower: `0x23 | BigEndian(ConsensusPower) | OperatorAddrLen (1 byte) | OperatorAddr -> OperatorAddr`
-- LastValidatorsPower: `0x11 | OperatorAddrLen (1 byte) | OperatorAddr -> ProtocolBuffer(ConsensusPower)`
+- 验证器:`0x21 | OperatorAddrLen (1 字节) | OperatorAddr -> ProtocolBuffer(validator)`
+- ValidatorsByConsAddr: `0x22 | ConsAddrLen (1 字节) | ConsAddr -> OperatorAddr`
+- ValidatorsByPower:`0x23 | BigEndian(ConsensusPower) | OperatorAddrLen (1 字节) | OperatorAddr -> OperatorAddr`
+- LastValidatorsPower:`0x11 | OperatorAddrLen (1 字节) | OperatorAddr -> ProtocolBuffer(ConsensusPower)`
 
-`Validators` is the primary index - it ensures that each operator can have only one
-associated validator, where the public key of that validator can change in the
-future. Delegators can refer to the immutable operator of the validator, without
-concern for the changing public key.
+`Validators` 是主要索引 - 它确保每个操作符只能有一个
+关联的验证器，该验证器的公钥可以在
+未来。委托人可以引用验证人的不可变操作符，无需
+关注不断变化的公钥。
 
-`ValidatorByConsAddr` is an additional index that enables lookups for slashing.
-When Tendermint reports evidence, it provides the validator address, so this
-map is needed to find the operator. Note that the `ConsAddr` corresponds to the
-address which can be derived from the validator's `ConsPubKey`.
+`ValidatorByConsAddr` 是一个额外的索引，可以进行斜线查找。
+Tendermint 上报证据时，会提供验证人地址，所以这个
+需要 map 才能找到操作符。请注意，`ConsAddr` 对应于
+可以从验证器的“ConsPubKey”派生的地址。
 
-`ValidatorsByPower` is an additional index that provides a sorted list of
-potential validators to quickly determine the current active set. Here
-ConsensusPower is validator.Tokens/10^6 by default. Note that all validators
-where `Jailed` is true are not stored within this index.
+`ValidatorsByPower` 是一个额外的索引，它提供了一个排序列表
+潜在的验证器来快速确定当前的活动集。这里
+默认情况下，ConsensusPower 是 validator.Tokens/10^6。请注意，所有验证器
+`Jailed` 为 true 的地方不存储在这个索引中。
 
-`LastValidatorsPower` is a special index that provides a historical list of the
-last-block's bonded validators. This index remains constant during a block but
-is updated during the validator set update process which takes place in [`EndBlock`](./05_end_block.md).
+`LastValidatorsPower` 是一个特殊的索引，它提供了历史列表
+最后一个区块的绑定验证器。该索引在块期间保持不变，但
+在 [`EndBlock`](./05_end_block.md) 中发生的验证器集更新过程中更新。
 
-Each validator's state is stored in a `Validator` struct:
+每个验证器的状态都存储在一个“验证器”结构中:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L65-L99
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L24-L63
 
-## Delegation
+## 代表团
 
-Delegations are identified by combining `DelegatorAddr` (the address of the delegator)
-with the `ValidatorAddr` Delegators are indexed in the store as follows:
+委托通过结合`DelegatorAddr`(委托人的地址)来识别
+使用 `ValidatorAddr` 委托人在存储中被索引如下:
 
-- Delegation: `0x31 | DelegatorAddrLen (1 byte) | DelegatorAddr | ValidatorAddrLen (1 byte) | ValidatorAddr -> ProtocolBuffer(delegation)`
+- 委托:`0x31 | DelegatorAddrLen (1 字节) |委托人地址 | ValidatorAddrLen(1 字节)| ValidatorAddr -> ProtocolBuffer(delegation)`
 
-Stake holders may delegate coins to validators; under this circumstance their
-funds are held in a `Delegation` data structure. It is owned by one
-delegator, and is associated with the shares for one validator. The sender of
-the transaction is the owner of the bond.
+利益相关者可以将硬币委托给验证者；在这种情况下他们的
+资金保存在“委托”数据结构中。它归一个人所有
+委托人，并与一个验证人的份额相关联。发件人
+交易是债券的所有者。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L159-L170
 
-### Delegator Shares
+### 委托人股份
 
-When one Delegates tokens to a Validator they are issued a number of delegator shares based on a
-dynamic exchange rate, calculated as follows from the total number of tokens delegated to the
-validator and the number of shares issued so far:
+当一个人将代币委托给验证者时，他们会根据
+动态汇率，根据委托给代币的代币总数计算如下
+验证器和迄今为止发行的股票数量:
 
-`Shares per Token = validator.TotalShares() / validator.Tokens()`
+`每个令牌的份额 = validator.TotalShares() / validator.Tokens()`
 
-Only the number of shares received is stored on the DelegationEntry. When a delegator then
-Undelegates, the token amount they receive is calculated from the number of shares they currently
-hold and the inverse exchange rate:
+仅收到的股份数量存储在委托条目中。当委托人然后
+Undelegates，他们收到的代币数量是根据他们当前的股份数量计算的
+持有和反向汇率:
 
-`Tokens per Share = validator.Tokens() / validatorShares()`
+`每股代币数 = validator.Tokens() / validatorShares()`
 
-These `Shares` are simply an accounting mechanism. They are not a fungible asset. The reason for
-this mechanism is to simplify the accounting around slashing. Rather than iteratively slashing the
-tokens of every delegation entry, instead the Validators total bonded tokens can be slashed,
-effectively reducing the value of each issued delegator share.
+这些“股份”只是一种会计机制。它们不是可替代的资产。的原因
+这种机制是为了简化围绕削减的核算。而不是反复削减
+每个委托条目的代币，而不是验证者的总绑定代币可以被削减，
+有效地降低了每份已发行的委托人股份的价值。 
 
-## UnbondingDelegation
+## 解除绑定委托
 
-Shares in a `Delegation` can be unbonded, but they must for some time exist as
-an `UnbondingDelegation`, where shares can be reduced if Byzantine behavior is
-detected.
+“委托”中的股份可以不绑定，但它们必须存在一段时间
+一个“UnbondingDelegation”，如果拜占庭行为是可以减少的
+检测到。
 
-`UnbondingDelegation` are indexed in the store as:
+`UnbondingDelegation` 在存储中被索引为:
 
-- UnbondingDelegation: `0x32 | DelegatorAddrLen (1 byte) | DelegatorAddr | ValidatorAddrLen (1 byte) | ValidatorAddr -> ProtocolBuffer(unbondingDelegation)`
-- UnbondingDelegationsFromValidator: `0x33 | ValidatorAddrLen (1 byte) | ValidatorAddr | DelegatorAddrLen (1 byte) | DelegatorAddr -> nil`
+- 解除绑定委托:`0x32 | DelegatorAddrLen (1 字节) |委托人地址 | ValidatorAddrLen(1 字节)| ValidatorAddr -> ProtocolBuffer(unbondingDelegation)`
+- UnbondingDelegationsFromValidator:`0x33 | ValidatorAddrLen(1 字节)|验证器地址 | DelegatorAddrLen (1 字节) | DelegatorAddr -> nil`
 
-The first map here is used in queries, to lookup all unbonding delegations for
-a given delegator, while the second map is used in slashing, to lookup all
-unbonding delegations associated with a given validator that need to be
-slashed.
+此处的第一张地图用于查询，以查找所有未绑定的委托
+给定的委托人，而第二张地图用于斜线，以查找所有
+与给定验证器关联的解除绑定委托需要
+削减。
 
-A UnbondingDelegation object is created every time an unbonding is initiated.
+每次启动解除绑定时都会创建一个 UnbondingDelegation 对象。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L172-L198
 
-## Redelegation
+## 重新授权
 
-The bonded tokens worth of a `Delegation` may be instantly redelegated from a
-source validator to a different validator (destination validator). However when
-this occurs they must be tracked in a `Redelegation` object, whereby their
-shares can be slashed if their tokens have contributed to a Byzantine fault
-committed by the source validator.
+价值“委托”的保税代币可以立即从
+源验证器到不同的验证器(目标验证器)。然而当
+发生这种情况时，他们必须在“重新委托”对象中进行跟踪，从而他们的
+如果他们的代币导致了拜占庭故障，则可以削减股票
+由源验证器提交。
 
-`Redelegation` are indexed in the store as:
+`Redelegation` 在存储中被索引为:
 
-- Redelegations: `0x34 | DelegatorAddrLen (1 byte) | DelegatorAddr | ValidatorAddrLen (1 byte) | ValidatorSrcAddr | ValidatorDstAddr -> ProtocolBuffer(redelegation)`
-- RedelegationsBySrc: `0x35 | ValidatorSrcAddrLen (1 byte) | ValidatorSrcAddr | ValidatorDstAddrLen (1 byte) | ValidatorDstAddr | DelegatorAddrLen (1 byte) | DelegatorAddr -> nil`
-- RedelegationsByDst: `0x36 | ValidatorDstAddrLen (1 byte) | ValidatorDstAddr | ValidatorSrcAddrLen (1 byte) | ValidatorSrcAddr | DelegatorAddrLen (1 byte) | DelegatorAddr -> nil`
+- 重新委托:`0x34 | DelegatorAddrLen (1 字节) |委托人地址 | ValidatorAddrLen(1 字节)| ValidatorSrcAddr | ValidatorDstAddr -> ProtocolBuffer(redelegation)`
+- RedelelegationsBySrc:`0x35 | ValidatorSrcAddrLen(1 字节)| ValidatorSrcAddr | ValidatorDstAddrLen(1 字节)| ValidatorDstAddr | DelegatorAddrLen (1 字节) | DelegatorAddr -> nil`
+- RedelelegationsByDst:`0x36 | ValidatorDstAddrLen(1 字节)| ValidatorDstAddr | ValidatorSrcAddrLen(1 字节)| ValidatorSrcAddr | DelegatorAddrLen (1 字节) | DelegatorAddr -> nil`
 
-The first map here is used for queries, to lookup all redelegations for a given
-delegator. The second map is used for slashing based on the `ValidatorSrcAddr`,
-while the third map is for slashing based on the `ValidatorDstAddr`.
+此处的第一张地图用于查询，以查找给定的所有重新授权
+委托人。第二个地图用于基于`ValidatorSrcAddr`的斜线，
+而第三张地图用于基于`ValidatorDstAddr`的削减。
 
-A redelegation object is created every time a redelegation occurs. To prevent
-"redelegation hopping" redelegations may not occur under the situation that:
+每次重新委派发生时都会创建一个重新委派对象。阻止
+在以下情况下可能不会发生“重新授权跳跃”重新授权:
 
-- the (re)delegator already has another immature redelegation in progress
-  with a destination to a validator (let's call it `Validator X`)
-- and, the (re)delegator is attempting to create a _new_ redelegation
-  where the source validator for this new redelegation is `Validator X`.
+-(重新)委托人已经有另一个不成熟的重新委托正在进行中
+  带有验证器的目的地(我们称之为“验证器 X”)
+- 并且，(重新)委托人正在尝试创建_新_重新委托
+  这个新的重新授权的源验证器是“Validator X”。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L200-L228
 
-## Queues
+## 队列
 
-All queues objects are sorted by timestamp. The time used within any queue is
-first rounded to the nearest nanosecond then sorted. The sortable time format
-used is a slight modification of the RFC3339Nano and uses the the format string
-`"2006-01-02T15:04:05.000000000"`. Notably this format:
+所有队列对象都按时间戳排序。任何队列中使用的时间是
+首先四舍五入到最接近的纳秒然后排序。可排序的时间格式
+used 是对 RFC3339Nano 的轻微修改并使用格式字符串
+`"2006-01-02T15:04:05.000000000"`。特别是这种格式:
 
-- right pads all zeros
-- drops the time zone info (uses UTC)
+- 右填充全零
+- 删除时区信息(使用 UTC)
 
-In all cases, the stored timestamp represents the maturation time of the queue
-element.
+在所有情况下，存储的时间戳代表队列的成熟时间
+元素。 
 
 ### UnbondingDelegationQueue
 
-For the purpose of tracking progress of unbonding delegations the unbonding
-delegations queue is kept.
+为了跟踪解绑授权的进展，解绑授权
+保留代表团队列。
 
-- UnbondingDelegation: `0x41 | format(time) -> []DVPair`
+- 解除绑定委托:`0x41 |格式(时间)-> []DVPair`
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L123-L133
 
-### RedelegationQueue
+### 重新授权队列
 
-For the purpose of tracking progress of redelegations the redelegation queue is
-kept.
+为了跟踪重新授权的进度，重新授权队列是
+保留。
 
-- RedelegationQueue: `0x42 | format(time) -> []DVVTriplet`
+- 重新委托队列:`0x42 |格式(时间)-> []DVVTriplet`
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L140-L152
 
-### ValidatorQueue
+### 验证器队列
 
-For the purpose of tracking progress of unbonding validators the validator
-queue is kept.
+为了跟踪解除绑定验证器的进度，验证器
+队列被保留。
 
-- ValidatorQueueTime: `0x43 | format(time) -> []sdk.ValAddress`
+- ValidatorQueueTime:`0x43 |格式(时间)-> []sdk.ValAddress`
 
-The stored object as each key is an array of validator operator addresses from
-which the validator object can be accessed. Typically it is expected that only
-a single validator record will be associated with a given timestamp however it is possible
-that multiple validators exist in the queue at the same location.
+作为每个键的存储对象是一个验证器操作员地址数组，来自
+可以访问验证器对象。通常预计只有
+单个验证器记录将与给定的时间戳相关联，但这是可能的
+多个验证器存在于同一位置的队列中。
 
-## HistoricalInfo
+## 历史信息
 
-HistoricalInfo objects are stored and pruned at each block such that the staking keeper persists
-the `n` most recent historical info defined by staking module parameter: `HistoricalEntries`.
+历史信息对象在每个块中被存储和修剪，以便 staking 保持者持续存在
+由 staking 模块参数定义的 `n` 最近的历史信息:`HistoricalEntries`。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L15-L22
 
-At each BeginBlock, the staking keeper will persist the current Header and the Validators that committed
-the current block in a `HistoricalInfo` object. The Validators are sorted on their address to ensure that
-they are in a determisnistic order.
-The oldest HistoricalEntries will be pruned to ensure that there only exist the parameter-defined number of
-historical entries.
+在每个 BeginBlock 中，Staking 管理员将保留当前的 ​​Header 和提交的验证器
+`HistoricalInfo` 对象中的当前块。验证者按其地址排序，以确保
+它们处于确定性顺序中。
+最旧的历史条目将被修剪以确保只存在参数定义的数量
+历史条目。 

@@ -1,12 +1,12 @@
-# Client
+# 客户
 
-## CLI
+##命令行界面
 
-A user can query and interact with the `feegrant` module using the CLI.
+用户可以使用 CLI 查询“feegrant”模块并与之交互。
 
-### Query
+### 询问
 
-The `query` commands allow users to query `feegrant` state.
+`query` 命令允许用户查询 `feegrant` 状态。 
 
 ```
 simd query feegrant --help
@@ -41,7 +41,7 @@ granter: cosmos1..
 
 #### grants
 
-The `grants` command allows users to query all grants for a given grantee.
+`grants` 命令允许用户查询给定受让人的所有授权。 
 
 ```
 simd query feegrant grants [grantee] [flags]
@@ -72,7 +72,7 @@ pagination:
 
 ### Transactions
 
-The `tx` commands allow users to interact with the `feegrant` module.
+`tx` 命令允许用户与 `feegrant` 模块交互。
 
 ```
 simd tx feegrant --help
@@ -80,7 +80,7 @@ simd tx feegrant --help
 
 #### grant
 
-The `grant` command allows users to grant fee allowances to another account. The fee allowance can have an expiration date, a total spend limit, and/or a periodic spend limit.
+`grant` 命令允许用户向另一个帐户授予费用津贴。 费用津贴可以具有到期日期、总支出限额和/或定期支出限额。 
 
 ```
 simd tx feegrant grant [granter] [grantee] [flags]
@@ -100,7 +100,7 @@ simd tx feegrant grant cosmos1.. cosmos1.. --period 3600 --period-limit 10stake
 
 #### revoke
 
-The `revoke` command allows users to revoke a granted fee allowance.
+`revoke` 命令允许用户撤销授予的费用津贴。
 
 ```
 simd tx feegrant revoke [granter] [grantee] [flags]
@@ -114,11 +114,11 @@ simd tx feegrant revoke cosmos1.. cosmos1..
 
 ## gRPC
 
-A user can query the `feegrant` module using gRPC endpoints.
+用户可以使用 gRPC 端点查询 `feegrant` 模块。
 
 ### Allowance
 
-The `Allowance` endpoint allows users to query a granted fee allowance.
+`Allowance` 端点允许用户查询授予的费用津贴。 
 
 ```
 cosmos.feegrant.v1beta1.Query/Allowance

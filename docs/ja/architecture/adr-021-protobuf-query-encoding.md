@@ -1,38 +1,38 @@
-# ADR 021: Protocol Buffer Query Encoding
+# ADR 021:プロトコルバッファクエリコード
 
-## Changelog
+## 変更ログ
 
-- 2020 March 27: Initial Draft
+-2020年3月27日:最初のドラフト
 
-## Status
+## 状態
 
-Accepted
+受け入れられました
 
-## Context
+## 環境
 
-This ADR is a continuation of the motivation, design, and context established in
-[ADR 019](./adr-019-protobuf-state-encoding.md) and
-[ARD 020](./adr-019-protobuf-transaction-encoding.md), namely, we aim to design the
-Protocol Buffer migration path for the client-side of the Cosmos SDK.
+ADRは
+[ADR 019](./adr-019-protobuf-state-encoding.md)および
+[ARD 020](./adr-019-protobuf-transaction-encoding.md)、つまり、私たちの目標は設計することです
+CosmosSDKクライアントのプロトコルバッファ移行パス。
 
-This ADR continues from [ARD 020](./adr-020-protobuf-transaction-encoding.md)
-to specify the encoding of queries.
+このADRは[ARD020](./adr-020-protobuf-transaction-encoding.md)から継続します
+クエリのエンコーディングを指定します。
 
-## Decision
+## 決定
 
-### Custom Query Definition
+###カスタムクエリ定義
 
-Modules define custom queries through a protocol buffers `service` definition.
-These `service` definitions are generally associated with and used by the
-GRPC protocol. However, the protocol buffers specification indicates that
-they can be used more generically by any request/response protocol that uses
-protocol buffer encoding. Thus, we can use `service` definitions for specifying
-custom ABCI queries and even reuse a substantial amount of the GRPC infrastructure.
+モジュールは、プロトコルバッファの「サービス」定義を介してカスタムクエリを定義します。
+これらの「サービス」の定義は通常、
+GRPCプロトコル。 ただし、プロトコルバッファの仕様には次のように記載されています。
+これらは、使用される任意の要求/応答プロトコルでより一般的に使用できます。
+プロトコルバッファエンコーディング。 したがって、 `service`定義を使用して指定できます
+ABCIクエリをカスタマイズし、多くのGRPCインフラストラクチャを再利用することもできます。
 
-Each module with custom queries should define a service canonically named `Query`:
+カスタムクエリを使用するすべてのモジュールは、Queryという名前のサービスを正規に定義する必要があります。
 
 ```proto
-// x/bank/types/types.proto
+/.x/bank/types/types.proto
 
 service Query {
   rpc QueryBalance(QueryBalanceParams) returns (cosmos_sdk.v1.Coin) { }
@@ -40,22 +40,22 @@ service Query {
 }
 ```
 
-#### Handling of Interface Types
+####インターフェースタイプの処理
 
-Modules that use interface types and need true polymorphism generally force a
-`oneof` up to the app-level that provides the set of concrete implementations of
-that interface that the app supports. While app's are welcome to do the same for
-queries and implement an app-level query service, it is recommended that modules
-provide query methods that expose these interfaces via `google.protobuf.Any`.
-There is a concern on the transaction level that the overhead of `Any` is too
-high to justify its usage. However for queries this is not a concern, and
-providing generic module-level queries that use `Any` does not preclude apps
-from also providing app-level queries that return use the app-level `oneof`s.
+インターフェイスタイプを使用し、真にポリモーフィックである必要があるモジュールは、通常、強制されます
+特定の実装アプリケーションレベルのセットを提供するまでの `oneof`
+アプリケーションでサポートされているインターフェース。 ウェルカムアプリケーションは
+アプリケーションレベルのクエリサービスのクエリと実装、モジュールの提案
+`google.protobuf.Any`を介してこれらのインターフェースを公開するクエリメソッドを提供します。
+トランザクションレベルで問題があります。つまり、 `Any`のオーバーヘッドが大きすぎます。
+その使用を正当化するために高い。 しかし、クエリの場合、これは問題ではありません。
+「Any」を使用して一般的なモジュールレベルのクエリを提供しても、アプリケーションは除外されません
+また、アプリケーションレベルの `oneof`の使用を返すアプリケーションレベルのクエリも提供します。
 
-A hypothetical example for the `gov` module would look something like:
+`gov`モジュールの架空の例は次のとおりです。 
 
 ```proto
-// x/gov/types/types.proto
+/.x/gov/types/types.proto
 
 import "google/protobuf/any.proto";
 
@@ -69,11 +69,11 @@ message AnyProposal {
 }
 ```
 
-### Custom Query Implementation
+### 自定义查询实现
 
-In order to implement the query service, we can reuse the existing [gogo protobuf](https://github.com/gogo/protobuf)
-grpc plugin, which for a service named `Query` generates an interface named
-`QueryServer` as below:
+为了实现查询服务，我们可以复用现有的[gogo protobuf](https://github.com/gogo/protobuf)
+grpc 插件，它为名为 `Query` 的服务生成一个名为的接口
+`QueryServer` 如下: 
 
 ```go
 type QueryServer interface {
@@ -82,17 +82,17 @@ type QueryServer interface {
 }
 ```
 
-The custom queries for our module are implemented by implementing this interface.
+モジュールのカスタムクエリは、このインターフェイスを実装することで実現されます。
 
-The first parameter in this generated interface is a generic `context.Context`,
-whereas querier methods generally need an instance of `sdk.Context` to read
-from the store. Since arbitrary values can be attached to `context.Context`
-using the `WithValue` and `Value` methods, the Cosmos SDK should provide a function
-`sdk.UnwrapSDKContext` to retrieve the `sdk.Context` from the provided
-`context.Context`.
+この生成されたインターフェースの最初のパラメーターは、一般的な `context.Context`です。
+クエリアメソッドは通常、読み取るために `sdk.Context`のインスタンスを必要とします
+ストレージから。 `context.Context`には任意の値を追加できるため
+`WithValue`および` Value`メソッドを使用して、CosmosSDKは関数を提供する必要があります
+`sdk.UnwrapSDKContext`は、提供されたオブジェクトから` sdk.Context`を取得します
+`コンテキスト。 コンテキスト `。
 
-An example implementation of `QueryBalance` for the bank module as above would
-look something like:
+上記の銀行モジュールの `QueryBalance`の実装例は次のようになります。
+のように見える: 
 
 ```go
 type Querier struct {
@@ -105,62 +105,62 @@ func (q Querier) QueryBalance(ctx context.Context, params *types.QueryBalancePar
 }
 ```
 
-### Custom Query Registration and Routing
+### カスタムクエリの登録とルーティング
 
-Query server implementations as above would be registered with `AppModule`s using
-a new method `RegisterQueryService(grpc.Server)` which could be implemented simply
-as below:
+上記のクエリサーバーの実装は `AppModule`sに登録されます
+簡単に実装できる新しいメソッド `RegisterQueryService(grpc.Server)`
+次のように:  
 
 ```go
-// x/bank/module.go
+/.x/bank/module.go
 func (am AppModule) RegisterQueryService(server grpc.Server) {
 	types.RegisterQueryServer(server, keeper.Querier{am.keeper})
 }
 ```
 
-Underneath the hood, a new method `RegisterService(sd *grpc.ServiceDesc, handler interface{})`
-will be added to the existing `baseapp.QueryRouter` to add the queries to the custom
-query routing table (with the routing method being described below).
-The signature for this method matches the existing
-`RegisterServer` method on the GRPC `Server` type where `handler` is the custom
-query server implementation described above.
+舞台裏では、新しいメソッド `RegisterService(sd * grpc.ServiceDesc、handler interface {})`
+クエリをカスタムに追加するために、既存の `baseapp.QueryRouter`に追加されます
+ルーティングテーブルを照会します(ルーティング方法については以下で説明します)。
+このメソッドのシグネチャは、既存のメソッドと一致します
+GRPCの `Server`タイプの` RegisterServer`メソッド。`handler`はカスタムです。
+上記のクエリサーバーの実装。
 
-GRPC-like requests are routed by the service name (ex. `cosmos_sdk.x.bank.v1.Query`)
-and method name (ex. `QueryBalance`) combined with `/`s to form a full
-method name (ex. `/cosmos_sdk.x.bank.v1.Query/QueryBalance`). This gets translated
-into an ABCI query as `custom/cosmos_sdk.x.bank.v1.Query/QueryBalance`. Service handlers
-registered with `QueryRouter.RegisterService` will be routed this way.
+GRPCのようなリクエストは、サービス名でルーティングされます(例: `cosmos_sdk.x.bank.v1.Query`)
+そして、メソッド名(例: `QueryBalance`)を`/`と組み合わせて、完全なものを形成します
+メソッド名(例: `/cosmos_sdk.x.bank.v1.Query/QueryBalance`)。これは翻訳されています
+「custom/cosmos_sdk.x.bank.v1.Query/QueryBalance」などのABCIクエリを入力します。サービスハンドラ
+`QueryRouter.RegisterService`に登録すると、この方法でルーティングされます。
 
-Beyond the method name, GRPC requests carry a protobuf encoded payload, which maps naturally
-to `RequestQuery.Data`, and receive a protobuf encoded response or error. Thus
-there is a quite natural mapping of GRPC-like rpc methods to the existing
-`sdk.Query` and `QueryRouter` infrastructure.
+メソッド名に加えて、GRPCリクエストはprotobufでエンコードされたペイロードも運びます。これは自然にマッピングされます
+`RequestQuery.Data`に移動し、protobufでエンコードされた応答またはエラーを受け取ります。したがって
+GRPCに似たrpcメソッドは、既存のものに非常に自然にマッピングされます
+`sdk.Query`および` QueryRouter`インフラストラクチャ。
 
-This basic specification allows us to reuse protocol buffer `service` definitions
-for ABCI custom queries substantially reducing the need for manual decoding and
-encoding in query methods.
+この基本仕様により、プロトコルバッファの「サービス」定義を再利用できます。
+ABCIカスタムクエリ、手動デコード、および
+queryメソッドでのエンコード。
 
-### GRPC Protocol Support
+### GRPCプロトコルのサポート
 
-In addition to providing an ABCI query pathway, we can easily provide a GRPC
-proxy server that routes requests in the GRPC protocol to ABCI query requests
-under the hood. In this way, clients could use their host languages' existing
-GRPC implementations to make direct queries against Cosmos SDK app's using
-these `service` definitions. In order for this server to work, the `QueryRouter`
-on `BaseApp` will need to expose the service handlers registered with
-`QueryRouter.RegisterService` to the proxy server implementation. Nodes could
-launch the proxy server on a separate port in the same process as the ABCI app
-with a command-line flag.
+ABCIクエリパスを提供するだけでなく、GRPCも簡単に提供できます
+ABCIクエリリクエストの場合、GRPCプロトコルのリクエストをプロキシサーバーにルーティングします
+フードの下。このようにして、顧客は既存のホスト言語を使用できます
+GRPCを使用して、CosmosSDKアプリケーションの直接クエリを実装します
+これらの「サービス」が定義されています。このサーバーを機能させるには、 `QueryRouter`
+BaseAppに公的に登録する必要があるサービスハンドラー
+`QueryRouter.RegisterService`をプロキシサーバーの実装に追加します。ノードはできます
+ABCIアプリケーションと同じプロセスで別のポートでプロキシサーバーを起動します
+コマンドラインフラグ付き。
 
-### REST Queries and Swagger Generation
+### RESTクエリとSwaggerの生成
 
-[grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) is a project that
-translates REST calls into GRPC calls using special annotations on service
-methods. Modules that want to expose REST queries should add `google.api.http`
-annotations to their `rpc` methods as in this example below.
+[grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway)はプロジェクトです
+サービスで特別なアノテーションを使用して、REST呼び出しをGRPC呼び出しに変換します
+方法。 RESTクエリを公開するモジュールは、 `google.api.http`を追加する必要があります
+以下の例に示すように、それらの `rpc`メソッドについてコメントします。  
 
 ```proto
-// x/bank/types/types.proto
+/.x/bank/types/types.proto
 
 service Query {
   rpc QueryBalance(QueryBalanceParams) returns (cosmos_sdk.v1.Coin) {
@@ -176,26 +176,26 @@ service Query {
 }
 ```
 
-grpc-gateway will work direcly against the GRPC proxy described above which will
-translate requests to ABCI queries under the hood. grpc-gateway can also
-generate Swagger definitions automatically.
+grpc-gatewayは、上記のGRPCプロキシに対して直接機能します。
+バックグラウンドでリクエストをABCIクエリに変換します。 grpc-gatewayも利用可能です
+Swagger定義は自動的に生成されます。
 
-In the current implementation of REST queries, each module needs to implement
-REST queries manually in addition to ABCI querier methods. Using the grpc-gateway
-approach, there will be no need to generate separate REST query handlers, just
-query servers as described above as grpc-gateway handles the translation of protobuf
-to REST as well as Swagger definitions.
+現在のRESTクエリの実装では、各モジュールを実装する必要があります
+ABCI Queryerメソッドに加えて、RESTクエリも手動で実行されます。 grpcゲートウェイを使用する
+メソッド、個別のRESTクエリハンドラーを生成する必要はありません。
+上記のクエリサーバーは、protobuf変換を処理するためのgrpc-gatewayとして使用されます
+RESTとSwaggerの定義に。
 
-The Cosmos SDK should provide CLI commands for apps to start GRPC gateway either in
-a separate process or the same process as the ABCI app, as well as provide a
-command for generating grpc-gateway proxy `.proto` files and the `swagger.json`
-file.
+Cosmos SDKは、アプリケーションがGRPCゲートウェイを開始するためのCLIコマンドを提供する必要があります
+別のプロセスまたはABCIアプリケーションと同じプロセスであり、
+grpc-gatewayプロキシの `.proto`ファイルと` swagger.json`を生成するためのコマンド
+資料。
 
-### Client Usage
+### クライアントの使用
 
-The gogo protobuf grpc plugin generates client interfaces in addition to server
-interfaces. For the `Query` service defined above we would get a `QueryClient`
-interface like:
+gogo protobuf grpcプラグインは、サーバーに加えてクライアントインターフェイスを生成します
+インターフェース。 上で定義した `Query`サービスの場合、` QueryClient`を取得します
+次のようなインターフェース: 
 
 ```go
 type QueryClient interface {
@@ -204,16 +204,15 @@ type QueryClient interface {
 }
 ```
 
-Via a small patch to gogo protobuf ([gogo/protobuf#675](https://github.com/gogo/protobuf/pull/675))
-we have tweaked the grpc codegen to use an interface rather than concrete type
-for the generated client struct. This allows us to also reuse the GRPC infrastructure
-for ABCI client queries.
+小さなパッチをgogoprotobufに渡します([gogo/protobuf#675](https://github.com/gogo/protobuf/pull/675))
+具体的なタイプの代わりにインターフェースを使用するようにgrpcコードジェネレーターを調整しました
+生成されたクライアント構造の場合。 これにより、GRPCインフラストラクチャも再利用できます
+ABCIクライアントクエリに使用されます。
 
-1Context`will receive a new method`QueryConn`that returns a`ClientConn`
-that routes calls to ABCI queries
+1Context`は、 `ClientConn`を返す新しいメソッド` QueryConn`を受け取ります
+ABCIクエリへの通話のルーティング
 
-Clients (such as CLI methods) will then be able to call query methods like this:
-
+クライアント(CLIメソッドなど)は、次のようなクエリメソッドを呼び出すことができます。 
 ```go
 clientCtx := client.NewContext()
 queryClient := types.NewQueryClient(clientCtx.QueryConn())
@@ -223,8 +222,8 @@ result, err := queryClient.QueryBalance(gocontext.Background(), params)
 
 ### Testing
 
-Tests would be able to create a query client directly from keeper and `sdk.Context`
-references using a `QueryServerTestHelper` as below:
+テストでは、キーパーと `sdk.Context`から直接クエリクライアントを作成できます。
+「QueryServerTestHelper」を使用するための参照は次のとおりです。 
 
 ```go
 queryHelper := baseapp.NewQueryServerTestHelper(ctx)
@@ -232,25 +231,25 @@ types.RegisterQueryServer(queryHelper, keeper.Querier{app.BankKeeper})
 queryClient := types.NewQueryClient(queryHelper)
 ```
 
-## Future Improvements
+## 将来の改善
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-* greatly simplified querier implementation (no manual encoding/decoding)
-* easy query client generation (can use existing grpc and swagger tools)
-* no need for REST query implementations
-* type safe query methods (generated via grpc plugin)
-* going forward, there will be less breakage of query methods because of the
-backwards compatibility guarantees provided by buf
+*クエリャーの実装を大幅に簡素化します(手動でエンコード/デコードする必要はありません)
+*クライアント生成を簡単に照会できます(既存のgrpcおよびswaggerツールを使用できます)
+* RESTクエリを実装する必要はありません
+*タイプセーフなクエリメソッド(grpcプラグインによって生成)
+*先に進むと、クエリメソッドの中断が少なくなります。
+bufによって提供される下位互換性の保証
 
-### Negative
+### ネガティブ
 
-* all clients using the existing ABCI/REST queries will need to be refactored
-for both the new GRPC/REST query paths as well as protobuf/proto-json encoded
-data, but this is more or less unavoidable in the protobuf refactoring
+*既存のABCI/RESTクエリを使用するすべてのクライアントをリファクタリングする必要があります
+新しいGRPC/RESTクエリパスとprotobuf/proto-jsonエンコーディングの場合
+データですが、これはprotobufの再構築では多かれ少なかれ避けられません
 
-### Neutral
+### ニュートラル
 
-## References
+## 参照 

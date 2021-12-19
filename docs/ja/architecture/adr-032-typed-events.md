@@ -1,45 +1,45 @@
-# ADR 032: Typed Events
+# ADR 032:入力されたイベント
 
-## Changelog
+## 変更ログ
 
-- 28-Sept-2020: Initial Draft
+-2020年9月28日:最初のドラフト
 
-## Authors
+## 著者
 
-- Anil Kumar (@anilcse)
-- Jack Zampolin (@jackzampolin)
-- Adam Bozanich (@boz)
+-アニルクマール(@anilcse)
+-ジャックザンポリン(@jackzampolin)
+-アダムボザンシ(@boz)
 
-## Status
+## 状態
 
-Proposed
+提案
 
-## Abstract
+## 概要
 
-Currently in the Cosmos SDK, events are defined in the handlers for each message as well as `BeginBlock` and `EndBlock`. Each module doesn't have types defined for each event, they are implemented as `map[string]string`. Above all else this makes these events difficult to consume as it requires a great deal of raw string matching and parsing. This proposal focuses on updating the events to use **typed events** defined in each module such that emiting and subscribing to events will be much easier. This workflow comes from the experience of the Akash Network team.
+現在、Cosmos SDKでは、イベントは各メッセージのハンドラーと「BeginBlock」および「EndBlock」で定義されています。各モジュールは各イベントのタイプを定義せず、 `map [string] string`として実装されます。最も重要なことは、これにより、多くの生の文字列の照合と解析が必要になるため、これらのイベントの使用が困難になることです。提案の焦点は、各モジュールで定義された**型付きイベント**を使用するようにイベントを更新し、イベントの発行とサブスクライブを容易にすることです。このワークフローは、Akashネットワークチームの経験に基づいています。
 
-## Context
+## 環境
 
-Currently in the Cosmos SDK, events are defined in the handlers for each message, meaning each module doesn't have a cannonical set of types for each event. Above all else this makes these events difficult to consume as it requires a great deal of raw string matching and parsing. This proposal focuses on updating the events to use **typed events** defined in each module such that emiting and subscribing to events will be much easier. This workflow comes from the experience of the Akash Network team.
+現在、Cosmos SDKでは、イベントは各メッセージのハンドラーで定義されています。つまり、各モジュールには、各イベントの正規タイプのセットがありません。最も重要なことは、これにより、多くの生の文字列の照合と解析が必要になるため、これらのイベントの使用が困難になることです。提案の焦点は、各モジュールで定義された**型付きイベント**を使用するようにイベントを更新し、イベントの発行とサブスクライブを容易にすることです。このワークフローは、Akashネットワークチームの経験に基づいています。
 
-[Our platform](http://github.com/ovrclk/akash) requires a number of programatic on chain interactions both on the provider (datacenter - to bid on new orders and listen for leases created) and user (application developer - to send the app manifest to the provider) side. In addition the Akash team is now maintaining the IBC [`relayer`](https://github.com/ovrclk/relayer), another very event driven process. In working on these core pieces of infrastructure, and integrating lessons learned from Kubernetes developement, our team has developed a standard method for defining and consuming typed events in Cosmos SDK modules. We have found that it is extremely useful in building this type of event driven application.
+[私たちのプラットフォーム](http://github.com/ovrclk/akash)は、プロバイダー(データセンター-新しい注文に入札し、作成されたリースを監視する)とユーザー(アプリケーション開発者-アプリケーションリストをプロバイダー)終了。さらに、Akashチームは現在IBC [`relayer`](https://github.com/ovrclk/relayer)を維持しています。これは、もう1つの非常にイベント駆動型のプロセスです。これらのインフラストラクチャのコア部分を処理し、Kubernetes開発から学んだ教訓を統合する際に、私たちのチームはCosmosSDKモジュールで型付きイベントを定義して使用するための標準的な方法を開発しました。このタイプのイベント駆動型アプリケーションを構築するときに非常に便利です。
 
-As the Cosmos SDK gets used more extensively for apps like `peggy`, other peg zones, IBC, DeFi, etc... there will be an exploding demand for event driven applications to support new features desired by users. We propose upstreaming our findings into the Cosmos SDK to enable all Cosmos SDK applications to quickly and easily build event driven apps to aid their core application. Wallets, exchanges, explorers, and defi protocols all stand to benefit from this work.
+Cosmos SDKは、「ペギー」、他のフック領域、IBC、DeFiなどのアプリケーションでより広く使用されるため、ユーザーが必要とする新機能をサポートするために、イベント駆動型アプリケーションの需要が爆発的に増加します。すべてのCosmosSDKアプリケーションがイベント駆動型アプリケーションを迅速かつ簡単に構築してコアアプリケーションを支援できるように、調査結果をCosmosSDKにアップロードすることをお勧めします。ウォレット、エクスチェンジ、ブラウザ、defiプロトコルはすべてこの作業の恩恵を受けます。
 
-If this proposal is accepted, users will be able to build event driven Cosmos SDK apps in go by just writing `EventHandler`s for their specific event types and passing them to `EventEmitters` that are defined in the Cosmos SDK.
+この提案が受け入れられると、ユーザーはgoでイベント駆動型のCosmos SDKアプリケーションを構築し、特定のイベントタイプのEventHandlerを記述して、CosmosSDKで定義されたEventEmittersに渡すことができます。
 
-The end of this proposal contains a detailed example of how to consume events after this refactor.
+このリファクタリング後にイベントを消費する方法を説明するために、この提案の最後に詳細な例が含まれています。
 
-This proposal is specifically about how to consume these events as a client of the blockchain, not for intermodule communication.
+この提案は、モジュール間の通信ではなく、ブロックチェーンのクライアントとしてこれらのイベントをどのように使用するかについて具体的に説明しています。
 
-## Decision
+## 決定
 
-__Step-1__:  Implement additional functionality in the `types` package: `EmitTypedEvent` and `ParseTypedEvent` functions
+__Step-1__: `types`パッケージに追加の関数を実装します:` EmitTypedEvent`および `ParseTypedEvent`関数 
 
 ```go
-// types/events.go
+/.types/events.go
 
-// EmitTypedEvent takes typed event and emits converting it into sdk.Event
+/.EmitTypedEvent takes typed event and emits converting it into sdk.Event
 func (em *EventManager) EmitTypedEvent(event proto.Message) error {
 	evtType := proto.MessageName(event)
 	evtJSON, err := codec.ProtoMarshalJSON(event)
@@ -69,7 +69,7 @@ func (em *EventManager) EmitTypedEvent(event proto.Message) error {
 	return nil
 }
 
-// ParseTypedEvent converts abci.Event back to typed event
+/.ParseTypedEvent converts abci.Event back to typed event
 func ParseTypedEvent(event abci.Event) (proto.Message, error) {
 	concreteGoType := proto.MessageType(event.Type)
 	if concreteGoType == nil {
@@ -107,17 +107,17 @@ func ParseTypedEvent(event abci.Event) (proto.Message, error) {
 }
 ```
 
-Here, the `EmitTypedEvent` is a method on `EventManager` which takes typed event as input and apply json serialization on it. Then it maps the JSON key/value pairs to `event.Attributes` and emits it in form of `sdk.Event`. `Event.Type` will be the type URL of the proto message.
+ここで、 `EmitTypedEvent`は、型付きイベントを入力として受け取り、それにjsonシリアル化を適用する` EventManager`のメソッドです。 次に、JSONキーと値のペアを `event.Attributes`にマップし、` sdk.Event`の形式で出力します。 `Event.Type`は、プロトメッセージのタイプURLになります。
 
-When we subscribe to emitted events on the tendermint websocket, they are emitted in the form of an `abci.Event`. `ParseTypedEvent` parses the event back to it's original proto message.
+テンダーミントWebSocketで発行されるイベントをサブスクライブすると、それらは `abci.Event`の形式で発行されます。 `ParseTypedEvent`は、イベントを解析して元のプロトメッセージに戻します。
 
-__Step-2__: Add proto definitions for typed events for msgs in each module:
+__Step-2__:各モジュールのmsgsの型付きイベントのプロトタイプ定義を追加します。
 
-For example, let's take `MsgSubmitProposal` of `gov` module and implement this event's type.
+たとえば、 `gov`モジュールの` MsgSubmitProposal`を使用して、このイベントタイプを実装しましょう。  
 
 ```protobuf
-// proto/cosmos/gov/v1beta1/gov.proto
-// Add typed event definition
+/.proto/cosmos/gov/v1beta1/gov.proto
+/.Add typed event definition
 
 package cosmos.gov.v1beta1;
 
@@ -128,10 +128,10 @@ message EventSubmitProposal {
 }
 ```
 
-__Step-3__: Refactor event emission to use the typed event created and emit using `sdk.EmitTypedEvent`:
+__Step-3__: `sdk.EmitTypedEvent`を使用して作成および発行された型付きイベントを使用するように、イベント発行をリファクタリングします。
 
 ```go
-// x/gov/handler.go
+/.x/gov/handler.go
 func handleMsgSubmitProposal(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSubmitProposalI) (*sdk.Result, error) {
     ...
     types.Context.EventManager().EmitTypedEvent(
@@ -145,41 +145,41 @@ func handleMsgSubmitProposal(ctx sdk.Context, keeper keeper.Keeper, msg types.Ms
 }
 ```
 
-#### How to subscribe to these typed events in `Client`
+#### `クライアント`でこれらのタイプのイベントをサブスクライブする方法
 
-> NOTE: Full code example below
+>注:以下の完全なコード例
 
-Users will be able to subscribe using `client.Context.Client.Subscribe` and consume events which are emitted using `EventHandler`s.
+ユーザーは `client.Context.Client.Subscribe`を使用して、` EventHandler`を使用して発行されたイベントをサブスクライブおよび使用できるようになります。
 
-Akash Network has built a simple [`pubsub`](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/pubsub/bus.go#L20). This can be used to subscribe to `abci.Events` and [publish](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/events/publish.go#L21) them as typed events.
+Akash Networkは、単純な[`pubsub`](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/pubsub/bus.go#L20)を構築しました。これを使用して、タイプイベントとして `abci.Events`および[publish](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/events/publish.go#L21)をサブスクライブできます。
 
-Please see the below code sample for more detail on this flow looks for clients.
+クライアントを見つけるためのこのプロセスの詳細については、次のコード例を参照してください。
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-* Improves consistency of implementation for the events currently in the Cosmos SDK
-* Provides a much more ergonomic way to handle events and facilitates writing event driven applications
-* This implementation will support a middleware ecosystem of `EventHandler`s
+*現在のCosmosSDKでのイベント実装の一貫性が向上しました
+*イベントを処理し、イベント駆動型アプリケーションの作成を容易にする、より人間工学的な方法を提供します
+*この実装は、 `EventHandler`のミドルウェアエコシステムをサポートします
 
-### Negative
+### ネガティブ
 
-## Detailed code example of publishing events
+## 公開イベントの詳細なコード例
 
-This ADR also proposes adding affordances to emit and consume these events. This way developers will only need to write
-`EventHandler`s which define the actions they desire to take.
+ADRは、これらのイベントを発行して使用するための可用性を追加することも推奨しています。したがって、開発者は書くだけで済みます
+`EventHandler`は、実行するアクションを定義します。  
 
 ```go
-// EventEmitter is a type that describes event emitter functions
-// This should be defined in `types/events.go`
+/.EventEmitter is a type that describes event emitter functions
+/.This should be defined in `types/events.go`
 type EventEmitter func(context.Context, client.Context, ...EventHandler) error
 
-// EventHandler is a type of function that handles events coming out of the event bus
-// This should be defined in `types/events.go`
+/.EventHandler is a type of function that handles events coming out of the event bus
+/.This should be defined in `types/events.go`
 type EventHandler func(proto.Message) error
 
-// Sample use of the functions below
+/.Sample use of the functions below
 func main() {
     ctx, cancel := context.WithCancel(context.Background())
 
@@ -191,13 +191,13 @@ func main() {
     return
 }
 
-// SubmitProposalEventHandler is an example of an event handler that prints proposal details
-// when any EventSubmitProposal is emitted.
+/.SubmitProposalEventHandler is an example of an event handler that prints proposal details
+/.when any EventSubmitProposal is emitted.
 func SubmitProposalEventHandler(ev proto.Message) (err error) {
     switch event := ev.(type) {
-    // Handle governance proposal events creation events
+   ..Handle governance proposal events creation events
     case govtypes.EventSubmitProposal:
-        // Users define business logic here e.g.
+       ..Users define business logic here e.g.
         fmt.Println(ev.FromAddress, ev.ProposalId, ev.Proposal)
         return nil
     default:
@@ -205,11 +205,11 @@ func SubmitProposalEventHandler(ev proto.Message) (err error) {
     }
 }
 
-// TxEmitter is an example of an event emitter that emits just transaction events. This can and
-// should be implemented somewhere in the Cosmos SDK. The Cosmos SDK can include an EventEmitters for tm.event='Tx'
-// and/or tm.event='NewBlock' (the new block events may contain typed events)
+/.TxEmitter is an example of an event emitter that emits just transaction events. This can and
+/.should be implemented somewhere in the Cosmos SDK. The Cosmos SDK can include an EventEmitters for tm.event='Tx'
+/.and/or tm.event='NewBlock' (the new block events may contain typed events)
 func TxEmitter(ctx context.Context, cliCtx client.Context, ehs ...EventHandler) (err error) {
-    // Instantiate and start tendermint RPC client
+   ..Instantiate and start tendermint RPC client
     client, err := cliCtx.GetNode()
     if err != nil {
         return err
@@ -219,25 +219,25 @@ func TxEmitter(ctx context.Context, cliCtx client.Context, ehs ...EventHandler) 
         return err
     }
 
-    // Start the pubsub bus
+   ..Start the pubsub bus
     bus := pubsub.NewBus()
     defer bus.Close()
 
-    // Initialize a new error group
+   ..Initialize a new error group
     eg, ctx := errgroup.WithContext(ctx)
 
-    // Publish chain events to the pubsub bus
+   ..Publish chain events to the pubsub bus
     eg.Go(func() error {
         return PublishChainTxEvents(ctx, client, bus, simapp.ModuleBasics)
     })
 
-    // Subscribe to the bus events
+   ..Subscribe to the bus events
     subscriber, err := bus.Subscribe()
     if err != nil {
         return err
     }
 
-	// Handle all the events coming out of the bus
+	/.Handle all the events coming out of the bus
 	eg.Go(func() error {
         var err error
         for {
@@ -260,23 +260,23 @@ func TxEmitter(ctx context.Context, cliCtx client.Context, ehs ...EventHandler) 
 	return group.Wait()
 }
 
-// PublishChainTxEvents events using tmclient. Waits on context shutdown signals to exit.
+/.PublishChainTxEvents events using tmclient. Waits on context shutdown signals to exit.
 func PublishChainTxEvents(ctx context.Context, client tmclient.EventsClient, bus pubsub.Bus, mb module.BasicManager) (err error) {
-    // Subscribe to transaction events
+   ..Subscribe to transaction events
     txch, err := client.Subscribe(ctx, "txevents", "tm.event='Tx'", 100)
     if err != nil {
         return err
     }
 
-    // Unsubscribe from transaction events on function exit
+   ..Unsubscribe from transaction events on function exit
     defer func() {
         err = client.UnsubscribeAll(ctx, "txevents")
     }()
 
-    // Use errgroup to manage concurrency
+   ..Use errgroup to manage concurrency
     g, ctx := errgroup.WithContext(ctx)
 
-    // Publish transaction events in a goroutine
+   ..Publish transaction events in a goroutine
     g.Go(func() error {
         var err error
         for {
@@ -289,8 +289,8 @@ func PublishChainTxEvents(ctx context.Context, client tmclient.EventsClient, bus
                     if !evt.Result.IsOK() {
                         continue
                     }
-                    // range over events, parse them using the basic manager and
-                    // send them to the pubsub bus
+                   ..range over events, parse them using the basic manager and
+                   ..send them to the pubsub bus
                     for _, abciEv := range events {
                         typedEvent, err := sdk.ParseTypedEvent(abciEv)
                         if err != nil {
@@ -308,12 +308,12 @@ func PublishChainTxEvents(ctx context.Context, client tmclient.EventsClient, bus
         return err
 	})
 
-    // Exit on error or context cancelation
+   ..Exit on error or context cancelation
     return g.Wait()
 }
 ```
 
-## References
+## 参照
 
-- [Publish Custom Events via a bus](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/events/publish.go#L19-L58)
-- [Consuming the events in `Client`](https://github.com/ovrclk/deploy/blob/bf6c633ab6c68f3026df59efd9982d6ca1bf0561/cmd/event-handlers.go#L57)
+-[バス経由でカスタムイベントを公開する](https://github.com/ovrclk/akash/blob/90d258caeb933b611d575355b8df281208a214f8/events/publish.go#L19-L58)
+-[`クライアント`でイベントを使用](https://github.com/ovrclk/deploy/blob/bf6c633ab6c68f3026df59efd9982d6ca1bf0561/cmd/event-handlers.go#L57) 

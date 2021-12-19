@@ -246,7 +246,7 @@ Cosmos SDK `codec.Codec` 接口提供支持方法 `MarshalInterface` 和 `Unmars
 
 此外，应该在反序列化中引入一个 `UnpackInterfaces` 阶段，以便在需要它们之前解压接口。直接或通过其成员之一包含 protobuf `Any` 的 Protobuf 类型应该实现 `UnpackInterfacesMessage` 接口:
 
-```去
+```Go
 类型 UnpackInterfacesMessage 接口 {
   UnpackInterfaces(InterfaceUnpacker) 错误
 }

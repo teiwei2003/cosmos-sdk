@@ -1,11 +1,11 @@
-# Basics
+# 基本
 
-This repository contains reference documentation on the basic concepts of the Cosmos SDK.
+此存储库包含有关 Cosmos SDK 基本概念的参考文档。
 
-1. [Anatomy of a Cosmos SDK Application](./app-anatomy.md)
-2. [Lifecycle of a transaction](./tx-lifecycle.md)
-3. [Lifecycle of a query](./query-lifecycle.md)
-4. [Accounts](./accounts.md)
+1. [Cosmos SDK 应用剖析](./app-anatomy.md)
+2. [交易的生命周期](./tx-lifecycle.md)
+3. [查询的生命周期](./query-lifecycle.md)
+4. [账户](./accounts.md)
 5. [Gas and Fees](./gas-fees.md)
 
-After reading the basics, head on to the [Core Reference](../core/README.md) for more advanced material.
+阅读基础知识后，请前往 [核心参考](../core/README.md) 获取更高级的材料。

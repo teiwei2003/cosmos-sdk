@@ -1,111 +1,111 @@
-# Messages and Queries
+# 消息和查询
 
-`Msg`s and `Queries` are the two primary objects handled by modules. Most of the core components defined in a module, like `Msg` services, `keeper`s and `Query` services, exist to process `message`s and `queries`. {synopsis}
+`Msg`s 和 `Queries` 是模块处理的两个主要对象。模块中定义的大多数核心组件，如 `Msg` 服务、`keeper`s 和 `Query` 服务，都用于处理 `message`s 和 `queries`。 {概要}
 
-## Pre-requisite Readings
+## 先决条件阅读
 
-- [Introduction to Cosmos SDK Modules](./intro.md) {prereq}
+- [Cosmos SDK 模块介绍](./intro.md) {prereq}
 
-## Messages
+## 消息
 
-`Msg`s are objects whose end-goal is to trigger state-transitions. They are wrapped in [transactions](../core/transactions.md), which may contain one or more of them.
+`Msg`s 是其最终目标是触发状态转换的对象。它们包含在 [transactions](../core/transactions.md) 中，其中可能包含其中一个或多个。
 
-When a transaction is relayed from the underlying consensus engine to the Cosmos SDK application, it is first decoded by [`BaseApp`](../core/baseapp.md). Then, each message contained in the transaction is extracted and routed to the appropriate module via `BaseApp`'s `MsgServiceRouter` so that it can be processed by the module's [`Msg` service](./msg-services.md). For a more detailed explanation of the lifecycle of a transaction, click [here](../basics/tx-lifecycle.md).
+当交易从底层共识引擎中继到 Cosmos SDK 应用程序时，它首先被 [`BaseApp`](../core/baseapp.md) 解码。然后，事务中包含的每条消息都被提取并通过`BaseApp` 的`MsgServiceRouter` 路由到适当的模块，以便模块的[`Msg` 服务](./msg-services.md) 处理它。有关事务生命周期的更详细说明，请单击 [此处](../basics/tx-lifecycle.md)。
 
-### `Msg` Services
+### `Msg` 服务
 
-Starting from v0.40, defining Protobuf `Msg` services is the recommended way to handle messages. A Protobuf `Msg` service should be created for each module, typically in `tx.proto` (see more info about [conventions and naming](../core/encoding.md#faq)). It must have an RPC service method defined for each message in the module.
+从 v0.40 开始，定义 Protobuf `Msg` 服务是处理消息的推荐方式。应该为每个模块创建 Protobuf `Msg` 服务，通常在 `tx.proto` 中(请参阅有关 [约定和命名](../core/encoding.md#faq) 的更多信息)。它必须为模块中的每条消息定义一个 RPC 服务方法。
 
-See an example of a `Msg` service definition from `x/bank` module:
+查看来自 `x/bank` 模块的 `Msg` 服务定义示例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc1/proto/cosmos/bank/v1beta1/tx.proto#L10-L17
 
-Each `Msg` service method must have exactly one argument, which must implement the `sdk.Msg` interface, and a Protobuf response. The naming convention is to call the RPC argument `Msg<service-rpc-name>` and the RPC response `Msg<service-rpc-name>Response`. For example:
+每个 `Msg` 服务方法必须只有一个参数，该参数必须实现 `sdk.Msg` 接口和一个 Protobuf 响应。命名约定是调用 RPC 参数 `Msg<service-rpc-name>` 和 RPC 响应 `Msg<service-rpc-name>Response`。例如: 
 
 ```
   rpc Send(MsgSend) returns (MsgSendResponse);
 ```
 
-`sdk.Msg` interface is a simplified version of the Amino `LegacyMsg` interface described [below](#legacy-amino-msgs) with only `ValidateBasic()` and `GetSigners()` methods. For backwards compatibility with [Amino `LegacyMsg`s](#legacy-amino-msgs), existing `LegacyMsg` types should be used as the request parameter for `service` RPC definitions. Newer `sdk.Msg` types, which only support `service` definitions, should use canonical `Msg...` name.
+`sdk.Msg` 接口是 [下文](#legacy-amino-msgs) 描述的 Amino `LegacyMsg` 接口的简化版本，只有 `ValidateBasic()` 和 `GetSigners()` 方法。为了向后兼容 [Amino `LegacyMsg`s](#legacy-amino-msgs)，现有的 `LegacyMsg` 类型应该用作 `service` RPC 定义的请求参数。较新的 `sdk.Msg` 类型只支持 `service` 定义，应该使用规范的 `Msg...` 名称。
 
-The Cosmos SDK uses Protobuf definitions to generate client and server code:
+Cosmos SDK 使用 Protobuf 定义生成客户端和服务器代码:
 
-* `MsgServer` interface defines the server API for the `Msg` service and its implementation is described as part of the [`Msg` services](./msg-services.md) documentation.
-* Structures are generated for all RPC request and response types.
+* `MsgServer` 接口定义了 `Msg` 服务的服务器 API，其实现在 [`Msg` 服务](./msg-services.md) 文档中进行了描述。
+* 为所有 RPC 请求和响应类型生成结构。
 
-A `RegisterMsgServer` method is also generated and should be used to register the module's `MsgServer` implementation in `RegisterServices` method from the [`AppModule` interface](./module-manager.md#appmodule).
+还生成了一个 `RegisterMsgServer` 方法，它应该用于在来自 [`AppModule` 接口](./module-manager.md#appmodule) 的 `RegisterServices` 方法中注册模块的 `MsgServer` 实现。
 
-In order for clients (CLI and grpc-gateway) to have these URLs registered, the Cosmos SDK provides the function `RegisterMsgServiceDesc(registry codectypes.InterfaceRegistry, sd *grpc.ServiceDesc)` that should be called inside module's [`RegisterInterfaces`](module-manager.md#appmodulebasic) method, using the proto-generated `&_Msg_serviceDesc` as `*grpc.ServiceDesc` argument.
+为了让客户端(CLI 和 grpc-gateway)注册这些 URL，Cosmos SDK 提供了函数 `RegisterMsgServiceDesc(registry codectypes.InterfaceRegistry, sd *grpc.ServiceDesc)`，应该在模块的 [`RegisterInterfaces`]( module-manager.md#appmodulebasic) 方法，使用原型生成的 `&_Msg_serviceDesc` 作为 `*grpc.ServiceDesc` 参数。
 
 ### Legacy Amino `LegacyMsg`s
 
-The following way of defining messages is deprecated and using [`Msg` services](#msg-services) is preferred.
+不推荐使用以下定义消息的方式，首选使用 [`Msg` 服务](#msg-services)。
 
-Amino `LegacyMsg`s can be defined as protobuf messages. The messages definition usually includes a list of parameters needed to process the message that will be provided by end-users when they want to create a new transaction containing said message.
+Amino `LegacyMsg`s 可以定义为 protobuf 消息。消息定义通常包括处理消息所需的参数列表，当最终用户想要创建包含所述消息的新事务时，他们将提供这些参数。
 
-A `LegacyMsg` is typically accompanied by a standard constructor function, that is called from one of the [module's interface](./module-interfaces.md). `message`s also need to implement the `sdk.Msg` interface:
+`LegacyMsg` 通常伴随着一个标准的构造函数，它是从 [module's interface](./module-interfaces.md) 之一调用的。 `message`s 还需要实现 `sdk.Msg` 接口:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/4a1b2fba43b1052ca162b3a1e0b6db6db9c26656/types/tx_msg.go#L10-L33
 
-It extends `proto.Message` and contains the following methods:
+它扩展了 `proto.Message` 并包含以下方法:
 
-- `Route() string`: Name of the route for this message. Typically all `message`s in a module have the same route, which is most often the module's name.
-- `Type() string`: Type of the message, used primarly in [events](../core/events.md). This should return a message-specific `string`, typically the denomination of the message itself.
-- `ValidateBasic() error`: This method is called by `BaseApp` very early in the processing of the `message` (in both [`CheckTx`](../core/baseapp.md#checktx) and [`DeliverTx`](../core/baseapp.md#delivertx)), in order to discard obviously invalid messages. `ValidateBasic` should only include *stateless* checks, i.e. checks that do not require access to the state. This usually consists in checking that the message's parameters are correctly formatted and valid (i.e. that the `amount` is strictly positive for a transfer).
-- `GetSignBytes() []byte`: Return the canonical byte representation of the message. Used to generate a signature.
-- `GetSigners() []AccAddress`: Return the list of signers. The Cosmos SDK will make sure that each `message` contained in a transaction is signed by all the signers listed in the list returned by this method.
+- `Route() string`:此消息的路由名称。通常，模块中的所有“消息”都具有相同的路由，通常是模块的名称。
+- `Type() string`:消息的类型，主要用于 [events](../core/events.md)。这应该返回一个特定于消息的“字符串”，通常是消息本身的面额。
+- `ValidateBasic() error`:这个方法在处理`message`(在[`CheckTx`](../core/baseapp.md#checktx)和[`DeliverTx中)的早期就被`BaseApp`调用`](../core/baseapp.md#delivertx))，以便丢弃明显无效的消息。 `ValidateBasic` 应该只包括 *stateless* 检查，即不需要访问状态的检查。这通常包括检查消息的参数格式是否正确且有效(即“金额”对于传输而言严格为正数)。
+- `GetSignBytes() []byte`:返回消息的规范字节表示。用于生成签名。
+- `GetSigners() []AccAddress`:返回签名者列表。 Cosmos SDK 将确保交易中包含的每条“消息”都由此方法返回的列表中列出的所有签名者签名。
 
-See an example implementation of a `message` from the `gov` module:
+查看来自 `gov` 模块的 `message` 的示例实现:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc1/x/gov/types/msgs.go#L77-L125
 
-## Queries
+## 查询
 
-A `query` is a request for information made by end-users of applications through an interface and processed by a full-node. A `query` is received by a full-node through its consensus engine and relayed to the application via the ABCI. It is then routed to the appropriate module via `BaseApp`'s `queryrouter` so that it can be processed by the module's query service (./query-services.md). For a deeper look at the lifecycle of a `query`, click [here](../basics/query-lifecycle.md).
+“查询”是应用程序的最终用户通过接口发出并由全节点处理的信息请求。全节点通过其共识引擎接收“查询”，并通过 ABCI 中继到应用程序。然后通过`BaseApp` 的`queryrouter` 将其路由到适当的模块，以便模块的查询服务(./query-services.md) 可以对其进行处理。要更深入地了解“查询”的生命周期，请单击 [此处](../basics/query-lifecycle.md)。
 
-### gRPC Queries
+### gRPC 查询 
 
-Starting from v0.40, the prefered way to define queries is by using [Protobuf services](https://developers.google.com/protocol-buffers/docs/proto#services). A `Query` service should be created per module in `query.proto`. This service lists endpoints starting with `rpc`.
+从 v0.40 开始，定义查询的首选方法是使用 [Protobuf 服务](https://developers.google.com/protocol-buffers/docs/proto#services)。应该在 `query.proto` 中为每个模块创建一个 `Query` 服务。该服务列出了以 `rpc` 开头的端点。
 
-Here's an example of such a `Query` service definition:
+以下是此类“查询”服务定义的示例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/d55c1a26657a0af937fa2273b38dcfa1bb3cff9f/proto/cosmos/auth/v1beta1/query.proto#L12-L23
 
-As `proto.Message`s, generated `Response` types implement by default `String()` method of [`fmt.Stringer`](https://golang.org/pkg/fmt/#Stringer).
+作为`proto.Message`s，生成的`Response`类型默认实现[`fmt.Stringer`](https://golang.org/pkg/fmt/#Stringer)的`String()`方法。
 
-A `RegisterQueryServer` method is also generated and should be used to register the module's query server in the `RegisterServices` method from the [`AppModule` interface](./module-manager.md#appmodule).
+还生成了一个 `RegisterQueryServer` 方法，应该用于在 [`AppModule` 接口](./module-manager.md#appmodule) 的 `RegisterServices` 方法中注册模块的查询服务器。
 
-### Legacy Queries
+### 遗留查询
 
-Before the introduction of Protobuf and gRPC in the Cosmos SDK, there was usually no specific `query` object defined by module developers, contrary to `message`s. Instead, the Cosmos SDK took the simpler approach of using a simple `path` to define each `query`. The `path` contains the `query` type and all the arguments needed in order to process it. For most module queries, the `path` should look like the following:
+在 Cosmos SDK 中引入 Protobuf 和 gRPC 之前，通常没有模块开发人员定义的特定“查询”对象，与“消息”相反。相反，Cosmos SDK 采用了更简单的方法，使用简单的“路径”来定义每个“查询”。 `path` 包含 `query` 类型和处理它所需的所有参数。对于大多数模块查询，`path` 应该如下所示:
 
-```
+``
 queryCategory/queryRoute/queryType/arg1/arg2/...
-```
+``
 
-where:
+在哪里:
 
-- `queryCategory` is the category of the `query`, typically `custom` for module queries. It is used to differentiate between different kinds of queries within `BaseApp`'s [`Query` method](../core/baseapp.md#query).
-- `queryRoute` is used by `BaseApp`'s [`queryRouter`](../core/baseapp.md#query-routing) to map the `query` to its module. Usually, `queryRoute` should be the name of the module.
-- `queryType` is used by the module's [`querier`](./query-services.md#legacy-queriers) to map the `query` to the appropriate `querier function` within the module.
-- `args` are the actual arguments needed to process the `query`. They are filled out by the end-user. Note that for bigger queries, you might prefer passing arguments in the `Data` field of the request `req` instead of the `path`.
+- `queryCategory` 是`query` 的类别，通常用于模块查询的`custom`。它用于区分 `BaseApp` 的 [`Query` 方法](../core/baseapp.md#query) 中不同类型的查询。
+- `baseApp` 的 [`queryRouter`](../core/baseapp.md#query-routing) 使用 `queryRoute` 将 `query` 映射到其模块。通常，`queryRoute` 应该是模块的名称。
+- 模块的 [`querier`](./query-services.md#legacy-queriers) 使用 `queryType` 将 `query` 映射到模块内适当的 `querier function`。
+- `args` 是处理 `query` 所需的实际参数。它们由最终用户填写。请注意，对于更大的查询，您可能更喜欢在请求 `req` 的 `Data` 字段而不是 `path` 中传递参数。
 
-The `path` for each `query` must be defined by the module developer in the module's [command-line interface file](./module-interfaces.md#query-commands).Overall, there are 3 mains components module developers need to implement in order to make the subset of the state defined by their module queryable:
+每个`query`的`path`必须由模块开发者在模块的[命令行界面文件](./module-interfaces.md#query-commands)中定义。总的来说，模块开发者需要3个主要组件实现以使由其模块定义的状态子集可查询:
 
-- A [`querier`](./query-services.md#legacy-queriers), to process the `query` once it has been [routed to the module](../core/baseapp.md#query-routing).
-- [Query commands](./module-interfaces.md#query-commands) in the module's CLI file, where the `path` for each `query` is specified.
-- `query` return types. Typically defined in a file `types/querier.go`, they specify the result type of each of the module's `queries`. These custom types must implement the `String()` method of [`fmt.Stringer`](https://golang.org/pkg/fmt/#Stringer).
+- [`querier`](./query-services.md#legacy-queriers)，一旦它被[路由到模块](../core/baseapp.md#query-routing) 处理`query` )。
+- [查询命令](./module-interfaces.md#query-commands) 在模块的 CLI 文件中，其中指定了每个 `query` 的 `path`。
+- `query` 返回类型。通常在文件 `types/querier.go` 中定义，它们指定每个模块的 `queries` 的结果类型。这些自定义类型必须实现 [`fmt.Stringer`](https://golang.org/pkg/fmt/#Stringer) 的 `String()` 方法。
 
-### Store Queries
+### 存储查询
 
-Store queries query directly for store keys. They use `clientCtx.QueryABCI(req abci.RequestQuery)` to return the full `abci.ResponseQuery` with inclusion Merkle proofs.
+存储查询直接查询存储键。他们使用 `clientCtx.QueryABCI(req abci.RequestQuery)` 返回完整的 `abci.ResponseQuery` 并包含 Merkle 证明。
 
-See following examples:
+请参阅以下示例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/080fcf1df25ccdf97f3029b6b6f83caaf5a235e4/x/ibc/core/client/query.go#L36-L46
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/080fcf1df25ccdf97f3029b6b6f83caaf5a235e4/baseapp/abci.go#L722-L749
 
-## Next {hide}
+## 下一个 {hide}
 
-Learn about [`Msg` services](./msg-services.md) {hide}
+了解 [`Msg` 服务](./msg-services.md) {hide} 

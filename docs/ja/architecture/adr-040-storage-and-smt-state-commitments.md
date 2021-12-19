@@ -1,139 +1,139 @@
-# ADR 040: Storage and SMT State Commitments
+# ADR 040:ストレージとSMT状態のコミットメント
 
-## Changelog
+## 変更ログ
 
-- 2020-01-15: Draft
+-2020-01-15:ドラフト
 
-## Status
+## 状態
 
-DRAFT Not Implemented
+ドラフトは実装されていません
 
-## Abstract
+## 概要
 
-Sparse Merkle Tree ([SMT](https://osf.io/8mcnh/)) is a version of a Merkle Tree with various storage and performance optimizations. This ADR defines a separation of state commitments from data storage and the Cosmos SDK transition from IAVL to SMT.
+スパースマーケルツリー([SMT](https://osf.io/8mcnh/))は、さまざまなストレージとパフォーマンスの最適化を備えたバージョンのマーケルツリーです。このADRは、州のコミットメントとデータストレージの分離、およびCosmosSDKのIAVLからSMTへの変換を定義します。
 
-## Context
+## 環境
 
-Currently, Cosmos SDK uses IAVL for both state [commitments](https://cryptography.fandom.com/wiki/Commitment_scheme) and data storage.
+現在、Cosmos SDKはステータス[コミットメント](https://cryptography.fandom.com/wiki/Commitment_scheme)とデータストレージにIAVLを使用しています。
 
-IAVL has effectively become an orphaned project within the Cosmos ecosystem and it's proven to be an inefficient state commitment data structure.
-In the current design, IAVL is used for both data storage and as a Merkle Tree for state commitments. IAVL is meant to be a standalone Merkelized key/value database, however it's using a KV DB engine to store all tree nodes. So, each node is stored in a separate record in the KV DB. This causes many inefficiencies and problems:
+IAVLは、事実上Cosmosエコシステムで孤立したプロジェクトになり、非効率的な州のコミットメントデータ構造であることが証明されています。
+現在の設計では、IAVLはデータストレージと状態コミットメントのMerkelツリーに使用されます。 IAVLは、独立したMerkelized Key .Valueデータベースを目指していますが、KVデータベースエンジンを使用してすべてのツリーノードを格納します。したがって、各ノードはKVDBの個別のレコードに格納されます。これは多くの非効率性と問題を引き起こします:
 
-+ Each object query requires a tree traversal from the root. Subsequent queries for the same object are cached on the Cosmos SDK level.
-+ Each edge traversal requires a DB query.
-+ Creating snapshots is [expensive](https://github.com/cosmos/cosmos-sdk/issues/7215#issuecomment-684804950). It takes about 30 seconds to export less than 100 MB of state (as of March 2020).
-+ Updates in IAVL may trigger tree reorganization and possible O(log(n)) hashes re-computation, which can become a CPU bottleneck.
-+ The node structure is pretty expensive - it contains a standard tree node elements (key, value, left and right element) and additional metadata such as height, version (which is not required by the Cosmos SDK). The entire node is hashed, and that hash is used as the key in the underlying database, [ref](https://github.com/cosmos/iavl/blob/master/docs/node/node.md
-).
++すべてのオブジェクトクエリは、ルートからツリーをトラバースする必要があります。同じオブジェクトに対する後続のクエリは、CosmosSDKレベルでキャッシュされます。
++各エッジトラバーサルにはDBクエリが必要です。
++スナップショットを作成します[高価](https://github.com/cosmos/cosmos-sdk/issues/7215#issuecomment-684804950)。 100 MB未満の状態をエクスポートするのに約30秒かかります(2020年3月現在)。
++ IAVLの更新により、ツリーの再編成とO(log(n))ハッシュの再計算がトリガーされる可能性があり、これがCPUのボトルネックになる可能性があります。
++ノード構造は非常に高価です。標準のツリーノード要素(キー、値、左および右の要素)と、高さやバージョン(Cosmos SDKでは不要)などの追加のメタデータが含まれています。ノード全体をハッシュし、基になるデータベースのキーとしてハッシュを使用します[ref](https://github.com/cosmos/iavl/blob/master/docs/node/node.md
+)。
 
-Moreover, the IAVL project lacks support and a maintainer and we already see better and well-established alternatives. Instead of optimizing the IAVL, we are looking into other solutions for both storage and state commitments.
+さらに、IAVLプロジェクトにはサポートとメンテナーが不足しており、より優れた完全な代替案が見られました。 IAVLは最適化されていませんが、ストレージと状態の約束を達成するための他のソリューションを検討しています。
 
-## Decision
+## 決定
 
-We propose to separate the concerns of state commitment (**SC**), needed for consensus, and state storage (**SS**), needed for state machine. Finally we replace IAVL with [Celestia's SMT](https://github.com/lazyledger/smt). Celestia SMT is based on Diem (called jellyfish) design [*] - it uses a compute-optimised SMT by replacing subtrees with only default values with a single node (same approach is used by Ethereum2) and implements compact proofs.
+コンセンサスに必要な状態コミットメント(** SC **)とステートマシンに必要な状態ストレージ(** SS **)のフォーカスを分離することをお勧めします。最後に、IAVLを[CelestiaのSMT](https://github.com/lazyledger/smt)に置き換えます。 Celestia SMTはDiem(クラゲと呼ばれる)設計に基づいています[*]-デフォルト値のみのサブツリーを単一ノードで置き換えることにより(Ethereum2は同じ方法を使用します)、計算上最適化されたSMTを使用し、コンパクトな証明を実現します。
 
-The storage model presented here doesn't deal with data structure nor serialization. It's a Key-Value database, where both key and value are binaries. The storage user is responsible for data serialization.
+ここで説明するストレージモデルは、データ構造やシリアル化を扱いません。これはキーと値のデータベースであり、キーと値はバイナリファイルです。ストレージユーザーは、データのシリアル化を担当します。 
 
-### Decouple state commitment from storage
+### 状態の約束をストレージから分離する
 
-Separation of storage and commitment (by the SMT) will allow the optimization of different components according to their usage and access patterns.
+ストレージとコミットメントを(SMTを介して)分離することで、さまざまなコンポーネントをその使用法とアクセスパターンに基づいて最適化できます。
 
-`SC` (SMT) is used to commit to a data and compute Merkle proofs. `SS` is used to directly access data. To avoid collisions, both `SS` and `SC` will use a separate storage namespace (they could use the same database underneath). `SS` will store each record directly (mapping `(key, value)` as `key → value`).
+`SC`(SMT)は、データを送信し、マークル証明を計算するために使用されます。 `SS`はデータに直接アクセスするために使用されます。競合を回避するために、 `SS`と` SC`の両方が別々のストレージ名前空間を使用します(以下で同じデータベースを使用できます)。 `SS`は各レコードを直接保存します(`(key、value) `を` key→value`にマップします)。
 
-SMT is a merkle tree structure: we don't store keys directly. For every `(key, value)` pair, `hash(key)` is used as leaf path (we hash a key to uniformly distribute leaves in the tree) and `hash(value)` as the leaf contents. The tree structure is specified in more depth [below](#smt-for-state-commitment).
+SMTはMerkelツリー構造です。キーを直接保存しません。 `(key、value)`ペアごとに、 `hash(key)`がリーフパスとして使用され(キーをハッシュしてツリー内の葉を均等に分散します)、 `hash(value)`はリーフコンテンツです。 [以下](#smt-for-state-commitment)は、ツリー構造をより詳細に指定します。
 
-For data access we propose 2 additional KV buckets (implemented as namespaces for the key-value pairs, sometimes called [column family](https://github.com/facebook/rocksdb/wiki/Terminology)):
+データアクセスには、2つの追加のKVバケットを使用することをお勧めします(キーと値のペアの名前空間として実装され、[列ファミリー](https://github.com/facebook/rocksdb/wiki/Terminology)と呼ばれることもあります):
 
-1. B1: `key → value`: the principal object storage, used by a state machine, behind the Cosmos SDK `KVStore` interface: provides direct access by key and allows prefix iteration (KV DB backend must support it).
-2. B2: `hash(key) → key`: a reverse index to get a key from an SMT path. Internally the SMT will store `(key, value)` as `prefix || hash(key) || hash(value)`. So, we can get an object value by composing `hash(key) → B2 → B1`.
-3. We could use more buckets to optimize the app usage if needed.
+1. B1: `key→value`:Cosmos SDK` KVStore`インターフェースの背後にあるステートマシンによって使用されるメインオブジェクトストレージ:直接キーアクセスを提供し、プレフィックスの反復を許可します(KV DBバックエンドがサポートする必要があります)。
+2. B2: `hash(key)→key`:SMTパスからキーの逆インデックスを取得します。内部的には、SMTは `(key、value)`を `prefix || hash(key)|| hash(value)`として保存します。したがって、 `hash(key)→B2→B1`を組み合わせることでオブジェクト値を取得できます。
+3.必要に応じて、より多くのバケットを使用してアプリケーションの使用を最適化できます。
 
-We propose to use a KV database for both `SS` and `SC`. The store interface will allow to use the same physical DB backend for both `SS` and `SC` as well two separate DBs. The latter option allows for the separation of `SS` and `SC` into different hardware units, providing support for more complex setup scenarios and improving overall performance: one can use different backends (eg RocksDB and Badger) as well as independently tuning the underlying DB configuration.
+「SS」と「SC」にはKVデータベースの使用をお勧めします。ストレージインターフェイスでは、「SS」と「SC」に同じ物理データベースバックエンドと2つの別々のデータベースを使用できます。後者のオプションでは、 `SS`と` SC`を異なるハードウェアユニットに分離して、より複雑なセットアップシナリオをサポートし、全体的なパフォーマンスを向上させることができます。異なるバックエンド(RocksDBやBadgerなど)を使用でき、最下層を個別に調整できます。データベース構成。
 
-### Requirements
+### 要件
 
-State Storage requirements:
+州の保管要件:
 
-+ range queries
-+ quick (key, value) access
-+ creating a snapshot
-+ historical versioning
-+ pruning (garbage collection)
++範囲クエリ
++高速(キー、値)アクセス
++スナップショットを作成する
++履歴バージョン
++剪定(ガベージコレクション)
 
-State Commitment requirements:
+国家のコミットメント要件:
 
-+ fast updates
-+ tree path should be short
-+ query historical commitment proofs using ICS-23 standard
-+ pruning (garbage collection)
++クイックアップデート
++ツリーパスは短くする必要があります
++ ICS-23標準を使用して、過去のコミットメント証明書を照会します
++剪定(ガベージコレクション)
 
-### SMT for State Commitment
+### National Commitment SMT
 
-A Sparse Merkle tree is based on the idea of a complete Merkle tree of an intractable size. The assumption here is that as the size of the tree is intractable, there would only be a few leaf nodes with valid data blocks relative to the tree size, rendering a sparse tree.
+スパースなマークルツリーは、扱いにくいサイズの完全なマークルツリーのアイデアに基づいています。ここでの前提は、ツリーのサイズを処理するのが難しいため、ツリーのサイズに比べて有効なデータブロックを持つリーフノードが数個しかないため、まばらなツリーが表示されることです。
 
-The full specification can be found at [Celestia](https://github.com/celestiaorg/celestia-specs/blob/ec98170398dfc6394423ee79b00b71038879e211/src/specs/data_structures.md#sparse-merkle-tree). In summary:
+完全な仕様は[Celestia](https://github.com/celestiaorg/celestia-specs/blob/ec98170398dfc6394423ee79b00b71038879e211/src/specs/data_structures.md#sparse-merkle-tree)にあります。要するに:
 
-* The SMT consists of a binary Merkle tree, constructed in the same fashion as described in [Certificate Transparency (RFC-6962)](https://tools.ietf.org/html/rfc6962), but using as the hashing function SHA-2-256 as defined in [FIPS 180-4](https://doi.org/10.6028/NIST.FIPS.180-4).
-* Leaves and internal nodes are hashed differently: the one-byte `0x00` is prepended for leaf nodes while `0x01` is prepended for internal nodes.
-* Default values are given to leaf nodes with empty leaves.
-* While the above rule is sufficient to pre-compute the values of intermediate nodes that are roots of empty subtrees, a further simplification is to extend this default value to all nodes that are roots of empty subtrees. The 32-byte zero is used as the default value. This rule takes precedence over the above one.
-* An internal node that is the root of a subtree that contains exactly one non-empty leaf is replaced by that leaf's leaf node.
+* SMTは、[Certificate Transparency(RFC-6962)](https://tools.ietf.org/html/rfc6962)で説明されているのと同じ方法で構築された、バイナリMerkleツリーで構成されていますが、ハッシュ関数SHAとして使用されます。 -2-256、[FIPS 180-4](https://doi.org/10.6028/NIST.FIPS.180-4)で定義されています。
+※リーフノードと内部ノードのハッシュ方式が異なります。リーフノードの前面に1バイトの「0x00」が追加され、内部ノードの前面に「0x01」が追加されます。
+*空のリーフノードにデフォルト値を割り当てます。
+*上記のルールは、空のサブツリーのルートである中間ノードの値を事前に計算するのに十分ですが、さらに単純化すると、このデフォルト値を空のサブツリーのルートであるすべてのノードに拡張できます。デフォルト値として32バイトのゼロが使用されます。このルールは、上記のルールよりも優先されます。
+*空でないリーフを含むサブツリーのルートである内部ノードは、そのリーフのリーフノードに置き換えられます。
 
-### Snapshots for storage sync and state versioning
+### ストレージ同期と状態バージョン管理のためのスナップショット
 
-Below, with simple _snapshot_ we refer to a database snapshot mechanism, not to a _ABCI snapshot sync_. The latter will be referred as _snapshot sync_ (which will directly use DB snapshot as described below).
+以下では、単に_snapshot_によって、_ABCIスナップショット同期_ではなく、データベーススナップショットメカニズムを参照しています。後者は_snapshotsync_と呼ばれます(以下で説明するように、データベーススナップショットが直接使用されます)。
 
-Database snapshot is a view of DB state at a certain time or transaction. It's not a full copy of a database (it would be too big). Usually a snapshot mechanism is based on a _copy on write_ and it allows DB state to be efficiently delivered at a certain stage.
-Some DB engines support snapshotting. Hence, we propose to reuse that functionality for the state sync and versioning (described below). We limit the supported DB engines to ones which efficiently implement snapshots. In a final section we discuss the evaluated DBs.
+データベーススナップショットは、特定の時間またはトランザクションにおけるデータベースの状態のビューです。データベースの完全なコピーではありません(大きすぎます)。通常、スナップショットメカニズムは_コピーオンライト_に基づいており、特定の段階でDBステータスを効果的に転送できます。
+一部のデータベースエンジンはスナップショットをサポートしています。したがって、状態の同期とバージョン管理(以下で説明)にこの機能を再利用することをお勧めします。サポートされているデータベースエンジンは、スナップショットを効果的に実装するものに限定しています。最後のセクションでは、評価されたDBについて説明します。
 
-One of the Stargate core features is a _snapshot sync_ delivered in the `/snapshot` package. It provides a way to trustlessly sync a blockchain without repeating all transactions from the genesis. This feature is implemented in Cosmos SDK and requires storage support. Currently IAVL is the only supported backend. It works by streaming to a client a snapshot of a `SS` at a certain version together with a header chain.
+Stargateのコア機能の1つは、 `.snapshot`パッケージで提供される_snapshotsync_です。これは、信頼せずに、すべてのトランザクションを繰り返さずにブロックチェーンを同期する方法を提供します。この機能はCosmosSDKに実装されており、ストレージのサポートが必要です。現在、サポートされているバックエンドはIAVLのみです。これは、特定のバージョンの「SS」のスナップショットをヘッダーチェーンとともにクライアントにストリーミングすることで機能します。
 
-A new database snapshot will be created in every `EndBlocker` and identified by a block height. The `root` store keeps track of the available snapshots to offer `SS` at a certain version. The `root` store implements the `RootStore` interface described below. In essence, `RootStore` encapsulates a `Committer` interface. `Committer` has a `Commit`, `SetPruning`, `GetPruning` functions which will be used for creating and removing snapshots. The `rootStore.Commit` function creates a new snapshot and increments the version on each call, and checks if it needs to remove old versions. We will need to update the SMT interface to implement the `Committer` interface.
-NOTE: `Commit` must be called exactly once per block. Otherwise we risk going out of sync for the version number and block height.
-NOTE: For the Cosmos SDK storage, we may consider splitting that interface into `Committer` and `PruningCommitter` - only the multiroot should implement `PruningCommitter` (cache and prefix store don't need pruning).
+新しいデータベーススナップショットが各「EndBlocker」に作成され、ブロックの高さで識別されます。 `root`は、利用可能なスナップショットを保存および追跡して、` SS`の特定のバージョンを提供します。 `root`ストアは、以下で説明する` RootStore`インターフェースを実装します。基本的に、 `RootStore`は` Committer`インターフェースをカプセル化します。 `Committer`には、スナップショットを作成および削除するための` Commit`、 `SetPruning`、および` GetPruning`関数があります。 `rootStore.Commit`関数は、新しいスナップショットを作成し、呼び出されるたびにバージョンをインクリメントし、古いバージョンを削除する必要があるかどうかを確認します。 `コミッター`インターフェースを実装するためにSMTインターフェースを更新する必要があります。
+注:各ブロックは、 `Commit`を1回だけ呼び出す必要があります。そうしないと、バージョン番号とブロックが高度に同期するリスクに直面する可能性があります。
+注:Cosmos SDKストレージの場合、インターフェイスを `Committer`と` PruningCommitter`に分割することを検討できます。マルチルートのみが `PruningCommitter`を実装する必要があります(キャッシュとプレフィックスストレージをトリミングする必要はありません)。
 
-Number of historical versions for `abci.RequestQuery` and state sync snapshots is part of a node configuration, not a chain configuration (configuration implied by the blockchain consensus). A configuration should allow to specify number of past blocks and number of past blocks modulo some number (eg: 100 past blocks and one snapshot every 100 blocks for past 2000 blocks). Archival nodes can keep all past versions.
+`abci.RequestQuery`と状態同期スナップショットの履歴バージョン番号は、チェーン構成(ブロックチェーンコンセンサスによって暗示される構成)ではなく、ノード構成の一部です。構成では、過去のブロックの数と特定の数を法として過去のブロックの数を指定できる必要があります(たとえば、過去100ブロックと過去2000ブロックの100ブロックごとのスナップショット)。アーカイブノードは、過去のすべてのバージョンを保持できます。
 
-Pruning old snapshots is effectively done by a database. Whenever we update a record in `SC`, SMT won't update nodes - instead it creates new nodes on the update path, without removing the old one. Since we are snapshotting each block, we need to change that mechanism to immediately remove orphaned nodes from the database. This is a safe operation - snapshots will keep track of the records and make it available when accessing past versions.
+古いスナップショットのプルーニングは、データベースによって効果的に実行されます。 `SC`のレコードを更新するときはいつでも、SMTはノードを更新しません-古いノードを削除する代わりに、更新パス上に新しいノードを作成します。各ブロックのスナップショットを取得しているため、データベースから孤立したノードをすぐに削除するようにメカニズムを変更する必要があります。これは安全な操作です。スナップショットはレコードを追跡し、過去のバージョンにアクセスするときに利用できるようにします。
 
-To manage the active snapshots we will either use a DB _max number of snapshots_ option (if available), or we will remove DB snapshots in the `EndBlocker`. The latter option can be done efficiently by identifying snapshots with block height and calling a store function to remove past versions.
+アクティブなスナップショットを管理するために、DB _スナップショットの最大数_オプション(使用可能な場合)を使用するか、「EndBlocker」のDBスナップショットを削除します。ブロックの高さでスナップショットを識別し、ストレージ関数を呼び出して過去のバージョンを削除することにより、後者のオプションを効果的に完了することができます。
 
-#### Accessing old state versions
+#### 古いステータスバージョンにアクセス
 
-One of the functional requirements is to access old state. This is done through `abci.RequestQuery` structure.  The version is specified by a block height (so we query for an object by a key `K` at block height `H`). The number of old versions supported for `abci.RequestQuery` is configurable. Accessing an old state is done by using available snapshots.
-`abci.RequestQuery` doesn't need old state of `SC` unless the `prove=true` parameter is set. The SMT merkle proof must be included in the `abci.ResponseQuery` only if both `SC` and `SS` have a snapshot for requested version.
+機能要件の1つは、古い状態にアクセスすることです。これは、「abci.RequestQuery」構造を介して行われます。バージョンはブロックの高さで指定されます(したがって、ブロックの高さ「H」でキー「K」を使用してオブジェクトを照会します)。 `abci.RequestQuery`でサポートされている古いバージョンの数は構成可能です。古い状態へのアクセスは、利用可能なスナップショットを使用して行われます。
+`prove = true`パラメータが設定されていない限り、` abci.RequestQuery`は `SC`の古い状態を必要としません。 `SC`と` SS`の両方に要求されたバージョンのスナップショットがある場合にのみ、SMTMerkel証明書を `abci.ResponseQuery`に含める必要があります。
 
-Moreover, Cosmos SDK could provide a way to directly access a historical state. However, a state machine shouldn't do that - since the number of snapshots is configurable, it would lead to nondeterministic execution.
+さらに、Cosmos SDKは、履歴状態に直接アクセスする方法を提供できます。ただし、ステートマシンはこれを行うべきではありません。スナップショットの数は構成可能であるため、非決定論的な実行につながります。
 
-We positively [validated](https://github.com/cosmos/cosmos-sdk/discussions/8297) a versioning and snapshot mechanism for querying old state with regards to the database we evaluated.
+評価したデータベースの古い状態をクエリするためのバージョン管理とスナップショットのメカニズムを積極的に[確認](https://github.com/cosmos/cosmos-sdk/discussions/8297)します。
 
-### State Proofs
+### ステータスの証明
 
-For any object stored in State Store (SS), we have corresponding object in `SC`. A proof for object `V` identified by a key `K` is a branch of `SC`, where the path corresponds to the key `hash(K)`, and the leaf is `hash(K, V)`.
+状態ストア(SS)に格納されているオブジェクトの場合、対応するオブジェクトが「SC」にあります。キー「K」で識別されるオブジェクト「V」の証明は「SC」のブランチであり、パスはキー「hash(K)」に対応し、リーフは「hash(K、V)」です。
 
-### Rollbacks
+### ロールバック
 
-We need to be able to process transactions and roll-back state updates if a transaction fails. This can be done in the following way: during transaction processing, we keep all state change requests (writes) in a `CacheWrapper` abstraction (as it's done today). Once we finish the block processing, in the `Endblocker`,  we commit a root store - at that time, all changes are written to the SMT and to the `SS` and a snapshot is created.
+トランザクションが失敗した場合は、トランザクションを処理してステータスの更新をロールバックできる必要があります。これは、次の方法で実行できます。トランザクション中に、すべての状態変更要求(書き込み)を「CacheWrapper」抽象化に保存します(今日と同じように)。ブロック処理が終了したら、「Endblocker」でルートストレージを送信します。その時点で、すべての変更がSMTと「SS」に書き込まれ、スナップショットが作成されます。
 
-### Committing to an object without saving it
+### オブジェクトを保存せずに送信する
 
-We identified use-cases, where modules will need to save an object commitment without storing an object itself. Sometimes clients are receiving complex objects, and they have no way to prove a correctness of that object without knowing the storage layout. For those use cases it would be easier to commit to the object without storing it directly.
+モジュールがオブジェクト自体ではなくオブジェクトpromiseを保存する必要があるユースケースを特定しました。クライアントが複雑なオブジェクトを受け取ることがあり、ストレージレイアウトを知らないと、オブジェクトの正確さを証明できません。これらのユースケースでは、オブジェクトを直接保存せずに送信する方が簡単です。
 
-### Refactor MultiStore
+### マルチストアのリファクタリング
 
-The Stargate `/store` implementation (store/v1) adds an additional layer in the SDK store construction - the `MultiStore` structure. The multistore exists to support the modularity of the Cosmos SDK - each module is using its own instance of IAVL, but in the current implementation, all instances share the same database. The latter indicates, however, that the implementation doesn't provide true modularity. Instead it causes problems related to race condition and atomic DB commits (see: [\#6370](https://github.com/cosmos/cosmos-sdk/issues/6370) and [discussion](https://github.com/cosmos/cosmos-sdk/discussions/8297#discussioncomment-757043)).
+Stargateの `.store`実装(store .v1)は、追加のレイヤー(` MultiStore`構造)をSDKストレージビルドに追加します。マルチストアは、Cosmos SDKのモジュール性をサポートするために存在します。各モジュールは独自のIAVLインスタンスを使用しますが、現在の実装では、すべてのインスタンスが同じデータベースを共有します。ただし、後者は、実装が真のモジュール性を提供しないことを示しています。代わりに、競合状態とアトミックデータベースの送信に関連する問題が発生します([\#6370](https://github.com/cosmos/cosmos-sdk/issues/6370)および[ディスカッション](https://を参照)。 github.com)。com.cosmos .cosmos-sdk .discussions .8297#discussioncomment-757043))。
 
-We propose to reduce the multistore concept from the SDK, and to use a single instance of `SC` and `SS` in a `RootStore` object. To avoid confusion, we should rename the `MultiStore` interface to `RootStore`. The `RootStore` will have the following interface; the methods for configuring tracing and listeners are omitted for brevity.
+SDKで複数のストレージの概念を減らし、「RootStore」オブジェクトで「SC」と「SS」の単一インスタンスを使用することをお勧めします。混乱を避けるために、 `MultiStore`インターフェースの名前を` RootStore`に変更する必要があります。 `RootStore`には次のインターフェースがあります。簡潔にするために、トラッキングとリスナーを構成する方法は省略されています。  
 
 ```go
-// Used where read-only access to versions is needed.
+/.Used where read-only access to versions is needed.
 type BasicRootStore interface {
     Store
     GetKVStore(StoreKey) KVStore
     CacheRootStore() CacheRootStore
 }
 
-// Used as the main app state, replacing CommitMultiStore.
+/.Used as the main app state, replacing CommitMultiStore.
 type CommitRootStore interface {
     BasicRootStore
     Committer
@@ -142,18 +142,18 @@ type CommitRootStore interface {
     GetVersion(uint64) (BasicRootStore, error)
     SetInitialVersion(uint64) error
 
-    ... // Trace and Listen methods
+    .....Trace and Listen methods
 }
 
-// Replaces CacheMultiStore for branched state.
+/.Replaces CacheMultiStore for branched state.
 type CacheRootStore interface {
     BasicRootStore
     Write()
 
-    ... // Trace and Listen methods
+    .....Trace and Listen methods
 }
 
-// Example of constructor parameters for the concrete type.
+/.Example of constructor parameters for the concrete type.
 type RootStoreConfig struct {
     Upgrades        *StoreUpgrades
     InitialVersion  uint64
@@ -162,104 +162,103 @@ type RootStoreConfig struct {
 }
 ```
 
-<!-- TODO: Review whether these types can be further reduced or simplified -->
-<!-- TODO: RootStorePersistentCache type -->
+<!-- TODO: 查看是否可以进一步减少或简化这些类型 -->
+<!-- TODO: RootStorePersistentCache 类型 -->
 
-In contrast to `MultiStore`, `RootStore` doesn't allow to dynamically mount sub-stores or provide an arbitrary backing DB for individual sub-stores.
+「MultiStore」とは異なり、「RootStore」では、サブストアを動的にマウントしたり、単一のサブストアにバックアップデータベースを提供したりすることはできません。
 
-NOTE: modules will be able to use a special commitment and their own DBs. For example: a module which will use ZK proofs for state can store and commit this proof in the `RootStore` (usually as a single record) and manage the specialized store privately or using the `SC` low level interface.
+注:モジュールは、特別なPromiseと独自のデータベースを使用できるようになります。例:州にZK認定を使用するモジュールは、この認定を `RootStore`(通常は単一のレコードとして)に保存して送信し、専用ストレージをプライベートに管理するか、` SC`低レベルインターフェイスを使用して管理できます。
 
-#### Compatibility support
+#### 互換性のサポート
 
-To ease the transition to this new interface for users, we can create a shim which wraps a `CommitMultiStore` but provides a `CommitRootStore` interface, and expose functions to safely create and access the underlying `CommitMultiStore`.
+ユーザーがこの新しいインターフェースに簡単に移行できるようにするために、「CommitMultiStore」をラップするが「CommitRootStore」インターフェースを提供し、基になる「CommitMultiStore」を安全に作成してアクセスするための関数を公開するシムを作成できます。
 
-The new `RootStore` and supporting types can be implemented in a `store/v2` package to avoid breaking existing code.
+新しい `RootStore`とサポートタイプを` store .v2`パッケージに実装して、既存のコードを壊さないようにすることができます。
 
-#### Merkle Proofs and IBC
+#### メルケルプルーフとIBC
 
-Currently, an IBC (v1.0) Merkle proof path consists of two elements (`["<store-key>", "<record-key>"]`), with each key corresponding to a separate proof. These are each verified according to individual [ICS-23 specs](https://github.com/cosmos/ibc-go/blob/f7051429e1cf833a6f65d51e6c3df1609290a549/modules/core/23-commitment/types/merkle.go#L17), and the result hash of each step is used as the committed value of the next step, until a root commitment hash is obtained.
-The root hash of the proof for `"<record-key>"` is hashed with the `"<store-key>"` to validate against the App Hash.
+現在、IBC(v1.0)マークル証明パスは2つの要素( `[" <store-key> "、" <record-key> "]`)で構成されており、各キーは個別の証明に対応しています。これらはすべて、個人の[ICS-23仕様](https://github.com/cosmos/ibc-go/blob/f7051429e1cf833a6f65d51e6c3df1609290a549/modules/core/23-commitment/types/merkle.go#L17)に従って検証されています。ルートコミットハッシュが取得されるまで、ハッシュは次のステップでコミット値として使用されます。
+`" <record-key> "`の証明書のルートハッシュは、アプリケーションハッシュを検証するために `" <store-key> "`でハッシュされます。
 
-This is not compatible with the `RootStore`, which stores all records in a single Merkle tree structure, and won't produce separate proofs for the store- and record-key. Ideally, the store-key component of the proof could just be omitted, and updated to use a "no-op" spec, so only the record-key is used. However, because the IBC verification code hardcodes the `"ibc"` prefix and applies it to the SDK proof as a separate element of the proof path, this isn't possible without a breaking change. Breaking this behavior would severely impact the Cosmos ecosystem which already widely adopts the IBC module. Requesting an update of the IBC module across the chains is a time consuming effort and not easily feasible.
+これは、すべてのレコードを単一のMerkleツリー構造に格納し、ストレージキーとレコードキーに対して個別の証明を生成しない「RootStore」とは互換性がありません。理想的には、プルーフのストレージキーコンポーネントを省略して、「操作なし」仕様を使用するように更新できるため、レコードキーのみが使用されます。ただし、IBC検証コードは `" ibc "`プレフィックスをハードコードし、それを認証パスの個別の要素としてSDK認証に適用するため、これは大きな変更なしでは不可能です。この動作を破ると、IBCモジュールを広く採用しているCosmosエコシステムに深刻な影響を及ぼします。 IBCモジュールを更新するためのクロスチェーン要求は、時間のかかる作業であり、実装するのは簡単ではありません。
 
-As a workaround, the `RootStore` will have to use two separate SMTs (they could use the same underlying DB): one for IBC state and one for everything else. A simple Merkle map that reference these SMTs will act as a Merkle Tree to create a final App hash. The Merkle map is not stored in a DBs - it's constructed in the runtime. The IBC substore key must be `"ibc"`.
+回避策として、「RootStore」は2つの別々のSMTを使用する必要があります(1つは同じ基になるデータベースを使用できます)。1つはIBC状態用で、もう1つはその他すべて用です。これらのSMTを参照する単純なMerkleマップは、最終的なアプリハッシュを作成するためのMerkleツリーとして機能します。 MerkleマッピングはDBに保存されません-実行時に構築されます。 IBCサブストレージキーは「ibc」である必要があります。
 
-The workaround can still guarantee atomic syncs: the [proposed DB backends](#evaluated-kv-databases) support atomic transactions and efficient rollbacks, which will be used in the commit phase.
+回避策は引き続きアトミック同期を保証できます。[提案されたデータベースバックエンド](#evaluated-kv-databases)は、コミットフェーズ中に使用されるアトミックトランザクションと効率的なロールバックをサポートします。
 
-The presented workaround can be used until the IBC module is fully upgraded to supports single-element commitment proofs.
+提案されたソリューションは、IBCモジュールが完全にアップグレードされて単一要素のコミットメントの証明をサポートするまで使用できます。
 
-### Optimization: compress module key prefixes
+### 最適化:モジュールキープレフィックスを圧縮
 
-We consider a compression of prefix keys by creating a mapping from module key to an integer, and serializing the integer using varint coding. Varint coding assures that different values don't have common byte prefix. For Merkle Proofs we can't use prefix compression - so it should only apply for the `SS` keys. Moreover, the prefix compression should be only applied for the module namespace. More precisely:
+モジュールキーから整数へのマッピングを作成し、varintエンコーディングを使用して整数をシリアル化することにより、プレフィックスキーを圧縮することを検討します。バリントエンコーディングは、異なる値に共通のバイトプレフィックスがないことを保証します。マークル証明の場合、プレフィックス圧縮を使用できないため、 `SS`キーに対してのみ機能するはずです。さらに、プレフィックス圧縮はモジュール名前空間にのみ適用する必要があります。すなわち:
 
-+ each module has it's own namespace;
-+ when accessing a module namespace we create a KVStore with embedded prefix;
-+ that prefix will be compressed only when accessing and managing `SS`.
++各モジュールには独自の名前空間があります。
++モジュールの名前空間にアクセスするときに、プレフィックスが埋め込まれたKVStoreを作成します。
++プレフィックスは、「SS」にアクセスして管理する場合にのみ圧縮されます。
 
-We need to assure that the codes won't change. We can fix the mapping in a static variable (provided by an app) or SS state under a special key.
+コードが変更されないようにする必要があります。静的変数(アプリケーションによって提供される)またはSS状態のマッピングを特別なキーで修正できます。
 
-TODO: need to make decision about the key compression.
+TODO:キーの圧縮を決定する必要があります。
+## 最適化:SSキー圧縮
 
-## Optimization: SS key compression
+一部のオブジェクトは、Protobufメッセージタイプを含むキーで保存される場合があります。そのような鍵は非常に長いです。 Protobufメッセージタイプをvarintにマッピングできれば、多くのスペースを節約できます。
 
-Some objects may be saved with key, which contains a Protobuf message type. Such keys are long. We could save a lot of space if we can map Protobuf message types in varints.
+TODO:この操作を完了するか、別のADRに移動します。
 
-TODO: finalize this or move to another ADR.
+## 結果
 
-## Consequences
+### 下位互換性
 
-### Backwards Compatibility
+このADRでは、CosmosSDKレベルのAPIの変更は導入されません。
 
-This ADR doesn't introduce any Cosmos SDK level API changes.
+ステートマシンのストレージレイアウトを変更し、これらの変更をマージするためにストレージハードフォークとネットワークのアップグレードが必要でした。 SMTはメルケル認証機能を提供しますが、ICS23とは互換性がありません。 ICS23互換性の証明を更新する必要があります。
 
-We change the storage layout of the state machine, a storage hard fork and network upgrade is required to incorporate these changes. SMT provides a merkle proof functionality, however it is not compatible with ICS23. Updating the proofs for ICS23 compatibility is required.
+### ポジティブ
 
-### Positive
++州と州のコミットメントを切り離すことで、さらなる最適化とより優れたストレージモデルのためのより優れたエンジニアリングの機会がもたらされます。
++パフォーマンスの向上。
++ IAVLよりも広く採用されていることが証明されているSMTベースのキャンプに参加してください。 SMTの採用を決定したサンプルプロジェクト:Ethereum2、Diem(Libra)、Trillan、Tezos、Celestia。
++マルチストアの削除により、現在のマルチストア設計の長期的な問題が修正されます。
++簡略化されたメルケル証明— IBCを除いて、すべてのモジュールには1つのメルケル証明しかありません。
 
-+ Decoupling state from state commitment introduce better engineering opportunities for further optimizations and better storage patterns.
-+ Performance improvements.
-+ Joining SMT based camp which has wider and proven adoption than IAVL. Example projects which decided on SMT: Ethereum2, Diem (Libra), Trillan, Tezos, Celestia.
-+ Multistore removal fixes a longstanding issue with the current MultiStore design.
-+ Simplifies merkle proofs - all modules, except IBC, have only one pass for merkle proof.
+### ネガティブ
 
-### Negative
++ストレージの移行
++ LLSMTはプルーニングをサポートしていません-この機能を追加してテストする必要があります。
++ `SS`キーにはキープレフィックスのオーバーヘッドがあります。 `SC`のすべてのキーは同じサイズ(ハッシュされている)であるため、これは` SC`には影響しません。
 
-+ Storage migration
-+ LL SMT doesn't support pruning - we will need to add and test that functionality.
-+ `SS` keys will have an overhead of a key prefix. This doesn't impact `SC` because all keys in `SC` have same size (they are hashed).
+### ニュートラル
 
-### Neutral
++ Cosmosホワイトペーパーの主要な提案の1つであるIAVLを廃止します。
 
-+ Deprecating IAVL, which is one of the core proposals of Cosmos Whitepaper.
+## 代替デザイン
 
-## Alternative designs
+ほとんどの代替設計は、[State Commitments and Storage Report](https://paper.dropbox.com/published/State-commitments-and-storage-review--BDvA1MLwRtOx55KRihJ5xxLbBw-KeEB7eOd11pNrZvVtqUgL3h)で評価されています。
 
-Most of the alternative designs were evaluated in [state commitments and storage report](https://paper.dropbox.com/published/State-commitments-and-storage-review--BDvA1MLwRtOx55KRihJ5xxLbBw-KeEB7eOd11pNrZvVtqUgL3h).
+イーサリアムの調査が公開されました[VerkleTrie](https://dankradfeist.de/ethereum/2021/06/18/verkle-trie-for-eth1.html)-多項式のコミットメントをメルケルツリーと組み合わせて、ツリーのアイデアの高さを減らします。このコンセプトには大きな可能性がありますが、実装するには時期尚早だと思います。他の研究で必要なすべてのライブラリが実装されると、現在のSMTベースの設計をVerkleTrieに簡単に更新できます。このADRで説明されている設計の主な利点は、状態の約束をデータストレージから分離し、より強力なインターフェイスを設計することです。
 
-Ethereum research published [Verkle Trie](https://dankradfeist.de/ethereum/2021/06/18/verkle-trie-for-eth1.html) - an idea of combining polynomial commitments with merkle tree in order to reduce the tree height. This concept has a very good potential, but we think it's too early to implement it. The current, SMT based design could be easily updated to the Verkle Trie once other research implement all necessary libraries. The main advantage of the design described in this ADR is the separation of state commitments from the data storage and designing a more powerful interface.
+## さらなる議論
 
-## Further Discussions
+### 評価されたKVデータベース
 
-### Evaluated KV Databases
+スナップショットのサポートを評価するために使用される既存のデータベースKVデータベースを検証しました。次のデータベースは、効率的なスナップショットメカニズムを提供します:Badger、RocksDB、[Pebble](https://github.com/cockroachdb/pebble)。このようなサポートを提供していない、または本番環境の準備ができていないデータベース:boltdb、leveldb、goleveldb、membdb、lmdb。
 
-We verified existing databases KV databases for evaluating snapshot support. The following databases provide efficient snapshot mechanism: Badger, RocksDB, [Pebble](https://github.com/cockroachdb/pebble). Databases which don't provide such support or are not production ready: boltdb, leveldb, goleveldb, membdb, lmdb.
+### リレーショナルデータベース
 
-### RDBMS
+状態を保存するには、単純なKVの代わりにRDBMSを使用します。 RDBMSを使用するには、Cosmos SDK API( `KVStore`インターフェース)に大きな変更を加える必要があり、より優れたデータ抽出およびインデックス作成ソリューションを提供します。オブジェクトを1バイトのブロックとして保存する代わりに、上記のSMTで「hash(key、protobuf(object))」として状態ストレージレイヤーのテーブルにレコードとして保存できます。 RDBMSに登録されているオブジェクトがSMTに送信されたオブジェクトと同じであることを確認するには、RDBMSからオブジェクトをロードし、protobufを使用してマーシャリング、ハッシュ、およびSMT検索を実行する必要があります。
 
-Use of RDBMS instead of simple KV store for state. Use of RDBMS will require a Cosmos SDK API breaking change (`KVStore` interface) and will allow better data extraction and indexing solutions. Instead of saving an object as a single blob of bytes, we could save it as record in a table in the state storage layer, and as a `hash(key, protobuf(object))` in the SMT as outlined above. To verify that an object registered in RDBMS is same as the one committed to SMT, one will need to load it from RDBMS, marshal using protobuf, hash and do SMT search.
+### チェーン店
 
-### Off Chain Store
+モジュールを使用してデータベースをサポートできるユースケースについて説明していますが、データベースは自動的に送信されません。このモジュールは、堅牢なストレージモデルを使用する役割を果たし、__オブジェクトを保存せずにオブジェクトにコミットする_セクションで説明されている機能を使用することを選択できます。
 
-We were discussing use case where modules can use a support database, which is not automatically committed. Module will responsible for having a sound storage model and can optionally use the feature discussed in __Committing to an object without saving it_ section.
+## 参照する
 
-## References
-
-+ [IAVL What's Next?](https://github.com/cosmos/cosmos-sdk/issues/7100)
-+ [IAVL overview](https://docs.google.com/document/d/16Z_hW2rSAmoyMENO-RlAhQjAG3mSNKsQueMnKpmcBv0/edit#heading=h.yd2th7x3o1iv) of it's state v0.15
-+ [State commitments and storage report](https://paper.dropbox.com/published/State-commitments-and-storage-review--BDvA1MLwRtOx55KRihJ5xxLbBw-KeEB7eOd11pNrZvVtqUgL3h)
-+ [Celestia (LazyLedger) SMT](https://github.com/lazyledger/smt)
-+ Facebook Diem (Libra) SMT [design](https://developers.diem.com/papers/jellyfish-merkle-tree/2021-01-14.pdf)
-+ [Trillian Revocation Transparency](https://github.com/google/trillian/blob/master/docs/papers/RevocationTransparency.pdf), [Trillian Verifiable Data Structures](https://github.com/google/trillian/blob/master/docs/papers/VerifiableDataStructures.pdf).
-+ Design and implementation [discussion](https://github.com/cosmos/cosmos-sdk/discussions/8297).
-+ [How to Upgrade IBC Chains and their Clients](https://github.com/cosmos/ibc-go/blob/main/docs/ibc/upgrades/quick-guide.md)
-+ [ADR-40 Effect on IBC](https://github.com/cosmos/ibc-go/discussions/256)
++ [IAVL次は何ですか？ ](https://github.com/cosmos/cosmos-sdk/issues/7100)
++ [IAVLの概要](https://docs.google.com/document/d/16Z_hW2rSAmoyMENO-RlAhQjAG3mSNKsQueMnKpmcBv0/edit#heading=h.yd2th7x3o1iv)v0.15
++ [State Commitment and Storage Report](https://paper.dropbox.com/published/State-commitments-and-storage-review--BDvA1MLwRtOx55KRihJ5xxLbBw-KeEB7eOd11pNrZvVtqUgL3h)
++ [Celestia(LazyLedger)SMT](https://github.com/lazyledger/smt)
++ Facebook Diem(Libra)SMT [デザイン](https://developers.diem.com/papers/jellyfish-merkle-tree/2021-01-14.pdf)
++ [Trillian Revocation Transparency](https://github.com/google/trillian/blob/master/docs/papers/RevocationTransparency.pdf)、[Trillian Verizable Data Structure](https://github.com/google.trillian.blob/master/docs/papers/VerizableDataStructures.pdf)。
++設計と実装[ディスカッション](https://github.com/cosmos/cosmos-sdk/discussions/8297)。
++ [IBCチェーンとそのクライアントをアップグレードする方法](https://github.com/cosmos/ibc-go/blob/main/docs/ibc/upgrades/quick-guide.md)
++ [IBCに対するADR-40の影響](https://github.com/cosmos/ibc-go/discussions/256) 

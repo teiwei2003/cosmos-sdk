@@ -1,263 +1,262 @@
-# ADR 023: Protocol Buffer Naming and Versioning Conventions
+# ADR 023:プロトコルバッファの命名とバージョン規則
 
-## Changelog
+## 変更ログ
 
-- 2020 April 27: Initial Draft
-- 2020 August 5: Update guidelines
+-2020年4月27日:最初のドラフト
+-2020年8月5日:ガイドラインを更新
 
-## Status
+## 状態
 
-Accepted
+受け入れられました
 
-## Context
+## 環境
 
-Protocol Buffers provide a basic [style guide](https://developers.google.com/protocol-buffers/docs/style)
-and [Buf](https://buf.build/docs/style-guide) builds upon that. To the
-extent possible, we want to follow industry accepted guidelines and wisdom for
-the effective usage of protobuf, deviating from those only when there is clear
-rationale for our use case.
+Protocol Buffersは、基本的な[スタイルガイド](https://developers.google.com/protocol-buffers/docs/style)を提供します
+[Buf](https://buf.build/docs/style-guide)これに基づいています。到着
+可能な場合は、業界で認められたガイドラインと知恵に従うことを望んでいます
+protobufの効果的な使用は、明確な場合にのみそれらから逸脱します
+ユースケースの基本原則。
 
-### Adoption of `Any`
+### `Any`を採用する
 
-The adoption of `google.protobuf.Any` as the recommended approach for encoding
-interface types (as opposed to `oneof`) makes package naming a central part
-of the encoding as fully-qualified message names now appear in encoded
-messages.
+推奨されるエンコード方法として「google.protobuf.Any」を使用してください
+( `oneof`ではなく)インターフェースタイプにより、パッケージの命名がコア部分になります
+完全修飾としてエンコードされたメッセージの名前がエンコードに表示されるようになりました
+情報。
 
-### Current Directory Organization
+### 現在のディレクトリ編成
 
-Thus far we have mostly followed [Buf's](https://buf.build) [DEFAULT](https://buf.build/docs/lint-checkers#default)
-recommendations, with the minor deviation of disabling [`PACKAGE_DIRECTORY_MATCH`](https://buf.build/docs/lint-checkers#file_layout)
-which although being convenient for developing code comes with the warning
-from Buf that:
+これまでのところ、主に[Buf's](https://buf.build)[DEFAULT](https://buf.build/docs/lint-checkers#default)に従います。
+[`PACKAGE_DIRECTORY_MATCH`](https://buf.build/docs/lint-checkers#file_layout)の小さな偏差を無効にすることをお勧めします
+コードを開発するのは便利ですが、警告があります
+Bufから:
 
-> you will have a very bad time with many Protobuf plugins across various languages if you do not do this
+>そうしないと、さまざまな言語の多くのProtobufプラグインで非常に悪い時間を過ごすことになります
 
-### Adoption of gRPC Queries
+### gRPCを使用したクエリ
 
-In [ADR 021](adr-021-protobuf-query-encoding.md), gRPC was adopted for Protobuf
-native queries. The full gRPC service path thus becomes a key part of ABCI query
-path. In the future, gRPC queries may be allowed from within persistent scripts
-by technologies such as CosmWasm and these query routes would be stored within
-script binaries.
+[ADR 021](adr-021-protobuf-query-encoding.md)では、ProtobufはgRPCを使用します
+ローカルクエリ。したがって、完全なgRPCサービスパスはABCIクエリの重要な部分になっています
+トレイル。将来的には、gRPCクエリが永続的なスクリプトで許可される可能性があります
+CosmWasmなどのテクノロジーを通じて、これらのクエリルートは次の場所に保存されます。
+スクリプトバイナリファイル。
 
-## Decision
+## 決定
 
-The goal of this ADR is to provide thoughtful naming conventions that:
+このADRの目標は、思慮深い命名規則を提供することです。
 
-* encourage a good user experience for when users interact directly with
-.proto files and fully-qualified protobuf names
-* balance conciseness against the possibility of either over-optimizing (making
-names too short and cryptic) or under-optimizing (just accepting bloated names
-with lots of redundant information)
+*ユーザーが直接操作するときに優れたユーザーエクスペリエンスを促進する
+.protoファイルと完全修飾protobuf名
+*単純さと過度の最適化の可能性のバランスを取ります(
+名前が短すぎて不思議です)または最適化が不十分です(肥大化した名前のみが受け入れられます
+冗長な情報がたくさんあります)
 
-These guidelines are meant to act as a style guide for both the Cosmos SDK and
-third-party modules.
+これらのガイドは、CosmosSDKおよび
+サードパーティのモジュール。
 
-As a starting point, we should adopt all of the [DEFAULT](https://buf.build/docs/lint-checkers#default)
-checkers in [Buf's](https://buf.build) including [`PACKAGE_DIRECTORY_MATCH`](https://buf.build/docs/lint-checkers#file_layout),
-except:
+開始点として、すべての[DEFAULT](https://buf.build/docs/lint-checkers#default)を使用する必要があります
+[`PACKAGE_DIRECTORY_MATCH`](https://buf.build/docs/lint-checkers#file_layout)を含む[Buf's](https://buf.build)のチェッカー、
+の他に: 
 
 * [PACKAGE_VERSION_SUFFIX](https://buf.build/docs/lint-checkers#package_version_suffix)
 * [SERVICE_SUFFIX](https://buf.build/docs/lint-checkers#service_suffix)
 
-Further guidelines to be described below.
+さらなるガイダンスを以下に説明する。
 
-### Principles
+### 原則として
 
-#### Concise and Descriptive Names
+#### 簡潔でわかりやすい名前
 
-Names should be descriptive enough to convey their meaning and distinguish
-them from other names.
+名前は、その意味を伝え、区別するのに十分な説明的である必要があります
+彼らは他の名前から来ています。
 
-Given that we are using fully-qualifed names within
-`google.protobuf.Any` as well as within gRPC query routes, we should aim to
-keep names concise, without going overboard. The general rule of thumb should
-be if a shorter name would convey more or else the same thing, pick the shorter
-name.
+完全修飾名を使用したことを考えると
+`google.protobuf.Any`とgRPCクエリルーティングでは、私たちの目標は
+名前は簡潔に保ち、やりすぎないでください。一般的な経験則は
+短い名前がより多くのまたは同じことを伝える場合は、短い名前を選択してください
+名前。
 
-For instance, `cosmos.bank.MsgSend` (19 bytes) conveys roughly the same information
-as `cosmos_sdk.x.bank.v1.MsgSend` (28 bytes) but is more concise.
+たとえば、 `cosmos.bank.MsgSend`(19バイト)はほぼ同じ情報を伝達します
+`cosmos_sdk.x.bank.v1.MsgSend`(28バイト)などですが、より簡潔です。
 
-Such conciseness makes names both more pleasant to work with and take up less
-space within transactions and on the wire.
+この簡潔さにより、名前が使いやすくなり、使用量が少なくなります。
+取引とオンラインスペース。
 
-We should also resist the temptation to over-optimize, by making names
-cryptically short with abbreviations. For instance, we shouldn't try to
-reduce `cosmos.bank.MsgSend` to `csm.bk.MSnd` just to save a few bytes.
+また、名前を付けて過度に最適化する誘惑に抵抗する必要があります
+略語付きのミステリアスなショート。たとえば、試してはいけません
+`cosmos.bank.MsgSend`を` csm.bk.MSnd`に減らすことは、ほんの数バイトを節約することです。
 
-The goal is to make names **_concise but not cryptic_**.
+目標は、名前を** _簡潔に、しかし神秘的ではない_ **にすることです。 
 
-#### Names are for Clients First
+#### 名前はカスタマーサービス用です
 
-Package and type names should be chosen for the benefit of users, not
-necessarily because of legacy concerns related to the go code-base.
+パッケージとタイプの名前は、ユーザーの利益のために選択する必要があります。
+これは、goコードベースに関連するレガシーの問題が原因である必要があります。
 
-#### Plan for Longevity
+#### 長寿計画
 
-In the interests of long-term support, we should plan on the names we do
-choose to be in usage for a long time, so now is the opportunity to make
-the best choices for the future.
+長期的なサポートのために、私たちは私たちが作る名前を計画する必要があります
+長期使用を選択するので、今が作成する機会です
+将来のための最良の選択。
 
-### Versioning
+### バージョン管理
 
-#### Guidelines on Stable Package Versions
+#### 安定したパッケージバージョンガイド
 
-In general, schema evolution is the way to update protobuf schemas. That means that new fields,
-messages, and RPC methods are _added_ to existing schemas and old fields, messages and RPC methods
-are maintained as long as possible.
+一般的に、モードの進化は、protobufモードを更新する方法です。これは新しい分野を意味し、
+メッセージとRPCメソッドが既存のスキーマに追加され、古いフィールド、メッセージ、およびRPCメソッドが追加されます
+できるだけ長く保管してください。
 
-Breaking things is often unacceptable in a blockchain scenario. For instance, immutable smart contracts
-may depend on certain data schemas on the host chain. If the host chain breaks those schemas, the smart
-contract may be irreparably broken. Even when things can be fixed (for instance in client software),
-this often comes at a high cost.
+ブロックチェーンのシナリオでは、物事を壊すことは通常受け入れられません。たとえば、不変のスマートコントラクト
+ホストチェーンの特定のデータパターンに依存する場合があります。ホストチェーンがこれらのパターンを破った場合、スマート
+契約は不可逆的に破られる可能性があります。修正できる場合でも(たとえば、クライアントソフトウェアで)、
+これは通常、高い価格を必要とします。
 
-Instead of breaking things, we should make every effort to evolve schemas rather than just breaking them.
-[Buf](https://buf.build) breaking change detection should be used on all stable (non-alpha or beta) packages
-to prevent such breakage.
+物事を破壊するのではなく、単に破壊するのではなく、モデルを開発するためにできる限りのことをする必要があります。
+[Buf](https://buf.build)すべての安定した(非アルファまたはベータ)パッケージには、重大な変更の検出を使用する必要があります
+そのような損傷を防ぐため。
 
-With that in mind, different stable versions (i.e. `v1` or `v2`) of a package should more or less be considered
-different packages and this should be last resort approach for upgrading protobuf schemas. Scenarios where creating
-a `v2` may make sense are:
+これを念頭に置いて、パッケージのさまざまな安定したバージョン(つまり、 `v1`または` v2`)を多かれ少なかれ検討する必要があります
+さまざまなパッケージで、これがprotobufモードをアップグレードする最後の手段になるはずです。作成したシーン
+`v2`が意味をなすのは次のとおりです。
 
-* we want to create a new module with similar functionality to an existing module and adding `v2` is the most natural
-way to do this. In that case, there are really just two different, but similar modules with different APIs.
-* we want to add a new revamped API for an existing module and it's just too cumbersome to add it to the existing package,
-so putting it in `v2` is cleaner for users. In this case, care should be made to not deprecate support for
-`v1` if it is actively used in immutable smart contracts.
+*既存のモジュールと同様の機能を持つ新しいモジュールを作成したいので、 `v2`を追加するのが最も自然です
+これを行う方法。この場合、実際には、APIが異なる2つの異なるが類似したモジュールしかありません。
+*既存のモジュールに新しく改善されたAPIを追加したいのですが、既存のパッケージに追加するのは面倒です。
+したがって、 `v2`に入れる方がユーザーにとってよりクリーンです。この場合、の使用を放棄しないように注意する必要があります
+不変のスマートコントラクトで積極的に使用されている場合は `v1`。
 
-#### Guidelines on unstable (alpha and beta) package versions
+####不安定な(アルファおよびベータ)パッケージバージョンガイド
 
-The following guidelines are recommended for marking packages as alpha or beta:
+次のガイドラインに従って、パッケージをアルファまたはベータとしてマークすることをお勧めします。
 
-* marking something as `alpha` or `beta` should be a last resort and just putting something in the
-stable package (i.e. `v1` or `v2`) should be preferred
-* a package *should* be marked as `alpha` *if and only if* there are active discussions to remove
-or significantly alter the package in the near future
-* a package *should* be marked as `beta` *if and only if* there is an active discussion to
-significantly refactor/rework the functionality in the near future but not remove it
-* modules *can and should* have types in both stable (i.e. `v1` or `v2`) and unstable (`alpha` or `beta`) packages.
+*一部のコンテンツを `alpha`または` beta`としてマークすることは最後の手段であり、一部のコンテンツを
+安定したパッケージ(つまり、 `v1`または` v2`)を優先する必要があります
+*削除するアクティブなディスカッションがある場合にのみ、パッケージを「アルファ」としてマークする必要があります。
+または、近い将来、パッケージを大幅に変更します
+*活発な議論がある場合に限り、パッケージは「ベータ」としてマークされるべきです。
+近い将来、大幅にリファクタリング/再設計された機能ですが、削除されることはありません
+*モジュールは、安定した(つまり、 `v1`または` v2`)および不安定な( `alpha`または` beta`)パッケージタイプを持つことができます。
 
-*`alpha` and `beta` should not be used to avoid responsibility for maintaining compatibility.*
-Whenever code is released into the wild, especially on a blockchain, there is a high cost to changing things. In some
-cases, for instance with immutable smart contracts, a breaking change may be impossible to fix.
+*互換性を維持する責任を回避するために、 `alpha`と` beta`を使用しないでください。 *
+特にブロックチェーン上でコードが公開されるときはいつでも、物事を変更するコストは高くなります。いくつかの
+たとえば、不変のスマートコントラクトの場合、主要な変更は修復できない場合があります。
 
-When marking something as `alpha` or `beta`, maintainers should ask the questions:
+何かを「アルファ」または「ベータ」としてマークする場合、メンテナは次の質問をする必要があります。
 
-* what is the cost of asking others to change their code vs the benefit of us maintaining the optionality to change it?
-* what is the plan for moving this to `v1` and how will that affect users?
+*他の人にコードを変更するように依頼するコストと、コードを変更するオプションを維持することの利点は何ですか？
+*それを `v1`に移動する計画は何ですか？これはユーザーにどのように影響しますか？
 
-`alpha` or `beta` should really be used to communicate "changes are planned".
+`alpha`または` beta`は、実際には「計画された変更」を伝えるために使用する必要があります。
 
-As a case study, gRPC reflection is in the package `grpc.reflection.v1alpha`. It hasn't been changed since
-2017 and it is now used in other widely used software like gRPCurl. Some folks probably use it in production services
-and so if they actually went and changed the package to `grpc.reflection.v1`, some software would break and
-they probably don't want to do that... So now the `v1alpha` package is more or less the de-facto `v1`. Let's not do that.
+ケーススタディとして、gRPCリフレクションは `grpc.reflection.v1alpha`パッケージにあります。それ以来変わっていません
+2017年には、gRPCurlなどの他の広く使用されているソフトウェアで使用されるようになりました。一部の人々はそれを生産サービスで使用するかもしれません
+したがって、パッケージを `grpc.reflection.v1`に変更すると、一部のソフトウェアがクラッシュし、
+彼らはそれをしたくないかもしれません...それで今 `v1alpha`パッケージは多かれ少なかれ実際の` v1`です。そんなことはしないでください。
 
-The following are guidelines for working with non-stable packages:
+以下は、不安定なパッケージを使用するためのガイドです。
 
-* [Buf's recommended version suffix](https://buf.build/docs/lint-checkers#package_version_suffix)
-(ex. `v1alpha1`) _should_ be used for non-stable packages
-* non-stable packages should generally be excluded from breaking change detection
-* immutable smart contract modules (i.e. CosmWasm) _should_ block smart contracts/persistent
-scripts from interacting with `alpha`/`beta` packages
+* [Buf推奨バージョンのサフィックス](https://buf.build/docs/lint-checkers#package_version_suffix)
+(例: `v1alpha1`)は不安定なパッケージに使用する必要があります
+*不安定なパッケージは通常、破壊的な変更の検出から除外する必要があります
+*不変のスマートコントラクトモジュール(つまり、CosmWasm)_should_blockスマートコントラクト/永続的
+`alpha`.` beta`パッケージと相互作用するスクリプト
 
-#### Omit v1 suffix
+#### v1サフィックスを省略
 
-Instead of using [Buf's recommended version suffix](https://buf.build/docs/lint-checkers#package_version_suffix),
-we can omit `v1` for packages that don't actually have a second version. This
-allows for more concise names for common use cases like `cosmos.bank.Send`.
-Packages that do have a second or third version can indicate that with `.v2`
-or `.v3`.
+[Buf推奨バージョンサフィックス](https://buf.build/docs/lint-checkers#package_version_suffix)を使用する代わりに、
+実際に2番目のバージョンがないパッケージの場合、 `v1`を省略できます。この
+`cosmos.bank.Send`などの一般的なユースケースのより簡潔な名前を許可します。
+2番目または3番目のバージョンのパッケージは `.v2`で表すことができます
+または `.v3`。
 
-### Package Naming
+### パッケージの命名
 
-#### Adopt a short, unique top-level package name
+#### 短くて一意のトップレベルのパッケージ名を使用する
 
-Top-level packages should adopt a short name that is known to not collide with
-other names in common usage within the Cosmos ecosystem. In the near future, a
-registry should be created to reserve and index top-level package names used
-within the Cosmos ecosystem. Because the Cosmos SDK is intended to provide
-the top-level types for the Cosmos project, the top-level package name `cosmos`
-is recommended for usage within the Cosmos SDK instead of the longer `cosmos_sdk`.
-[ICS](https://github.com/cosmos/ics) specifications could consider a
-short top-level package like `ics23` based upon the standard number.
+トップレベルのパッケージでは、競合しないことがわかっている短い名前を使用する必要があります
+コスモスエコシステムで一般的に使用される他の名前。近い将来、
+使用される最上位のパッケージ名を保持および索引付けするために、レジストリを作成する必要があります
+コスモスエコシステム。 CosmosSDKが提供することを目的としているため
+Cosmosプロジェクトのトップレベルタイプ。トップレベルパッケージ名は `cosmos`です。
+長い `cosmos_sdk`の代わりに、CosmosSDKで使用することをお勧めします。
+[ICS](https://github.com/cosmos/ics)仕様は1つを考慮することができます
+`ics23`などの標準番号に基づく短いトップレベルパッケージ。
 
-#### Limit sub-package depth
+#### サブパッケージの深さを制限する
 
-Sub-package depth should be increased with caution. Generally a single
-sub-package is needed for a module or a library. Even though `x` or `modules`
-is used in source code to denote modules, this is often unnecessary for .proto
-files as modules are the primary thing sub-packages are used for. Only items which
-are known to be used infrequently should have deep sub-package depths.
+下請けの深さを増すように注意する必要があります。一般的にシングル
+モジュールまたはライブラリにはサブパッケージが必要です。 `x`または` modules`であっても
+ソースコードでモジュールを表すために使用されます。これは通常、.protoには不要です。
+モジュールとしてのファイルは、サブパッケージの主な目的です。それだけ
+使用頻度が低いことがわかっているものは、サブパッケージの深さを深くする必要があります。
 
-For the Cosmos SDK, it is recommended that that we simply write `cosmos.bank`,
-`cosmos.gov`, etc. rather than `cosmos.x.bank`. In practice, most non-module
-types can go straight in the `cosmos` package or we can introduce a
-`cosmos.base` package if needed. Note that this naming _will not_ change
-go package names, i.e. the `cosmos.bank` protobuf package will still live in
-`x/bank`.
+Cosmos SDKの場合、単に `cosmos.bank`と書くことをお勧めします。
+`cosmos.x.bank`の代わりに` cosmos.gov`など。実際には、ほとんどの非モジュール
+タイプは `cosmos`パッケージに直接配置することも、導入することもできます
+必要に応じて、 `cosmos.base`をパッケージ化します。この命名は変更されないことに注意してください
+goパッケージ名、つまり `cosmos.bank`protobufパッケージはまだ存在します
+`x .bank`。
 
-### Message Naming
+### メッセージの命名
 
-Message type names should be as concise possible without losing clarity. `sdk.Msg`
-types which are used in transactions will retain the `Msg` prefix as that provides
-helpful context.
+メッセージタイプの名前は、わかりやすくするためにできるだけ簡潔にする必要があります。 `sdk.Msg`
+トランザクションで使用されるタイプは、「Msg」プレフィックスを保持します。
+便利なコンテキスト。
 
-### Service and RPC Naming
+### サービスとRPCの命名
 
-[ADR 021](adr-021-protobuf-query-encoding.md) specifies that modules should
-implement a gRPC query service. We should consider the principle of conciseness
-for query service and RPC names as these may be called from persistent script
-modules such as CosmWasm. Also, users may use these query paths from tools like
-[gRPCurl](https://github.com/fullstorydev/grpcurl). As an example, we can shorten
-`/cosmos_sdk.x.bank.v1.QueryService/QueryBalance` to
-`/cosmos.bank.Query/Balance` without losing much useful information.
+[ADR 021](adr-021-protobuf-query-encoding.md)は、モジュールが
+gRPCクエリサービスを実現します。単純性の原則を考慮する必要があります
+永続的なスクリプトから呼び出すことができるため、サービス名とRPC名のクエリに使用されます
+CosmWasmおよびその他のモジュール。さらに、ユーザーは次のようなツールからこれらのクエリパスを使用できます。
+[gRPCurl](https://github.com/fullstorydev/grpcurl)。たとえば、短縮できます
+`.cosmos_sdk.x.bank.v1.QueryService .QueryBalance`から
+`.cosmos.bank.Query .Balance`は多くの有用な情報を失うことはありません。
 
-RPC request and response types _should_ follow the `ServiceNameMethodNameRequest`/
-`ServiceNameMethodNameResponse` naming convention. i.e. for an RPC method named `Balance`
-on the `Query` service, the request and response types would be `QueryBalanceRequest`
-and `QueryBalanceResponse`. This will be more self-explanatory than `BalanceRequest`
-and `BalanceResponse`.
+RPC要求および応答type_should_は `ServiceNameMethodNameRequest`.に従います
+`ServiceNameMethodNameResponse`の命名規則。つまり、「Balance」という名前のRPCメソッドの場合
+`Query`サービスでは、リクエストとレスポンスのタイプは` QueryBalanceRequest`になります
+そして `QueryBalanceResponse`。これは、BalanceRequestよりも自明です。
+そして「バランスの取れた反応」。
 
-#### Use just `Query` for the query service
+#### クエリサービスとしてのみ `Query`を使用する
 
-Instead of [Buf's default service suffix recommendation](https://github.com/cosmos/cosmos-sdk/pull/6033),
-we should simply use the shorter `Query` for query services.
+[Bufのデフォルトのサービスサフィックスの推奨事項](https://github.com/cosmos/cosmos-sdk/pull/6033)の代わりに、
+クエリサービスを提供するには、単に短い `Query`を使用する必要があります。
 
-For other types of gRPC services, we should consider sticking with Buf's
-default recommendation.
+他のタイプのgRPCサービスについては、Bufに固執することを検討する必要があります
+デフォルトで推奨されます。
 
-#### Omit `Get` and `Query` from query service RPC names
+#### クエリサービスのRPC名から `Get`と` Query`を省略します
 
-`Get` and `Query` should be omitted from `Query` service names because they are
-redundant in the fully-qualified name. For instance, `/cosmos.bank.Query/QueryBalance`
-just says `Query` twice without any new information.
+`Get`と` Query`は `Query`サービス名から省略されるべきです。
+完全修飾名では冗長です。たとえば、 `.cosmos.bank.Query .QueryBalance`
+新しい情報なしで、「クエリ」を2回言うだけです。
 
-## Future Improvements
+## 将来の改善
 
-A registry of top-level package names should be created to coordinate naming
-across the ecosystem, prevent collisions, and also help developers discover
-useful schemas. A simple starting point would be a git repository with
-community-based governance.
+ネーミングを調整するために、トップレベルのパッケージ名のレジストリを作成する必要があります
+クロスエコロジカルで、競合を防ぎ、開発者が発見するのを助けます
+便利なパターン。簡単な出発点はgitリポジトリです
+コミュニティベースのガバナンス。
+## 結果
 
-## Consequences
+### ポジティブ
 
-### Positive
+*名前はより簡潔で読みやすく入力しやすくなります
+* `Any`を使用するすべてのトランザクションが短縮されます(` _sdk.x`と `.v1`は削除されます)
+* `.proto`ファイルのインポートはより標準的になります(` "third_party .proto" `はありません
+道)
+* .protoファイルが
+単一の `proto.`ディレクトリでは、散在する代わりにコピーできます
+CosmosSDK全体
 
-* names will be more concise and easier to read and type
-* all transactions using `Any` will be at shorter (`_sdk.x` and `.v1` will be removed)
-* `.proto` file imports will be more standard (without `"third_party/proto"` in
-the path)
-* code generation will be easier for clients because .proto files will be
-in a single `proto/` directory which can be copied rather than scattered
-throughout the Cosmos SDK
+### ネガティブ
 
-### Negative
+### ニュートラル
 
-### Neutral
+* `.proto`ファイルを再編成して再構築する必要があります
+*一部のモジュールはアルファまたはベータとしてマークする必要がある場合があります
 
-* `.proto`  files will need to be reorganized and refactored
-* some modules may need to be marked as alpha or beta
-
-## References
+## 参照 

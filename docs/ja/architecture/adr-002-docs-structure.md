@@ -1,17 +1,17 @@
-# ADR 002: SDK Documentation Structure
+# ADR 002:SDKドキュメント構造
 
-## Context
+## 環境
 
-There is a need for a scalable structure of the Cosmos SDK documentation. Current documentation includes a lot of non-related Cosmos SDK material, is difficult to maintain and hard to follow as a user.
+CosmosSDKドキュメントの拡張可能な構造が必要です。 現在のドキュメントには、Cosmos SDKに関連しない多くの資料が含まれています。これらの資料は、保守が難しく、ユーザーとしてフォローするのが困難です。
 
-Ideally, we would have:
+理想的には、次のことを行う必要があります。
 
-- All docs related to dev frameworks or tools live in their respective github repos (sdk repo would contain sdk docs, hub repo would contain hub docs, lotion repo would contain lotion docs, etc.)
-- All other docs (faqs, whitepaper, high-level material about Cosmos) would live on the website.
+-開発フレームワークまたはツールに関連するすべてのドキュメントは、それぞれのgithubリポジトリにあります(sdkリポジトリにはsdkドキュメントが含まれ、ハブリポジトリにはハブドキュメントが含まれ、ローションリポジトリにはローションドキュメントが含まれます)。
+-他のすべてのドキュメント(FAQ、ホワイトペーパー、Cosmosに関する高度な資料)はWebサイトに保存されます。
 
-## Decision
+## 決定
 
-Re-structure the `/docs` folder of the Cosmos SDK github repo as follows:
+次のように、Cosmos SDKgithubリポジトリの `/docs`フォルダーを再構築します。 
 
 ```
 docs/
@@ -37,50 +37,50 @@ docs/
 └── architecture/
 ```
 
-The files in each sub-folders do not matter and will likely change. What matters is the sectioning:
+各サブフォルダー内のファイルは無関係であり、変更される可能性があります。重要なことはスライスすることです:
 
-- `README`: Landing page of the docs.
-- `intro`: Introductory material. Goal is to have a short explainer of the Cosmos SDK and then channel people to the resource they need. The [Cosmos SDK tutorial](https://github.com/cosmos/sdk-application-tutorial/) will be highlighted, as well as the `godocs`.
-- `concepts`: Contains high-level explanations of the abstractions of the Cosmos SDK. It does not contain specific code implementation and does not need to be updated often. **It is not an API specification of the interfaces**. API spec is the `godoc`.
-- `clients`: Contains specs and info about the various Cosmos SDK clients.
-- `spec`: Contains specs of modules, and others.
-- `modules`: Contains links to `godocs` and the spec of the modules.
-- `architecture`: Contains architecture-related docs like the present one.
-- `translations`: Contains different translations of the documentation.
+-`README`:ドキュメントのランディングページ。
+-`intro`:紹介資料。目標は、Cosmos SDKの簡単な説明をしてから、必要なリソースに人々を導くことです。 [Cosmos SDKチュートリアル](https://github.com/cosmos/sdk-application-tutorial/)と `godocs`が強調表示されます。
+-`concepts`:CosmosSDK抽象化の高レベルの説明が含まれています。特定のコード実装は含まれておらず、頻繁に更新する必要はありません。 **これはインターフェースのAPI仕様ではありません**。 API仕様は `godoc`です。
+-`clients`:さまざまなCosmosSDKクライアントに関する仕様と情報が含まれています。
+-`spec`:モジュール仕様などが含まれます。
+-`modules`: `godocs`とモジュール仕様へのリンクが含まれています。
+-`architecture`:現在のアーキテクチャに関連するドキュメントが含まれています。
+-`translations`:ドキュメントのさまざまな翻訳が含まれています。
 
-Website docs sidebar will only include the following sections:
+Webサイトのドキュメントのサイドバーには、次のセクションのみが含まれます。
 
-- `README`
-- `intro`
-- `concepts`
-- `clients`
+-`Readme`
+-`はじめに `
+-`コンセプト `
+-`顧客 `
 
-`architecture` need not be displayed on the website.
+「アーキテクチャ」をウェブサイトに表示する必要はありません。
 
-## Status
+## ステータス
 
-Accepted
+受け入れられました
 
-## Consequences
+## 結果
 
-### Positive
+### 目的
 
-- Much clearer organisation of the Cosmos SDK docs.
-- The `/docs` folder now only contains Cosmos SDK and gaia related material. Later, it will only contain Cosmos SDK related material.
-- Developers only have to update `/docs` folder when they open a PR (and not `/examples` for example).
-- Easier for developers to find what they need to update in the docs thanks to reworked architecture.
-- Cleaner vuepress build for website docs.
-- Will help build an executable doc (cf https://github.com/cosmos/cosmos-sdk/issues/2611)
+-CosmosSDKドキュメントの構成がより明確になりました。
+-`/docs`フォルダーには、CosmosSDKとgaia関連の資料のみが含まれるようになりました。後で、CosmosSDK関連の資料のみが含まれるようになります。
+-開発者は、PRを開くときに `/docs`フォルダを更新するだけで済みます(たとえば、`/examples`ではありません)。
+-再設計されたアーキテクチャのおかげで、開発者はドキュメントで更新する必要があるものを簡単に見つけることができます。
+-Webサイトドキュメント用のよりクリーンなvuepressビルド。
+-実行可能ドキュメントの作成に役立ちます(https://github.com/cosmos/cosmos-sdk/issues/2611を参照)
 
-### Neutral
+### ニュートラル
 
-- We need to move a bunch of deprecated stuff to `/_attic` folder.
-- We need to integrate content in `docs/sdk/docs/core` in `concepts`.
-- We need to move all the content that currently lives in `docs` and does not fit in new structure (like `lotion`, intro material, whitepaper) to the website repository.
-- Update `DOCS_README.md`
+-廃止されたものの束を `/_attic`フォルダに移動する必要があります。
+-`docs/sdk/docs/core`のコンテンツを `concepts`に統合する必要があります。
+-現在 `docs`に存在し、新しい構造に適していないすべてのもの(` lotion`、紹介資料、ホワイトペーパーなど)をWebサイトリポジトリに移動する必要があります。
+-`DOCS_README.md`を更新します
 
-## References
+## 参照する
 
-- https://github.com/cosmos/cosmos-sdk/issues/1460
-- https://github.com/cosmos/cosmos-sdk/pull/2695
-- https://github.com/cosmos/cosmos-sdk/issues/2611
+-https://github.com/cosmos/cosmos-sdk/issues/1460
+-https://github.com/cosmos/cosmos-sdk/pull/2695
+-https://github.com/cosmos/cosmos-sdk/issues/2611 

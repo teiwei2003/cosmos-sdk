@@ -1,6 +1,6 @@
-# Events
+# 事件
 
-The distribution module emits the following events:
+分发模块发出以下事件: 
 
 ## BeginBlocker
 

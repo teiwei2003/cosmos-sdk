@@ -1,30 +1,30 @@
-# Keepers
+# 守门员
 
-The bank module provides these exported keeper interfaces that can be
-passed to other modules that read or update account balances. Modules
-should use the least-permissive interface that provides the functionality they
-require.
+bank 模块提供了这些导出的 keeper 接口，可以
+传递给读取或更新帐户余额的其他模块。模块
+应该使用提供它们的功能的最少许可的接口
+要求。
 
-Best practices dictate careful review of `bank` module code to ensure that
-permissions are limited in the way that you expect.
+最佳实践要求仔细审查“银行”模块代码，以确保
+权限以您期望的方式受到限制。
 
-## Blocklisting Addresses
+## 屏蔽地址
 
-The `x/bank` module accepts a map of addresses that are considered blocklisted
-from directly and explicitly receiving funds through means such as `MsgSend` and
-`MsgMultiSend` and direct API calls like `SendCoinsFromModuleToAccount`.
+`x/bank` 模块接受被视为阻止列表的地址映射
+通过“MsgSend”等方式直接明确地接收资金，
+`MsgMultiSend` 和直接 API 调用，如 `SendCoinsFromModuleToAccount`。
 
-Typically, these addresses are module accounts. If these addresses receive funds
-outside the expected rules of the state machine, invariants are likely to be
-broken and could result in a halted network.
+通常，这些地址是模块帐户。如果这些地址收到资金
+在状态机的预期规则之外，不变量很可能是
+损坏并可能导致网络停止。
 
-By providing the `x/bank` module with a blocklisted set of addresses, an error occurs for the operation if a user or client attempts to directly or indirectly send funds to a blocklisted account, for example, by using [IBC](http://docs.cosmos.network/master/ibc/).
+通过为“x/bank”模块提供一组被屏蔽的地址，如果用户或客户试图直接或间接地将资金发送到被屏蔽的账户，例如，通过使用 [IBC](http: //docs.cosmos.network/master/ibc/)。
 
-## Common Types
+## 常见类型
 
-### Input
+### 输入
 
-An input of a multiparty transfer
+多方转移的输入 
 
 ```protobuf
 // Input models transaction input.
@@ -48,7 +48,7 @@ message Output {
 
 ## BaseKeeper
 
-The base keeper provides full-permission access: the ability to arbitrary modify any account's balance and mint or burn coins.
+Base keeper 提供完全权限访问:能够任意修改任何帐户的余额并铸造或燃烧硬币。 
 
 ```go
 // Keeper defines a module interface that facilitates the transfer of coins
@@ -83,8 +83,8 @@ type Keeper interface {
 
 ## SendKeeper
 
-The send keeper provides access to account balances and the ability to transfer coins between
-accounts. The send keeper does not alter the total supply (mint or burn coins).
+发送保管员提供对帐户余额的访问以及在之间转移硬币的能力
+帐户。 发送管理员不会改变总供应量(铸造或燃烧硬币)。 
 
 ```go
 // SendKeeper defines a module interface that facilitates the transfer of coins
@@ -107,7 +107,7 @@ type SendKeeper interface {
 
 ## ViewKeeper
 
-The view keeper provides read-only access to account balances. The view keeper does not have balance alteration functionality. All balance lookups are `O(1)`.
+视图管理器提供对帐户余额的只读访问。 视图保持器没有平衡更改功能。 所有余额查找都是“O(1)”。 
 
 ```go
 // ViewKeeper defines a module interface that facilitates read only access to

@@ -1,122 +1,121 @@
-# ADR 039: Epoched Staking
+# ADR 039:画期的な賭け
 
-## Changelog
+## 変更ログ
 
-- 10-Feb-2021: Initial Draft
+-2021年2月10日:最初のドラフト
 
-## Authors
+## 著者
 
-- Dev Ojha (@valardragon)
-- Sunny Aggarwal (@sunnya97)
+-Dev Ojha(@valardragon)
+-Sunny Aggarwal(@ sunya97)
 
-## Status
+## 状態
 
-Proposed
+提案
 
-## Abstract
+## 概要
 
-This ADR updates the proof of stake module to buffer the staking weight updates for a number of blocks before updating the consensus' staking weights. The length of the buffer is dubbed an epoch. The prior functionality of the staking module is then a special case of the abstracted module, with the epoch being set to 1 block.
+ADRは、コンセンサスエクイティウェイトを更新する前に、エクイティプルーフモジュールを更新して、複数のブロックのエクイティプルーフウェイトの更新をバッファリングします。バッファの長さはエポックと呼ばれます。ステーキングモジュールのアプリオリ機能は抽象モジュールの特殊なケースであり、エポックは1ブロックに設定されます。
 
-## Context
+## 環境
 
-The current proof of stake module takes the design decision to apply staking weight changes to the consensus engine immediately. This means that delegations and unbonds get applied immediately to the validator set. This decision was primarily done as it was implementationally simplest, and because we at the time believed that this would lead to better UX for clients.
+現在のエクイティプルーフモジュールは、設計上の決定を採用し、エクイティウェイトの変更をコンセンサスエンジンに即座に適用します。これは、委任とバインド解除がバリデーターセットにすぐに適用されることを意味します。この決定は主に、実装が最も簡単であり、顧客により良いユーザーエクスペリエンスをもたらすと信じていたためです。
 
-An alternative design choice is to allow buffering staking updates (delegations, unbonds, validators joining) for a number of blocks. This 'epoch'd proof of stake consensus provides the guarantee that the consensus weights for validators will not change mid-epoch, except in the event of a slash condition.
+別の設計オプションは、複数のブロック(委任、バインド解除、検証者の結合)の誓約更新のバッファリングを許可することです。この種の「エポック」エクイティコンセンサスプルーフは、スラッシュ条件がない限り、検証者のコンセンサスウェイトが中期的に変化しないことを保証します。
 
-Additionally, the UX hurdle may not be as significant as was previously thought. This is because it is possible to provide users immediate acknowledgement that their bond was recorded and will be executed.
+さらに、ユーザーエクスペリエンスの障壁は、以前考えられていたほど重要ではない場合があります。これは、ユーザーが自分の預金が記録され、実行されることをすぐに確認できるためです。
 
-Furthermore, it has become clearer over time that immediate execution of staking events comes with limitations, such as:
+さらに、時間の経過とともに、次のようなステーキングイベントの即時実行の制限がますます明白になっています。
 
-* Threshold based cryptography. One of the main limitations is that because the validator set can change so regularly, it makes the running of multiparty computation by a fixed validator set difficult. Many threshold-based cryptographic features for blockchains such as randomness beacons and threshold decryption require a computationally-expensive DKG process (will take much longer than 1 block to create). To productively use these, we need to guarantee that the result of the DKG will be used for a reasonably long time. It wouldn't be feasible to rerun the DKG every block. By epoching staking, it guarantees we'll only need to run a new DKG once every epoch.
+*しきい値に基づく暗号化。主な制限の1つは、バリデーターセットを定期的に変更できるため、固定のバリデーターセットからマルチパーティ計算を実行することが困難になることです。ランダムビーコンやしきい値復号化など、ブロックチェーンの多くのしきい値ベースの暗号化機能には、計算コストの高いDKGプロセスが必要です(作成時間は1ブロックの作成よりもはるかに長くなります)。これらを有効に活用するためには、DKGの成果を長期にわたって活用していく必要があります。ブロックごとにDKGを再実行することはできません。エポックステーキングにより、エポックごとに1回だけ新しいDKGを実行する必要があることが保証されます。
 
-* Light client efficiency. This would lessen the overhead for IBC when there is high churn in the validator set. In the Tendermint light client bisection algorithm, the number of headers you need to verify is related to bounding the difference in validator sets between a trusted header and the latest header. If the difference is too great, you verify more header in between the two. By limiting the frequency of validator set changes, we can reduce the worst case size of IBC lite client proofs, which occurs when a validator set has high churn.
+*軽いクライアント効率。これにより、バリデーターセットに大量のチャーンがある場合のIBCのオーバーヘッドが削減されます。 Tendermint lightクライアントの二分法アルゴリズムでは、検証する必要のあるヘッダーの数は、信頼できるヘッダーと最新のヘッダーの間のバリデーターセットの差の制限に関連しています。差が大きすぎる場合は、2つの間のヘッダーをさらに確認してください。バリデーターセットへの変更の頻度を制限することにより、バリデーターセットの解約率が高い場合に発生するIBCliteクライアントアテステーションのワーストケースサイズを減らすことができます。
 
-* Fairness of deterministic leader election. Currently we have no ways of reasoning of fairness of deterministic leader election in the presence of staking changes without epochs (tendermint/spec#217). Breaking fairness of leader election is profitable for validators, as they earn additional rewards from being the proposer. Adding epochs at least makes it easier for our deterministic leader election to match something we can prove secure. (Albeit, we still haven’t proven if our current algorithm is fair with > 2 validators in the presence of stake changes)
+*リーダー選挙の公平性について決定論的。現在、エポックなしで決定論的リーダー選挙の公平性について推論する方法はありません(tendermint .spec#217)。リーダー選挙の公平性を破ることは、提案者になることで追加の報酬を得ることができるため、バリデーターにとって有益です。エポックを追加すると、少なくとも、決定論的なリーダー選挙が安全であると証明できるものと一致することが容易になります。 (それでも、現在のアルゴリズムが、エクイティの変更が存在する場合に2つを超えるバリデーターに対して公平であるかどうかはまだ証明されていません)
 
-* Staking derivative design. Currently, reward distribution is done lazily using the F1 fee distribution. While saving computational complexity, lazy accounting requires a more stateful staking implementation. Right now, each delegation entry has to track the time of last withdrawal. Handling this can be a challenge for some staking derivatives designs that seek to provide fungibility for all tokens staked to a single validator. Force-withdrawing rewards to users can help solve this, however it is infeasible to force-withdraw rewards to users on a per block basis. With epochs, a chain could more easily alter the design to have rewards be forcefully withdrawn (iterating over delegator accounts only once per-epoch), and can thus remove delegation timing from state. This may be useful for certain staking derivative designs.
+*ステーキングデリバティブデザイン。現在、F1料金の分配を使用して報酬の分配が遅れています。計算の複雑さを軽減する一方で、怠惰な簿記には、よりステートフルなステーキングの実装が必要です。ここで、各委任エントリは、最後の撤回の時刻を追跡する必要があります。この問題に対処することは、単一のバリデーターに誓約されたすべてのトークンに代替可能性を提供しようとする一部の誓約派生設計にとっては課題となる可能性があります。ユーザーに報酬の撤回を強制することはこの問題の解決に役立ちますが、ブロックごとにユーザーへの報酬を強制的に撤回することは現実的ではありません。エポックを使用すると、チェーンはより簡単にデザインを変更して報酬の撤回を強制でき(各エポックはプリンシパルアカウントを1回だけ繰り返す)、コミッション時間を州から削除できます。これは、特定の住宅ローンのデリバティブの設計に役立つ場合があります。 
 
-## Design considerations
+## 設計上の考慮事項
 
-### Slashing
+### スラッシュ
 
-There is a design consideration for whether to apply a slash immediately or at the end of an epoch. A slash event should apply to only members who are actually staked during the time of the infraction, namely during the epoch the slash event occured.
+スラッシュをすぐに適用するか、エポックの最後に適用するかについては、設計上の考慮事項があります。スラッシュイベントは、違反期間中、つまりスラッシュイベントが発生した期間中に実際に賭けたメンバーにのみ適用する必要があります。
 
-Applying it immediately can be viewed as offering greater consensus layer security, at potential costs to the aforementioned usecases. The benefits of immediate slashing for consensus layer security can be all be obtained by executing the validator jailing immediately (thus removing it from the validator set), and delaying the actual slash change to the validator's weight until the epoch boundary. For the use cases mentioned above, workarounds can be integrated to avoid problems, as follows:
+すぐに適用すると、より高いコンセンサスレイヤーのセキュリティが提供されると見なすことができますが、上記のユースケースには潜在的なコストがかかります。コンセンサスレイヤーのセキュリティを即座に削減するメリットは、バリデーター刑務所をすぐに実行し(したがって、バリデーターセットから削除し)、検証権の変更の実際の削減をエポック境界まで遅らせることで得られます。上記のユースケースでは、以下に示すように、問題を回避するために回避策を統合できます。
 
-- For threshold based cryptography, this setting will have the threshold cryptography use the original epoch weights, while consensus has an update that lets it more rapidly benefit from additional security. If the threshold based cryptography blocks liveness of the chain, then we have effectively raised the liveness threshold of the remaining validators for the rest of the epoch. (Alternatively, jailed nodes could still contribute shares) This plan will fail in the extreme case that more than 1/3rd of the validators have been jailed within a single epoch. For such an extreme scenario, the chain already have its own custom incident response plan, and defining how to handle the threshold cryptography should be a part of that.
-- For light client efficiency, there can be a bit included in the header indicating an intra-epoch slash (ala https://github.com/tendermint/spec/issues/199).
-- For fairness of deterministic leader election, applying a slash or jailing within an epoch would break the guarantee we were seeking to provide. This then re-introduces a new (but significantly simpler) problem for trying to provide fairness guarantees. Namely, that validators can adversarially elect to remove themself from the set of proposers. From a security perspective, this could potentially be handled by two different mechanisms (or prove to still be too difficult to achieve). One is making a security statement acknowledging the ability for an adversary to force an ahead-of-time fixed threshold of users to drop out of the proposer set within an epoch. The second method would be to  parameterize such that the cost of a slash within the epoch far outweights benefits due to being a proposer. However, this latter criterion is quite dubious, since being a proposer can have many advantageous side-effects in chains with complex state machines. (Namely, DeFi games such as Fomo3D)
-- For staking derivative design, there is no issue introduced. This does not increase the state size of staking records, since whether a slash has occured is fully queryable given the validator address.
+-しきい値ベースの暗号化の場合、この設定により、しきい値暗号化で元の時代の重みを使用できるようになり、コンセンサスを更新して、追加のセキュリティをより迅速に活用できるようにする必要があります。しきい値ベースの暗号化によってチェーンの活性が妨げられる場合は、残りのバリデーターの活性しきい値を効果的に引き上げています。 (あるいは、投獄されたノードは引き続きシェアを提供できます)極端な場合、計画は失敗します。つまり、バリデーターの3分の1以上が単一のエポック内に投獄されます。この極端なケースでは、チェーンにはすでに独自のカスタムインシデント対応計画があり、しきい値パスワードの処理方法を定義することもその一部である必要があります。
+-ライトクライアントの効率を高めるために、ヘッダーには、ピリオド内のスラッシュを示すポイントを含めることができます(ala https://github.com/tendermint/spec/issues/199)。
+-リーダー選挙の公平性を判断するために、エポック内でスラッシュまたは投獄を適用すると、私たちが提供しようとしている保証が損なわれます。次に、これにより、公平性の保証を提供するための新しい(ただし明らかに単純な)問題が再導入されます。言い換えれば、検証者は、敵対的に提案者のセットから自分自身を削除することを選択できます。セキュリティの観点から、これは2つの異なるメカニズムを介して処理される可能性があります(または、達成するのが依然として困難であることが判明する可能性があります)。 1つは、セキュリティステートメントを作成し、攻撃者がユーザーに事前に固定しきい値を設定して、一定期間内に設定された提案者から撤退するように強制する能力があることを認めることです。 2番目の方法はパラメーター化です。これは提案者であるため、エポックでのスラッシュのコストはメリットをはるかに上回ります。ただし、後者の基準は非常に疑わしいものです。複雑なステートマシンを備えたチェーンでは、提案者になることで多くの有益な副作用が発生する可能性があるためです。 (つまり、Fomo3DなどのDeFiゲーム)
+-問題を引き起こさないステーキングの派生設計。バリデーターアドレスが与えられると、スラッシュが発生するかどうかは完全に照会可能であるため、これによってステーキングレコードの状態サイズが大きくなることはありません。
+### トークンのロックアップ
 
-### Token lockup
+誰かが委託取引を行う場合、すぐに誓約されていなくても、トークンは誓約モジュールによって管理されるプールに転送され、期間の終わりに使用される必要があります。これにより、トークンがどこにステーキングされているかを心配し、それらがステーキングに割り当てられていることに気付かずにこれらのトークンを使用して、ステーキングトランザクションが失敗するのを防ぐことができます。
 
-When someone makes a transaction to delegate, even though they are not immediately staked, their tokens should be moved into a pool managed by the staking module which will then be used at the end of an epoch. This prevents concerns where they stake, and then spend those tokens not realizing they were already allocated for staking, and thus having their staking tx fail.
+### エポックのパイプライン化
 
-### Pipelining the epochs
+特にしきい値ベースの暗号化では、エポック変更のためのパイプラインが必要です。これは、エポックNにいるときに、バリデーターセットがそれに応じてDKGを実行できるように、エポックN +1の重みを固定する必要があるためです。したがって、現在N番目の期間にいる場合は、N + 1番目の期間のエクイティウェイトを固定し、新しいエクイティの変更をN +2番目の期間に適用する必要があります。
 
-For threshold based cryptography in particular, we need a pipeline for epoch changes. This is because when we are in epoch N, we want the epoch N+1 weights to be fixed so that the validator set can do the DKG accordingly. So if we are currently in epoch N, the stake weights for epoch N+1 should already be fixed, and new stake changes should be getting applied to epoch N + 2.
+これは、エポックパイプの長さのパラメータを設定することで処理できます。ハードフォーク中を除いて、パイプラインの長さの切り替えの複雑さを軽減するために、このパラメーターを変更しないでください。
 
-This can be handled by making a parameter for the epoch pipeline length. This parameter should not be alterable except during hard forks, to mitigate implementation complexity of switching the pipeline length.
+パイプの長さが1の場合、エポックNの間に再割り当てすると、エポックN +1の開始前に再割り当てが適用されます。
+パイプラインの長さが2の場合、N番目の期間に再割り当てすると、N +2番目の期間が開始する前に再委任が適用されます。
 
-With pipeline length 1, if I redelegate during epoch N, then my redelegation is applied prior to the beginning of epoch N+1.
-With pipeline length 2, if I redelegate during epoch N, then my redelegation is applied prior to the beginning of epoch N+2.
+### 賞
 
-### Rewards
+すべてのステーキングの更新がエポック境界に適用された場合でも、報酬が請求されるとすぐに配布できます。これは、報酬の自動バインドを実現していないため、現在のエクイティウェイトに影響を与えないためです。このような関数を実装する場合は、報酬がエポック境界に自動的にバインドされるように設定する必要があります。
 
-Even though all staking updates are applied at epoch boundaries, rewards can still be distributed immediately when they are claimed. This is because they do not affect the current stake weights, as we do not implement auto-bonding of rewards. If such a feature were to be implemented, it would have to be setup so that rewards are auto-bonded at the epoch boundary.
+### パラメータ化されたエポック長
 
-### Parameterizing the epoch length
+エポックの長さを選択するときは、キューイングステータス/計算構造を比較検討し、前述の即時実行制限を相殺する必要があります(特定のチェーンに適用される場合)。
 
-When choosing the epoch length, there is a trade-off queued state/computation buildup, and countering the previously discussed limitations of immediate execution if they apply to a given chain.
+可変ブロック時間ABCIメカニズムが導入される前は、計算の累積のために高い期間長を使用することは賢明ではありませんでした。これは、ブロックの実行時間がTendermintの予想ブロック時間よりも長い場合、ラウンドが増加する可能性があるためです。
 
-Until an ABCI mechanism for variable block times is introduced, it is ill-advised to be using high epoch lengths due to the computation buildup. This is because when a block's execution time is greater than the expected block time from Tendermint, rounds may increment.
+## 決定
 
-## Decision
+__Step-1__:すべての誓約とカットメッセージのバッファーを実現します。
 
-__Step-1__:  Implement buffering of all staking and slashing messages.
+まず、バインドされているトークンを格納するためのプールを作成しますが、これは「EpochDelegationPool」と呼ばれるエポック境界で適用する必要があります。次に、2つの別々のキューがあります。1つはステーキング用で、もう1つはスラッシュ用です。各メッセージが配信されたときに何が起こるかを以下に説明します。
 
-First we create a pool for storing tokens that are being bonded, but should be applied at the epoch boundary called the `EpochDelegationPool`. Then, we have two separate queues, one for staking, one for slashing. We describe what happens on each message being delivered below:
+###誓約ニュース
 
-### Staking messages
+-** MsgCreateValidator **:ユーザーのセルフバインディングをすぐに `EpochDelegationPool`に移動します。 「EpochDelegationPool」から資金を取得して、自己拘束を処理するためのエポック境界のメッセージをキューに入れます。エポックの実行が失敗した場合、資金はエポックデレゲーションプールからユーザーのアカウントに返還されます。
+-** MsgEditValidator **:メッセージを検証します。有効な場合は、エポックの最後に実行するためにメッセージをキューに入れます。
+-** MsgDelegate **:ユーザーの資金をすぐに `EpochDelegationPool`に送金します。委任を処理するためのエポック境界のメッセージをキューに入れ、「EpochDelegationPool」から資金を取得します。エポックの実行が失敗した場合、資金はエポックデレゲーションプールからユーザーのアカウントに返還されます。
+-** MsgBeginRedelegate **:メッセージを確認します。有効な場合は、エポックの最後に実行するためにメッセージをキューに入れます。
+-** MsgUndelegate **:メッセージを確認します。有効な場合は、エポックの最後に実行するためにメッセージをキューに入れます。 
 
-- **MsgCreateValidator**: Move user's self-bond to `EpochDelegationPool` immediately. Queue a message for the epoch boundary to handle the self-bond, taking the funds from the `EpochDelegationPool`. If Epoch execution fail, return back funds from `EpochDelegationPool` to user's account.
-- **MsgEditValidator**: Validate message and if valid queue the message for execution at the end of the Epoch.
-- **MsgDelegate**: Move user's funds to `EpochDelegationPool` immediately. Queue a message for the epoch boundary to handle the delegation, taking the funds from the `EpochDelegationPool`. If Epoch execution fail, return back funds from `EpochDelegationPool` to user's account.
-- **MsgBeginRedelegate**: Validate message and if valid queue the message for execution at the end of the Epoch.
-- **MsgUndelegate**: Validate message and if valid queue the message for execution at the end of the Epoch.
+### メッセージをカット
 
-### Slashing messages
+-** MsgUnjail **:メッセージを確認します。有効な場合は、エポックの最後に実行するためにメッセージをキューに入れます。
+-**スラッシュイベント**:スラッシュイベントが作成されるたびに、エポックの最後に適用されるスラッシュモジュールのキューに入れられます。このスラッシュがすぐに適用されるように、キューを設定する必要があります。
 
-- **MsgUnjail**: Validate message and if valid queue the message for execution at the end of the Epoch.
-- **Slash Event**: Whenever a slash event is created, it gets queued in the slashing module to apply at the end of the epoch. The queues should be setup such that this slash applies immediately.
+### 証拠メッセージ
 
-### Evidence Messages
+-** MsgSubmitEvidence **:すぐに実行すると、バリデーターはすぐに投獄されます。ただし、スラッシュでは、実際のスラッシュイベントがキューに入れられます。
 
-- **MsgSubmitEvidence**: This gets executed immediately, and the validator gets jailed immediately. However in slashing, the actual slash event gets queued.
+次に、エンドブロッカーにメソッドを追加して、キューがエポック境界でクリアされ、委任された更新が適用されるようにします。
 
-Then we add methods to the end blockers, to ensure that at the epoch boundary the queues are cleared and delegation updates are applied.
+__Step-2__:キューに入れられた誓約トランザクションのクエリを実現します。
 
-__Step-2__: Implement querying of queued staking txs.
+特定のアドレスの誓約アクティビティを照会する場合、ステータスは、誓約されたトークンの数を返すだけでなく、そのアドレスでキューに入れられた誓約イベントがあるかどうかも返す必要があります。これには、キューに入れられる今後のステーキングイベントを追跡するために、クエリロジックでより多くの作業が必要になります。
 
-When querying the staking activity of a given address, the status should return not only the amount of tokens staked, but also if there are any queued stake events for that address. This will require more work to be done in the querying logic, to trace the queued upcoming staking events.
+最初の実装として、これは、キューに入れられたすべての住宅ローンイベントの線形検索として実装できます。ただし、長いエポックを必要とするチェーンの場合、一定時間で結果を生成できるように、最終的にはクエリをサポートするノードの追加サポートを構築する必要があります。 (これは、アドレスごとに今後のステーキングイベントにインデックスを付けるための補助ハッシュグラフを維持することで実現できます)
 
-As an initial implementation, this can be implemented as a linear search over all queued staking events. However, for chains that need long epochs, they should eventually build additional support for nodes that support querying to be able to produce results in constant time. (This is do-able by maintaining an auxilliary hashmap for indexing upcoming staking events by address)
+__ステップ-3__:ガスを調整します
 
-__Step-3__: Adjust gas
+現在、ガスは、トランザクションがすぐに完了したときにトランザクションを実行するためのコストを表します。 (p2pコスト、状態アクセスコスト、および計算コストのコストを組み合わせます)ただし、現在、トランザクションは、将来のブロック、つまりエポック境界で計算を引き起こす可能性があります。
 
-Currently gas represents the cost of executing a transaction when its done immediately. (Merging together costs of p2p overhead, state access overhead, and computational overhead) However, now a transaction can cause computation in a future block, namely at the epoch boundary.
+この問題を解決するには、最初に将来の計算量(ガスでの価格設定)を見積もるためのパラメーターを含め、メッセージの固定料金として追加する必要があります。
+ガス価格の将来の計算と現在の計算の重み付け方法の範囲から除外し、現在の重みと等しくなるように設定します。
 
-To handle this, we should initially include parameters for estimating the amount of future computation (denominated in gas), and add that as a flat charge needed for the message.
-We leave it as out of scope for how to weight future computation versus current computation in gas pricing, and have it set such that the are weighted equally for now.
+## 結果
 
-## Consequences
+### ポジティブ
 
-### Positive
+*既存の機能の保持を可能にするプルーフオブステークモジュールを抽象化しました
+*バリデーターセットに基づくしきい値暗号化などの新機能を有効にする
 
-* Abstracts the proof of stake module that allows retaining the existing functionality
-* Enables new features such as validator-set based threshold cryptography
+### ネガティブ
 
-### Negative
-
-* Increases complexity of integrating more complex gas pricing mechanisms, as they now have to consider future execution costs as well.
-* When epoch > 1, validators can no longer leave the network immediately, and must wait until an epoch boundary.
+*将来の実行コストも考慮する必要があるため、より複雑なガス価格設定メカニズムの統合の複雑さが増しました。
+*エポック> 1の場合、ベリファイアはネットワークをすぐに離れることができなくなり、エポック境界まで待機する必要があります。 

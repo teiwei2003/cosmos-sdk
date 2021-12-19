@@ -1,4 +1,4 @@
-# Events
+# 事件
 
-The `x/upgrade` does not emit any events by itself. Any and all proposal related
-events are emitted through the `x/gov` module.
+`x/upgrade` 本身不会发出任何事件。 任何和所有提案相关
+事件通过 `x/gov` 模块发出。 

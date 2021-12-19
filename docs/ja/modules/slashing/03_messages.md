@@ -1,11 +1,11 @@
-# Messages
+# 消息
 
-In this section we describe the processing of messages for the `slashing` module.
+在本节中，我们描述了 `slashing` 模块的消息处理。
 
-## Unjail
+## 出狱
 
-If a validator was automatically unbonded due to downtime and wishes to come back online &
-possibly rejoin the bonded set, it must send `MsgUnjail`:
+如果验证器因停机而自动解除绑定并希望重新上线&
+可能重新加入绑定集，它必须发送`MsgUnjail`:
 
 ```protobuf
 // MsgUnjail is an sdk.Msg used for unjailing a jailed validator, thus returning
@@ -16,7 +16,7 @@ message MsgUnjail {
 }
 ```
 
-Below is a pseudocode of the `MsgSrv/Unjail` RPC:
+下面是 `MsgSrv/Unjail` RPC 的伪代码: 
 
 ```
 unjail(tx MsgUnjail)
@@ -42,6 +42,6 @@ unjail(tx MsgUnjail)
     return
 ```
 
-If the validator has enough stake to be in the top `n = MaximumBondedValidators`, it will be automatically rebonded,
-and all delegators still delegated to the validator will be rebonded and begin to again collect
-provisions and rewards.
+如果验证者有足够的股份进入顶部`n = MaximumBondedValidators`，它将自动重新绑定，
+并且所有仍然委托给验证者的委托人将被重新绑定并开始再次收集
+规定和奖励。 

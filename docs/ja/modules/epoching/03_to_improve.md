@@ -1,19 +1,19 @@
-# Changes to make
+# 要进行的更改
 
-## Validator self-unbonding (which exceed minimum self delegation) could be required to start instantly
+## 验证者自解绑(超过最小自委派)可能需要立即启动
 
-Cases that trigger unbonding process
+触发解绑过程的案例
 
-- Validator undelegate can unbond more tokens than his minimum_self_delegation and it will automatically turn the validator into unbonding
-In this case, unbonding should start instantly.
-- Validator miss blocks and get slashed
-- Validator get slashed for double sign
+- 验证人 undelegate 可以解除绑定比他的 minimum_self_delegation 多的代币，它会自动将验证人变为解除绑定状态
+在这种情况下，应立即开始解绑。
+- 验证器错过块并被削减
+- 验证器因双重签名而被削减
 
-**Note:** When a validator begins the unbonding process, it could be required to turn the validator into unbonding state instantly.
-  This is different than a specific delegator beginning to unbond. A validator beginning to unbond means that it's not in the set any more.
-  A delegator unbonding from a validator removes their delegation from the validator.
+**注意:** 当验证者开始解绑过程时，可能需要立即将验证器转为解绑状态。
+   这与开始解除绑定的特定委托人不同。 开始解除绑定的验证器意味着它不再在集合中。
+   与验证者解除绑定的委托人会将其委托从验证者中移除。
 
-## Pending development
+## 待开发 
 
 ```go
 // Changes to make

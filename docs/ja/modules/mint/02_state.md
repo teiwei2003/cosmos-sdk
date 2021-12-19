@@ -1,17 +1,17 @@
-# State
+# 状态
 
-## Minter
+##铸币厂
 
-The minter is a space for holding current inflation information.
+铸币厂是保存当前通货膨胀信息的空间。
 
-- Minter: `0x00 -> ProtocolBuffer(minter)`
+- 铸币厂:`0x00 -> ProtocolBuffer(铸币厂)`
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc7/proto/cosmos/mint/v1beta1/mint.proto#L8-L19
 
-## Params
+## 参数
 
-Minting params are held in the global params store.
+铸造参数保存在全局参数存储中。
 
-- Params: `mint/params -> legacy_amino(params)`
+- 参数:`mint/params -> legacy_amino(params)`
 
-+++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc7/proto/cosmos/mint/v1beta1/mint.proto#L21-L53
++++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc7/proto/cosmos/mint/v1beta1/mint.proto#L21-L53 

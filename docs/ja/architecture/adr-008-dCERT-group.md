@@ -1,171 +1,171 @@
-# ADR 008: Decentralized Computer Emergency Response Team (dCERT) Group
+# ADR 008:分散コンピューター緊急対応チーム(dCERT)チーム
 
-## Changelog
+## 変更ログ
 
-- 2019 Jul 31: Initial Draft
+-2019年7月31日:最初のドラフト
 
-## Context
+## 環境
 
-In order to reduce the number of parties involved with handling sensitive
-information in an emergency scenario, we propose the creation of a
-specialization group named The Decentralized Computer Emergency Response Team
-(dCERT).  Initially this group's role is intended to serve as coordinators
-between various actors within a blockchain community such as validators,
-bug-hunters, and developers.  During a time of crisis, the dCERT group would
-aggregate and relay input from a variety of stakeholders to the developers who
-are actively devising a patch to the software, this way sensitive information
-does not need to be publicly disclosed while some input from the community can
-still be gained.
+機密情報の取り扱いに関与する当事者の数を減らすため
+緊急情報の場合は、作成することをお勧めします
+分散型コンピュータ緊急対応チームと呼ばれる専門チーム
+(dCERT)。当初、このグループの役割はコーディネーターとしてでした。
+バリデーターなど、ブロックチェーンコミュニティのさまざまな参加者間
+脆弱性ハンターと開発者。危機の時には、dCERTチームは
+さまざまな利害関係者の意見を収集して開発者に転送する
+ソフトウェアのパッチを積極的に設計しているため、機密情報
+公開する必要はなく、コミュニティからの意見によっては
+まだ利益があります。
 
-Additionally, a special privilege is proposed for the dCERT group: the capacity
-to "circuit-break" (aka. temporarily disable)  a particular message path. Note
-that this privilege should be enabled/disabled globally with a governance
-parameter such that this privilege could start disabled and later be enabled
-through a parameter change proposal, once a dCERT group has been established.
+さらに、dCERTグループに特別な特権が提案されました:容量
+特定のメッセージパスを「中断」(別名、一時的に無効)します。ノート
+この特権は、ガバナンスを通じてグローバルに有効化/無効化する必要があります
+この権限を無効にして後で有効にできるようにするためのパラメータ
+dCERTグループが確立された後、パラメータを変更することが提案されます。
 
-In the future it is foreseeable that the community may wish to expand the roles
-of dCERT with further responsibilities such as the capacity to "pre-approve" a
-security update on behalf of the community prior to a full community
-wide vote whereby the sensitive information would be revealed prior to a
-vulnerability being patched on the live network.  
+コミュニティが将来的に役割を拡大したいと思うかもしれないことは予見可能です
+「事前承認」などのdCERTの責任
+完全なコミュニティの前に、コミュニティに代わってセキュリティ更新を実行します
+その前に、広範な投票、機密情報が開示されます
+リアルタイムネットワークの脆弱性にパッチが適用されています。
 
-## Decision
+## 決定
 
-The dCERT group is proposed to include an implementation of a `SpecializationGroup`
-as defined in [ADR 007](./adr-007-specialization-groups.md). This will include the
-implementation of:
+dCERTグループに「SpecializationGroup」の実装を含めることをお勧めします
+[ADR 007](./adr-007-specialization-groups.md)で定義されています。これには以下が含まれます
+実装:
 
-- continuous voting
-- slashing due to breach of soft contract
-- revoking a member due to breach of soft contract
-- emergency disband of the entire dCERT group (ex. for colluding maliciously)
-- compensation stipend from the community pool or other means decided by
-   governance
+-継続的な投票
+-ソフト契約違反のために削減
+-ソフト契約違反による会員資格の取り消し
+-dCERTチーム全体を緊急に解散する(悪意のある共謀など)
+-コミュニティプールまたは他の方法から決定された補償手当
+   ガバナンス
 
-This system necessitates the following new parameters:
+システムには、次の新しいパラメータが必要です。
 
-- blockly stipend allowance per dCERT member
-- maximum number of dCERT members
-- required staked slashable tokens for each dCERT member
-- quorum for suspending a particular member
-- proposal wager for disbanding the dCERT group
-- stabilization period for dCERT member transition
-- circuit break dCERT privileges enabled
+-各dCERTメンバーの通常の手当
+-dCERTメンバーの最大数
+-各dCERTメンバーは、スラッシュ可能なトークンを誓約する必要があります
+-特定のメンバーの定足数を一時停止します
+-dCERTチームを解散するための提案された賭け
+-dCERTメンバーの移行の安定期間
+-開回路dCERT許可が有効になっている
 
-These parameters are expected to be implemented through the param keeper such
-that governance may change them at any given point.
+これらのパラメータは、たとえばパラメータキーパーを介して実装されることが期待されます
+このガバナンスはいつでもそれらを変更する可能性があります。
 
-### Continuous Voting Electionator
+### 連続投票選挙人
 
-An `Electionator` object is to be implemented as continuous voting and with the
-following specifications:
+`Electionator`オブジェクトは、継続的な投票として実装されます。
+次の仕様:
 
-- All delegation addresses may submit votes at any point which updates their
-   preferred representation on the dCERT group.
-- Preferred representation may be arbitrarily split between addresses (ex. 50%
-   to John, 25% to Sally, 25% to Carol)
-- In order for a new member to be added to the dCERT group they must
-   send a transaction accepting their admission at which point the validity of
-   their admission is to be confirmed.
-    - A sequence number is assigned when a member is added to dCERT group.
-     If a member leaves the dCERT group and then enters back, a new sequence number
-     is assigned.  
-- Addresses which control the greatest amount of preferred-representation are
-   eligible to join the dCERT group (up the _maximum number of dCERT members_).
-   If the dCERT group is already full and new member is admitted, the existing
-   dCERT member with the lowest amount of votes is kicked from the dCERT group.
-    - In the split situation where the dCERT group is full but a vying candidate
-     has the same amount of vote as an existing dCERT member, the existing
-     member should maintain its position.
-    - In the split situation where somebody must be kicked out but the two
-     addresses with the smallest number of votes have the same number of votes,
-     the address with the smallest sequence number maintains its position.  
-- A stabilization period can be optionally included to reduce the
-   "flip-flopping" of the dCERT membership tail members. If a stabilization
-   period is provided which is greater than 0, when members are kicked due to
-   insufficient support, a queue entry is created which documents which member is
-   to replace which other member. While this entry is in the queue, no new entries
-   to kick that same dCERT member can be made. When the entry matures at the
-   duration of the  stabilization period, the new member is instantiated, and old
-   member kicked.
+-すべての委任アドレスは、いつでも投票を送信して更新できます
+   dCERTチームの優先代表。
+-最初の選択肢は、アドレスを任意に分割できることを意味します(例:50％
+   ジョン、サリーは25％、キャロルは25％)
+-dCERTグループに新しいメンバーを追加するには、メンバーは
+   承認したトランザクションを送信して受け入れます。これは現時点で有効です。
+   彼らの入場はまだ確認されていません。
+    -dCERTグループにメンバーが追加されると、シリアル番号が割り当てられます。
+     メンバーがdCERTグループを離れて再入場した場合、新しいシリアル番号
+     手配しました。
+-優先表現の最大数を制御するアドレスは
+   dCERTグループに参加する資格があります(最大_dCERTメンバーの最大数_)。
+   dCERTグループが満員で、新しいメンバーが許可されている場合、既存のメンバーは
+   投票数が最も少ないdCERTメンバーは、dCERTグループから追い出されます。
+    -dCERTグループが満員であるが、競合する候補者が分割されている場合
+     既存のdCERTメンバーと同じ投票数、既存の
+     メンバーは自分のステータスを維持する必要があります。
+    -誰かが追い出されなければならないが、2人が追い出されるという分割された状況
+     投票数が最も少ない住所の投票数は同じですが、
+     シリアル番号が最小のアドレスがその位置を維持します。
+-オプションで、安定化期間を含めて削減します
+   dCERTメンバーのテールメンバーの「フリップ」。安定している場合
+   次の理由でメンバーが追い出された場合は、0より大きい期間を指定してください
+   サポートが不十分な場合、どのメンバーが
+   交換する他のメンバー。このアイテムがキューにある場合、新しいアイテムはありません
+   同じdCERTメンバーを蹴ることができます。エントリが
+   安定化期間の期間、新しいメンバーがインスタンス化され、古いメンバーがインスタンス化されます
+   メンバーが蹴った。 
 
-### Staking/Slashing
+### 杭打ち/カット
 
-All members of the dCERT group must stake tokens _specifically_ to maintain
-eligibility as a dCERT member. These tokens can be staked directly by the vying
-dCERT member or out of the good will of a 3rd party (who shall gain no on-chain
-benefits for doing so). This staking mechanism should use the existing global
-unbonding time of tokens staked for network validator security. A dCERT member
-can _only be_ a member if it has the required tokens staked under this
-mechanism. If those tokens are unbonded then the dCERT member must be
-automatically kicked from the group.  
+dCERTグループのすべてのメンバーは、維持するために_特に_住宅ローントークンを保持する必要があります
+dCERTメンバーシップ。これらのトークンは、競合他社が直接抵当に入れることができます
+dCERTメンバーまたは第三者が誠意を持って(チェーン上で取得することは許可されていません)
+そうすることの利点)。この住宅ローンのメカニズムは、既存のグローバルを使用する必要があります
+ネットワークバリデーターのセキュリティのために約束されたトークンのアンバンドリング時間。 dCERTメンバー
+_onlyは、ここで必要なトークンを誓約している場合に限り、メンバーになることができます
+機構。これらのトークンが関連付けられていない場合、dCERTメンバーは
+グループを自動的にキックアウトします。
 
-Slashing of a particular dCERT member due to soft-contract breach should be
-performed by governance on a per member basis based on the magnitude of the
-breach.  The process flow is anticipated to be that a dCERT member is suspended
-by the dCERT group prior to being slashed by governance.  
+ソフト契約の違反により特定のdCERTメンバーを削減する必要があります
+各メンバーのサイズに基づいてガバナンスによって実装されます
+違反。このプロセスは、dCERTメンバーの停止になると予想されます
+これは、ガバナンスによって削減される前に、dCERTチームによって実装されます。
 
-Membership suspension by the dCERT group takes place through a voting procedure
-by the dCERT group members. After this suspension has taken place, a governance
-proposal to slash the dCERT member must be submitted, if the proposal is not
-approved by the time the rescinding member has completed unbonding their
-tokens, then the tokens are no longer staked and unable to be slashed.
+dCERTグループのメンバーシップの停止は、投票プロセスを通じて行われます。
+dCERTチームのメンバー。この停止が発生した後、ガバナンス
+提案がない場合は、dCERTのメンバーシップを減らす提案を提出する必要があります
+取り消されたメンバーがバインド解除を完了したときに承認を取得します
+トークン、トークンはもはや誓約されておらず、減らすことはできません。
 
-Additionally in the case of an emergency situation of a colluding and malicious
-dCERT group, the community needs the capability to disband the entire dCERT
-group and likely fully slash them. This could be achieved though a special new
-proposal type (implemented as a general governance proposal) which would halt
-the functionality of the dCERT group until the proposal was concluded. This
-special proposal type would likely need to also have a fairly large wager which
-could be slashed if the proposal creator was malicious. The reason a large
-wager should be required is because as soon as the proposal is made, the
-capability of the dCERT group to halt message routes is put on temporarily
-suspended, meaning that a malicious actor who created such a proposal could
-then potentially exploit a bug during this period of time, with no dCERT group
-capable of shutting down the exploitable message routes.
+さらに、共謀的で悪意のある緊急事態が発生した場合
+dCERTチーム、コミュニティにはdCERT全体を解散する能力が必要です
+グループ化し、完全にカットする場合があります。これは、特別な新しい
+提案タイプ(一般的なガバナンス提案として実施)は廃止されます
+提案が終了するまでのdCERTチームの機能。この
+特別な提案の種類もかなりの利害関係を必要とする場合があります
+プロポーザルの作成者が悪意のある場合は、カットされる可能性があります。大きな理由
+提案が行われると、賭けを要求する必要があります。
+dCERTグループがメッセージルーティングを停止できるようにする
+一時停止。これは、そのような提案を作成する悪意のあるアクターが
+次に、dCERTグループがない場合、この期間中にエラーが悪用される可能性があります
+使用可能なメッセージルーティングを閉じる機能。
 
-### dCERT membership transactions
+### dCERTメンバートランザクション
 
-Active dCERT members
+アクティブなdCERTメンバー
 
-- change of the description of the dCERT group
-- circuit break a message route
-- vote to suspend a dCERT member.
+-dCERTグループの説明を変更します
+-壊れたメッセージルーティング
+-dCERTメンバーを一時停止するための投票。
 
-Here circuit-breaking refers to the capability to disable a groups of messages,
-This could for instance mean: "disable all staking-delegation messages", or
-"disable all distribution messages". This could be accomplished by verifying
-that the message route has not been "circuit-broken" at CheckTx time (in
-`baseapp/baseapp.go`).
+ここでの回路遮断とは、メッセージのグループを無効にする機能を指します。
+たとえば、これは「すべての誓約委任メッセージを無効にする」、または
+「すべての配布メッセージを無効にする」。これは検証で行うことができます
+CheckTx時のメッセージルーティング(
+`baseapp/baseapp.go`)。
 
-"unbreaking" a circuit is anticipated only to occur during a hard fork upgrade
-meaning that no capability to unbreak a message route on a live chain is
-required.
+「中断のない」回路は、ハードフォークのアップグレード中にのみ発生すると予想されます
+これは、メッセージルーティングをリアルタイムチェーンでオンにできないことを意味します
+必須。
 
-Note also, that if there was a problem with governance voting (for instance a
-capability to vote many times) then governance would be broken and should be
-halted with this mechanism, it would be then up to the validator set to
-coordinate and hard-fork upgrade to a patched version of the software where
-governance is re-enabled (and fixed). If the dCERT group abuses this privilege
-they should all be severely slashed.
+また、ガバナンスの投票に問題がある場合(例:
+複数回投票する能力)その後、ガバナンスは破られ、
+このメカニズムを使用して停止し、バリデーターによって次のように設定されます
+ソフトウェアのパッチバージョンへの調整とハードフォークのアップグレード。
+ガバナンスを再度有効化(および修復)します。 dCERTグループがこの特権を悪用した場合
+それらはすべて厳しくカットする必要があります。
 
-## Status
+## 状態
 
-> Proposed
+>提案
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-- Potential to reduces the number of parties to coordinate with during an emergency
-- Reduction in possibility of disclosing sensitive information to malicious parties
+-緊急時に調整する必要のある当事者の数を減らすことが可能です
+-機密情報が悪意のある第三者に漏洩する可能性を減らします
 
-### Negative
+### ネガティブ
 
-- Centralization risks
+-集中化のリスク
 
-### Neutral
+### ニュートラル
 
-## References
+## 参照
 
-  [Specialization Groups ADR](./adr-007-specialization-groups.md)
+  [スペシャライゼーショングループADR](./adr-007-specialization-groups.md) 

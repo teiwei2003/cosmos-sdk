@@ -1,36 +1,36 @@
-# AnteHandlers
+# 前处理程序
 
-The `x/auth` module presently has no transaction handlers of its own, but does expose the special `AnteHandler`, used for performing basic validity checks on a transaction, such that it could be thrown out of the mempool.
-The `AnteHandler` can be seen as a set of decorators that check transactions within the current context, per [ADR 010](https://github.com/cosmos/cosmos-sdk/blob/v0.43.0-alpha1/docs/architecture/adr-010-modular-antehandler.md).
+`x/auth` 模块目前没有自己的事务处理程序，但确实公开了特殊的 `AnteHandler`，用于对事务执行基本的有效性检查，以便它可以被抛出内存池。
+根据 [ADR 010](https://github.com/cosmos/cosmos-sdk/blob/v0.43.0-alpha1/docs/架构/adr-010-modular-antehandler.md)。
 
-Note that the `AnteHandler` is called on both `CheckTx` and `DeliverTx`, as Tendermint proposers presently have the ability to include in their proposed block transactions which fail `CheckTx`.
+请注意，在 `CheckTx` 和 `DeliverTx` 上都调用了 `AnteHandler`，因为 Tendermint 提议者目前能够将失败的 `CheckTx` 包含在他们提议的区块交易中。
 
-## Decorators
+## 装饰器
 
-The auth module provides `AnteDecorator`s that are recursively chained together into a single `AnteHandler` in the following order:
+auth 模块提供了 `AnteDecorator`s，它们按以下顺序递归地链接到单个 `AnteHandler` 中:
 
-- `SetUpContextDecorator`: Sets the `GasMeter` in the `Context` and wraps the next `AnteHandler` with a defer clause to recover from any downstream `OutOfGas` panics in the `AnteHandler` chain to return an error with information on gas provided and gas used.
+- `SetUpContextDecorator`:在 `Context` 中设置 `GasMeter`，并用 defer 子句包装下一个 `AnteHandler`，以从 `AnteHandler` 链中的任何下游 `OutOfGas` 恐慌中恢复，并返回有关所提供气体的信息的错误和使用的气体。
 
-- `RejectExtensionOptionsDecorator`: Rejects all extension options which can optionally be included in protobuf transactions.
+- `RejectExtensionOptionsDecorator`:拒绝所有可以选择包含在 protobuf 事务中的扩展选项。
 
-- `MempoolFeeDecorator`: Checks if the `tx` fee is above local mempool `minFee` parameter during `CheckTx`.
+- `MempoolFeeDecorator`:在`CheckTx`期间检查`tx`费用是否高于本地内存池`minFee`参数。
 
-- `ValidateBasicDecorator`: Calls `tx.ValidateBasic` and returns any non-nil error.
+- `ValidateBasicDecorator`:调用`tx.ValidateBasic` 并返回任何非零错误。
 
-- `TxTimeoutHeightDecorator`: Check for a `tx` height timeout.
+- `TxTimeoutHeightDecorator`:检查`tx` 高度超时。
 
-- `ValidateMemoDecorator`: Validates `tx` memo with application parameters and returns any non-nil error.
+- `ValidateMemoDecorator`:使用应用程序参数验证 `tx` 备忘录并返回任何非零错误。
 
-- `ConsumeGasTxSizeDecorator`: Consumes gas proportional to the `tx` size based on application parameters.
+- `ConsumeGasTxSizeDecorator`:根据应用程序参数消耗与`tx` 大小成比例的gas。
 
-- `DeductFeeDecorator`: Deducts the `FeeAmount` from first signer of the `tx`. If the `x/feegrant` module is enabled and a fee granter is set, it deducts fees from the fee granter account.
+- `DeductFeeDecorator`:从 `tx` 的第一个签名者中扣除 `FeeAmount`。如果启用了 `x/feegrant` 模块并设置了费用授予者，它会从费用授予者帐户中扣除费用。
 
-- `SetPubKeyDecorator`: Sets the pubkey from a `tx`'s signers that does not already have its corresponding pubkey saved in the state machine and in the current context.
+- `SetPubKeyDecorator`:从`tx` 的签名者设置公钥，该签名者还没有在状态机和当前上下文中保存其相应的公钥。
 
-- `ValidateSigCountDecorator`: Validates the number of signatures in `tx` based on app-parameters.
+- `ValidateSigCountDecorator`:根据应用参数验证 `tx` 中的签名数量。
 
-- `SigGasConsumeDecorator`: Consumes parameter-defined amount of gas for each signature. This requires pubkeys to be set in context for all signers as part of `SetPubKeyDecorator`.
+- `SigGasConsumeDecorator`:为每个签名消耗参数定义的气体量。这需要在上下文中为所有签名者设置公钥作为“SetPubKeyDecorator”的一部分。
 
-- `SigVerificationDecorator`: Verifies all signatures are valid. This requires pubkeys to be set in context for all signers as part of `SetPubKeyDecorator`.
+- `SigVerificationDecorator`:验证所有签名是否有效。这需要在上下文中为所有签名者设置公钥作为“SetPubKeyDecorator”的一部分。
 
-- `IncrementSequenceDecorator`: Increments the account sequence for each signer to prevent replay attacks.
+- `IncrementSequenceDecorator`:为每个签名者增加账户序列以防止重放攻击。 

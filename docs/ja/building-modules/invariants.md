@@ -1,20 +1,20 @@
-# Invariants
+# 不变量
 
-An invariant is a property of the application that should always be true. In the context of the Cosmos SDK, an `Invariant` is a function that checks for a particular invariant. These functions are useful to detect bugs early on and act upon them to limit their potential consequences (e.g. by halting the chain). They are also useful in the development process of the application to detect bugs via simulations. {synopsis}
+不变量是应用程序的一个属性，它应该始终为真。在 Cosmos SDK 的上下文中，“不变量”是检查特定不变量的函数。这些功能可用于及早检测错误并对其采取行动以限制其潜在后果(例如，通过停止链)。它们在应用程序的开发过程中也很有用，可以通过模拟检测错误。 {概要}
 
-## Pre-requisite Readings
+## 先决条件阅读
 
 - [Keepers](./keeper.md) {prereq}
 
-## Implementing `Invariant`s
+## 实现 `Invariant`s
 
-An `Invariant` is a function that checks for a particular invariant within a module. Module `Invariant`s must follow the `Invariant` type:
+`Invariant` 是一个函数，用于检查模块中的特定不变量。模块 `Invariant` 必须遵循 `Invariant` 类型:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/types/invariant.go#L9
 
-The `string` return value is the invariant message, which can be used when printing logs, and the `bool` return value is the actual result of the invariant check.
+`string` 返回值是不变消息，可以在打印日志时使用，`bool` 返回值是不变检查的实际结果。
 
-In practice, each module implements `Invariant`s in a `./keeper/invariants.go` file within the module's folder. The standard is to implement one `Invariant` function per logical grouping of invariants with the following model:
+实际上，每个模块在模块文件夹内的`./keeper/invariants.go` 文件中实现`Invariant`。标准是使用以下模型为每个不变量的逻辑分组实现一个“不变量”函数: 
 
 ```go
 // Example for an Invariant that checks balance-related invariants
@@ -26,7 +26,7 @@ func BalanceInvariants(k Keeper) sdk.Invariant {
 }
 ```
 
-Additionally, module developers should generally implement an `AllInvariants` function that runs all the `Invariant`s functions of the module:
+此外，模块开发人员通常应该实现一个 `AllInvariants` 函数来运行模块的所有 `Invariant` 函数:
 
 ```go
 // AllInvariants runs all invariants of the module.
@@ -45,7 +45,7 @@ func AllInvariants(k Keeper) sdk.Invariant {
 }
 ```
 
-Finally, module developers need to implement the `RegisterInvariants` method as part of the [`AppModule` interface](./module-manager.md#appmodule). Indeed, the `RegisterInvariants` method of the module, implemented in the `module/module.go` file, typically only defers the call to a `RegisterInvariants` method implemented in the `keeper/invariants.go` file. The `RegisterInvariants` method registers a route for each `Invariant` function in the [`InvariantRegistry`](#invariant-registry):
+最后，模块开发者需要实现 `RegisterInvariants` 方法作为 [`AppModule` 接口](./module-manager.md#appmodule) 的一部分。 实际上，在`module/module.go` 文件中实现的模块的`RegisterInvariants` 方法通常只将调用延迟到在`keeper/invariants.go` 文件中实现的`RegisterInvariants` 方法。 `RegisterInvariants` 方法为 [`InvariantRegistry`](#invariant-registry) 中的每个 `Invariant` 函数注册一个路由: 
 
 ```go
 // RegisterInvariants registers all staking invariants
@@ -57,28 +57,28 @@ func RegisterInvariants(ir sdk.InvariantRegistry, k Keeper) {
 }
 ```
 
-For more, see an example of [`Invariant`s implementation from the `staking` module](https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/x/staking/keeper/invariants.go).
+有关更多信息，请参阅 [`staking` 模块中的 `Invariant` 实现示例](https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/x/staking/keeper/invariants.go)。
 
-## Invariant Registry
+## 不变注册表
 
-The `InvariantRegistry` is a registry where the `Invariant`s of all the modules of an application are registered. There is only one `InvariantRegistry` per **application**, meaning module developers need not implement their own `InvariantRegistry` when building a module. **All module developers need to do is to register their modules' invariants in the `InvariantRegistry`, as explained in the section above**. The rest of this section gives more information on the `InvariantRegistry` itself, and does not contain anything directly relevant to module developers.
+`InvariantRegistry` 是一个注册表，其中注册了应用程序所有模块的 `Invariant`。每个 **application** 只有一个 `InvariantRegistry`，这意味着模块开发人员在构建模块时不需要实现他们自己的 `InvariantRegistry`。 **所有模块开发人员需要做的是在 `InvariantRegistry` 中注册他们模块的不变量，如上一节所述**。本节的其余部分提供有关 `InvariantRegistry` 本身的更多信息，不包含与模块开发人员直接相关的任何内容。
 
-At its core, the `InvariantRegistry` is defined in the Cosmos SDK as an interface:
+在其核心，`InvariantRegistry` 在 Cosmos SDK 中被定义为一个接口:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/types/invariant.go#L14-L17
 
-Typically, this interface is implemented in the `keeper` of a specific module. The most used implementation of an `InvariantRegistry` can be found in the `crisis` module:
+通常，此接口在特定模块的“keeper”中实现。 `InvariantRegistry` 最常用的实现可以在 `crisis` 模块中找到:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/crisis/keeper/keeper.go#L50-L54
 
- The `InvariantRegistry` is therefore typically instantiated by instantiating the `keeper` of the `crisis` module in the [application's constructor function](../basics/app-anatomy.md#constructor-function).
+ 因此，`InvariantRegistry` 通常是通过在 [应用程序的构造函数](../basics/app-anatomy.md#constructor-function) 中实例化 `crisis` 模块的 `keeper` 来实例化的。
 
-`Invariant`s can be checked manually via [`message`s](./messages-and-queries.md), but most often they are checked automatically at the end of each block. Here is an example from the `crisis` module:
+`Invariant`s 可以通过 [`message`s](./messages-and-queries.md) 手动检查，但大多数情况下它们会在每个块的末尾自动检查。下面是来自“crisis”模块的一个例子:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/x/crisis/abci.go#L7-L14
 
-In both cases, if one of the `Invariant`s returns false, the `InvariantRegistry` can trigger special logic (e.g. have the application panic and print the `Invariant`s message in the log).
+在这两种情况下，如果 `Invariant` 之一返回 false，`InvariantRegistry` 可以触发特殊逻辑(例如，让应用程序恐慌并在日志中打印 `Invariant`s 消息)。
 
-## Next {hide}
+## 下一个 {hide}
 
-Learn about [genesis functionalities](./genesis.md) {hide}
+了解 [创世功能](./genesis.md) {hide} 

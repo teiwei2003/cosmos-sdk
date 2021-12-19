@@ -1,109 +1,109 @@
-# ADR 019: Protocol Buffer State Encoding
+# ADR 019:プロトコルバッファステータスコード
 
-## Changelog
+## 変更ログ
 
-- 2020 Feb 15: Initial Draft
-- 2020 Feb 24: Updates to handle messages with interface fields
-- 2020 Apr 27: Convert usages of `oneof` for interfaces to `Any`
-- 2020 May 15: Describe `cosmos_proto` extensions and amino compatibility
-- 2020 Dec 4: Move and rename `MarshalAny` and `UnmarshalAny` into the `codec.Codec` interface.
-- 2021 Feb 24: Remove mentions of `HybridCodec`, which has been abandoned in [#6843](https://github.com/cosmos/cosmos-sdk/pull/6843).
+-2020年2月15日:最初のドラフト
+-2020年2月24日:インターフェースフィールドを使用したメッセージの処理を更新
+-2020年4月27日:インターフェースの `oneof`の使用法を` Any`に変換します
+-2020年5月15日:「cosmos_proto」拡張機能とアミノ互換性について説明する
+-2020年12月4日:「MarshalAny」と「UnmarshalAny」を「codec.Codec」インターフェースに移動して名前を変更します。
+-2021年2月24日:[#6843](https://github.com/cosmos/cosmos-sdk/pull/6843)で放棄された「HybridCodec」の言及を削除します。
 
-## Status
+## 状態
 
-Accepted
+受け入れられました
 
-## Context
+## 環境
 
-Currently, the Cosmos SDK utilizes [go-amino](https://github.com/tendermint/go-amino/) for binary
-and JSON object encoding over the wire bringing parity between logical objects and persistence objects.
+現在、Cosmos SDKはバイナリに[go-amino](https://github.com/tendermint/go-amino/)を使用しています
+また、JSONオブジェクトエンコーディングは、ワイヤーを介して論理オブジェクトと永続オブジェクトの間に同等性をもたらします。
 
-From the Amino docs:
+アミノのドキュメントから:
 
-> Amino is an object encoding specification. It is a subset of Proto3 with an extension for interface
-> support. See the [Proto3 spec](https://developers.google.com/protocol-buffers/docs/proto3) for more
-> information on Proto3, which Amino is largely compatible with (but not with Proto2).
->
-> The goal of the Amino encoding protocol is to bring parity into logic objects and persistence objects.
+> Aminoはオブジェクトエンコーディング仕様です。これは、インターフェイス拡張機能を備えたProto3のサブセットです。
+>サポート。詳細については、[Proto3仕様](https://developers.google.com/protocol-buffers/docs/proto3)を参照してください。
+> Proto3に関する情報に関しては、Aminoはほぼ互換性があります(Proto2は互換性がありません)。
+>>
+> Aminoエンコーディングプロトコルの目標は、論理オブジェクトと永続オブジェクトにパリティを導入することです。
 
-Amino also aims to have the following goals (not a complete list):
+Aminoは、次の目標の達成も目​​指しています(完全なリストではありません)。
 
-- Binary bytes must be decode-able with a schema.
-- Schema must be upgradeable.
-- The encoder and decoder logic must be reasonably simple.
+-バイナリバイトはパターンデコード可能である必要があります。
+-アーキテクチャはアップグレード可能である必要があります。
+-エンコーダーとデコーダーのロジックはかなり単純でなければなりません。
 
-However, we believe that Amino does not fulfill these goals completely and does not fully meet the
-needs of a truly flexible cross-language and multi-client compatible encoding protocol in the Cosmos SDK.
-Namely, Amino has proven to be a big pain-point in regards to supporting object serialization across
-clients written in various languages while providing virtually little in the way of true backwards
-compatibility and upgradeability. Furthermore, through profiling and various benchmarks, Amino has
-been shown to be an extremely large performance bottleneck in the Cosmos SDK <sup>1</sup>. This is
-largely reflected in the performance of simulations and application transaction throughput.
+しかし、アミノはこれらの目標を完全には達成しておらず、完全に満足しているわけでもありません。
+CosmosSDKの非常に柔軟なクロスランゲージおよびマルチクライアント互換のエンコーディングプロトコル要件。
+言い換えれば、Aminoは、クロスオブジェクトのシリアル化をサポートする上で大きな問題点であることが証明されています。
+クライアントはさまざまな言語で書かれており、実際のフォールバックはほとんどありません。
+互換性とアップグレード性。さらに、分析とさまざまなベンチマークテストを通じて、Aminoは
+これは、Cosmos SDK <sup> 1 <.sup>の非常に大きなパフォーマンスのボトルネックであることが判明しました。これは
+主にシミュレーションパフォーマンスとアプリケーショントランザクションスループットに反映されます。
 
-Thus, we need to adopt an encoding protocol that meets the following criteria for state serialization:
+したがって、次の州のシリアル化標準を満たすエンコーディングプロトコルを採用する必要があります。
 
-- Language agnostic
-- Platform agnostic
-- Rich client support and thriving ecosystem
-- High performance
-- Minimal encoded message size
-- Codegen-based over reflection-based
-- Supports backward and forward compatibility
+-言語不可知論
+-プラットフォームにとらわれない
+-豊富なカスタマーサポートと繁栄するエコシステム
+-ハイパフォーマンス
+-エンコードされたメッセージの最小サイズ
+-リフレクションではなくコード生成に基づく
+-下位互換性と上位互換性をサポートします
 
-Note, migrating away from Amino should be viewed as a two-pronged approach, state and client encoding.
-This ADR focuses on state serialization in the Cosmos SDK state machine. A corresponding ADR will be
-made to address client-side encoding.
+Aminoからの移行は、状態とクライアントのコーディングという2つのアプローチと見なす必要があることに注意してください。
+このADRは、CosmosSDKステートマシンでの状態のシリアル化に焦点を当てています。対応するADRは
+クライアントコーディングを解決するために使用されます。
 
-## Decision
+## 決定
 
-We will adopt [Protocol Buffers](https://developers.google.com/protocol-buffers) for serializing
-persisted structured data in the Cosmos SDK while providing a clean mechanism and developer UX for
-applications wishing to continue to use Amino. We will provide this mechanism by updating modules to
-accept a codec interface, `Marshaler`, instead of a concrete Amino codec. Furthermore, the Cosmos SDK
-will provide two concrete implementations of the `Marshaler` interface: `AminoCodec` and `ProtoCodec`.
+シリアル化には[ProtocolBuffers](https://developers.google.com/protocol-buffers)を使用します
+Cosmos SDKで構造化データを永続化すると同時に、
+Aminoのアプリケーションを引き続き使用したいと考えています。モジュールを更新することにより、このメカニズムを提供します
+特定のAminoコーデックではなく、コーデックインターフェイス `Marshaler`を受け入れます。さらに、Cosmos SDK
+`Marshaler`インターフェースの2つの具体的な実装が提供されます:` AminoCodec`と `ProtoCodec`。
 
-- `AminoCodec`: Uses Amino for both binary and JSON encoding.
-- `ProtoCodec`: Uses Protobuf for both binary and JSON encoding.
+-`AminoCodec`:バイナリおよびJSONエンコーディングにAminoを使用します。
+-`ProtoCodec`:バイナリおよびJSONエンコーディングにProtobufを使用します。
 
-Modules will use whichever codec that is instantiated in the app. By default, the Cosmos SDK's `simapp`
-instantiates a `ProtoCodec` as the concrete implementation of `Marshaler`, inside the `MakeTestEncodingConfig`
-function. This can be easily overwritten by app developers if they so desire.
+モジュールは、アプリケーションでインスタンス化されたコーデックを使用します。デフォルトでは、CosmosSDKの `simapp`
+`Marshaler`の具体的な実装として、` MakeTestEncodingConfig`で `ProtoCodec`をインスタンス化します
+特徴。必要に応じて、これはアプリケーション開発者が簡単に上書きできます。
 
-The ultimate goal will be to replace Amino JSON encoding with Protobuf encoding and thus have
-modules accept and/or extend `ProtoCodec`. Until then, Amino JSON is still provided for legacy use-cases.
-A handful of places in the Cosmos SDK still have Amino JSON hardcoded, such as the Legacy API REST endpoints
-and the `x/params` store. They are planned to be converted to Protobuf in a gradual manner.
+最終的な目標は、AminoJSONエンコーディングをProtobufエンコーディングに置き換えることです。
+モジュールは `ProtoCodec`を受け入れたり拡張したりします。それまでは、AminoJSONはレガシーユースケースで引き続き利用できます。
+Cosmos SDKのいくつかの場所は、Legacy APIRESTエンドポイントなどのAminoJSONを使用してハードコーディングされています
+そして `x .params`ストレージ。彼らは徐々にProtobufに変換することを計画しています。
 
-### Module Codecs
+###モジュールコーデック
 
-Modules that do not require the ability to work with and serialize interfaces, the path to Protobuf
-migration is pretty straightforward. These modules are to simply migrate any existing types that
-are encoded and persisted via their concrete Amino codec to Protobuf and have their keeper accept a
-`Marshaler` that will be a `ProtoCodec`. This migration is simple as things will just work as-is.
+インターフェイスモジュール、Protobufパスを処理およびシリアル化できる必要はありません
+移行は非常に簡単です。これらのモジュールは、既存のタイプを単純に移行するためのものです
+Protobufを特定のAminoコーデックでエンコードして永続化し、管理者に受け入れさせます
+`Marshaler`は` ProtoCodec`になります。物事はそのまま実行されるため、この移行は簡単です。
 
-Note, any business logic that needs to encode primitive types like `bool` or `int64` should use
-[gogoprotobuf](https://github.com/gogo/protobuf) Value types.
+基本型(「bool」や「int64」など)をエンコードする必要があるビジネスロジックを使用する必要があることに注意してください
+[gogoprotobuf](https://github.com/gogo/protobuf)値のタイプ。
 
-Example:
+例: 
 
 ```go
   ts, err := gogotypes.TimestampProto(completionTime)
   if err != nil {
-    // ...
+   .....
   }
 
   bz := cdc.MustMarshal(ts)
 ```
 
-However, modules can vary greatly in purpose and design and so we must support the ability for modules
-to be able to encode and work with interfaces (e.g. `Account` or `Content`). For these modules, they
-must define their own codec interface that extends `Marshaler`. These specific interfaces are unique
-to the module and will contain method contracts that know how to serialize the needed interfaces.
+ただし、モジュールの目的と設計は大きく異なる可能性があるため、モジュールの機能をサポートする必要があります
+インターフェイス( `Account`や` Content`など)をコーディングして使用する機能。 これらのモジュールの場合、
+`Marshaler`を拡張するには、独自のコーデックインターフェイスを定義する必要があります。 これらの特定のインターフェースは一意です
+モジュールに、必要なインターフェースをシリアル化する方法を知っているメソッドコントラクトが含まれます。
 
-Example:
+例: 
 
 ```go
-// x/auth/types/codec.go
+/.x/auth/types/codec.go
 
 type Codec interface {
   codec.Codec
@@ -116,104 +116,104 @@ type Codec interface {
 }
 ```
 
-### Usage of `Any` to encode interfaces
+### `Any`を使用してインターフェースをエンコードします
 
-In general, module-level .proto files should define messages which encode interfaces
-using [`google.protobuf.Any`](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/any.proto).
-After [extension discussion](https://github.com/cosmos/cosmos-sdk/issues/6030),
-this was chosen as the preferred alternative to application-level `oneof`s
-as in our original protobuf design. The arguments in favor of `Any` can be
-summarized as follows:
+通常、モジュールレベルの.protoファイルは、インターフェイスをエンコードするメッセージを定義する必要があります
+[`google.protobuf.Any`](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/any.proto)を使用します。
+[拡張ディスカッション]後(https://github.com/cosmos/cosmos-sdk/issues/6030)、
+これは、アプリケーションレベルの「oneof」の推奨される代替手段として選択されました。
+オリジナルのprotobufデザインと同じように。 「Any」の引数は次のようになります
+次のように要約します。
 
-* `Any` provides a simpler, more consistent client UX for dealing with
-interfaces than app-level `oneof`s that will need to be coordinated more
-carefully across applications. Creating a generic transaction
-signing library using `oneof`s may be cumbersome and critical logic may need
-to be reimplemented for each chain
-* `Any` provides more resistance against human error than `oneof`
-* `Any` is generally simpler to implement for both modules and apps
+* `Any`は、よりシンプルで一貫性のあるクライアントユーザーエクスペリエンスを提供します
+アプリケーションレベルの `oneof`よりも多くの調整されたインターフェースが必要
+アプリケーションを慎重にクロスします。一般的なトランザクションを作成する
+`oneof`署名ライブラリの使用は面倒であり、重要なロジックが必要になる場合があります
+各チェーンの再実装
+* `Any`は` oneof`よりもヒューマンエラーに対して耐性があります
+* `Any`は通常、モジュールとアプリケーションに実装する方が簡単です
 
-The main counter-argument to using `Any` centers around its additional space
-and possibly performance overhead. The space overhead could be dealt with using
-compression at the persistence layer in the future and the performance impact
-is likely to be small. Thus, not using `Any` is seem as a pre-mature optimization,
-with user experience as the higher order concern.
+「Any」を使用することへの主な反対意見は、その余分なスペースを中心に展開します
+そして、可能なパフォーマンスのオーバーヘッド。処理スペースのオーバーヘッド
+将来の永続層の圧縮とパフォーマンスへの影響
+小さいかもしれません。したがって、 `Any`を使用しないことは時期尚早の最適化のようです。
+ユーザーエクスペリエンスをより高いレベルの懸念事項と見なします。
 
-Note, that given the Cosmos SDK's decision to adopt the `Codec` interfaces described
-above, apps can still choose to use `oneof` to encode state and transactions
-but it is not the recommended approach. If apps do choose to use `oneof`s
-instead of `Any` they will likely lose compatibility with client apps that
-support multiple chains. Thus developers should think carefully about whether
-they care more about what is possibly a pre-mature optimization or end-user
-and client developer UX.
+Cosmos SDKは、説明されている「コーデック」インターフェイスを採用することを決定したため、注意してください
+上記では、アプリケーションは引き続き `oneof`を使用してステータスとトランザクションをエンコードすることを選択できます
+ただし、これは推奨される方法ではありません。アプリケーションが `oneof`の使用を選択した場合
+「any」の代わりに、クライアントアプリケーションとの互換性が失われる可能性があります
+複数のチェーンをサポートします。したがって、開発者は慎重に検討する必要があります
+彼らは、時期尚早の最適化やエンドユーザーの可能性についてより懸念しています
+そしてクライアント開発者のUX。
 
-### Safe usage of `Any`
+### `Any`の安全な使用
 
-By default, the [gogo protobuf implementation of `Any`](https://godoc.org/github.com/gogo/protobuf/types)
-uses [global type registration]( https://github.com/gogo/protobuf/blob/master/proto/properties.go#L540)
-to decode values packed in `Any` into concrete
-go types. This introduces a vulnerability where any malicious module
-in the dependency tree could registry a type with the global protobuf registry
-and cause it to be loaded and unmarshaled by a transaction that referenced
-it in the `type_url` field.
+デフォルトでは、[gogoprotobufは `Any`を実装します](https://godoc.org/github.com/gogo/protobuf/types)
+[グローバルタイプ登録](https://github.com/gogo/protobuf/blob/master/proto/properties.go#L540)を使用します
+「Any」にパックされた値を具象にデコードします
+タイプに移動します。これにより、悪意のあるモジュールが存在する脆弱性が発生します
+グローバルprotobufレジストリを使用して、依存関係ツリーにタイプを登録できます
+そして、参照されるトランザクションをロードしてマーシャリング解除します
+これは `type_url`フィールドにあります。
 
-To prevent this, we introduce a type registration mechanism for decoding `Any`
-values into concrete types through the `InterfaceRegistry` interface which
-bears some similarity to type registration with Amino:
+これを防ぐために、「Any」をデコードするための型登録メカニズムを導入しました
+`InterfaceRegistry`インターフェースを介して値を具象型に変換します
+Aminoの型登録にはいくつかの類似点があります。 
 
 ```go
 type InterfaceRegistry interface {
-    // RegisterInterface associates protoName as the public name for the
-    // interface passed in as iface
-    // Ex:
-    //   registry.RegisterInterface("cosmos_sdk.Msg", (*sdk.Msg)(nil))
+   ..RegisterInterface associates protoName as the public name for the
+   ..interface passed in as iface
+   ..Ex:
+   ..  registry.RegisterInterface("cosmos_sdk.Msg", (*sdk.Msg)(nil))
     RegisterInterface(protoName string, iface interface{})
 
-    // RegisterImplementations registers impls as a concrete implementations of
-    // the interface iface
-    // Ex:
-    //  registry.RegisterImplementations((*sdk.Msg)(nil), &MsgSend{}, &MsgMultiSend{})
+   ..RegisterImplementations registers impls as a concrete implementations of
+   ..the interface iface
+   ..Ex:
+   .. registry.RegisterImplementations((*sdk.Msg)(nil), &MsgSend{}, &MsgMultiSend{})
     RegisterImplementations(iface interface{}, impls ...proto.Message)
 
 }
 ```
 
-In addition to serving as a whitelist, `InterfaceRegistry` can also serve
-to communicate the list of concrete types that satisfy an interface to clients.
+ホワイトリストであることに加えて、InterfaceRegistryは次のように使用することもできます
+クライアントインターフェイスを満たす特定のタイプのリストを伝達します。
 
-In .proto files:
+.protoファイル内:
 
-* fields which accept interfaces should be annotated with `cosmos_proto.accepts_interface`
-using the same full-qualified name passed as `protoName` to `InterfaceRegistry.RegisterInterface`
-* interface implementations should be annotated with `cosmos_proto.implements_interface`
-using the same full-qualified name passed as `protoName` to `InterfaceRegistry.RegisterInterface`
+*インターフェースを受け入れるフィールドには、 `cosmos_proto.accepts_interface`の注釈を付ける必要があります
+`protoName`と同じ完全修飾名を使用して、` InterfaceRegistry.RegisterInterface`に渡します
+*インターフェースの実装には `cosmos_proto.implements_interface`の注釈を付ける必要があります
+`protoName`と同じ完全修飾名を使用して、` InterfaceRegistry.RegisterInterface`に渡します
 
-In the future, `protoName`, `cosmos_proto.accepts_interface`, `cosmos_proto.implements_interface`
-may be used via code generation, reflection &/or static linting.
+将来的には、 `protoName`、` cosmos_proto.accepts_interface`、 `cosmos_proto.implements_interface`
+これは、コード生成、リフレクション、および/または静的リンティングを通じて使用できます。
 
-The same struct that implements `InterfaceRegistry` will also implement an
-interface `InterfaceUnpacker` to be used for unpacking `Any`s:
+`InterfaceRegistry`を実装する同じ構造は、
+インターフェイス `InterfaceUnpacker`は、` Any`を解凍するために使用されます。 
 
 ```go
 type InterfaceUnpacker interface {
-    // UnpackAny unpacks the value in any to the interface pointer passed in as
-    // iface. Note that the type in any must have been registered with
-    // RegisterImplementations as a concrete type for that interface
-    // Ex:
-    //    var msg sdk.Msg
-    //    err := ctx.UnpackAny(any, &msg)
-    //    ...
+   ..UnpackAny unpacks the value in any to the interface pointer passed in as
+   ..iface. Note that the type in any must have been registered with
+   ..RegisterImplementations as a concrete type for that interface
+   ..Ex:
+   ..   var msg sdk.Msg
+   ..   err := ctx.UnpackAny(any, &msg)
+   ..   ...
     UnpackAny(any *Any, iface interface{}) error
 }
 ```
 
-Note that `InterfaceRegistry` usage does not deviate from standard protobuf
-usage of `Any`, it just introduces a security and introspection layer for
-golang usage.
+`InterfaceRegistry`の使用法は標準のprotobufから逸脱しないことに注意してください
+`Any`の使用法、それはただのためです
+golangの使用法。
 
-`InterfaceRegistry` will be a member of `ProtoCodec`
-described above. In order for modules to register interface types, app modules
-can optionally implement the following interface:
+`InterfaceRegistry`は` ProtoCodec`のメンバーになります
+上記のように。 モジュールがインターフェースタイプを登録するために、アプリケーションモジュール
+次のインターフェースを実装することを選択できます。 
 
 ```go
 type InterfaceModule interface {
@@ -221,17 +221,17 @@ type InterfaceModule interface {
 }
 ```
 
-The module manager will include a method to call `RegisterInterfaceTypes` on
-every module that implements it in order to populate the `InterfaceRegistry`.
+モジュールマネージャーには、 `RegisterInterfaceTypes`を呼び出すメソッドが含まれます
+それを実装するすべてのモジュールは、 `InterfaceRegistry`にデータを入力します。
 
-### Using `Any` to encode state
+### `Any`を使用して状態をエンコードします
 
-The Cosmos SDK will provide support methods `MarshalInterface` and `UnmarshalInterface` to hide a complexity of wrapping interface types into `Any` and allow easy serialization.
+Cosmos SDKは、サポートメソッド `MarshalInterface`と` UnmarshalInterface`を提供して、インターフェイスタイプを `Any`にラップする複雑さを隠し、簡単にシリアル化できるようにします。 
 
 ```go
 import "github.com/cosmos/cosmos-sdk/codec"
 
-// note: eviexported.Evidence is an interface type
+/.note: eviexported.Evidence is an interface type
 func MarshalEvidence(cdc codec.BinaryCodec, e eviexported.Evidence) ([]byte, error) {
 	return cdc.MarshalInterface(e)
 }
@@ -243,14 +243,14 @@ func UnmarshalEvidence(cdc codec.BinaryCodec, bz []byte) (eviexported.Evidence, 
 }
 ```
 
-### Using `Any` in `sdk.Msg`s
+### `sdk.Msg`sで` Any`を使用する
 
-A similar concept is to be applied for messages that contain interfaces fields.
-For example, we can define `MsgSubmitEvidence` as follows where `Evidence` is
-an interface:
+同様の概念が、インターフェースフィールドを含むメッセージにも当てはまります。
+たとえば、 `MsgSubmitEvidence`を次のように定義できます。ここで` Evidence`は
+インターフェース: 
 
 ```protobuf
-// x/evidence/types/types.proto
+/.x/evidence/types/types.proto
 
 message MsgSubmitEvidence {
   bytes submitter = 1
@@ -261,17 +261,17 @@ message MsgSubmitEvidence {
 }
 ```
 
-Note that in order to unpack the evidence from `Any` we do need a reference to
-`InterfaceRegistry`. In order to reference evidence in methods like
-`ValidateBasic` which shouldn't have to know about the `InterfaceRegistry`, we
-introduce an `UnpackInterfaces` phase to deserialization which unpacks
-interfaces before they're needed.
+`Any`から証拠を抽出するには、引用する必要があることに注意してください
+`インターフェース登録`。 メソッド内の証拠を参照するために、例えば
+`ValidateBasic`は` InterfaceRegistry`を知らないはずです。
+逆シリアル化して解凍するための `UnpackInterfaces`ステージを導入します
+インターフェースは必要になる前にあります。
 
-### Unpacking Interfaces
+### インターフェースを解凍します
 
-To implement the `UnpackInterfaces` phase of deserialization which unpacks
-interfaces wrapped in `Any` before they're needed, we create an interface
-that `sdk.Msg`s and other types can implement:
+解凍と逆シリアル化を実装するための `UnpackInterfaces`ステージ
+`Any`でラップされたインターフェースが必要になる前に、インターフェースを作成します
+`sdk.Msg`sおよびその他のタイプを実装できます。 
 
 ```go
 type UnpackInterfacesMessage interface {
@@ -279,26 +279,26 @@ type UnpackInterfacesMessage interface {
 }
 ```
 
-We also introduce a private `cachedValue interface{}` field onto the `Any`
-struct itself with a public getter `GetCachedValue() interface{}`.
+また、 `Any`にプライベート` cachedValue interface {} `フィールドを導入しました
+パブリックゲッター `GetCachedValue()interface {}`を使用してそれ自体を構築します。
 
-The `UnpackInterfaces` method is to be invoked during message deserialization right
-after `Unmarshal` and any interface values packed in `Any`s will be decoded
-and stored in `cachedValue` for reference later.
+`UnpackInterfaces`メソッドは、メッセージの逆シリアル化中に呼び出されます
+`Unmarshal`にあり、` Any`にカプセル化されているインターフェイス値はすべてデコードされます
+そして、将来の参照のためにそれを `cachedValue`に保存します。
 
-Then unpacked interface values can safely be used in any code afterwards
-without knowledge of the `InterfaceRegistry`
-and messages can introduce a simple getter to cast the cached value to the
-correct interface type.
+その後、解凍されたインターフェイス値を任意のコードで安全に使用できます
+`InterfaceRegistry`がわからない
+そして、メッセージは、キャッシュされた値をに変換するための簡単なゲッターを紹介することができます
+正しいインターフェイスタイプ。
 
-This has the added benefit that unmarshaling of `Any` values only happens once
-during initial deserialization rather than every time the value is read. Also,
-when `Any` values are first packed (for instance in a call to
-`NewMsgSubmitEvidence`), the original interface value is cached so that
-unmarshaling isn't needed to read it again.
+これには、 `Any`値のアンマーシャリングが1回だけ発生するという追加の利点があります
+値が読み取られるたびではなく、最初の逆シリアル化中。 また、
+Any値が初めてパックされたとき(例:
+`NewMsgSubmitEvidence`)を使用して、元のインターフェイス値をキャッシュし、
+もう一度読むには、アンマーシャリングは必要ありません。
 
-`MsgSubmitEvidence` could implement `UnpackInterfaces`, plus a convenience getter
-`GetEvidence` as follows:
+`MsgSubmitEvidence`は` UnpackInterfaces`と便利なゲッターを実装できます
+`GetEvidence`は次のとおりです。  
 
 ```go
 func (msg MsgSubmitEvidence) UnpackInterfaces(ctx sdk.InterfaceRegistry) error {
@@ -311,69 +311,69 @@ func (msg MsgSubmitEvidence) GetEvidence() eviexported.Evidence {
 }
 ```
 
-### Amino Compatibility
+### アミノの互換性
 
-Our custom implementation of `Any` can be used transparently with Amino if used
-with the proper codec instance. What this means is that interfaces packed within
-`Any`s will be amino marshaled like regular Amino interfaces (assuming they
-have been registered properly with Amino).
+使用する場合、カスタムの `Any`実装をAminoで透過的に使用できます
+正しいコーデックインスタンスを使用してください。これは、インターフェースがにカプセル化されていることを意味します
+`Any`は、通常のAminoインターフェースのようにアミノマーシャリングされます(
+Aminoに正しく登録されています)。
 
-In order for this functionality to work:
+この関数を機能させるには:
 
-- **all legacy code must use `*codec.LegacyAmino` instead of `*amino.Codec` which is
-  now a wrapper which properly handles `Any`**
-- **all new code should use `Marshaler` which is compatible with both amino and
-  protobuf**
-- Also, before v0.39, `codec.LegacyAmino` will be renamed to `codec.LegacyAmino`.
+-**すべてのレガシーコードは、 `* amino.Codec`の代わりに` * codec.LegacyAmino`を使用する必要があります。
+  `Any` **を正しく処理できるラッパーになりました
+-**すべての新しいコードは、アミノと組み合わせた `Marshaler`を使用する必要があります
+  プロトタイプバッファー**
+-さらに、v0.39より前では、 `codec.LegacyAmino`は` codec.LegacyAmino`に名前が変更されます。
 
-### Why Wasn't X Chosen Instead
+### Xを選んでみませんか
 
-For a more complete comparison to alternative protocols, see [here](https://codeburst.io/json-vs-protocol-buffers-vs-flatbuffers-a4247f8bda6f).
+代替プロトコルとのより完全な比較については、[ここ](https://codeburst.io/json-vs-protocol-buffers-vs-flatbuffers-a4247f8bda6f)を参照してください。
 
 ### Cap'n Proto
 
-While [Cap’n Proto](https://capnproto.org/) does seem like an advantageous alternative to Protobuf
-due to it's native support for interfaces/generics and built in canonicalization, it does lack the
-rich client ecosystem compared to Protobuf and is a bit less mature.
+[Cap'n Proto](https://capnproto.org/)はProtobufの好ましい代替手段のようですが
+インターフェイス/ジェネリックスのネイティブサポートと組み込みの正規化のために、それは本当に欠けています
+Protobufと比較すると、リッチクライアントエコシステムは十分に成熟していません。
 
 ### FlatBuffers
 
-[FlatBuffers](https://google.github.io/flatbuffers/) is also a potentially viable alternative, with the
-primary difference being that FlatBuffers does not need a parsing/unpacking step to a secondary
-representation before you can access data, often coupled with per-object memory allocation.
+[FlatBuffers](https://google.github.io/flatbuffers/)も、
+主な違いは、FlatBuffersは補助的な解析/解凍手順を必要としないことです
+データにアクセスする前に、通常、各オブジェクトのメモリ割り当てと組み合わされます。
 
-However, it would require great efforts into research and full understanding the scope of the migration
-and path forward -- which isn't immediately clear. In addition, FlatBuffers aren't designed for
-untrusted inputs.
+ただし、これには多くの調査と移行の範囲の完全な理解が必要です。
+そして今後の方向性-これはまだあまり明確ではありません。さらに、FlatBuffersは
+信頼できない入力。
 
-## Future Improvements & Roadmap
+##将来の改善とロードマップ
 
-In the future we may consider a compression layer right above the persistence
-layer which doesn't change tx or merkle tree hashes, but reduces the storage
-overhead of `Any`. In addition, we may adopt protobuf naming conventions which
-make type URLs a bit more concise while remaining descriptive.
+将来的には、永続性のすぐ上に圧縮レイヤーを追加することを検討する可能性があります
+txまたはMerkelツリーハッシュのレベルを変更しませんが、ストレージを削減します
+`Any`のオーバーヘッド。さらに、protobuf命名規則を採用する場合があります
+わかりやすくしながら、タイプURLをより簡潔にします。
 
-Additional code generation support around the usage of `Any` is something that
-could also be explored in the future to make the UX for go developers more
-seamless.
+`Any`の使用を取り巻く追加のコード生成サポートは
+Go開発者により多くのユーザーエクスペリエンスを提供するために、将来的に検討することもできます
+シームレス。
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-- Significant performance gains.
-- Supports backward and forward type compatibility.
-- Better support for cross-language clients.
+-大幅なパフォーマンスの向上。
+-後方および前方タイプの互換性をサポートします。
+-クロスランゲージクライアントのサポートが向上しました。
 
-### Negative
+### ネガティブ
 
-- Learning curve required to understand and implement Protobuf messages.
-- Slightly larger message size due to use of `Any`, although this could be offset
-  by a compression layer in the future
+-Protobufメッセージを理解して実装するために必要な学習曲線。
+-`Any`を使用しているため、メッセージサイズはわずかに大きくなりますが、これは相殺できます
+   圧縮層
 
-### Neutral
+### ニュートラル
 
-## References
+## 参照
 
 1. https://github.com/cosmos/cosmos-sdk/issues/4977
-2. https://github.com/cosmos/cosmos-sdk/issues/5444
+2. https://github.com/cosmos/cosmos-sdk/issues/5444 

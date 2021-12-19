@@ -1,129 +1,129 @@
-# ADR 041: In-Place Store Migrations
+# ADR 041:オンサイトストレージ移行
 
-## Changelog
+## 変更ログ
 
-- 17.02.2021: Initial Draft
+-17.02.2021:最初のドラフト
 
-## Status
+## 状態
 
-Accepted
+受け入れられました
 
-## Abstract
+## 概要
 
-This ADR introduces a mechanism to perform in-place state store migrations during chain software upgrades.
+このADRは、チェーンソフトウェアのアップグレード中にインプレース状態のストレージ移行を実行するメカニズムを導入します。
 
-## Context
+## 環境
 
-When a chain upgrade introduces state-breaking changes inside modules, the current procedure consists of exporting the whole state into a JSON file (via the `simd export` command), running migration scripts on the JSON file (`simd migrate` command), clearing the stores (`simd unsafe-reset-all` command), and starting a new chain with the migrated JSON file as new genesis (optionally with a custom initial block height). An example of such a procedure can be seen [in the Cosmos Hub 3->4 migration guide](https://github.com/cosmos/gaia/blob/v4.0.3/docs/migration/cosmoshub-3.md#upgrade-procedure).
+チェーンのアップグレードによってモジュール内の状態に破壊的な変更が導入された場合、現在のプロセスには、状態全体をJSONファイルにエクスポートし( `simd export`コマンドを使用)、JSONで移行スクリプト(` simdmigrate`コマンド)を実行することが含まれますファイルを作成し、ストレージをクリアして( `simd unsafe-reset-all`コマンド)、移行したJSONファイルを新しい作成として使用して(カスタムの初期ブロック高さを使用することを選択できます)、新しいチェーンを開始します。 [Cosmos Hub 3-> 4移行ガイド](https://github.com/cosmos/gaia/blob/v4.0.3/docs/migration/cosmoshub-3.md#Upgradeプログラム)。
 
-This procedure is cumbersome for multiple reasons:
+このプロセスは、さまざまな理由で面倒です。
 
-- The procedure takes time. It can take hours to run the `export` command, plus some additional hours to run `InitChain` on the fresh chain using the migrated JSON.
-- The exported JSON file can be heavy (~100MB-1GB), making it difficult to view, edit and transfer, which in turn introduces additional work to solve these problems (such as [streaming genesis](https://github.com/cosmos/cosmos-sdk/issues/6936)).
+-手続きには時間がかかります。 `export`コマンドの実行には数時間かかる場合があり、移行されたJSONを使用して新しいチェーンで` InitChain`を実行する場合はさらに時間がかかる場合があります。
+-エクスポートされたJSONファイルは重く(〜100MB-1GB)、表示、編集、転送が難しい場合があります。これにより、これらの問題を解決するための追加の作業が発生します(例:[ストリーミングジェネシス](https://github.com).cosmos .cosmos-sdk .issues .6936))。
 
-## Decision
+## 決定
 
-We propose a migration procedure based on modifying the KV store in-place without involving the JSON export-process-import flow described above.
+上記のJSONエクスポート-プロセス-インポートプロセスを使用せずに、KVストレージのその場での変更に基づく移行プロセスを提案します。
 
-### Module `ConsensusVersion`
+### モジュール `ConsensusVersion`
 
-We introduce a new method on the `AppModule` interface:
+`AppModule`インターフェースに新しいメソッドを導入しました。 
 
 ```go
 type AppModule interface {
-    // --snip--
+   ..--snip--
     ConsensusVersion() uint64
 }
 ```
 
-This methods returns an `uint64` which serves as state-breaking version of the module. It MUST be incremented on each consensus-breaking change introduced by the module. To avoid potential errors with default values, the initial version of a module MUST be set to 1. In the Cosmos SDK, version 1 corresponds to the modules in the v0.41 series.
+このメソッドは、モジュールの状態破棄バージョンとしてuint64を返します。 モジュールによって導入されたコンセンサスを破る変更ごとにインクリメントする必要があります。 デフォルト値の潜在的なエラーを回避するには、モジュールの初期バージョンを1に設定する必要があります。 Cosmos SDKでは、バージョン1はv0.41シリーズのモジュールに対応しています。
 
-### Module-Specific Migration Functions
+### モジュール固有の移行機能
 
-For each consensus-breaking change introduced by the module, a migration script from ConsensusVersion `N` to version `N+1` MUST be registered in the `Configurator` using its newly-added `RegisterMigration` method. All modules receive a reference to the configurator in their `RegisterServices` method on `AppModule`, and this is where the migration functions should be registered. The migration functions should be registered in increasing order.
+モジュールによって導入されたコンセンサスを破る変更ごとに、新しく追加された `RegisterMigration`メソッドを使用して、ConsensusVersion`N`からバージョン` N + 1`への移行スクリプトを `Configurator`に登録する必要があります。 すべてのモジュールは、移行機能を登録する必要がある「AppModule」の「RegisterServices」メソッドでコンフィギュレーターへの参照を受け取ります。 移行機能は昇順で登録する必要があります。  
 
 ```go
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-    // --snip--
+   ..--snip--
     cfg.RegisterMigration(types.ModuleName, 1, func(ctx sdk.Context) error {
-        // Perform in-place store migrations from ConsensusVersion 1 to 2.
+       ..Perform in-place store migrations from ConsensusVersion 1 to 2.
     })
      cfg.RegisterMigration(types.ModuleName, 2, func(ctx sdk.Context) error {
-        // Perform in-place store migrations from ConsensusVersion 2 to 3.
+       ..Perform in-place store migrations from ConsensusVersion 2 to 3.
     })
-    // etc.
+   ..etc.
 }
 ```
 
-For example, if the new ConsensusVersion of a module is `N` , then `N-1` migration functions MUST be registered in the configurator.
+たとえば、モジュールの新しいConsensusVersionが `N`の場合、` N-1`移行機能をコンフィギュレータに登録する必要があります。
 
-In the Cosmos SDK, the migration functions are handled by each module's keeper, because the keeper holds the `sdk.StoreKey` used to perform in-place store migrations. To not overload the keeper, a `Migrator` wrapper is used by each module to handle the migration functions:
+Cosmos SDKでは、キーパーがインプレースストレージ移行の実行に使用される `sdk.StoreKey`を保持しているため、移行機能は各モジュールのキーパーによって処理されます。 キーパーに過負荷をかけないように、各モジュールは `Migrator`ラッパーを使用して移行機能を処理します。 
 
 ```go
-// Migrator is a struct for handling in-place store migrations.
+/.Migrator is a struct for handling in-place store migrations.
 type Migrator struct {
   BaseKeeper
 }
 ```
 
-Migration functions should live inside the `migrations/` folder of each module, and be called by the Migrator's methods. We propose the format `Migrate{M}to{N}` for method names.
+移行関数は、各モジュールの `migrations.`フォルダーに配置され、移行者のメソッドによって呼び出される必要があります。 メソッド名の形式は `Migrate {M} to {N}`にすることをお勧めします。 
 
 ```go
-// Migrate1to2 migrates from version 1 to 2.
+/.Migrate1to2 migrates from version 1 to 2.
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-	return v043bank.MigrateStore(ctx, m.keeper.storeKey) // v043bank is package `x/bank/migrations/v043`.
+	return v043bank.MigrateStore(ctx, m.keeper.storeKey)..v043bank is package `x/bank/migrations/v043`.
 }
 ```
 
-Each module's migration functions are specific to the module's store evolutions, and are not described in this ADR. An example of x/bank store key migrations after the introduction of ADR-028 length-prefixed addresses can be seen in this [store.go code](https://github.com/cosmos/cosmos-sdk/blob/36f68eb9e041e20a5bb47e216ac5eb8b91f95471/x/bank/legacy/v043/store.go#L41-L62).
+各モジュールの移行機能は、モジュールのストレージの進化に固有であり、このADRでは説明されていません。 ADR-028の長さのプレフィックスアドレスの導入後のx .bankストアキーの移行の例は、この[store.goコード](https://github.com/cosmos/cosmos-sdk/blob/36f68eb9e041e20a5bb47e216ac5eb8b91f95471.x .bank .legacy .v043 .store.go#L41-L62)。
 
-### Tracking Module Versions in `x/upgrade`
+### `x .upgrade`でモジュールバージョンを追跡する
 
-We introduce a new prefix store in `x/upgrade`'s store. This store will track each module's current version, it can be modelized as a `map[string]uint64` of module name to module ConsensusVersion, and will be used when running the migrations (see next section for details). The key prefix used is `0x1`, and the key/value format is:
+`x .upgrade`のストレージに新しいプレフィックスストレージを導入しました。 ストレージは各モジュールの現在のバージョンを追跡し、モジュール名からモジュールConsensusVersionへの `map [string] uint64`としてモデル化でき、移行の実行時に使用されます(詳細については次のセクションを参照してください)。 使用されるキープレフィックスは `0x1`であり、キー/値の形式は次のとおりです。 
 
 ```
 0x2 | {bytes(module_name)} => BigEndian(module_consensus_version)
 ```
 
-The initial state of the store is set from `app.go`'s `InitChainer` method.
+ストレージの初期状態は、 `app.go`の` InitChainer`メソッドによって設定されます。
 
-The UpgradeHandler signature needs to be updated to take a `VersionMap`, as well as return an upgraded `VersionMap` and an error:
+UpgradeHandler署名を更新して、 `VersionMap`を取得し、アップグレードされた` VersionMap`とエラーを返す必要があります。
 
 ```diff
 - type UpgradeHandler func(ctx sdk.Context, plan Plan)
 + type UpgradeHandler func(ctx sdk.Context, plan Plan, versionMap VersionMap) (VersionMap, error)
 ```
 
-To apply an upgrade, we query the `VersionMap` from the `x/upgrade` store and pass it into the handler. The handler runs the actual migration functions (see next section), and if successful, returns an updated `VersionMap` to be stored in state.
+アップグレードを適用するには、 `x .upgrade`ストアから` VersionMap`を照会し、それをハンドラーに渡します。 ハンドラーは実際の移行関数を実行し(次のセクションを参照)、成功すると、状態に格納される更新された「VersionMap」を返します。
 
 ```diff
 func (k UpgradeKeeper) ApplyUpgrade(ctx sdk.Context, plan types.Plan) {
-    // --snip--
+   ..--snip--
 -   handler(ctx, plan)
-+   updatedVM, err := handler(ctx, plan, k.GetModuleVersionMap(ctx)) // k.GetModuleVersionMap() fetches the VersionMap stored in state.
++   updatedVM, err := handler(ctx, plan, k.GetModuleVersionMap(ctx))..k.GetModuleVersionMap() fetches the VersionMap stored in state.
 +   if err != nil {
 +       return err
 +   }
 +
-+   // Set the updated consensus versions to state
++  ..Set the updated consensus versions to state
 +   k.SetModuleVersionMap(ctx, updatedVM)
 }
 ```
 
-A gRPC query endpoint to query the `VersionMap` stored in `x/upgrade`'s state will also be added, so that app developers can double-check the `VersionMap` before the upgrade handler runs.
+gRPCクエリエンドポイントも追加され、 `x .upgrade`状態で保存されている` VersionMap`をクエリします。これにより、アプリケーション開発者は、アップグレードハンドラーを実行する前に `VersionMap`を再確認できます。
 
-### Running Migrations
+### 移行の実行
 
-Once all the migration handlers are registered inside the configurator (which happens at startup), running migrations can happen by calling the `RunMigrations` method on `module.Manager`. This function will loop through all modules, and for each module:
+すべての移行ハンドラーがコンフィギュレーターに登録されると(起動時に発生します)、 `module.Manager`で` RunMigrations`メソッドを呼び出すことで移行を実行できます。この関数は、すべてのモジュールと各モジュールを繰り返し処理します。
 
-- Get the old ConsensusVersion of the module from its `VersionMap` argument (let's call it `M`).
-- Fetch the new ConsensusVersion of the module from the `ConsensusVersion()` method on `AppModule` (call it `N`).
-- If `N>M`, run all registered migrations for the module sequentially `M -> M+1 -> M+2...` until `N`.
-    - There is a special case where there is no ConsensusVersion for the module, as this means that the module has been newly added during the upgrade. In this case, no migration function is run, and the module's current ConsensusVersion is saved to `x/upgrade`'s store.
+-モジュールの古いConsensusVersionを `VersionMap`パラメーターから取得します(これを` M`と呼びます)。
+-`AppModule`の `ConsensusVersion()`メソッドからモジュールの新しいConsensusVersion( `N`と呼びます)を取得します。
+-`N> M`の場合、モジュール `M-> M + 1-> M + 2 ...`の登録されたすべての移行を `N`まで実行します。
+    -モジュールにConsensusVersionがない特殊なケースがあります。これは、モジュールがアップグレードプロセス中に新たに追加されたことを意味するためです。この場合、移行機能は実行されず、モジュールの現在のConsensusVersionが `x .upgrade`のストレージに保存されます。
 
-If a required migration is missing (e.g. if it has not been registered in the `Configurator`), then the `RunMigrations` function will error.
+必要な移行が欠落している場合(たとえば、 `Configurator`に登録されていない場合)、` RunMigrations`関数はエラーを出します。
 
-In practice, the `RunMigrations` method should be called from inside an `UpgradeHandler`.
+実際には、 `RunMigrations`メソッドは` UpgradeHandler`内から呼び出す必要があります。 
 
 ```go
 app.UpgradeKeeper.SetUpgradeHandler("my-plan", func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap)  (module.VersionMap, error) {
@@ -131,37 +131,36 @@ app.UpgradeKeeper.SetUpgradeHandler("my-plan", func(ctx sdk.Context, plan upgrad
 })
 ```
 
-Assuming a chain upgrades at block `n`, the procedure should run as follows:
+チェーンがブロックnでアップグレードされたとすると、プログラムは次のように実行されます。
 
-- the old binary will halt in `BeginBlock` when starting block `N`. In its store, the ConsensusVersions of the old binary's modules are stored.
-- the new binary will start at block `N`. The UpgradeHandler is set in the new binary, so will run at `BeginBlock` of the new binary. Inside `x/upgrade`'s `ApplyUpgrade`, the `VersionMap` will be retrieved from the (old binary's) store, and passed into the `RunMigrations` functon, migrating all module stores in-place before the modules' own `BeginBlock`s.
+-ブロック「N」を開始すると、古いバイナリファイルは「BeginBlock」で停止します。そのストレージには、古いバイナリモジュールのコンセンサスバージョンが保存されます。
+-新しいバイナリファイルはブロック「N」から始まります。 UpgradeHandlerは新しいバイナリファイルに設定されているため、新しいバイナリファイルの「BeginBlock」で実行されます。 `x .upgrade`の` ApplyUpgrade`では、 `VersionMap`が(古いバイナリ)ストレージから取得され、` RunMigrations`関数に渡されて、モジュール自体の `BeginBlockの前にすべてのモジュールストレージ`が移行されます。
 
-## Consequences
+## 結果
 
-### Backwards Compatibility
+### 下位互換性
 
-This ADR introduces a new method `ConsensusVersion()` on `AppModule`, which all modules need to implement. It also alters the UpgradeHandler function signature. As such, it is not backwards-compatible.
+このADRは、 `AppModule`に新しいメソッド` ConsensusVersion() `を導入し、すべてのモジュールがこのメソッドを実装する必要があります。また、UpgradeHandler関数のシグネチャも変更します。したがって、下位互換性はありません。
 
-While modules MUST register their migration functions when bumping ConsensusVersions, running those scripts using an upgrade handler is optional. An application may perfectly well decide to not call the `RunMigrations` inside its upgrade handler, and continue using the legacy JSON migration path.
+モジュールはConsensusVersionsと衝突するときに移行関数を登録する必要がありますが、アップグレードハンドラーを使用してこれらのスクリプトを実行することはオプションです。アプリケーションは、アップグレードハンドラーで `RunMigrations`を呼び出さず、代わりに古いJSON移行パスを引き続き使用することを決定する可能性があります。
 
-### Positive
+### ポジティブ
 
-- Perform chain upgrades without manipulating JSON files.
-- While no benchmark has been made yet, it is probable that in-place store migrations will take less time than JSON migrations. The main reason supporting this claim is that both the `simd export` command on the old binary and the `InitChain` function on the new binary will be skipped.
+-JSONファイルを操作せずにチェーンのアップグレードを実行します。
+-ベースラインは確立されていませんが、インプレースストレージ移行はJSON移行よりも時間がかからない場合があります。このステートメントをサポートする主な理由は、古いバイナリファイルの `simdexport`コマンドと新しいバイナリファイルの` InitChain`関数がスキップされるためです。
 
-### Negative
+### ネガティブ
 
-- Module developers MUST correctly track consensus-breaking changes in their modules. If a consensus-breaking change is introduced in a module without its corresponding `ConsensusVersion()` bump, then the `RunMigrations` function won't detect the migration, and the chain upgrade might be unsuccessful. Documentation should clearly reflect this.
+-モジュール開発者は、コンセンサスを破るモジュールの変更を正しく追跡する必要があります。対応する `ConsensusVersion()`バンプなしでコンセンサスを破る変更がモジュールに導入された場合、 `RunMigrations`関数は移行を検出せず、チェーンのアップグレードが失敗する可能性があります。ドキュメントはこれを明確に反映している必要があります。
 
-### Neutral
+### ニュートラル
 
-- The Cosmos SDK will continue to support JSON migrations via the existing `simd export` and `simd migrate` commands.
-- The current ADR does not allow creating, renaming or deleting stores, only modifying existing store keys and values. The Cosmos SDK already has the `StoreLoader` for those operations.
+-Cosmos SDKは、既存の `simdexport`および` simdmigrate`コマンドによるJSON移行を引き続きサポートします。
+-現在のADRでは、ストレージの作成、名前の変更、削除は許可されていません。変更できるのは、既存のストレージキーと値のみです。 Cosmos SDKは、これらの操作に `StoreLoader`を提供しています。
+## さらなる議論
 
-## Further Discussions
+## 参照
 
-## References
-
-- Initial discussion: https://github.com/cosmos/cosmos-sdk/discussions/8429
-- Implementation of `ConsensusVersion` and `RunMigrations`: https://github.com/cosmos/cosmos-sdk/pull/8485
-- Issue discussing `x/upgrade` design: https://github.com/cosmos/cosmos-sdk/issues/8514
+-予備的なディスカッション:https://github.com/cosmos/cosmos-sdk/discussions/8429
+-`ConsensusVersion`と `RunMigrations`の実装:https://github.com/cosmos/cosmos-sdk/pull/8485
+-`x .upgrade`デザインの問題について話し合います:https://github.com/cosmos/cosmos-sdk/issues/8514 

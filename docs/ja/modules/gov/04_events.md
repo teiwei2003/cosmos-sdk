@@ -1,6 +1,6 @@
-# Events
+# 事件
 
-The governance module emits the following events:
+治理模块发出以下事件: 
 
 ## EndBlocker
 

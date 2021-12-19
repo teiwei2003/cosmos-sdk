@@ -1,34 +1,34 @@
-# ADR 013: Observability
+# ADR 013:可観測性
 
-## Changelog
+## 変更ログ
 
-- 20-01-2020: Initial Draft
+-20-01-2020:最初のドラフト
 
-## Status
+## 状態
 
-Proposed
+提案
 
-## Context
+## 環境
 
-Telemetry is paramount into debugging and understanding what the application is doing and how it is
-performing. We aim to expose metrics from modules and other core parts of the Cosmos SDK.
+テレメトリは、アプリケーションが実行していることと、アプリケーションがどのように進行しているかをデバッグおよび理解するために不可欠です。
+パフォーマンス。私たちの目標は、CosmosSDKのモジュールおよびその他のコア部分からのインジケーターを公開することです。
 
-In addition, we should aim to support multiple configurable sinks that an operator may choose from.
-By default, when telemetry is enabled, the application should track and expose metrics that are
-stored in-memory. The operator may choose to enable additional sinks, where we support only
-[Prometheus](https://prometheus.io/) for now, as it's battle-tested, simple to setup, open source,
-and is rich with ecosystem tooling.
+さらに、私たちの目標は、オペレーターが選択できる複数の構成可能な受信機をサポートすることです。
+デフォルトでは、テレメトリが有効になっている場合、アプリはメトリクスを追跡して公開する必要があります
+メモリに保存されます。オペレーターは追加の受信機を有効にすることを選択できます。サポートするのは
+[Prometheus](https://prometheus.io/)これで、実際の戦闘でテストされたため、セットアップとオープンソースが簡単になりました。
+そして、豊富なエコシステムツールがあります。
 
-We must also aim to integrate metrics into the Cosmos SDK in the most seamless way possible such that
-metrics may be added or removed at will and without much friction. To do this, we will use the
-[go-metrics](https://github.com/armon/go-metrics) library.
+また、インジケーターをCosmos SDKに最もシームレスな方法で統合して、
+インジケーターは、あまり摩擦することなく、自由に追加または削除できます。このために使用します
+[go-metrics](https://github.com/armon/go-metrics)ライブラリ。
 
-Finally, operators may enable telemetry along with specific configuration options. If enabled, metrics
-will be exposed via `/metrics?format={text|prometheus}` via the API server.
+最後に、オペレーターはテレメトリと特定の構成オプションを有効にできます。有効になっている場合、インジケーター
+`/metrics？format = {text | prometheus}`を介してAPIサーバーを介して公開されます。
 
-## Decision
+## 決定
 
-We will add an additional configuration block to `app.toml` that defines telemetry settings:
+テレメトリ設定を定義するために、 `app.toml`に追加の構成ブロックを追加します。 
 
 ```toml
 ###############################################################################
@@ -58,23 +58,23 @@ enable-service-label = {{ .Telemetry.EnableServiceLabel }}
 prometheus-retention-time = {{ .Telemetry.PrometheusRetentionTime }}
 ```
 
-The given configuration allows for two sinks -- in-memory and Prometheus. We create a `Metrics`
-type that performs all the bootstrapping for the operator, so capturing metrics becomes seamless.
+指定された構成では、メモリ内とPrometheusの2つのシンクが可能です。 `メトリクス`を作成します
+オペレーターのすべてのブートストラップを実行するタイプであるため、メトリックのキャプチャーはシームレスになります。 
 
 ```go
-// Metrics defines a wrapper around application telemetry functionality. It allows
-// metrics to be gathered at any point in time. When creating a Metrics object,
-// internally, a global metrics is registered with a set of sinks as configured
-// by the operator. In addition to the sinks, when a process gets a SIGUSR1, a
-// dump of formatted recent metrics will be sent to STDERR.
+//Metrics defines a wrapper around application telemetry functionality. It allows
+//metrics to be gathered at any point in time. When creating a Metrics object,
+//internally, a global metrics is registered with a set of sinks as configured
+//by the operator. In addition to the sinks, when a process gets a SIGUSR1, a
+//dump of formatted recent metrics will be sent to STDERR.
 type Metrics struct {
   memSink           *metrics.InmemSink
   prometheusEnabled bool
 }
 
-// Gather collects all registered metrics and returns a GatherResponse where the
-// metrics are encoded depending on the type. Metrics are either encoded via
-// Prometheus or JSON if in-memory.
+//Gather collects all registered metrics and returns a GatherResponse where the
+//metrics are encoded depending on the type. Metrics are either encoded via
+//Prometheus or JSON if in-memory.
 func (m *Metrics) Gather(format string) (GatherResponse, error) {
   switch format {
   case FormatPrometheus:
@@ -92,16 +92,16 @@ func (m *Metrics) Gather(format string) (GatherResponse, error) {
 }
 ```
 
-In addition, `Metrics` allows us to gather the current set of metrics at any given point in time. An
-operator may also choose to send a signal, SIGUSR1, to dump and print formatted metrics to STDERR.
+さらに、「メトリクス」を使用すると、任意の時点で現在のメトリクスのセットを収集できます。 一
+オペレーターは、信号SIGUSR1を送信して、フォーマットされた標識をSTDERRにダンプおよび印刷することもできます。
 
-During an application's bootstrapping and construction phase, if `Telemetry.Enabled` is `true`, the
-API server will create an instance of a reference to `Metrics` object and will register a metrics
-handler accordingly.
+アプリケーションの起動およびビルドフェーズで、「Telemetry.Enabled」が「true」の場合、
+APIサーバーは、 `Metrics`オブジェクトへの参照インスタンスを作成し、メトリックを登録します
+対応する処理手順。 
 
 ```go
 func (s *Server) Start(cfg config.Config) error {
-  // ...
+./...
 
   if cfg.Telemetry.Enabled {
     m, err := telemetry.New(cfg.Telemetry)
@@ -113,7 +113,7 @@ func (s *Server) Start(cfg config.Config) error {
     s.registerMetrics()
   }
 
-  // ...
+./...
 }
 
 func (s *Server) registerMetrics() {
@@ -134,24 +134,24 @@ func (s *Server) registerMetrics() {
 }
 ```
 
-Application developers may track counters, gauges, summaries, and key/value metrics. There is no
-additional lifting required by modules to leverage profiling metrics. To do so, it's as simple as:
+アプリケーション開発者は、カウンター、ゲージ、要約、およびキー/値メトリックを追跡できます。
+プロファイリングメトリックを活用するためにモジュールに必要な追加のリフティング。これを行うには、次のように簡単です。 
 
 ```go
 func (k BaseKeeper) MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error {
   defer metrics.MeasureSince(time.Now(), "MintCoins")
-  // ...
+./...
 }
 ```
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-- Exposure into the performance and behavior of an application
+-アプリケーションのパフォーマンスと動作を理解する
 
-### Negative
+### ネガティブ
 
-### Neutral
+### ニュートラル
 
-## References
+## 参照 

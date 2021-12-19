@@ -1,30 +1,30 @@
-# ADR 012: State Accessors
+# ADR 012:ステータスアクセサー
 
-## Changelog
+## 変更ログ
 
-- 2019 Sep 04: Initial draft
+-2019年9月4日:最初のドラフト
 
-## Context
+## 環境
 
-Cosmos SDK modules currently use the `KVStore` interface and `Codec` to access their respective state. While
-this provides a large degree of freedom to module developers, it is hard to modularize and the UX is
-mediocre.
+Cosmos SDKモジュールは現在、 `KVStore`インターフェースと` Codec`を使用してそれぞれの状態にアクセスしています。でも
+これは、モジュール開発者に多くの自由を提供し、モジュール化が困難であり、UX
+平凡。
 
-First, each time a module tries to access the state, it has to marshal the value and set or get the
-value and finally unmarshal. Usually this is done by declaring `Keeper.GetXXX` and `Keeper.SetXXX` functions,
-which are repetitive and hard to maintain.
+まず、モジュールが状態にアクセスしようとするたびに、値をマーシャリングし、設定または取得する必要があります
+値を付け、最後にグループ化を解除します。通常、これは `Keeper.GetXXX`関数と` Keeper.SetXXX`関数を宣言することによって行われます。
+それらは反復的であり、維持するのが困難です。
 
-Second, this makes it harder to align with the object capability theorem: the right to access the
-state is defined as a `StoreKey`, which gives full access on the entire Merkle tree, so a module cannot
-send the access right to a specific key-value pair (or a set of key-value pairs) to another module safely.
+次に、これにより、オブジェクト機能の定理であるアクセスとの整合がより困難になります。
+状態は「StoreKey」として定義され、Merkleツリー全体へのフルアクセスを提供するため、モジュールはできません
+特定のキーと値のペア(またはキーと値のペアのセット)のアクセス権を別のモジュールに安全に送信します。
 
-Finally, because the getter/setter functions are defined as methods of a module's `Keeper`, the reviewers
-have to consider the whole Merkle tree space when they reviewing a function accessing any part of the state.
-There is no static way to know which part of the state that the function is accessing (and which is not).
+最後に、getter/setter関数は、モジュールの `Keeper`のメソッドとして定義されているため、レビュー担当者は
+状態の任意の部分にアクセスする関数を見るときは、マークルツリー空間全体を考慮する必要があります。
+関数がアクセスしている状態の部分(アクセスしていない部分)を静的に知る方法はありません。
 
-## Decision
+## 決断
 
-We will define a type named `Value`:
+「値」と呼ばれるタイプを定義します。 
 
 ```go
 type Value struct {
@@ -33,10 +33,10 @@ type Value struct {
 }
 ```
 
-The `Value` works as a reference for a key-value pair in the state, where `Value.m` defines the key-value
-space it will access and `Value.key` defines the exact key for the reference.
+`Value` 用作状态中键值对的引用，其中 `Value.m` 定义键值
+它将访问的空间和 `Value.key` 定义引用的确切键。
 
-We will define a type named `Mapping`:
+我们将定义一个名为 `Mapping` 的类型: 
 
 ```go
 type Mapping struct {
@@ -46,73 +46,73 @@ type Mapping struct {
 }
 ```
 
-The `Mapping` works as a reference for a key-value space in the state, where `Mapping.storeKey` defines
-the IAVL (sub-)tree and `Mapping.prefix` defines the optional subspace prefix.
+`Mapping` 用作状态中键值空间的引用，其中 `Mapping.storeKey` 定义
+IAVL(子)树和`Mapping.prefix` 定义了可选的子空间前缀。
 
-We will define the following core methods for the `Value` type:
+我们将为 `Value` 类型定义以下核心方法: 
 
 ```go
-// Get and unmarshal stored data, noop if not exists, panic if cannot unmarshal
+//Get and unmarshal stored data, noop if not exists, panic if cannot unmarshal
 func (Value) Get(ctx Context, ptr interface{}) {}
 
-// Get and unmarshal stored data, return error if not exists or cannot unmarshal
+//Get and unmarshal stored data, return error if not exists or cannot unmarshal
 func (Value) GetSafe(ctx Context, ptr interface{}) {}
 
-// Get stored data as raw byte slice
+//Get stored data as raw byte slice
 func (Value) GetRaw(ctx Context) []byte {}
 
-// Marshal and set a raw value
+//Marshal and set a raw value
 func (Value) Set(ctx Context, o interface{}) {}
 
-// Check if a raw value exists
+//Check if a raw value exists
 func (Value) Exists(ctx Context) bool {}
 
-// Delete a raw value value
+//Delete a raw value value
 func (Value) Delete(ctx Context) {}
 ```
 
 We will define the following core methods for the `Mapping` type:
 
 ```go
-// Constructs key-value pair reference corresponding to the key argument in the Mapping space
+//Constructs key-value pair reference corresponding to the key argument in the Mapping space
 func (Mapping) Value(key []byte) Value {}
 
-// Get and unmarshal stored data, noop if not exists, panic if cannot unmarshal
+//Get and unmarshal stored data, noop if not exists, panic if cannot unmarshal
 func (Mapping) Get(ctx Context, key []byte, ptr interface{}) {}
 
-// Get and unmarshal stored data, return error if not exists or cannot unmarshal
+//Get and unmarshal stored data, return error if not exists or cannot unmarshal
 func (Mapping) GetSafe(ctx Context, key []byte, ptr interface{})
 
-// Get stored data as raw byte slice
+//Get stored data as raw byte slice
 func (Mapping) GetRaw(ctx Context, key []byte) []byte {}
 
-// Marshal and set a raw value
+//Marshal and set a raw value
 func (Mapping) Set(ctx Context, key []byte, o interface{}) {}
 
-// Check if a raw value exists
+//Check if a raw value exists
 func (Mapping) Has(ctx Context, key []byte) bool {}
 
-// Delete a raw value value
+//Delete a raw value value
 func (Mapping) Delete(ctx Context, key []byte) {}
 ```
 
-Each method of the `Mapping` type that is passed the arguments `ctx`, `key`, and `args...` will proxy
-the call to `Mapping.Value(key)` with arguments `ctx` and `args...`.
+パラメータ `ctx`、` key`、および `args ...`を渡す `Mapping`タイプの各メソッドはプロキシします
+パラメータctxおよびargsを使用したMapping.Value(key)の呼び出し...
 
-In addition, we will define and provide a common set of types derived from the `Value` type:
+さらに、 `Value`型から派生したジェネリック型のセットを定義して提供します。 
 
 ```go
 type Boolean struct { Value }
 type Enum struct { Value }
 type Integer struct { Value; enc IntEncoding }
 type String struct { Value }
-// ...
+//...
 ```
 
-Where the encoding schemes can be different, `o` arguments in core methods are typed, and `ptr` arguments
-in core methods are replaced by explicit return types.
+エンコード方式が異なる場合は、コアメソッドの `o`パラメーターを入力し、` ptr`パラメーターを入力します。
+コアメソッドの明示的な戻り型に置き換えられました。
 
-Finally, we will define a family of types derived from the `Mapping` type:
+最後に、マッピングタイプから派生した一連のタイプを定義します。 
 
 ```go
 type Indexer struct {
@@ -121,35 +121,36 @@ type Indexer struct {
 }
 ```
 
-Where the `key` argument in core method is typed.
+コアメソッドの「key」パラメータの場所を入力します。
 
-Some of the properties of the accessor types are:
+アクセサタイプのいくつかのプロパティは次のとおりです。
 
-- State access happens only when a function which takes a `Context` as an argument is invoked
-- Accessor type structs give rights to access the state only that the struct is referring, no other
-- Marshalling/Unmarshalling happens implicitly within the core methods
+-状態アクセスは、パラメータとして `Context`を使用して関数を呼び出す場合にのみ発生します
+-アクセサータイプの構造体は、構造体によって参照される状態へのアクセスのみを許可し、他のアクセス許可は許可しません
+-マーシャリング/アンマーシャリングはコアメソッドで暗黙的に発生します
 
-## Status
+## 状態
 
-Proposed
+提案
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-- Serialization will be done automatically
-- Shorter code size, less boilerplate, better UX
-- References to the state can be transferred safely
-- Explicit scope of accessing
+-シリアル化は自動的に行われます
+-コードサイズが短く、定型文が少なく、ユーザーエクスペリエンスが向上しています
+-状態への参照を安全に転送できます
+-アクセス範囲を明確にする
 
-### Negative
+### ネガティブ
 
-- Serialization format will be hidden
-- Different architecture from the current, but the use of accessor types can be opt-in
-- Type-specific types (e.g. `Boolean` and `Integer`) have to be defined manually
+-シリアル化は自動的に行われます
+-コードサイズが短く、定型文が少なく、ユーザーエクスペリエンスが向上しています
+-状態への参照を安全に転送できます
+-アクセス範囲を明確にする
 
-### Neutral
+### ニュートラル
 
-## References
+## 参照
 
-- [#4554](https://github.com/cosmos/cosmos-sdk/issues/4554)
+-[#4554](https://github.com/cosmos/cosmos-sdk/issues/4554) 

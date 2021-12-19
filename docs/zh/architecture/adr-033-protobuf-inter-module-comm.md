@@ -286,7 +286,7 @@ func (am AppModule) RegisterServices(cfg Configurator) {
 除了检查“ModuleKey”权限外，还需要采取一些额外的安全预防措施
 底层路由器基础设施。
 
-####递归和重入
+#### 递归和重入
 
 递归或可重入方法调用构成潜在的安全威胁。如果模块 A，这可能是一个问题
 在同一个调用中调用模块 B 和模块 B 再次调用模块 A。

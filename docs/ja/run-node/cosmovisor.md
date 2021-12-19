@@ -1,45 +1,45 @@
-# Cosmosvisor
+# cosmovisor
 
-`cosmovisor` is a small process manager for Cosmos SDK application binaries that monitors the governance module for incoming chain upgrade proposals. If it sees a proposal that gets approved, `cosmovisor` can automatically download the new binary, stop the current binary, switch from the old binary to the new one, and finally restart the node with the new binary.
+`cosmovisor` 是 Cosmos SDK 应用程序二进制文件的小型进程管理器，用于监控传入链升级提议的治理模块。如果看到一个提案获得批准，`cosmovisor` 可以自动下载新的二进制文件，停止当前的二进制文件，从旧的二进制文件切换到新的二进制文件，最后用新的二进制文件重新启动节点。
 
-#### Design
+#### 设计
 
-Cosmovisor is designed to be used as a wrapper for a `Cosmos SDK` app:
+Cosmovisor 旨在用作“Cosmos SDK”应用程序的包装器:
 
-* it will pass arguments to the associated app (configured by `DAEMON_NAME` env variable).
-  Running `cosmovisor run arg1 arg2 ....` will run `app arg1 arg2 ...`;
-* it will manage an app by restarting and upgrading if needed;
-* it is configured using environment variables, not positional arguments.
+* 它将参数传递给关联的应用程序(由`DAEMON_NAME` 环境变量配置)。
+  运行 `cosmovisor run arg1 arg2 ....` 将运行 `app arg1 arg2 ...`；
+* 如果需要，它将通过重新启动和升级来管理应用程序；
+* 它是使用环境变量配置的，而不是位置参数。
 
-*Note: If new versions of the application are not set up to run in-place store migrations, migrations will need to be run manually before restarting `cosmovisor` with the new binary. For this reason, we recommend applications adopt in-place store migrations.*
+*注意:如果应用程序的新版本未设置为运行就地存储迁移，则需要在使用新二进制文件重新启动 `cosmovisor` 之前手动运行迁移。因此，我们建议应用程序采用就地存储迁移。*
 
-*Note: If validators would like to enable the auto-download option (which [we don't recommend](#auto-download)), and they are currently running an application using Cosmos SDK `v0.42`, they will need to use Cosmovisor [`v0.1`](https://github.com/cosmos/cosmos-sdk/releases/tag/cosmovisor%2Fv0.1.0). Later versions of Cosmovisor do not support Cosmos SDK `v0.44.3` or earlier if the auto-download option is enabled.*
+*注意:如果验证者想要启用自动下载选项([我们不推荐](#auto-download))，并且他们当前正在使用 Cosmos SDK `v0.42` 运行应用程序，他们将需要使用 Cosmovisor [`v0.1`](https://github.com/cosmos/cosmos-sdk/releases/tag/cosmovisor%2Fv0.1.0)。如果启用了自动下载选项，更高版本的 Cosmovisor 不支持 Cosmos SDK `v0.44.3` 或更早版本。*
 
-## Contributing
+## 贡献
 
-Cosmovisor is part of the Cosmos SDK monorepo, but it's a separate module with it's own release schedule.
+Cosmovisor 是 Cosmos SDK monorepo 的一部分，但它是一个单独的模块，有自己的发布时间表。
 
-Release branches have the following format `release/cosmovisor/vA.B.x`, where A and B are a number (e.g. `release/cosmovisor/v0.1.x`). Releases are tagged using the following format: `cosmovisor/vA.B.C`.
+发布分支具有以下格式`release/cosmovisor/vA.B.x`，其中 A 和 B 是一个数字(例如`release/cosmovisor/v0.1.x`)。使用以下格式标记版本:`cosmovisor/vA.B.C`。
 
-## Setup
+## 设置
 
-### Installation
+### 安装
 
-To install the latest version of `cosmovisor`, run the following command:
+要安装最新版本的 `cosmovisor`，请运行以下命令: 
 
 ```
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@latest
 ```
 
-To install a previous version, you can specify the version. IMPORTANT: Chains that use Cosmos-SDK v0.44.3 or earlier (eg v0.44.2) and want to use auto-download feature MUST use Cosmovisor v0.1.0
+要安装以前的版本，您可以指定版本。 重要提示:使用 Cosmos-SDK v0.44.3 或更早版本(例如 v0.44.2)并希望使用自动下载功能的链必须使用 Cosmovisor v0.1.0 
 
 ```
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v0.1.0
 ```
 
-It is possible to confirm the version of cosmovisor when using Cosmovisor v1.0.0, but it is not possible to do so with `v0.1.0`.
+使用 Cosmovisor v1.0.0 时可以确认 cosmovisor 的版本，但使用 `v0.1.0` 则无法这样做。 
 
-You can also install from source by pulling the cosmos-sdk repository and switching to the correct version and building as follows:
+您还可以通过拉取 cosmos-sdk 存储库并切换到正确的版本并按如下方式构建来从源代码安装: 
 
 ```
 git clone git@github.com:cosmos/cosmos-sdk
@@ -49,39 +49,39 @@ cd cosmovisor
 make
 ```
 
-This will build cosmovisor in your current directory. Afterwards you may want to put it into your machine's PATH like as follows:
+这将在您的当前目录中构建 cosmovisor。 之后，您可能希望将其放入机器的 PATH 中，如下所示: 
 
 ```
 cp cosmovisor ~/go/bin/cosmovisor
 ```
 
-*Note: If you are using go `v1.15` or earlier, you will need to use `go get`, and you may want to run the command outside a project directory.*
+*注意:如果您使用的是 go `v1.15` 或更早版本，则需要使用 `go get`，并且您可能希望在项目目录外运行该命令。*
 
-### Command Line Arguments And Environment Variables
+### 命令行参数和环境变量
 
-The first argument passed to `cosmovisor` is the action for `cosmovisor` to take. Options are:
+传递给 `cosmovisor` 的第一个参数是 `cosmovisor` 要采取的操作。选项是:
 
-* `help`, `--help`, or `-h` - Output `cosmovisor` help information and check your `cosmovisor` configuration.
-* `run` - Run the configured binary using the rest of the provided arguments.
-* `version`, or `--version` - Output the `cosmovisor` version and also run the binary with the `version` argument.
+* `help`、`--help` 或 `-h` - 输出 `cosmovisor` 帮助信息并检查你的 `cosmovisor` 配置。
+* `run` - 使用提供的其余参数运行配置的二进制文件。
+* `version` 或 `--version` - 输出 `cosmovisor` 版本并使用 `version` 参数运行二进制文件。
 
-All arguments passed to `cosmovisor run` will be passed to the application binary (as a subprocess). `cosmovisor` will return `/dev/stdout` and `/dev/stderr` of the subprocess as its own. For this reason, `cosmovisor run` cannot accept any command-line arguments other than those available to the application binary.
+传递给“cosmovisor run”的所有参数都将传递给应用程序二进制文件(作为子进程)。 `cosmovisor` 将返回子进程的 `/dev/stdout` 和 `/dev/stderr` 作为它自己的。出于这个原因，`cosmovisor run` 不能接受除应用程序二进制文件可用的命令行参数之外的任何命令行参数。
 
-*Note: Use of `cosmovisor` without one of the action arguments is deprecated. For backwards compatability, if the first argument is not an action argument, `run` is assumed. However, this fallback might be removed in future versions, so it is recommended that you always provide `run`.
+*注意:不推荐使用没有动作参数之一的`cosmovisor`。为了向后兼容，如果第一个参数不是动作参数，则假定为 `run`。但是，此回退可能会在未来版本中删除，因此建议您始终提供 `run`。
 
-`cosmovisor` reads its configuration from environment variables:
+`cosmovisor` 从环境变量中读取其配置:
 
-* `DAEMON_HOME` is the location where the `cosmovisor/` directory is kept that contains the genesis binary, the upgrade binaries, and any additional auxiliary files associated with each binary (e.g. `$HOME/.gaiad`, `$HOME/.regend`, `$HOME/.simd`, etc.).
-* `DAEMON_NAME` is the name of the binary itself (e.g. `gaiad`, `regend`, `simd`, etc.).
-* `DAEMON_ALLOW_DOWNLOAD_BINARIES` (*optional*), if set to `true`, will enable auto-downloading of new binaries (for security reasons, this is intended for full nodes rather than validators). By default, `cosmovisor` will not auto-download new binaries.
-* `DAEMON_RESTART_AFTER_UPGRADE` (*optional*, default = `true`), if `true`, restarts the subprocess with the same command-line arguments and flags (but with the new binary) after a successful upgrade. Otherwise (`false`), `cosmovisor` stops running after an upgrade and requires the system administrator to manually restart it. Note restart is only after the upgrade and does not auto-restart the subprocess after an error occurs.
-* `DAEMON_POLL_INTERVAL` is the interval length for polling the upgrade plan file. The value can either be a number (in milliseconds) or a duration (e.g. `1s`). Default: 300 milliseconds.
-* `UNSAFE_SKIP_BACKUP` (defaults to `false`), if set to `true`, upgrades directly without performing a backup. Otherwise (`false`, default) backs up the data before trying the upgrade. The default value of false is useful and recommended in case of failures and when a backup needed to rollback. We recommend using the default backup option `UNSAFE_SKIP_BACKUP=false`.
-* `DAEMON_PREUPGRADE_MAX_RETRIES` (defaults to `0`). The maximum number of times to call `pre-upgrade` in the application after exit status of `31`. After the maximum number of retries, cosmovisor fails the upgrade.
+* `DAEMON_HOME` 是保存 `cosmovisor/` 目录的位置，该目录包含创世二进制文件、升级二进制文件以及与每个二进制文件相关的任何其他辅助文件(例如 `$HOME/.gaiad`、`$HOME/. regend`、`$HOME/.simd` 等)。
+* `DAEMON_NAME` 是二进制文件本身的名称(例如`gaiad`、`regend`、`simd` 等)。
+* `DAEMON_ALLOW_DOWNLOAD_BINARIES`(*可选*)，如果设置为`true`，将启用新二进制文件的自动下载(出于安全原因，这适用于完整节点而不是验证器)。默认情况下，`cosmovisor` 不会自动下载新的二进制文件。
+* `DAEMON_RESTART_AFTER_UPGRADE`(*可选*，默认值 = `true`)，如果为 `true`，则在成功升级后使用相同的命令行参数和标志(但使用新的二进制文件)重新启动子进程。否则 (`false`)，`cosmovisor` 在升级后停止运行，需要系统管理员手动重启。注意restart 是升级后才会出现的，不会在出现错误后自动重启子进程。
+* `DAEMON_POLL_INTERVAL` 是轮询升级计划文件的间隔长度。该值可以是数字(以毫秒为单位)或持续时间(例如“1s”)。默认值:300 毫秒。
+* `UNSAFE_SKIP_BACKUP`(默认为`false`)，如果设置为`true`，直接升级而不执行备份。否则(`false`，默认)在尝试升级之前备份数据。默认值 false 很有用，建议在发生故障和备份需要回滚时使用。我们建议使用默认备份选项`UNSAFE_SKIP_BACKUP=false`。
+* `DAEMON_PREUPGRADE_MAX_RETRIES`(默认为 `0`)。退出状态为“31”后，应用程序中调用“pre-upgrade”的最大次数。达到最大重试次数后，cosmovisor 升级失败。
 
-### Folder Layout
+### 文件夹布局
 
-`$DAEMON_HOME/cosmovisor` is expected to belong completely to `cosmovisor` and the subprocesses that are controlled by it. The folder content is organized as follows:
+`$DAEMON_HOME/cosmovisor` 应该完全属于 `cosmovisor` 及其控制的子进程。文件夹内容组织如下: 
 
 ```
 .
@@ -96,9 +96,9 @@ All arguments passed to `cosmovisor run` will be passed to the application binar
         └── upgrade-info.json
 ```
 
-The `cosmovisor/` directory incudes a subdirectory for each version of the application (i.e. `genesis` or `upgrades/<name>`). Within each subdirectory is the application binary (i.e. `bin/$DAEMON_NAME`) and any additional auxiliary files associated with each binary. `current` is a symbolic link to the currently active directory (i.e. `genesis` or `upgrades/<name>`). The `name` variable in `upgrades/<name>` is the URI-encoded name of the upgrade as specified in the upgrade module plan.
+`cosmovisor/` 目录为应用程序的每个版本(即 `genesis` 或 `upgrades/<name>`)包含一个子目录。在每个子目录中是应用程序二进制文件(即`bin/$DAEMON_NAME`)和与每个二进制文件关联的任何其他辅助文件。 `current` 是指向当前活动目录(即 `genesis` 或 `upgrades/<name>`)的符号链接。 `upgrades/<name>` 中的 `name` 变量是升级模块计划中指定的升级的 URI 编码名称。
 
-Please note that `$DAEMON_HOME/cosmovisor` only stores the *application binaries*. The `cosmovisor` binary itself can be stored in any typical location (e.g. `/usr/local/bin`). The application will continue to store its data in the default data directory (e.g. `$HOME/.gaiad`) or the data directory specified with the `--home` flag. `$DAEMON_HOME` is independent of the data directory and can be set to any location. If you set `$DAEMON_HOME` to the same directory as the data directory, you will end up with a configuation like the following:
+请注意`$DAEMON_HOME/cosmovisor` 只存储*应用程序二进制文件*。 `cosmovisor` 二进制文件本身可以存储在任何典型的位置(例如 `/usr/local/bin`)。应用程序将继续将其数据存储在默认数据目录(例如`$HOME/.gaiad`)或使用`--home` 标志指定的数据目录中。 `$DAEMON_HOME` 独立于数据目录，可以设置为任何位置。如果您将 `$DAEMON_HOME` 设置为与数据目录相同的目录，您将得到如下配置: 
 
 ```
 .gaiad
@@ -107,46 +107,46 @@ Please note that `$DAEMON_HOME/cosmovisor` only stores the *application binaries
 └── cosmovisor
 ```
 
-## Usage
+## 用法
 
-The system administrator is responsible for:
+系统管理员负责:
 
-- installing the `cosmovisor` binary
-- configuring the host's init system (e.g. `systemd`, `launchd`, etc.)
-- appropriately setting the environmental variables
-- manually installing the `genesis` folder
-- manually installing the `upgrades/<name>` folders
+- 安装 `cosmovisor` 二进制文件
+- 配置主机的初始化系统(例如`systemd`、`launchd`等)
+- 适当设置环境变量
+- 手动安装 `genesis` 文件夹
+- 手动安装 `upgrades/<name>` 文件夹
 
-`cosmovisor` will set the `current` link to point to `genesis` at first start (i.e. when no `current` link exists) and then handle switching binaries at the correct points in time so that the system administrator can prepare days in advance and relax at upgrade time.
+`cosmovisor` 会在第一次启动时将 `current` 链接设置为指向 `genesis`(即不存在 `current` 链接时)，然后在正确的时间点处理切换二进制文件，以便系统管理员可以提前几天准备并在升级时放松。
 
-In order to support downloadable binaries, a tarball for each upgrade binary will need to be packaged up and made available through a canonical URL. Additionally, a tarball that includes the genesis binary and all available upgrade binaries can be packaged up and made available so that all the necessary binaries required to sync a fullnode from start can be easily downloaded.
+为了支持可下载的二进制文件，需要打包每个升级二进制文件的 tarball 并通过规范 URL 提供。此外，包含 genesis 二进制文件和所有可用升级二进制文件的 tarball 可以打包并提供，以便可以轻松下载从一开始就同步全节点所需的所有必要二进制文件。
 
-The `DAEMON` specific code and operations (e.g. tendermint config, the application db, syncing blocks, etc.) all work as expected. The application binaries' directives such as command-line flags and environment variables also work as expected.
+`DAEMON` 特定的代码和操作(例如，tendermint 配置、应用程序数据库、同步块等)都按预期工作。应用程序二进制文件的指令(例如命令行标志和环境变量)也按预期工作。
 
-### Detecting Upgrades
+### 检测升级
 
-`cosmovisor` is polling the `$DAEMON_HOME/data/upgrade-info.json` file for new upgrade instructions. The file is created by the x/upgrade module in `BeginBlocker` when an upgrade is detected and the blockchain reaches the upgrade height.
-The following heuristic is applied to detect the upgrade:
+`cosmovisor` 正在轮询 `$DAEMON_HOME/data/upgrade-info.json` 文件以获取新的升级说明。当检测到升级并且区块链达到升级高度时，该文件由“BeginBlocker”中的 x/upgrade 模块创建。
+应用以下启发式方法来检测升级:
 
-+ When starting, `cosmovisor` doesn't know much about currently running upgrade, except the binary which is `current/bin/`. It tries to read the `current/update-info.json` file to get information about the current upgrade name.
-+ If neither `cosmovisor/current/upgrade-info.json` nor `data/upgrade-info.json` exist, then `cosmovisor` will wait for `data/upgrade-info.json` file to trigger an upgrade.
-+ If `cosmovisor/current/upgrade-info.json` doesn't exist but `data/upgrade-info.json` exists, then `cosmovisor` assumes that whatever is in `data/upgrade-info.json` is a valid upgrade request. In this case `cosmovisor` tries immediately to make an upgrade according to the `name` attribute in `data/upgrade-info.json`.
-+ Otherwise, `cosmovisor` waits for changes in `upgrade-info.json`. As soon as a new upgrade name is recorded in the file, `cosmovisor` will trigger an upgrade mechanism.
++ 启动时，`cosmovisor` 不太了解当前正在运行的升级，除了`current/bin/` 二进制文件。它尝试读取“current/update-info.json”文件以获取有关当前升级名称的信息。
++ 如果`cosmovisor/current/upgrade-info.json` 和`data/upgrade-info.json` 都不存在，那么`cosmovisor` 将等待`data/upgrade-info.json` 文件触发升级。
++ 如果`cosmovisor/current/upgrade-info.json` 不存在但`data/upgrade-info.json` 存在，那么`cosmovisor` 假设`data/upgrade-info.json` 中的任何内容都是有效的升级请求。在这种情况下，`cosmovisor` 会立即尝试根据 `data/upgrade-info.json` 中的 `name` 属性进行升级。
++ 否则，`cosmovisor` 会等待 `upgrade-info.json` 中的更改。一旦文件中记录了新的升级名称，`cosmovisor` 将触发升级机制。
 
-When the upgrade mechanism is triggered, `cosmovisor` will:
+当升级机制被触发时，`cosmovisor` 将:
 
-1. if `DAEMON_ALLOW_DOWNLOAD_BINARIES` is enabled, start by auto-downloading a new binary into `cosmovisor/<name>/bin` (where `<name>` is the `upgrade-info.json:name` attribute);
-2. update the `current` symbolic link to point to the new directory and save `data/upgrade-info.json` to `cosmovisor/current/upgrade-info.json`.
+1. 如果启用了`DAEMON_ALLOW_DOWNLOAD_BINARIES`，首先将新的二进制文件自动下载到`cosmovisor/<name>/bin`(其中`<name>` 是`upgrade-info.json:name` 属性)；
+2.更新`current`符号链接指向新目录，并将`data/upgrade-info.json`保存到`cosmovisor/current/upgrade-info.json`。
 
-### Auto-Download
+### 自动下载
 
-Generally, `cosmovisor` requires that the system administrator place all relevant binaries on disk before the upgrade happens. However, for people who don't need such control and want an automated setup (maybe they are syncing a non-validating fullnode and want to do little maintenance), there is another option.
+通常，`cosmovisor` 要求系统管理员在升级之前将所有相关的二进制文件放在磁盘上。然而，对于不需要这种控制并想要自动设置的人(也许他们正在同步一个非验证全节点并且想要做很少的维护)，还有另一种选择。
 
-**NOTE: we don't recommend using auto-download** because it doesn't verify in advance if a binary is available. If there will be any issue with downloading a binary, the cosmovisor will stop and won't restart an App (which could lead to a chain halt).
+**注意:我们不建议使用自动下载**，因为它不会提前验证二进制文件是否可用。如果下载二进制文件有任何问题，cosmovisor 将停止并且不会重新启动应用程序(这可能导致链停止)。 
 
-If `DAEMON_ALLOW_DOWNLOAD_BINARIES` is set to `true`, and no local binary can be found when an upgrade is triggered, `cosmovisor` will attempt to download and install the binary itself based on the instructions in the `info` attribute in the `data/upgrade-info.json` file. The files is constructed by the x/upgrade module and contains data from the upgrade `Plan` object. The `Plan` has an info field that is expected to have one of the following two valid formats to specify a download:
+如果 `DAEMON_ALLOW_DOWNLOAD_BINARIES` 设置为 `true`，并且在触发升级时找不到本地二进制文件，`cosmovisor` 将尝试根据 `data` 中的 `info` 属性中的说明下载并安装二进制文件本身 /upgrade-info.json` 文件。 这些文件由 x/upgrade 模块构建，并包含来自升级“计划”对象的数据。 `Plan` 有一个信息字段，它应该具有以下两种有效格式之一来指定下载:
 
-1. Store an os/architecture -> binary URI map in the upgrade plan info field as JSON under the `"binaries"` key. For example:
+1. 将 os/architecture -> 二进制 URI 映射存储在升级计划信息字段中作为“二进制”键下的 JSON。 例如: 
 
 ```json
 {
@@ -156,7 +156,7 @@ If `DAEMON_ALLOW_DOWNLOAD_BINARIES` is set to `true`, and no local binary can be
 }
 ```
 
-You can include multiple binaries at once to ensure more than one environment will receive the correct binaries:
+您可以一次包含多个二进制文件，以确保多个环境将收到正确的二进制文件: 
 
 ```json
 {
@@ -168,7 +168,7 @@ You can include multiple binaries at once to ensure more than one environment wi
 }
 ```
 
-When submitting this as a proposal ensure there are no spaces. An example command using `gaiad` could look like:
+将此作为提案提交时，请确保没有空格。 使用“gaiad”的示例命令可能如下所示: 
 
 ```
 > gaiad tx gov submit-proposal software-upgrade Vega \
@@ -185,31 +185,31 @@ When submitting this as a proposal ensure there are no spaces. An example comman
 --yes
 ```
 
-2. Store a link to a file that contains all information in the above format (e.g. if you want to specify lots of binaries, changelog info, etc. without filling up the blockchain). For example:
+2. 以上述格式存储包含所有信息的文件的链接(例如，如果您想指定大量二进制文件、更改日志信息等，而无需填充区块链)。 例如: 
 
 ```
 https://example.com/testnet-1001-info.json?checksum=sha256:deaaa99fda9407c4dbe1d04bd49bab0cc3c1dd76fa392cd55a9425be074af01e
 ```
 
-When `cosmovisor` is triggered to download the new binary, `cosmovisor` will parse the `"binaries"` field, download the new binary with [go-getter](https://github.com/hashicorp/go-getter), and unpack the new binary in the `upgrades/<name>` folder so that it can be run as if it was installed manually.
+当 `cosmovisor` 被触发下载新的二进制文件时，`cosmovisor` 会解析 `"binaries"` 字段，使用 [go-getter](https://github.com/hashicorp/go-getter) 下载新的二进制文件 ，并将新的二进制文件解压到 `upgrades/<name>` 文件夹中，这样它就可以像手动安装一样运行。
 
-Note that for this mechanism to provide strong security guarantees, all URLs should include a SHA 256/512 checksum. This ensures that no false binary is run, even if someone hacks the server or hijacks the DNS. `go-getter` will always ensure the downloaded file matches the checksum if it is provided. `go-getter` will also handle unpacking archives into directories (in this case the download link should point to a `zip` file of all data in the `bin` directory).
+请注意，为了让此机制提供强大的安全保证，所有 URL 都应包含 SHA 256/512 校验和。 这确保不会运行虚假的二进制文件，即使有人入侵服务器或劫持 DNS。 `go-getter` 将始终确保下载的文件与提供的校验和匹配。 `go-getter` 还将处理将档案解压到目录中(在这种情况下，下载链接应该指向 `bin` 目录中所有数据的 `zip` 文件)。
 
-To properly create a sha256 checksum on linux, you can use the `sha256sum` utility. For example:
+要在 linux 上正确创建 sha256 校验和，您可以使用 `sha256sum` 实用程序。 例如: 
 
 ```
 sha256sum ./testdata/repo/zip_directory/autod.zip
 ```
 
-The result will look something like the following: `29139e1381b8177aec909fab9a75d11381cab5adf7d3af0c05ff1c9c117743a7`.
+结果将类似于以下内容:`29139e1381b8177aec909fab9a75d11381cab5adf7d3af0c05ff1c9c117743a7`。
 
-You can also use `sha512sum` if you would prefer to use longer hashes, or `md5sum` if you would prefer to use broken hashes. Whichever you choose, make sure to set the hash algorithm properly in the checksum argument to the URL.
+如果您希望使用更长的散列，您也可以使用 `sha512sum`，或者如果您希望使用损坏的散列，您也可以使用 `md5sum`。 无论您选择哪种方式，请确保在 URL 的校验和参数中正确设置哈希算法。
 
-## Example: SimApp Upgrade
+## 示例:SimApp 升级
 
-The following instructions provide a demonstration of `cosmovisor` using the simulation application (`simapp`) shipped with the Cosmos SDK's source code. The following commands are to be run from within the `cosmos-sdk` repository.
+以下说明使用 Cosmos SDK 源代码附带的模拟应用程序 (`simapp`) 演示了 `cosmovisor`。 以下命令将从 `cosmos-sdk` 存储库中运行。
 
-First, check out the latest `v0.42` release:
+首先，查看最新的 `v0.42` 版本: 
 
 ```
 git checkout v0.42.7

@@ -1,10 +1,10 @@
-# CLI
+# 命令行界面
 
-A user can query and interact with the `slashing` module using the CLI.
+用户可以使用 CLI 查询“slashing”模块并与之交互。
 
-### Query
+### 询问
 
-The `query` commands allow users to query `slashing` state.
+`query` 命令允许用户查询 `slashing` 状态。 
 
 ```bash
 simd query slashing --help

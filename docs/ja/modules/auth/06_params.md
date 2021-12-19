@@ -1,6 +1,6 @@
 # Parameters
 
-The auth module contains the following parameters:
+auth 模块包含以下参数: 
 
 | Key                    | Type            | Example |
 | ---------------------- | --------------- | ------- |

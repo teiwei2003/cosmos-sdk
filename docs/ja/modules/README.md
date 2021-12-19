@@ -1,25 +1,25 @@
-# List of Modules
+# 模块列表
 
-Here are some production-grade modules that can be used in Cosmos SDK applications, along with their respective documentation:
+以下是一些可用于 Cosmos SDK 应用程序的生产级模块及其各自的文档:
 
-- [Auth](auth/) - Authentication of accounts and transactions for Cosmos SDK applications.
-- [Authz](authz/) - Authorization for accounts to perform actions on behalf of other accounts.
-- [Bank](bank/) - Token transfer functionalities.
-- [Capability](capability/) - Object capability implementation.
-- [Crisis](crisis/) - Halting the blockchain under certain circumstances (e.g. if an invariant is broken).
-- [Distribution](distribution/) - Fee distribution, and staking token provision distribution.
-- [Epoching](epoching/) - Allows modules to queue messages for execution at a certain block height.
-- [Evidence](evidence/) - Evidence handling for double signing, misbehaviour, etc.
-- [Feegrant](feegrant/) - Grant fee allowances for executing transactions.
-- [Governance](gov/) - On-chain proposals and voting.
-- [Mint](mint/) - Creation of new units of staking token.
-- [Params](params/) - Globally available parameter store.
-- [Slashing](slashing/) - Validator punishment mechanisms.
-- [Staking](staking/) - Proof-of-Stake layer for public blockchains.
-- [Upgrade](upgrade/) - Software upgrades handling and coordination.
+- [Auth](auth/) - Cosmos SDK 应用程序的账户和交易认证。
+- [Authz](authz/) - 授权账户代表其他账户执行操作。
+- [银行](bank/) - 代币转移功能。
+- [Capability](capability/) - 对象能力实现。
+- [Crisis](crisis/) - 在某些情况下停止区块链(例如，如果不变量被破坏)。
+- [Distribution](distribution/) - 费用分配和抵押代币供应分配。
+- [Epoching](epoching/) - 允许模块将消息排队以在特定块高度执行。
+- [Evidence](evidence/) - 双重签名、不当行为等的证据处理。
+- [Feegrant](feegrant/) - 授予执行交易的费用津贴。
+- [治理](gov/) - 链上提案和投票。
+- [Mint](mint/) - 创建新的抵押代币单位。
+- [Params](params/) - 全局可用的参数存储。
+- [Slashing](slashing/) - 验证者惩罚机制。
+- [Staking](staking/) - 公共区块链的权益证明层。
+- [升级](upgrade/) - 软件升级处理和协调。
 
-To learn more about the process of building modules, visit the [building modules reference documentation](/building-modules/intro.html).
+要了解有关构建模块过程的更多信息，请访问 [构建模块参考文档](/building-modules/intro.html)。
 
-## IBC
+## 国际商业银行
 
-The IBC module for the SDK has moved to its [own repository](https://github.com/cosmos/ibc-go).
+SDK 的 IBC 模块已移至其[自己的存储库](https://github.com/cosmos/ibc-go)。 

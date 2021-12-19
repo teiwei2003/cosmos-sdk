@@ -1,21 +1,21 @@
-# Messages
+# 消息
 
-In this section we describe the processing of the crisis messages and the
-corresponding updates to the state.
+在本节中，我们将描述危机消息的处理以及
+状态的相应更新。
 
 ## MsgVerifyInvariant
 
-Blockchain invariants can be checked using the `MsgVerifyInvariant` message.
+可以使用“MsgVerifyInvariant”消息检查区块链不变量。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc7/proto/cosmos/crisis/v1beta1/tx.proto#L14-L22
 
-This message is expected to fail if:
+如果出现以下情况，此消息预计会失败:
 
-- the sender does not have enough coins for the constant fee
-- the invariant route is not registered
+- 发件人没有足够的硬币来支付固定费用
+- 不变路由未注册
 
-This message checks the invariant provided, and if the invariant is broken it
-panics, halting the blockchain. If the invariant is broken, the constant fee is
-never deducted as the transaction is never committed to a block (equivalent to
-being refunded). However, if the invariant is not broken, the constant fee will
-not be refunded.
+此消息检查提供的不变量，如果不变量被破坏
+恐慌，停止区块链。 如果不变量被破坏，则恒定费用为
+从未扣除，因为交易从未提交到区块(相当于
+被退还)。 但是，如果不变量不破，恒定费用将
+不予退还。 

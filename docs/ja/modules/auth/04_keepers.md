@@ -1,11 +1,11 @@
-# Keepers
+# 守门员
 
-The auth module only exposes one keeper, the account keeper, which can be used to read and write accounts.
+auth 模块只暴露了一个keeper，accountkeeper，可以用来读写账户。
 
-## Account Keeper
+## 帐户管理员
 
-Presently only one fully-permissioned account keeper is exposed, which has the ability to both read and write
-all fields of all accounts, and to iterate over all stored accounts.
+目前只暴露了一个完全许可的帐户管理员，它具有读写能力
+所有帐户的所有字段，并遍历所有存储的帐户。 
 
 ```go
 // AccountKeeperI is the interface contract that x/auth's keeper implements.

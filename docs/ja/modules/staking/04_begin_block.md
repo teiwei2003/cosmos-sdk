@@ -1,12 +1,12 @@
-# Begin-Block
+# 开始块
 
-Each abci begin block call, the historical info will get stored and pruned
-according to the `HistoricalEntries` parameter.
+每个 abci 开始块调用，历史信息将被存储和修剪
+根据`HistoricalEntries`参数。
 
-## Historical Info Tracking
+## 历史信息跟踪
 
-If the `HistoricalEntries` parameter is 0, then the `BeginBlock` performs a no-op.
+如果`HistoricalEntries` 参数为0，则`BeginBlock` 执行无操作。
 
-Otherwise, the latest historical info is stored under the key `historicalInfoKey|height`, while any entries older than `height - HistoricalEntries` is deleted.
-In most cases, this results in a single entry being pruned per block.
-However, if the parameter `HistoricalEntries` has changed to a lower value there will be multiple entries in the store that must be pruned.
+否则，最新的历史信息存储在键“historicalInfoKey|height”下，而任何早于“height - HistoricalEntries”的条目都将被删除。
+在大多数情况下，这会导致每个块修剪单个条目。
+但是，如果参数“HistoricalEntries”已更改为较低的值，则存储中将有多个必须修剪的条目。 
