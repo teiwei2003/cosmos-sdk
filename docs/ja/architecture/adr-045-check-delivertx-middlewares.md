@@ -248,30 +248,30 @@ app.SetTxHandler(txHandler)
 
 このリファクタリングは一部のロジックをBaseAppからミドルウェアに移動するため、アプリケーション開発者向けのAPIに重大な変更が加えられます。特に、アプリケーション開発者は `app.go`にアンティハンドラチェーンを作成する必要はありませんが、ミドルウェアスタックを作成する必要があります。
 
-`` `diff
--anteHandler、err:= ante.NewAnteHandler(
--ante.HandlerOptions {
--AccountKeeper:app.AccountKeeper、
--BankKeeper:app.BankKeeper、
--SignModeHandler:encodingConfig.TxConfig.SignModeHandler()、
--FeegrantKeeper:app.FeeGrantKeeper、
--SigGasConsumer:ante.DefaultSigVerificationGasConsumer、
--}、
+```diff
+- anteHandler, err := ante.NewAnteHandler(
+-    ante.HandlerOptions{
+-        AccountKeeper:   app.AccountKeeper,
+-        BankKeeper:      app.BankKeeper,
+-        SignModeHandler: encodingConfig.TxConfig.SignModeHandler(),
+-        FeegrantKeeper:  app.FeeGrantKeeper,
+-        SigGasConsumer:  ante.DefaultSigVerificationGasConsumer,
+-    },
 -)
-+ txHandler、err:= authmiddleware.NewDefaultTxHandler(authmiddleware.TxHandlerOptions {
-+デバッグ:app.Trace()、
-+ IndexEvents:indexEvents、
-+ LegacyRouter:app.legacyRouter、
-+ MsgServiceRouter:app.msgSvcRouter、
-+ LegacyAnteHandler:anteHandler、
-+ TxDecoder:encodingConfig.TxConfig.TxDecoder、
++txHandler, err := authmiddleware.NewDefaultTxHandler(authmiddleware.TxHandlerOptions{
++    Debug:             app.Trace(),
++    IndexEvents:       indexEvents,
++    LegacyRouter:      app.legacyRouter,
++    MsgServiceRouter:  app.msgSvcRouter,
++    LegacyAnteHandler: anteHandler,
++    TxDecoder:         encodingConfig.TxConfig.TxDecoder,
 +})
-err！= nil {の場合
-    パニック(エラー)
+if err != nil {
+    panic(err)
 }
--app.SetAnteHandler(anteHandler)
+- app.SetAnteHandler(anteHandler)
 + app.SetTxHandler(txHandler)
-`` `
+```
 
 CHANGELOGは、他の小さなAPIの重大な変更も提供します。いつものように、Cosmos SDKは、アプリケーション開発者向けのバージョン移行ドキュメントを提供します。
 

@@ -1,111 +1,111 @@
-# 消息和查询
+# ニュースとクエリ
 
-`Msg`s 和 `Queries` 是模块处理的两个主要对象。模块中定义的大多数核心组件，如 `Msg` 服务、`keeper`s 和 `Query` 服务，都用于处理 `message`s 和 `queries`。 {概要}
+`Msg`sと` Queries`は、モジュールによって処理される2つの主要なオブジェクトです。 「Msg」サービス、「keeper」、「Query」サービスなど、モジュールで定義されているコアコンポーネントのほとんどは、「メッセージ」と「クエリ」の処理に使用されます。 {まとめ}
 
-## 先决条件阅读
+## 読むための前提条件
 
-- [Cosmos SDK 模块介绍](./intro.md) {prereq}
+-[Cosmos SDKモジュールの紹介](。/intro.md){前提条件}
 
-## 消息
+## 情報
 
-`Msg`s 是其最终目标是触发状态转换的对象。它们包含在 [transactions](../core/transactions.md) 中，其中可能包含其中一个或多个。
+`Msg`sは、状態遷移をトリガーすることを最終的な目標とするオブジェクトです。それらは[transactions](../core/transactions.md)に含まれており、1つ以上含まれている可能性があります。
 
-当交易从底层共识引擎中继到 Cosmos SDK 应用程序时，它首先被 [`BaseApp`](../core/baseapp.md) 解码。然后，事务中包含的每条消息都被提取并通过`BaseApp` 的`MsgServiceRouter` 路由到适当的模块，以便模块的[`Msg` 服务](./msg-services.md) 处理它。有关事务生命周期的更详细说明，请单击 [此处](../basics/tx-lifecycle.md)。
+トランザクションが基盤となるコンセンサスエンジンからCosmosSDKアプリケーションに中継されると、最初に[`BaseApp`](../core/baseapp.md)によってデコードされます。次に、トランザクションに含まれる各メッセージが抽出され、モジュールの[`Msg`サービス](./msg-services.md)が処理できるように、` BaseApp`の `MsgServiceRouter`を介して適切なモジュールにルーティングされます。トランザクションライフサイクルの詳細については、[こちら](../basics/tx-lifecycle.md)をクリックしてください。
 
-### `Msg` 服务
+### `Msg`サービス
 
-从 v0.40 开始，定义 Protobuf `Msg` 服务是处理消息的推荐方式。应该为每个模块创建 Protobuf `Msg` 服务，通常在 `tx.proto` 中(请参阅有关 [约定和命名](../core/encoding.md#faq) 的更多信息)。它必须为模块中的每条消息定义一个 RPC 服务方法。
+v0.40以降では、Protobuf`Msg`サービスを定義することがメッセージを処理するための推奨される方法です。 Protobufの `Msg`サービスは、モジュールごとに、通常は` tx.proto`で作成する必要があります(詳細については、[Convention and Naming](../core/encoding.md#faq)を参照してください)。モジュール内のメッセージごとにRPCサービスメソッドを定義する必要があります。
 
-查看来自 `x/bank` 模块的 `Msg` 服务定义示例:
+`x/bank`モジュールからの` Msg`サービス定義の例を表示します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc1/proto/cosmos/bank/v1beta1/tx.proto#L10-L17
 
-每个 `Msg` 服务方法必须只有一个参数，该参数必须实现 `sdk.Msg` 接口和一个 Protobuf 响应。命名约定是调用 RPC 参数 `Msg<service-rpc-name>` 和 RPC 响应 `Msg<service-rpc-name>Response`。例如: 
+各 `Msg`サービスメソッドにはパラメータが1つだけ必要であり、これは` sdk.Msg`インターフェイスとProtobuf応答を実装する必要があります。命名規則では、RPCパラメーター `Msg <service-rpc-name>`とRPC応答 `Msg <service-rpc-name> Response`を呼び出します。例えば: 
 
 ```
   rpc Send(MsgSend) returns (MsgSendResponse);
 ```
 
-`sdk.Msg` 接口是 [下文](#legacy-amino-msgs) 描述的 Amino `LegacyMsg` 接口的简化版本，只有 `ValidateBasic()` 和 `GetSigners()` 方法。为了向后兼容 [Amino `LegacyMsg`s](#legacy-amino-msgs)，现有的 `LegacyMsg` 类型应该用作 `service` RPC 定义的请求参数。较新的 `sdk.Msg` 类型只支持 `service` 定义，应该使用规范的 `Msg...` 名称。
+`sdk.Msg`インターフェースは、[以下](#legacy-amino-msgs)で説明されているAminoの` LegacyMsg`インターフェースの簡略版であり、 `ValidateBasic()`メソッドと `GetSigners()`メソッドのみが含まれています。[Amino `LegacyMsg`s](#legacy-amino-msgs)との下位互換性を保つには、既存の` LegacyMsg`タイプを `service`RPCで定義されたリクエストパラメーターとして使用する必要があります。新しい `sdk.Msg`タイプは` service`定義のみをサポートし、正規の `Msg ...`名を使用する必要があります。
 
-Cosmos SDK 使用 Protobuf 定义生成客户端和服务器代码:
+Cosmos SDKは、Protobuf定義を使用して、クライアントおよびサーバーコードを生成します。
 
-* `MsgServer` 接口定义了 `Msg` 服务的服务器 API，其实现在 [`Msg` 服务](./msg-services.md) 文档中进行了描述。
-* 为所有 RPC 请求和响应类型生成结构。
+* `MsgServer`インターフェースは、` Msg`サービスのサーバーAPIを定義します。これは、実際には[`Msg`サービス](./msg-services.md)ドキュメントで説明されています。
+*すべてのRPC要求および応答タイプの構造を生成します。
 
-还生成了一个 `RegisterMsgServer` 方法，它应该用于在来自 [`AppModule` 接口](./module-manager.md#appmodule) 的 `RegisterServices` 方法中注册模块的 `MsgServer` 实现。
+`RegisterMsgServer`メソッドも生成されます。これは、モジュールの` MsgServer`実装を[`AppModule`インターフェイス](./module-manager.md#appmodule)の` RegisterServices`メソッドに登録するために使用する必要があります。
 
-为了让客户端(CLI 和 grpc-gateway)注册这些 URL，Cosmos SDK 提供了函数 `RegisterMsgServiceDesc(registry codectypes.InterfaceRegistry, sd *grpc.ServiceDesc)`，应该在模块的 [`RegisterInterfaces`]( module-manager.md#appmodulebasic) 方法，使用原型生成的 `&_Msg_serviceDesc` 作为 `*grpc.ServiceDesc` 参数。
+クライアント(CLIおよびgrpc-gateway)がこれらのURLを登録できるようにするために、CosmosSDKは関数 `RegisterMsgServiceDesc(registry codectypes.InterfaceRegistry、sd * grpc.ServiceDesc)`を提供します。これは、モジュールの[`RegisterInterfaces`]にある必要があります。 (module-manager。md#appmodulebasic)メソッド。プロトタイプによって生成された `＆_Msg_serviceDesc`を` * grpc.ServiceDesc`パラメーターとして使用します。
 
-### Legacy Amino `LegacyMsg`s
+### レガシーアミノ `LegacyMsg`s
 
-不推荐使用以下定义消息的方式，首选使用 [`Msg` 服务](#msg-services)。
+次のメッセージの定義方法はお勧めできません。[`Msg`service](#msg-services)をお勧めします。
 
-Amino `LegacyMsg`s 可以定义为 protobuf 消息。消息定义通常包括处理消息所需的参数列表，当最终用户想要创建包含所述消息的新事务时，他们将提供这些参数。
+Aminoの `LegacyMsg`は、protobufメッセージとして定義できます。メッセージ定義には通常、メッセージの処理に必要なパラメーターのリストが含まれており、エンドユーザーがメッセージを含む新しいトランザクションを作成する場合は、これらのパラメーターを提供します。
 
-`LegacyMsg` 通常伴随着一个标准的构造函数，它是从 [module's interface](./module-interfaces.md) 之一调用的。 `message`s 还需要实现 `sdk.Msg` 接口:
+`LegacyMsg`には通常、[モジュールのインターフェース](./module-interfaces.md)の1つから呼び出される標準コンストラクターが付属しています。 `message`sは` sdk.Msg`インターフェースも実装する必要があります。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/4a1b2fba43b1052ca162b3a1e0b6db6db9c26656/types/tx_msg.go#L10-L33
 
-它扩展了 `proto.Message` 并包含以下方法:
+これは `proto.Message`を拡張し、次のメソッドを含みます。
 
-- `Route() string`:此消息的路由名称。通常，模块中的所有“消息”都具有相同的路由，通常是模块的名称。
-- `Type() string`:消息的类型，主要用于 [events](../core/events.md)。这应该返回一个特定于消息的“字符串”，通常是消息本身的面额。
-- `ValidateBasic() error`:这个方法在处理`message`(在[`CheckTx`](../core/baseapp.md#checktx)和[`DeliverTx中)的早期就被`BaseApp`调用`](../core/baseapp.md#delivertx))，以便丢弃明显无效的消息。 `ValidateBasic` 应该只包括 *stateless* 检查，即不需要访问状态的检查。这通常包括检查消息的参数格式是否正确且有效(即“金额”对于传输而言严格为正数)。
-- `GetSignBytes() []byte`:返回消息的规范字节表示。用于生成签名。
-- `GetSigners() []AccAddress`:返回签名者列表。 Cosmos SDK 将确保交易中包含的每条“消息”都由此方法返回的列表中列出的所有签名者签名。
+-`Route()string`:このメッセージのルート名。一般に、モジュール内のすべての「メッセージ」は同じルート、通常はモジュールの名前を持っています。
+-`Type()string`:主に[events](../core/events.md)で使用されるメッセージのタイプ。これにより、メッセージ固有の「文字列」(通常はメッセージ自体の額面)が返されます。
+-`ValidateBasic()エラー `:このメソッドは、` message`([`CheckTx`](../core/baseapp.md#checktx)および[` DeliverTx)](../core/baseapp.md#delivertx))明らかに無効なメッセージを破棄するため。 `ValidateBasic`には、*ステートレス*チェックのみを含める必要があります。つまり、アクセス状態チェックは必要ありません。これには通常、メッセージのパラメータ形式が正しく有効であるかどうかのチェックが含まれます(つまり、「量」は送信に対して厳密に正です)。
+-`GetSignBytes()[] byte`:メッセージの正規のバイト表現を返します。署名を生成するために使用されます。
+-`GetSigners()[] AccAddress`:署名者のリストを返します。 Cosmos SDKは、トランザクションに含まれるすべての「メッセージ」が、このメソッドによって返されるリストにリストされているすべての署名者によって署名されていることを確認します。
 
-查看来自 `gov` 模块的 `message` 的示例实现:
+`gov`モジュールからの` message`の実装例を確認してください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc1/x/gov/types/msgs.go#L77-L125
 
-## 查询
+## お問い合わせ
 
-“查询”是应用程序的最终用户通过接口发出并由全节点处理的信息请求。全节点通过其共识引擎接收“查询”，并通过 ABCI 中继到应用程序。然后通过`BaseApp` 的`queryrouter` 将其路由到适当的模块，以便模块的查询服务(./query-services.md) 可以对其进行处理。要更深入地了解“查询”的生命周期，请单击 [此处](../basics/query-lifecycle.md)。
+「照会」は、アプリケーションのエンドユーザーがインターフェースを介して送信し、ノード全体で処理される情報要求です。フルノードは、コンセンサスエンジンを介して「クエリ」を受信し、ABCIを介してアプリケーションに中継します。次に、モジュールのクエリサービス(./query-services.md)が処理できるように、 `BaseApp`の` queryrouter`を介して適切なモジュールにルーティングされます。 「クエリ」ライフサイクルの詳細については、[こちら](../basics/query-lifecycle.md)をクリックしてください。
 
-### gRPC 查询 
+### gRPCクエリ
 
-从 v0.40 开始，定义查询的首选方法是使用 [Protobuf 服务](https://developers.google.com/protocol-buffers/docs/proto#services)。应该在 `query.proto` 中为每个模块创建一个 `Query` 服务。该服务列出了以 `rpc` 开头的端点。
+v0.40以降、クエリを定義するための推奨される方法は、[Protobuf Service](https://developers.google.com/protocol-buffers/docs/proto#services)を使用することです。 `query.proto`のモジュールごとに` Query`サービスを作成する必要があります。このサービスは、 `rpc`で始まるエンドポイントを一覧表示します。
 
-以下是此类“查询”服务定义的示例:
+以下は、そのような「クエリ」サービス定義の例です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/d55c1a26657a0af937fa2273b38dcfa1bb3cff9f/proto/cosmos/auth/v1beta1/query.proto#L12-L23
 
-作为`proto.Message`s，生成的`Response`类型默认实现[`fmt.Stringer`](https://golang.org/pkg/fmt/#Stringer)的`String()`方法。
+`proto.Message`sとして、生成された` Response`タイプは、デフォルトで[`fmt.Stringer`](https://golang.org/pkg/fmt/#Stringer)の` String() `メソッドを実装します。
 
-还生成了一个 `RegisterQueryServer` 方法，应该用于在 [`AppModule` 接口](./module-manager.md#appmodule) 的 `RegisterServices` 方法中注册模块的查询服务器。
+`RegisterQueryServer`メソッドも生成されます。これは、モジュールのクエリサーバーを[` AppModule`インターフェイス](./module-manager.md#appmodule)の `RegisterServices`メソッドに登録するために使用する必要があります。
 
-### 遗留查询
+### レガシークエリ
 
-在 Cosmos SDK 中引入 Protobuf 和 gRPC 之前，通常没有模块开发人员定义的特定“查询”对象，与“消息”相反。相反，Cosmos SDK 采用了更简单的方法，使用简单的“路径”来定义每个“查询”。 `path` 包含 `query` 类型和处理它所需的所有参数。对于大多数模块查询，`path` 应该如下所示:
+Cosmos SDKにProtobufとgRPCが導入される前は、通常、「メッセージ」ではなく、モジュール開発者によって定義された特定の「クエリ」オブジェクトはありませんでした。代わりに、Cosmos SDKは、単純な「パス」を使用して各「クエリ」を定義する、より単純なアプローチを採用しています。 `path`には、` query`タイプとそれを処理するために必要なすべてのパラメータが含まれています。ほとんどのモジュールクエリでは、 `path`は次のようになります。
 
-``
+```
 queryCategory/queryRoute/queryType/arg1/arg2/...
-``
+```
 
-在哪里:
+どこ:
 
-- `queryCategory` 是`query` 的类别，通常用于模块查询的`custom`。它用于区分 `BaseApp` 的 [`Query` 方法](../core/baseapp.md#query) 中不同类型的查询。
-- `baseApp` 的 [`queryRouter`](../core/baseapp.md#query-routing) 使用 `queryRoute` 将 `query` 映射到其模块。通常，`queryRoute` 应该是模块的名称。
-- 模块的 [`querier`](./query-services.md#legacy-queriers) 使用 `queryType` 将 `query` 映射到模块内适当的 `querier function`。
-- `args` 是处理 `query` 所需的实际参数。它们由最终用户填写。请注意，对于更大的查询，您可能更喜欢在请求 `req` 的 `Data` 字段而不是 `path` 中传递参数。
+-`queryCategory`は `query`のカテゴリであり、通常はモジュールクエリの` custom`に使用されます。これは、 `BaseApp`の[` Query`メソッド](../core/baseapp.md#query)でさまざまなタイプのクエリを区別するために使用されます。
+-`baseApp`の[`queryRouter`](../core/baseapp.md#query-routing)は、` queryRoute`を使用して `query`をそのモジュールにマップします。通常、 `queryRoute`はモジュールの名前である必要があります。
+-モジュールの[`querier`](./query-services.md#legacy-queriers)は、` queryType`を使用して `query`をモジュール内の適切な` querier関数 `にマップします。
+-`args`は、 `query`を処理するために必要な実際のパラメータです。それらはエンドユーザーによって記入されます。大規模なクエリの場合は、リクエストの「パス」ではなく「リクエスト」の「データ」フィールドにパラメータを渡すことをお勧めします。
 
-每个`query`的`path`必须由模块开发者在模块的[命令行界面文件](./module-interfaces.md#query-commands)中定义。总的来说，模块开发者需要3个主要组件实现以使由其模块定义的状态子集可查询:
+各 `query`の` path`は、モジュールの[コマンドラインインターフェイスファイル](./module-interfaces.md#query-commands)でモジュール開発者が定義する必要があります。一般に、モジュール開発者は、モジュールによって定義された状態サブセットをクエリ可能にするために、3つの主要なコンポーネントの実装が必要です。
 
-- [`querier`](./query-services.md#legacy-queriers)，一旦它被[路由到模块](../core/baseapp.md#query-routing) 处理`query` )。
-- [查询命令](./module-interfaces.md#query-commands) 在模块的 CLI 文件中，其中指定了每个 `query` 的 `path`。
-- `query` 返回类型。通常在文件 `types/querier.go` 中定义，它们指定每个模块的 `queries` 的结果类型。这些自定义类型必须实现 [`fmt.Stringer`](https://golang.org/pkg/fmt/#Stringer) 的 `String()` 方法。
+-[`querier`](./query-services.md#legacy-queriers)、[route to module](../core/baseapp.md#query-routing))によって処理されると。
+-[クエリコマンド](。/module-interfaces.md#query-commands)モジュールのCLIファイルでは、各 `query`の` path`が指定されています。
+-`query`リターンタイプ。通常、ファイル `types/querier.go`で定義され、各モジュールの` queries`の結果タイプを指定します。これらのカスタム型は、[`fmt.Stringer`](https://golang.org/pkg/fmt/#Stringer)の` String() `メソッドを実装する必要があります。
 
-### 存储查询
+### ストアクエリ
 
-存储查询直接查询存储键。他们使用 `clientCtx.QueryABCI(req abci.RequestQuery)` 返回完整的 `abci.ResponseQuery` 并包含 Merkle 证明。
+ストレージクエリは、ストレージキーを直接クエリします。 `clientCtx.QueryABCI(req abci.RequestQuery)`を使用して、完全な `abci.ResponseQuery`を返し、Merkle証明を含めます。
 
-请参阅以下示例:
+次の例を参照してください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/080fcf1df25ccdf97f3029b6b6f83caaf5a235e4/x/ibc/core/client/query.go#L36-L46
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/080fcf1df25ccdf97f3029b6b6f83caaf5a235e4/baseapp/abci.go#L722-L749
 
-## 下一个 {hide}
+## 次へ{hide}
 
-了解 [`Msg` 服务](./msg-services.md) {hide} 
+[`Msg`サービス](./msg-services.md){hide}を理解する 

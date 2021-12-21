@@ -1,102 +1,102 @@
-# `Msg` 服务
+# `Msg`サービス
 
-Protobuf `Msg` 服务处理 [messages](./messages-and-queries.md#messages)。 Protobuf `Msg` 服务特定于定义它们的模块，并且只处理在所述模块中定义的消息。它们在 [`DeliverTx`](../core/baseapp.md#delivertx) 期间从 `BaseApp` 调用。 {概要}
+Protobuf `Msg`サービス処理[メッセージ](./messages-and-queries.md#messages)。 Protobuf `Msg`サービスは、それらが定義されているモジュールに固有であり、モジュールで定義されているメッセージのみを処理します。これらは、[`DeliverTx`](../core/baseapp.md#delivertx)中に` BaseApp`から呼び出されます。 {まとめ}
 
-## 先决条件阅读
+## 読むための前提条件
 
-- [模块管理器](./module-manager.md) {prereq}
-- [消息和查询](./messages-and-queries.md) {prereq}
+-[モジュールマネージャー](。/module-manager.md){前提条件}
+-[メッセージとクエリ](./messages-and-queries.md){prereq}
 
-## 模块`Msg`服务的实现
+## モジュール `Msg`サービスの実装
 
-每个模块都应该定义一个 Protobuf `Msg` 服务，它将负责处理请求(实现 `sdk.Msg`)并返回响应。
+各モジュールは、Protobuf `Msg`サービスを定義する必要があります。このサービスは、要求の処理(` sdk.Msg`の実装)と応答の返送を担当します。
 
-正如 [ADR 031](../architecture/adr-031-msg-service.md) 中进一步描述的那样，这种方法的优点是明确指定返回类型并生成服务器和客户端代码。
+[ADR 031](../architecture/adr-031-msg-service.md)でさらに説明されているように、このメソッドの利点は、リターンタイプが明確に指定され、サーバーコードとクライアントコードが生成されることです。
 
-Protobuf 根据 `Msg` 服务的定义生成一个 `MsgServer` 接口。模块开发人员的职责是通过实现在接收到每个 `sdk.Msg` 时应该发生的状态转换逻辑来实现这个接口。例如，这里是为 `x/bank` 生成的 `MsgServer` 接口，它暴露了两个 `sdk.Msg`:
+Protobufは、 `Msg`サービスの定義に従って` MsgServer`インターフェースを生成します。モジュール開発者の責任は、各 `sdk.Msg`が受信されたときに発生するはずの状態遷移ロジックを実装することによってこのインターフェイスを実装することです。たとえば、次は `x/bank`用に生成された` MsgServer`インターフェースで、2つの `sdk.Msg`を公開します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/x/bank/types/tx.pb.go#L285-L291
 
-如果可能，现有模块的 [`Keeper`](keeper.md) 应该实现 `MsgServer`，否则可以创建嵌入 `Keeper` 的 `msgServer` 结构，通常在 `./keeper/msg_server.go` 中:
+可能であれば、既存のモジュールの[`Keeper`](keeper.md)は` MsgServer`を実装する必要があります。そうでない場合は、通常は `。/keeper/msg_server.go`に` Keeper`が埋め込まれた `msgServer`構造を作成できます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc1/x/bank/keeper/msg_server.go#L14-L16
 
-`msgServer` 方法可以使用 `sdk.UnwrapSDKContext` 从 `context.Context` 参数方法中检索 `sdk.Context`:
+`msgServer`メソッドは` sdk.UnwrapSDKContext`を使用して、 `context.Context`パラメータメソッドから` sdk.Context`を取得できます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc1/x/bank/keeper/msg_server.go#L27-L28
 
-`sdk.Msg` 处理通常遵循以下 2 个步骤:
+`sdk.Msg`の処理は通常、次の2つの手順に従います。
 
-- 首先，他们执行 *stateful* 检查以确保 `message` 有效。在这个阶段，已经调用了 `message` 的 `ValidateBasic()` 方法，这意味着已经执行了对消息的 *stateless* 检查(例如确保参数格式正确)。在 `msgServer` 方法中执行的检查可能更昂贵并且需要访问状态。例如，“transfer”消息的“msgServer”方法可能会检查发送帐户是否有足够的资金来实际执行转移。要访问状态，`msgServer` 方法需要调用 [`keeper`'s](./keeper.md) 的 getter 函数。
-- 然后，如果检查成功，`msgServer` 方法调用 [`keeper`'s](./keeper.md) setter 函数来实际执行状态转换。
+-最初に、「ステートフル」チェックを実行して、「メッセージ」が有効であることを確認します。この段階で、 `message`の` ValidateBasic() `メソッドが呼び出されました。これは、メッセージの*ステートレス*チェックが実行されたことを意味します(たとえば、パラメーター形式が正しいことを確認するため)。 `msgServer`メソッドで実行されるチェックは、よりコストがかかり、状態へのアクセスが必要になる可能性があります。たとえば、「転送」メッセージの「msgServer」メソッドは、送信アカウントに実際に転送を実行するのに十分な資金があるかどうかを確認する場合があります。状態にアクセスするには、 `msgServer`メソッドが[` keeper`'s](./keeper.md)のgetter関数を呼び出す必要があります。
+-次に、チェックが成功すると、 `msgServer`メソッドは[` keeper`s](./keeper.md)setter関数を呼び出して、実際に状態遷移を実行します。
 
-在返回之前，`msgServer` 方法通常通过 `ctx` 中保存的 `EventManager` 发出一个或多个 [events](../core/events.md): 
+戻る前に、 `msgServer`メソッドは通常、` ctx`に保存されている `EventManager`を介して1つ以上の[events](../core/events.md)を送信します。
 
 ```go
-ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			eventType, //e.g. sdk.EventTypeMessage for a message, types.CustomEventType for a custom event defined in the module
-			sdk.NewAttribute(attributeKey, attributeValue),
-		),
-    )
+ctx.EventManager()。EmitEvent(
+sdk.NewEvent(
+eventType、//例:メッセージの場合はsdk.EventTypeMessage、モジュールで定義されたカスタムイベントの場合はtypes.CustomEventType
+sdk.NewAttribute(attributeKey、attributeValue)、
+)、
+    )。
 ```
 
-这些事件被转发回底层的共识引擎，服务提供商可以使用这些事件来围绕应用程序实现服务。单击 [此处](../core/events.md) 了解有关事件的更多信息。
+これらのイベントは基盤となるコンセンサスエンジンに転送され、サービスプロバイダーはこれらのイベントを使用してアプリケーションの周囲にサービスを実装できます。イベントの詳細については、[こちら](../core/events.md)をクリックしてください。
 
-调用的 `msgServer` 方法返回一个 `proto.Message` 响应和一个 `error`。然后使用 `sdk.WrapServiceResult(ctx sdk.Context, res proto.Message, err error)` 将这些返回值包装到 `*sdk.Result` 或 `error` 中:
+呼び出された `msgServer`メソッドは、` proto.Message`応答と `error`を返します。次に、 `sdk.WrapServiceResult(ctx sdk.Context、res proto.Message、err error)`を使用して、これらの戻り値を `* sdk.Result`または` error`にラップします。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc2/baseapp/msg_service_router.go#L104-L104
 
-此方法负责将 `res` 参数编组到 protobuf，并将 `ctx.EventManager()` 上的任何事件附加到 `sdk.Result`。
+このメソッドは、 `res`パラメーターをprotobufにマーシャリングし、` ctx.EventManager() `のイベントを` sdk.Result`にアタッチする役割を果たします。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/d55c1a26657a0af937fa2273b38dcfa1bb3cff9f/proto/cosmos/base/abci/v1beta1/abci.proto#L81-L95
 
-此图显示了 Protobuf `Msg` 服务的典型结构，以及消息如何通过模块传播。
+この図は、Protobuf `Msg`サービスの一般的な構造と、メッセージがモジュールを介してどのように伝播されるかを示しています。
 
-![交易流程](../uml/svg/transaction_flow.svg)
+！[トランザクションフロー](../uml/svg/transaction_flow.svg)
 
-## 氨基`LegacyMsg`s
+## Amino`LegacyMsg`s
 
-### `处理程序` 类型
+### `ハンドラー`タイプ
 
-Cosmos SDK 中定义的 `handler` 类型将被弃用，取而代之的是 [`Msg` 服务](#implementation-of-a-module-msg-service)。
+CosmosSDKで定義されている `handler`タイプは非推奨になり、[` Msg` service](#implementation-of-a-module-msg-service)に置き換えられます。
 
-以下是`handler`函数的典型结构:
+以下は、 `handler`関数の典型的な構造です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc2/types/handler.go#L4-L4
 
-让我们分解一下:
+それを分解しましょう:
 
-- [`LegacyMsg`](./messages-and-queries.md#messages) 是正在处理的实际对象。
-- [`Context`](../core/context.md) 包含处理 `msg` 所需的所有必要信息，以及最新状态的分支。如果 `msg` 处理成功，`ctx` 中包含的状态的分支版本将被写入主状态(分支)。
-- 返回给“BaseApp”的“*Result”包含(除其他外)关于“handler”和[events](../core/events.md)执行的信息。
+-[`LegacyMsg`](./messages-and-queries.md#messages)は、処理されている実際のオブジェクトです。
+-[`Context`](../core/context.md)には、` msg`の処理に必要なすべての情報と、ブランチの最新の状態が含まれています。 `msg`プロセスが成功すると、` ctx`に含まれる状態のブランチバージョンがメイン状態(ブランチ)に書き込まれます。
+-「BaseApp」に返される「* Result」には、(とりわけ)「handler」と[events](../core/events.md)の実行に関する情報が含まれています。
 
-模块“handler”通常在模块文件夹内的“./handler.go”文件中实现。 [模块管理器](./module-manager.md) 用于将模块的`handler`s 添加到
-[应用程序的`router`](../core/baseapp.md#message-routing) 通过`Route()` 方法。通常，
-manager 的 `Route()` 方法简单地构造了一个调用 `handler.go` 中定义的 `NewHandler()` 方法的路由。
+モジュール「handler」は通常、モジュールフォルダの「./handler.go」ファイルに実装されています。[モジュールマネージャー](./module-manager.md)は、モジュールの `ハンドラー`をに追加するために使用されます
+[アプリの `router`](../core/baseapp.md#message-routing)` Route() `メソッドを使用します。いつもの、
+マネージャの `Route()`メソッドは、 `handler.go`で定義された` NewHandler() `メソッドを呼び出すルートを作成するだけです。
 
-+++ https://github.com/cosmos/cosmos-sdk/blob/228728cce2af8d494c8b4e996d011492139b04ab/x/gov/module.go#L143-L146
++++ https://github.com/cosmos/cosmos-sdk/blob/228728cce2af8d494c8b4e996d011492139b04ab/x/gov/module.go#L143-L146 
 
-### 执行
+### 埋め込む
 
-`NewHandler` 函数将 `LegacyMsg` 分派给适当的处理函数，通常使用 switch 语句:
+`NewHandler`関数は、通常はswitchステートメントを使用して、` LegacyMsg`を適切な処理関数に割り当てます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/d55c1a26657a0af937fa2273b38dcfa1bb3cff9f/x/bank/handler.go#L13-L29
 
-首先，`NewHandler` 函数为上下文设置一个新的 `EventManager`，以隔离每个 `msg` 的事件。
-然后，一个简单的开关根据 `LegacyMsg` 类型调用适当的 `handler`。
+まず、 `NewHandler`関数は、コンテキストに新しい` EventManager`を設定して、各 `msg`イベントを分離します。
+次に、単純なスイッチが、 `LegacyMsg`タイプに基づいて適切な` handler`を呼び出します。
 
-对此，每个模块`LegacyMsg`都需要实现`handler`的功能。这也将涉及对 LegacyMsg 类型的手动处理程序注册。
-`handler` 的函数应该返回一个 `*Result` 和一个 `error`。
+この点で、各モジュール `LegacyMsg`は` handler`の機能を実装する必要があります。 これには、LegacyMsgタイプの手動ハンドラー登録も含まれます。
+`handler`の関数は、` * Result`と `error`を返す必要があります。
 
-## 遥测
+## テレメトリ
 
-处理消息时，可以从 `msgServer` 方法创建新的 [遥测指标](../core/telemetry.md)。
+メッセージを処理するときに、 `msgServer`メソッドから新しい[テレメトリインジケーター](../core/telemetry.md)を作成できます。
 
-这是来自 `x/auth/vesting` 模块的一个例子:
+これは、 `x/auth/vesting`モジュールの例です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc1/x/auth/vesting/msg_server.go#L73-L85
 
-## 下一个 {hide}
+## 次へ{hide}
 
-了解 [查询服务](./query-services.md) {hide} 
+[クエリサービス](./query-services.md){hide}を理解する 

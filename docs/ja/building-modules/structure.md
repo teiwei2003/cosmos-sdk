@@ -1,10 +1,10 @@
-# 推荐的文件夹结构
+# 推奨されるフォルダ構造
 
-本文档概述了 Cosmos SDK 模块的推荐结构。 这些想法旨在作为建议加以应用。 鼓励应用程序开发人员改进模块结构和开发设计并做出贡献。 {概要}
+このドキュメントでは、CosmosSDKモジュールの推奨される構造の概​​要を説明します。 これらのアイデアは、提案として適用することを目的としています。 アプリケーション開発者に、モジュール構造と開発設計を改善し、貢献するように促します。 {まとめ}
 
-## 结构
+## 構造
 
-一个典型的 Cosmos SDK 模块结构如下: 
+典型的なCosmosSDKモジュール構造は次のとおりです。 
 
 ```shell
 proto
@@ -18,11 +18,11 @@ proto
             └── tx.proto
 ```
 
-- `{module_name}.proto`:模块的通用消息类型定义。
-- `event.proto`:与事件相关的模块消息类型定义。
-- `genesis.proto`:与创世状态相关的模块消息类型定义。
-- `query.proto`:模块的查询服务和相关的消息类型定义。
-- `tx.proto`:模块的消息服务和相关消息类型定义。 
+-` {module_name} .proto`:モジュールの一般的なメッセージタイプの定義。
+-`event.proto`:イベントに関連するモジュールメッセージタイプの定義。
+-`genesis.proto`:作成状態に関連するモジュールメッセージタイプの定義。
+-`query.proto`:モジュールのクエリサービスと関連するメッセージタイプの定義。
+-`tx.proto`:モジュールのメッセージサービスと関連するメッセージタイプの定義。 
 
 ```shell
 x/{module_name}
@@ -72,24 +72,24 @@ x/{module_name}
 └── tx.pb.go
 ```
 
-- `client/`:模块的 CLI 客户端功能实现和模块的集成测试套件。
-- `exported/`:模块的导出类型 - 通常是接口类型。如果一个模块依赖于另一个模块的 Keepers，则期望通过 `expected_keepers.go` 文件(见下文)接收作为接口合同的 Keeper，以避免直接依赖于实现 Keepers 的模块。但是，这些接口契约可以定义操作和/或返回特定于实现 Keepers 的模块的类型的方法，这就是“exported/”发挥作用的地方。 `exported/` 中定义的接口类型使用规范类型，允许模块通过 `expected_keepers.go` 文件接收作为接口合约的 Keeper。这种模式允许代码保持 DRY 并缓解导入周期混乱。
-- `keeper/`:模块的`Keeper` 和`MsgServer` 实现。
-- `module/`:模块的`AppModule` 和`AppModuleBasic` 实现。
-- `simulation/`:模块的 [simulation](./simulator.html) 包定义了区块链模拟器应用程序 (`simapp`) 使用的函数。
-- `spec/`:模块的规范文档概述了重要概念、状态存储结构以及消息和事件类型定义。
-- 根目录包括消息、事件和创世状态的类型定义，包括协议缓冲区生成的类型定义。
-    - `abci.go`:模块的`BeginBlocker` 和`EndBlocker` 实现(只有在需要定义`BeginBlocker` 和/或`EndBlocker` 时才需要此文件)。
-    - `codec.go`:模块的接口类型注册方法。
-    - `errors.go`:模块的哨兵错误。
-    - `events.go`:模块的事件类型和构造函数。
-    - `expected_keepers.go`:模块的 [expected keeper](./keeper.html#type-definition) 接口。
-    - `genesis.go`:模块的创世状态方法和辅助函数。
-    - `keys.go`:模块的存储键和相关的辅助函数。
-    - `msgs.go`:模块的消息类型定义和相关方法。
-    - `params.go`:模块的参数类型定义和相关方法。
-    - `*.pb.go`:由 Protocol Buffers 生成的模块类型定义(在上面相应的 `*.proto` 文件中定义)。
+-`client/`:モジュールのCLIクライアント関数の実装とモジュールの統合テストスイート。
+-`exported/`:モジュールのエクスポートされたタイプ-通常はインターフェースタイプ。モジュールが別のモジュールのキーパーに依存している場合、キーパーを実装するモジュールに直接依存することを避けるために、 `expected_keepers.go`ファイル(以下を参照)を介してインターフェースコントラクトとしてキーパーを受け取ることが期待されます。ただし、これらのインターフェイスコントラクトは、Keepersを実装する特定のタイプのモジュールを返す操作やメソッドを定義できます。ここで、「exported/」が機能します。 `exported/`で定義されたインターフェースタイプは標準タイプを使用し、モジュールが `expected_keepers.go`ファイルを介してインターフェースコントラクトとしてKeeperを受信できるようにします。このモードでは、コードをDRYのままにして、インポートサイクルの混乱を緩和できます。
+-`keeper/`:モジュールの` Keeper`と `MsgServer`の実装。
+-`module/`:モジュールの` AppModule`と `AppModuleBasic`の実装。
+-`simulation/`:モジュールの[simulation](./simulator.html)パッケージは、ブロックチェーンシミュレーターアプリケーション(` simapp`)によって使用される関数を定義します。
+-`spec/`:モジュールの仕様書には、重要な概念、状態ストレージ構造、メッセージおよびイベントタイプの定義の概要が記載されています。
+-ルートディレクトリには、メッセージ、イベント、および作成ステータスのタイプ定義(プロトコルバッファ生成のタイプ定義を含む)が含まれます。
+    -`abci.go`:モジュールの `BeginBlocker`および` EndBlocker`の実装(このファイルは、 `BeginBlocker`および/または` EndBlocker`を定義する必要がある場合にのみ必要です)。
+    -`codec.go`:モジュールのインターフェースタイプ登録方法。
+    -`errors.go`:モジュールのセンチネルエラー。
+    -`events.go`:モジュールのイベントタイプとコンストラクター。
+    -`expected_keepers.go`:モジュールの[expected keeper](./keeper.html#type-definition)インターフェース。
+    -`genesis.go`:モジュールのジェネシス状態メソッドと補助関数。
+    -`keys.go`:モジュールストレージキーと関連する補助機能。
+    -`msgs.go`:モジュールのメッセージタイプ定義と関連メソッド。
+    -`params.go`:モジュールパラメータタイプの定義と関連メソッド。
+    -` * .pb.go`:プロトコルバッファによって生成されたモジュールタイプの定義(上記の対応する `* .proto`ファイルで定義されています)。
 
-## 下一个 {hide}
+## 次へ{hide}
 
-了解 [错误](./errors.md) {hide} 
+[errors](./errors.md){hide}を理解する 

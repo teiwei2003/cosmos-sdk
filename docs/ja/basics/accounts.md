@@ -1,16 +1,16 @@
-# 帐户
+# アカウント
 
-本文档介绍了 Cosmos SDK 的内置账号和公钥系统。 {概要}
+このドキュメントでは、CosmosSDKの組み込みアカウントと公開鍵システムを紹介します。 {まとめ}
 
-### 先决条件阅读
+### 読むための前提条件
 
-- [Cosmos SDK 应用剖析](./app-anatomy.md) {prereq}
+-[Cosmos SDKアプリケーション分析](./app-anatomy.md){前提条件}
 
-## 帐户定义
+##アカウント定義
 
-在 Cosmos SDK 中，一个 _account_ 指定一对 _public key_ `PubKey` 和 _private key_ `PrivKey`。可以派生出“公钥”以生成各种“地址”，用于识别应用程序中的用户(以及其他方)。 `Addresses` 还与 [`message`s](../building-modules/messages-and-queries.md#messages) 相关联，以识别 `message` 的发送者。 `PrivKey` 用于生成[数字签名](#signatures) 以证明与给定的“消息”的“PrivKey”关联的“地址”。
+Cosmos SDKでは、_account_は_public key_`PubKey`と_privatekey_`PrivKey`のペアを指定します。 「公開鍵」は、アプリケーション内のユーザー(およびその他の関係者)を識別するために使用されるさまざまな「アドレス」を生成するために導出できます。 `Addresses`は、` message`の送信者を識別するために[`message`s](../building-modules/messages-and-queries.md#messages)にも関連付けられています。 `PrivKey`は、[デジタル署名](#signatures)を生成して、指定された「メッセージ」の「PrivKey」に関連付けられた「アドレス」を証明するために使用されます。
 
-对于 HD 密钥派生，Cosmos SDK 使用称为 [BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki) 的标准。 BIP32 允许用户创建一个 HD 钱包(如 [BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki) 中指定的)——一组源自初始秘密的账户种子。种子通常由 12 或 24 字的助记符创建。单个种子可以使用单向加密函数派生任意数量的“PrivKey”。然后，可以从 `PrivKey` 派生出一个 `PubKey`。自然地，助记符是最敏感的信息，因为如果保留助记符，私钥总是可以重新生成的。 
+HDキーの導出には、Cosmos SDKは[BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)と呼ばれる標準を使用します。 BIP32を使用すると、ユーザーはHDウォレットを作成できます([BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)で指定)-最初のシークレットから派生したアカウントシードのセット。シードは通常、12語または24語のニーモニックによって作成されます。単一のシードは、一方向の暗号化機能を使用して、任意の数の「PrivKey」を導出できます。次に、 `PubKey`を` PrivKey`から派生させることができます。当然のことながら、ニーモニックは最も機密性の高い情報です。ニーモニックを保持しておけば、秘密鍵をいつでも再生成できるからです。 
 ```
      Account 0                         Account 1                         Account 2
 
@@ -51,19 +51,19 @@
                                  +-------------------+
 ```
 
-在 Cosmos SDK 中，密钥是通过一个名为 [`Keyring`](#keyring) 的对象来存储和管理的。
+Cosmos SDKでは、キーは[`Keyring`](#keyring)という名前のオブジェクトによって保存および管理されます。 
 
-## 密钥、帐户、地址和签名
+## キー、アカウント、アドレス、署名
 
-对用户进行身份验证的主要方式是使用 [数字签名](https://en.wikipedia.org/wiki/Digital_signature)。用户使用自己的私钥签署交易。签名验证是使用关联的公钥完成的。出于链上签名验证的目的，我们将公钥存储在“Account”对象中(以及正确交易验证所需的其他数据)。
+ユーザーを認証する主な方法は、[デジタル署名](https://en.wikipedia.org/wiki/Digital_signature)を使用することです。ユーザーは自分の秘密鍵を使用してトランザクションに署名します。署名の検証は、関連付けられた公開鍵を使用して行われます。チェーンでの署名検証の目的で、公開鍵を「Account」オブジェクト(および正しいトランザクション検証に必要なその他のデータ)に格納します。
 
-在节点中，所有数据都使用 Protocol Buffers 序列化存储。
+ノードでは、すべてのデータがシリアル化され、プロトコルバッファを使用して保存されます。
 
-Cosmos SDK 支持以下用于创建数字签名的数字密钥方案:
+Cosmos SDKは、デジタル署名を作成するための次のデジタルキースキームをサポートしています。
 
-- `secp256k1`，在 [Cosmos SDK 的 `crypto/keys/secp256k1` 包中实现](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/crypto/keys/secp256k1/secp256k1。去)。
-- `secp256r1`，在 [Cosmos SDK 的 `crypto/keys/secp256r1` 包中实现](https://github.com/cosmos/cosmos-sdk/blob/master/crypto/keys/secp256r1/pubkey.go) ,
-- `tm-ed25519`，在 [Cosmos SDK `crypto/keys/ed25519` 包中实现](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/crypto/keys/ed25519/ ed25519.go)。该方案仅支持共识验证。 
+-`secp256k1`、[Cosmos SDK` crypto/keys/secp256k1`パッケージ](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/crypto/keys/secp256k1/secp256k1。gowith )。
+-`secp256r1`、[Cosmos SDK` crypto/keys/secp256r1`パッケージ](https://github.com/cosmos/cosmos-sdk/blob/master/crypto/keys/secp256r1/pubkey.go)に実装されています。
+-`tm-ed25519`、[Cosmos SDK` crypto/keys/ed25519`パッケージ](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/crypto/keys/ed25519/ed25519に実装されています。行く)。このソリューションは、コンセンサス検証のみをサポートします。 
 
 |              | Address length in bytes | Public key length in bytes | Used for transaction authentication | Used for consensus (tendermint) |
 |:------------:|:-----------------------:|:--------------------------:|:-----------------------------------:|:-------------------------------:|
@@ -71,30 +71,30 @@ Cosmos SDK 支持以下用于创建数字签名的数字密钥方案:
 | `secp256r1`  | 32                      |                         33 | yes                                 | no                              |
 | `tm-ed25519` | -- not used --          |                         32 | no                                  | yes                             |
 
-## 地址
+## 住所
 
-`Addresses` 和 `PubKey`s 都是识别应用程序中参与者的公共信息。 `Account` 用于存储认证信息。基本帐户实现由“BaseAccount”对象提供。
+`Addresses`と` PubKey`はどちらも、アプリケーションの参加者を識別する公開情報です。 `アカウント`は認証情報を保存するために使用されます。 基本的なアカウントの実装は、「BaseAccount」オブジェクトによって提供されます。
 
-每个帐户都使用“地址”标识，地址是从公钥派生的字节序列。在 Cosmos SDK 中，我们定义了 3 种地址类型，用于指定使用帐户的上下文:
+各アカウントは、公開鍵から派生した一連のバイトである「アドレス」によって識別されます。 Cosmos SDKでは、アカウントを使用するコンテキストを指定するために3種類のアドレスを定義します。
 
-- `AccAddress` 标识用户(`message` 的发送者)。
-- `ValAddress` 标识验证器操作符。
-- `ConsAddress` 标识参与共识的验证器节点。验证器节点是使用 **`ed25519`** 曲线导出的。
+-`AccAddress`は、ユーザー( `message`の送信者)を識別します。
+-`ValAddress`はバリデーター演算子を識別します。
+-`ConsAddress`は、コンセンサスに参加しているバリデーターノードを識別します。 バリデーターノードは、** `ed25519` **曲線を使用して導出されます。
 
-这些类型实现了 `Address` 接口:
+これらのタイプは、アドレスインターフェイスを実装します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/types/address.go#L71-L90
 
-地址构建算法在[ADR-28](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-028-public-key-addresses.md)中定义。
-以下是从“pub”公钥获取帐户地址的标准方法: 
+アドレス構築アルゴリズムは[ADR-28](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-028-public-key-addresses.md)で定義されています。
+以下は、「pub」公開鍵からアカウントアドレスを取得する標準的な方法です。 
 
 ```go
 sdk.AccAddress(pub.Address().Bytes())
 ```
 
-值得注意的是，`Marshal()` 和 `Bytes()` 方法都返回地址的相同原始 `[]byte` 形式。 `Marshal()` 是 Protobuf 兼容性所必需的。
+`Marshal()`メソッドと `Bytes()`メソッドはどちらも、同じ元の `[] byte`形式のアドレスを返すことに注意してください。 `Marshal()`はProtobufの互換性のために必要です。
 
-对于用户交互，地址使用 [Bech32](https://en.bitcoin.it/wiki/Bech32) 格式化并通过 `String` 方法实现。 Bech32 方法是与区块链交互时唯一支持使用的格式。 Bech32 人类可读部分(Bech32 前缀)用于表示地址类型。 例子: 
+ユーザーとの対話のために、アドレスは[Bech32](https://en.bitcoin.it/wiki/Bech32)を使用してフォーマットされ、 `String`メソッドによって実装されます。 Bech32メソッドは、ブロックチェーンと対話するときにサポートされる唯一の形式です。 Bech32の人間が読める部分(Bech32プレフィックス)は、アドレスタイプを示すために使用されます。 例: 
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/types/address.go#L230-L244
 
@@ -104,44 +104,44 @@ sdk.AccAddress(pub.Address().Bytes())
 | Validator Operator | cosmosvaloper         |
 | Consensus Nodes    | cosmosvalcons         |
 
-### 公钥
+### 公開鍵
 
-Cosmos SDK 中的公钥由`cryptotypes.PubKey` 接口定义。由于公钥保存在存储中，`cryptotypes.PubKey` 扩展了 `proto.Message` 接口:
+Cosmos SDKの公開鍵は、 `cryptotypes.PubKey`インターフェースによって定義されます。公開鍵はストレージに保存されるため、 `cryptotypes.PubKey`は` proto.Message`インターフェースを拡張します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/crypto/types/types.go#L8-L17
 
-压缩格式用于“secp256k1”和“secp256r1”序列化。
+圧縮形式は、「secp256k1」および「secp256r1」のシリアル化に使用されます。
 
-- 第一个字节是一个 0x02 字节，如果 `y` 坐标是与 `x` 坐标相关的两个字节中字典序最大的。
-- 否则第一个字节是“0x03”。
+-`y`座標が `x`座標に関連する2バイトの辞書式順序で最大の場合、最初のバイトは0x02バイトです。
+-それ以外の場合、最初のバイトは「0x03」です。
 
-此前缀后跟“x”坐标。
+この接頭辞の後に「x」座標が続きます。
 
-公钥不用于引用帐户(或用户)，通常在编写交易消息时不使用(除了少数例外:`MsgCreateValidator`、`Validator` 和 `Multisig` 消息)。
-对于用户交互，`PubKey` 使用 Protobufs JSON ([ProtoMarshalJSON](https://github.com/cosmos/cosmos-sdk/blob/release/v0.42.x/codec/json.go#L12) 函数格式化)。例子:
+公開鍵はアカウント(またはユーザー)の参照には使用されず、通常、トランザクションメッセージの作成には使用されません(いくつかの例外: `MsgCreateValidator`、` Validator`、および `Multisig`メッセージを除く)。
+ユーザーとの対話には、 `PubKey`はProtobufsJSONを使用します([ProtoMarshalJSON](https://github.com/cosmos/cosmos-sdk/blob/release/v0.42.x/codec/json.go#L12)関数形式) 。例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/7568b66/crypto/keyring/output.go#L23-L39
 
-## 钥匙圈
+## キーホルダー
 
-`Keyring` 是一个存储和管理帐户的对象。在 Cosmos SDK 中，Keyring 实现遵循 Keyring 接口:
+`Keyring`は、アカウントを保存および管理するためのオブジェクトです。 Cosmos SDKでは、Keyringの実装はKeyringインターフェースに従います。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/crypto/keyring/keyring.go#L51-L89
 
-`Keyring` 的默认实现来自第三方 [`99designs/keyring`](https://github.com/99designs/keyring) 库。
+`Keyring`のデフォルトの実装は、サードパーティの[` 99designs/keyring`](https://github.com/99designs/keyring)ライブラリから取得されます。
 
-关于“Keyring”方法的一些注意事项:
+「キーリング」方式に関する注意事項:
 
-- `Sign(uid string, payload []byte) ([]byte, sdkcrypto.PubKey, error)`严格处理`payload`字节的签名。您必须准备交易并将其编码为规范的 `[]byte` 形式。因为 protobuf 不是确定性的，所以在 [ADR-020](../architecture/adr-020-protobuf-transaction-encoding.md) 中已经确定要签名的规范 `payload` 是 `SignDoc` 结构，确定性使用 [ADR-027](adr-027-deterministic-protobuf-serialization.md) 编码。请注意，Cosmos SDK 中默认没有实现签名验证，它推迟到 [`anteHandler`](../core/baseapp.md#antehandler)。
+-`Sign(uid string、payload[] byte)([] byte、sdkcrypto.PubKey、error) `は、` payload`バイトの署名を厳密に処理します。トランザクションを準備し、それを正規の `[] byte`形式にエンコードする必要があります。 protobufは決定論的ではないため、[ADR-020](../architecture/adr-020-protobuf-transaction-encoding.md)で、署名される仕様 `payload`は` SignDoc`構造であると判断されています。 deterministic[ADR-027](adr-027-deterministic-protobuf-serialization.md)エンコーディングを使用します。署名の検証はCosmosSDKにデフォルトで実装されておらず、[`anteHandler`](../core/baseapp.md#antehandler)に延期されていることに注意してください。
   +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/proto/cosmos/tx/v1beta1/tx.proto#L47-L64
 
-- `NewAccount(uid, mnemonic, bip39Passwd, hdPath string, algo SignatureAlgo) (Info, error)` 基于 [`bip44 path`](https://github.com/bitcoin/bips/blob/) 创建一个新账户master/bip-0044.mediawiki)并将其保存在磁盘上。 `PrivKey` **永远不会未加密存储**，而是 [使用密码加密](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/crypto/armor.go ) 之前被坚持。在此方法的上下文中，密钥类型和序列号指的是 BIP44 派生路径中用于派生私有和助记符中的公钥。使用相同的助记符和派生路径，生成相同的`PrivKey`、`PubKey`和`Address`。密钥环支持以下密钥:
+-`NewAccount(uid、mnemonic、bip39Passwd、hdPath string、algo SignatureAlgo)(Info、error) `[` bip44path`](https://github.com/bitcoin/bips/blob/に基づいて新しいアカウントマスターを作成します)/bip-0044.mediawiki)そしてそれをディスクに保存します。 `PrivKey` **暗号化されていない状態で保存することはありません**が、[パスワードで暗号化](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/crypto/armor.go)以前に主張されていました。この方法のコンテキストでは、キータイプとシリアル番号は、BIP44派生パスで秘密キーとニーモニックを派生させるために使用される公開キーを参照します。同じニーモニックおよび派生パスを使用して、同じ `PrivKey`、` PubKey`、および `Address`を生成します。キーリングは次のキーをサポートします。
 
 -`secp256k1`
 -`ed25519`
 
-- `ExportPrivKeyArmor(uid, encryptPassphrase string) (armor string, err error)` 使用给定的密码以 ASCII 装甲加密格式导出私钥。然后，您可以使用 `ImportPrivKey(uid, Armor, passphrase string)` 函数将私钥再次导入密钥环，或者使用 `UnarmorDecryptPrivKey(armorStr string, passphrase string)` 函数将其解密为原始私钥。
+-`ExportPrivKeyArmor(uid、encryptPassphrase string)(armor string、err error) `指定されたパスワードを使用して、ASCII装甲暗号化形式で秘密鍵をエクスポートします。次に、 `ImportPrivKey(uid、Armor、passphrase string)`関数を使用して秘密鍵をキーリングに再度インポートするか、 `UnarmorDecryptPrivKey(armorStr string、passphrase string)`関数を使用して元の秘密鍵に復号化します。 。
 
-## 下一个 {hide}
+## 次へ{hide}
 
-了解 [gas 和费用](./gas-fees.md) {hide} 
+[ガスと料金](./gas-fees.md)を理解する{hide} 

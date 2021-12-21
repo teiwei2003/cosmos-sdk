@@ -1,146 +1,146 @@
-# 模块管理器
+# モジュールマネージャー
 
-Cosmos SDK 模块需要实现[`AppModule` 接口](#application-module-interfaces)，以便由应用程序的[模块管理器](#module-manager) 进行管理。模块管理器在 [`message` 和 `query` 路由](../core/baseapp.md#routing) 中扮演着重要的角色，并允许应用程序开发者设置各种函数的执行顺序，例如 [`BeginBlocker ` 和 `EndBlocker`](../basics/app-anatomy.md#begingblocker-and-endblocker)。 {概要}
+Cosmos SDKモジュールは、アプリケーションの[module manager](#module-manager)で管理できるように、[`AppModule`インターフェース](#application-module-interfaces)を実装する必要があります。モジュールマネージャーは、[`message`および` query`ルーティング](../core/baseapp.md#routing)で重要な役割を果たし、アプリケーション開発者が[`BeginBlocker`や` BeginBlocker`などのさまざまな関数の実行順序を設定できるようにします。 `EndBlocker`](../basics/app-anatomy.md#begingblocker-and-endblocker)。 {まとめ}
 
-## 先决条件阅读
+## 読むための前提条件
 
-- [Cosmos SDK 模块介绍](./intro.md) {prereq}
+-[Cosmos SDKモジュールの紹介](。/intro.md){前提条件}
 
-## 应用模块接口
+## アプリケーションモジュールインターフェイス
 
-应用程序模块接口的存在是为了便于将模块组合在一起以形成功能性 Cosmos SDK 应用程序。有3个主要的应用模块接口:
+アプリケーションモジュールインターフェイスは、モジュールの組み合わせを容易にして機能的なCosmosSDKアプリケーションを形成するために存在します。 3つの主要なアプリケーションモジュールインターフェイスがあります。
 
-- [`AppModuleBasic`](#appmodulebasic) 用于独立模块功能。
-- [`AppModule`](#appmodule) 用于相互依赖的模块功能)与创世相关的功能除外)。
-- [`AppModuleGenesis`](#appmodulegenesis) 用于相互依赖的与创世相关的模块功能。
+-[`AppModuleBasic`](#appmodulebasic)は、独立したモジュール関数に使用されます。
+-[`AppModule`](#appmodule)相互依存モジュール関数の場合)作成に関連する関数を除く)。
+-[`AppModuleGenesis`](#appmodulegenesis)は、作成に関連する相互依存モジュール関数に使用されます。
 
-`AppModuleBasic` 接口的存在是为了定义模块的独立方法，即那些不依赖于应用程序中其他模块的方法。这允许在应用程序定义的早期构建基本应用程序结构，通常在[主应用程序文件](../basics/app-anatomy.md#core-application-file)的`init()`函数中.
+`AppModuleBasic`インターフェースは、モジュールの独立したメソッド、つまり、アプリケーション内の他のモジュールに依存しないメソッドを定義するために存在します。これにより、基本的なアプリケーション構造をアプリケーション定義の早い段階で、通常は[メインアプリケーションファイル](../basics/app-anatomy.md#core-application-file)の `init()`関数で構築できます。
 
-`AppModule` 接口用于定义相互依赖的模块方法。许多模块需要与其他模块交互，通常通过 [`keeper`s](./keeper.md)，这意味着需要一个接口，其中模块列出它们的 `keeper`s 和其他需要引用的方法另一个模块的对象。 `AppModule` 接口还使模块管理器能够设置模块方法之间的执行顺序，如 `BeginBlock` 和 `EndBlock`，这在模块之间的执行顺序在应用程序上下文中很重要的情况下很重要。
+`AppModule`インターフェースは、相互に依存するモジュールメソッドを定義するために使用されます。多くのモジュールは、通常[`keeper`s](./keeper.md)を介して他のモジュールと対話する必要があります。これは、インターフェースが必要であることを意味します。ここで、モジュールは、参照する必要のある` keeper`sおよびその他のメソッドを一覧表示します。別のモジュールオブジェクト。 `AppModule`インターフェースを使用すると、モジュールマネージャーは` BeginBlock`や `EndBlock`などのモジュールメソッド間の実行順序を設定することもできます。これは、アプリケーションのコンテキストでモジュール間の実行順序が重要な場合に重要です。
 
-最后，创世功能“AppModuleGenesis”的接口与完整的模块功能“AppModule”分离，以便模块
-仅用于 genesis 可以利用 `Module` 模式，而无需定义许多占位符函数。
+最後に、ジェネシス関数「AppModuleGenesis」のインターフェースは、完全なモジュール関数「AppModule」から分離されているため、モジュールは
+ジェネシスの場合のみ、多くのプレースホルダー関数を定義せずに `Module`モードを使用できます。 
 
 ### `AppModuleBasic`
 
-`AppModuleBasic` 接口定义了模块需要实现的独立方法。
+`AppModuleBasic`インターフェースは、モジュールが実装する必要のある独立したメソッドを定義します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/325be6ff215db457c6fc7668109640cd7fdac461/types/module/module.go#L49-L63
 
-让我们来看看这些方法:
+これらのメソッドを見てみましょう。
 
-- `Name()`:以 `string` 形式返回模块的名称。
-- `RegisterLegacyAminoCodec(*codec.LegacyAmino)`:为模块注册 `amino` 编解码器，用于向/从 `[]byte` 编组和解组结构，以便将它们保存在模块的 `KVStore` 中。
-- `RegisterInterfaces(codectypes.InterfaceRegistry)`:将模块的接口类型及其具体实现注册为`proto.Message`。
-- `DefaultGenesis(codec.JSONCodec)`:返回模块的默认 [`GenesisState`](./genesis.md#genesisstate)，编组为 `json.RawMessage`。默认的“GenesisState”需要由模块开发者定义，主要用于测试。
-- `ValidateGenesis(codec.JSONCodec, client.TxEncodingConfig, json.RawMessage)`:用于验证模块定义的`GenesisState`，以`json.RawMessage`形式给出。它通常会在运行模块开发人员定义的自定义 [`ValidateGenesis`](./genesis.md#validategenesis) 函数之前解组 `json`。
-- `RegisterRESTRoutes(client.Context, *mux.Router)`:为模块注册 REST 路由。这些路由将用于将 REST 请求映射到模块以处理它们。有关更多信息，请参阅 [gRPC 和 REST](../core/grpc_rest.md)。
-- `RegisterGRPCGatewayRoutes(client.Context, *runtime.ServeMux)`:为模块注册 gRPC 路由。
-- `GetTxCmd()`:返回模块的根 [`Tx` 命令](./module-interfaces.md#tx)。最终用户使用此根命令的子命令来生成包含模块中定义的 [`message`s](./messages-and-queries.md#queries) 的新事务。
-- `GetQueryCmd()`:返回模块的根 [`query` 命令](./module-interfaces.md#query)。最终用户使用此根命令的子命令来生成对模块定义的状态子集的新查询。
+-`Name() `:モジュールの名前を` string`の形式で返します。
+-`RegisterLegacyAminoCodec(* codec.LegacyAmino) `:モジュールの` amino`コーデックを登録します。これは `[] byte`との間で構造をマーシャリングおよびアンマーシャリングするために使用され、モジュールの` KVStore`に格納できるようにします。
+-`RegisterInterfaces(codectypes.InterfaceRegistry) `:モジュールのインターフェースタイプとその特定の実装を` proto.Message`として登録します。
+-`DefaultGenesis(codec.JSONCodec) `:モジュールのデフォルトの[` GenesisState`](./genesis.md#genesisstate)を、 `json.RawMessage`としてグループ化して返します。デフォルトの「GenesisState」はモジュール開発者が定義する必要があり、主にテストに使用されます。
+-`ValidateGenesis(codec.JSONCodec、client.TxEncodingConfig、json.RawMessage) `:モジュール定義の検証に使用される` GenesisState`は、 `json.RawMessage`の形式で指定されます。通常、モジュール開発者が定義したカスタム[`ValidateGenesis`](./genesis.md#validategenesis)関数を実行する前に、` json`をアンマーシャリングします。
+-`RegisterRESTRoutes(client.Context、* mux.Router) `:モジュールのRESTルートを登録します。これらのルートは、RESTリクエストをモジュールにマッピングして処理するために使用されます。詳細については、[gRPCおよびREST](../core/grpc_rest.md)を参照してください。
+-`RegisterGRPCGatewayRoutes(client.Context、* runtime.ServeMux) `:モジュールのgRPCルートを登録します。
+-`GetTxCmd() `:モジュールのルートを返します[` Tx`コマンド](./module-interfaces.md#tx)。エンドユーザーは、このrootコマンドのサブコマンドを使用して、モジュールで定義された[`message`s](./messages-and-queries.md#queries)を含む新しいトランザクションを生成します。
+-`GetQueryCmd() `:モジュールのルートを返します[` query`コマンド](./module-interfaces.md#query)。エンドユーザーは、このrootコマンドのサブコマンドを使用して、モジュールによって定義された状態サブセットの新しいクエリを生成します。
 
-应用程序的所有`AppModuleBasic` 都由[`BasicManager`](#basicmanager) 管理。
+アプリケーションのすべての `AppModuleBasic`は、[` BasicManager`](#basicmanager)によって管理されます。
 
 ### `AppModuleGenesis`
 
-`AppModuleGenesis` 接口是带有两个附加方法的 `AppModuleBasic` 接口的简单嵌入。 
+`AppModuleGenesis`インターフェースは、` AppModuleBasic`インターフェースに2つの追加メソッドを単純に埋め込んだものです。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/325be6ff215db457c6fc7668109640cd7fdac461/types/module/module.go#L152-L158
 
-让我们来看看添加的两个方法:
+追加された2つの方法を見てみましょう。
 
-- `InitGenesis(sdk.Context, codec.JSONCodec, json.RawMessage)`:初始化模块管理的状态子集。它在创世时)即链第一次启动时)被调用。
-- `ExportGenesis(sdk.Context, codec.JSONCodec)`:导出模块管理的最新状态子集，用于新的创世文件。当从现有链的状态启动新链时，每个模块都会调用 `ExportGenesis`。
+-`InitGenesis(sdk.Context、codec.JSONCodec、json.RawMessage) `:モジュールによって管理される状態サブセットを初期化します。作成時(つまり、チェーンが最初に開始されたとき)に呼び出されます。
+-`ExportGenesis(sdk.Context、codec.JSONCodec) `:新しいジェネシスファイルで使用するために、モジュールによって管理される最新の状態サブセットをエクスポートします。既存のチェーンの状態から新しいチェーンを開始する場合、各モジュールは `ExportGenesis`を呼び出します。
 
-它没有自己的管理器，并且与 [`AppModule`](#appmodule) 分开存在，仅用于实现创世功能的模块，这样它们就可以被管理而无需实现所有 `AppModule` 的方法.如果模块不仅在创世期间使用，`InitGenesis(sdk.Context, codec.JSONCodec, json.RawMessage)` 和 `ExportGenesis(sdk.Context, codec.JSONCodec)` 通常会被定义为实现的具体类型的方法`AppModule` 接口。
+独自のマネージャーを持たず、[`AppModule`](#appmodule)とは別に存在します。作成機能を実装するモジュールにのみ使用されるため、` AppModule`のすべてのメソッドを実装せずに管理できます。モジュールは作成期間中に使用されるだけでなく、 `InitGenesis(sdk.Context、codec.JSONCodec、json.RawMessage)`と `ExportGenesis(sdk.Context、codec.JSONCodec)`は通常、実装する具体的なタイプのメソッドとして定義されます。 `AppModule`インターフェース。
 
 ### `AppModule`
 
-`AppModule` 接口定义了模块需要实现的相互依赖的方法。
+`AppModule`インターフェースは、モジュールが実装する必要のある相互依存メソッドを定義します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/b4cce159bcc6a32ac78245c6866dd87c73f3720d/types/module/module.go#L160-L182
 
-`AppModule`s 由 [模块管理器](#manager) 管理。该接口嵌入了`AppModuleGenesis`接口，以便管理器可以访问模块的所有独立和创世相互依赖的方法。这意味着实现 `AppModule` 接口的具体类型必须要么实现 `AppModuleGenesis`)以及扩展为 `AppModuleBasic`)的所有方法，或者包含一个作为参数的具体类型。
+`AppModule`は[モジュールマネージャー](#manager)によって管理されます。このインターフェースには `AppModuleGenesis`インターフェースが組み込まれているため、マネージャーはモジュールのすべての独立したメソッドと作成に依存するメソッドにアクセスできます。つまり、 `AppModule`インターフェイスを実装する具象型は、` AppModuleGenesis`)のすべてのメソッドを実装して `AppModuleBasic`)に展開するか、パラメータとして具象型を含める必要があります。
 
-让我们来看看`AppModule`的方法:
+`AppModule`のメソッドを見てみましょう。
 
-- `RegisterInvariants(sdk.InvariantRegistry)`:注册模块的[`invariants`](./invariants.md)。如果一个不变量偏离了它的预测值，[`InvariantRegistry`](./invariants.md#registry) 会触发适当的逻辑)大多数情况下链将被停止)。
-- `Route()`:返回 [`message`s](./messages-and-queries.md#messages) 的路由，由 [`BaseApp`](../core/baseapp.md#messages) 路由到模块。 md#消息路由)。
-- `QuerierRoute()`)不推荐使用):返回模块的查询路由的名称，用于 [`queries`](./messages-and-queries.md#queries) 是由 [`BaseApp`] 到模块的路由)../core/baseapp.md#query-routing)。
-- `LegacyQuerierHandler(*codec.LegacyAmino)`)不推荐使用):返回一个 [`querier`](./query-services.md#legacy-queriers) 给定查询 `path`，以便处理 `query`。
-- `RegisterServices(Configurator)`:允许模块注册服务。
-- `BeginBlock(sdk.Context, abci.RequestBeginBlock)`:此方法为模块开发人员提供了实现在每个块开始时自动触发的逻辑的选项。如果不需要在此模块的每个块的开头触发逻辑，则实现为空。
-- `EndBlock(sdk.Context, abci.RequestEndBlock)`:此方法为模块开发人员提供了实现在每个块结束时自动触发的逻辑的选项。这也是模块可以将验证器集更改通知底层共识引擎的地方)例如，`staking` 模块)。如果不需要在此模块的每个块的末尾触发逻辑，则实现为空。
+-`RegisterInvariants(sdk.InvariantRegistry) `:登録されたモジュールの[` invariants`](./invariants.md)。不変条件が予測値から外れると、[`InvariantRegistry`](./invariants.md#registry)が適切なロジックをトリガーします)ほとんどの場合、チェーンは停止します)。
+-`Route() `:[` BaseApp`](../core/baseapp.md#messages)によってルーティングされた[`message`s](./messages-and-queries.md#messages)のルートを返します)モジュール。 md#メッセージルーティング)。
+-`QuerierRoute() `)は推奨されません):[` BaseApp`]から[`queries`](./messages-and-queries.md#queries)に使用されるモジュールのクエリルートの名前を返しますモジュールRouting)../core/baseapp.md#query-routing)。
+-`LegacyQuerierHandler(* codec.LegacyAmino) `)は推奨されません):` query`を処理するために、クエリ `path`を指定して[` querier`](./query-services.md#legacy-queriers)を返します。
+-`RegisterServices(Configurator) `:モジュールがサービスを登録できるようにします。
+-`BeginBlock(sdk.Context、abci.RequestBeginBlock) `:このメソッドは、モジュール開発者に、各ブロックの開始時に自動的にトリガーされるロジックを実装するオプションを提供します。このモジュールの各ブロックの先頭でロジックをトリガーする必要がない場合、実装は空です。
+-`EndBlock(sdk.Context、abci.RequestEndBlock) `:このメソッドは、モジュール開発者に、各ブロックの最後で自動的にトリガーされるロジックを実装するオプションを提供します。これは、モジュールがバリデーターセットへの変更を基礎となるコンセンサスエンジンに通知できる場所でもあります(たとえば、「ステーキング」モジュール)。このモジュールの各ブロックの最後でロジックをトリガーする必要がない場合、実装は空です。 
 
-### 实现应用程序模块接口
+### アプリケーションモジュールインターフェイスを実装する
 
-通常，各种应用程序模块接口在名为“module.go”的文件中实现，该文件位于模块的文件夹中)例如，“./x/module/module.go”)。
+一般に、さまざまなアプリケーションモジュールインターフェイスは、モジュールのフォルダにある「module.go」という名前のファイル(たとえば、「。/x/module/module.go」)に実装されます。
 
-几乎每个模块都需要实现`AppModuleBasic` 和`AppModule` 接口。如果模块仅用于创世，它将实现`AppModuleGenesis`而不是`AppModule`。实现接口的具体类型可以添加实现接口的各种方法所需的参数。例如，`Route()`函数经常调用`keeper/msg_server.go`中定义的`NewMsgServerImpl(k keeper)`函数，因此需要将模块的[`keeper`](./keeper.md)作为一个参数。 
+ほとんどすべてのモジュールは、 `AppModuleBasic`および` AppModule`インターフェースを実装する必要があります。 モジュールが作成にのみ使用される場合は、 `AppModule`の代わりに` AppModuleGenesis`を実装します。 特定のタイプのインターフェースを実装するために、インターフェースのさまざまなメソッドを実装するために必要なパラメーターを追加できます。 たとえば、 `Route()`関数は `keeper/msg_server.go`で定義された` NewMsgServerImpl(k keeper) `関数を呼び出すことが多いため、モジュールの[` keeper`](./keeper.md)はパラメータ。 
 
 ```go
-// example
+//example
 type AppModule struct {
 	AppModuleBasic
 	keeper       Keeper
 }
 ```
 
-在上面的示例中，您可以看到“AppModule”具体类型引用了“AppModuleBasic”，而不是“AppModuleGenesis”。 那是因为`AppModuleGenesis` 只需要在专注于与创世相关功能的模块中实现。 在大多数模块中，具体的`AppModule` 类型将引用一个`AppModuleBasic`，并直接在`AppModule` 类型中实现`AppModuleGenesis` 的两个添加方法。
+上記の例では、具体的なタイプ「AppModule」が「AppModuleGenesis」ではなく「AppModuleBasic」を参照していることがわかります。 これは、 `AppModuleGenesis`は、作成に関連する関数に焦点を当てたモジュールにのみ実装する必要があるためです。 ほとんどのモジュールでは、特定の `AppModule`タイプは` AppModuleBasic`を参照し、 `AppModuleGenesis`の2つの追加メソッドは` AppModule`タイプに直接実装されます。
 
-如果不需要参数)`AppModuleBasic` 通常就是这种情况)，只需声明一个空的具体类型，如下所示: 
+パラメータが必要ない場合)(通常は `AppModuleBasic`が当てはまります)、次に示すように、空の具象型を宣言するだけです。
 
 ```go
 type AppModuleBasic struct{}
 ```
 
-## 模块管理器
+## モジュールマネージャー
 
-模块管理器用于管理`AppModuleBasic` 和`AppModule` 的集合。
+モジュールマネージャは、 `AppModuleBasic`と` AppModule`のコレクションを管理するために使用されます。
 
-### `基本管理器`
+### `ベーシックマネージャー`
 
-`BasicManager` 是一个列出应用程序所有 `AppModuleBasic` 的结构:
+`BasicManager`は、アプリケーションのすべての` AppModuleBasic`を一覧表示する構造です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/325be6ff215db457c6fc7668109640cd7fdac461/types/module/module.go#L65-L66
 
-它实现了以下方法:
+次のメソッドを実装します。
 
-- `NewBasicManager(modules ...AppModuleBasic)`:构造函数。它获取应用程序的“AppModuleBasic”列表并构建一个新的“BasicManager”。该函数一般在[`app.go`](../basics/app-anatomy.md#core-application-file)的`init()`函数中调用，用于快速初始化应用程序模块的独立元素)单击 [此处])https://github.com/cosmos/gaia/blob/master/app/app.go#L59-L74)查看示例)。
-- `RegisterLegacyAminoCodec(cdc *codec.LegacyAmino)`:注册每个应用程序的`AppModuleBasic`的[`codec.LegacyAmino`s](../core/encoding.md#amino)。这个函数通常在[应用程序的构造](../basics/app-anatomy.md#constructor)的早期被调用。
-- `RegisterInterfaces(registry codectypes.InterfaceRegistry)`:注册每个应用程序`AppModuleBasic`的接口类型和实现。
-- `DefaultGenesis(cdc codec.JSONCodec)`:通过调用每个模块的[`DefaultGenesis(cdc codec.JSONCodec)`](./genesis.md#defaultgenesis)函数，为应用程序中的模块提供默认的创世信息。它用于为应用程序构建一个默认的创世文件。
-- `ValidateGenesis(cdc codec.JSONCodec, txEncCfg client.TxEncodingConfig, genesis map[string]json.RawMessage)`:通过调用[`ValidateGenesis(codec.JSONCodec, client.TxEncodingConfig, json.RawMessage)`验证创世信息模块](./genesis.md#validategenesis) 每个模块的函数。
-- `RegisterRESTRoutes(ctx client.Context, rtr *mux.Router)`:通过调用每个模块的 [`RegisterRESTRoutes`](./module-interfaces.md#register-routes) 函数，为模块注册 REST 路由。该函数通常从[应用程序的命令行界面](../core/cli.md)的`main.go`函数中调用。
--`RegisterGRPCGatewayRoutes(clientCtx client.Context, rtr *runtime.ServeMux)`:为模块注册gRPC路由。
-- `AddTxCommands(rootTxCmd *cobra.Command)`:将模块的事务命令添加到应用程序的 [`rootTxCommand`](../core/cli.md#transaction-commands)。该函数通常从[应用程序的命令行界面](../core/cli.md)的`main.go`函数中调用。
-- `AddQueryCommands(rootQueryCmd *cobra.Command)`:将模块的查询命令添加到应用程序的 [`rootQueryCommand`](../core/cli.md#query-commands)。该函数通常从[应用程序的命令行界面](../core/cli.md)的`main.go`函数中调用。
+-`NewBasicManager(modules ... AppModuleBasic) `:コンストラクター。アプリケーションの「AppModuleBasic」リストを取得し、新しい「BasicManager」を構築します。この関数は通常、[`app.go`](../basics/app-anatomy.md#core-application-file)の` init() `関数で呼び出され、アプリケーションモジュールの独立した要素をすばやく初期化します)[ここをクリック])https://github.com/cosmos/gaia/blob/master/app/app.go#L59-L74)をクリックして、例を表示します)。
+-`RegisterLegacyAminoCodec(cdc * codec.LegacyAmino) `:各アプリケーションの` AppModuleBasic`の[`codec.LegacyAmino`s](../core/encoding.md#amino)を登録します。この関数は通常、[アプリケーション構築](../basics/app-anatomy.md#constructor)の初期段階で呼び出されます。
+-`RegisterInterfaces(registry codectypes.InterfaceRegistry) `:各アプリケーション` AppModuleBasic`のインターフェースタイプと実装を登録します。
+-`DefaultGenesis(cdc codec.JSONCodec) `:各モジュールの[` DefaultGenesis(cdc codec.JSONCodec) `](./genesis.md#defaultgenesis)関数を呼び出して、アプリケーション情報でモジュールのデフォルトのジェネシスを指定します。これは、アプリケーションのデフォルトのジェネシスファイルを作成するために使用されます。
+-`ValidateGenesis(cdc codec.JSONCodec、txEncCfg client.TxEncodingConfig、genesis map[string] json.RawMessage) `:[` ValidateGenesis(codec.JSONCodec、client.TxEncodingConfig、json.RawMessage) `を呼び出してジェネシス情報モジュールを検証する](./genesis.md#validategenesis)各モジュールの機能。
+-`RegisterRESTRoutes(ctx client.Context、rtr * mux.Router) `:各モジュールの[` RegisterRESTRoutes`](./module-interfaces.md#register-routes)関数を呼び出して、モジュールのRESTルートを登録します。この関数は通常、[アプリケーションコマンドラインインターフェイス](../core/cli.md)の `main.go`関数から呼び出されます。
+-`RegisterGRPCGatewayRoutes(clientCtx client.Context、rtr * runtime.ServeMux) `:モジュールのgRPCルートを登録します。
+-`AddTxCommands(rootTxCmd * cobra.Command) `:モジュールのトランザクションコマンドをアプリケーションの[` rootTxCommand`](../core/cli.md#transaction-commands)に追加します。この関数は通常、[アプリケーションコマンドラインインターフェイス](../core/cli.md)の `main.go`関数から呼び出されます。
+-`AddQueryCommands(rootQueryCmd * cobra.Command) `:モジュールのクエリコマンドをアプリケーションの[` rootQueryCommand`](../core/cli.md#query-commands)に追加します。この関数は通常、[アプリケーションコマンドラインインターフェイス](../core/cli.md)の `main.go`関数から呼び出されます。
 
-### `Manager`
+### `マネージャー`
 
-`Manager` 是一个包含应用程序所有 `AppModule` 的结构，并定义了这些模块的几个关键组件之间的执行顺序:
+`Manager`は、アプリケーションのすべての` AppModule`を含む構造であり、これらのモジュールのいくつかの主要コンポーネントの実行順序を定義します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/325be6ff215db457c6fc7668109640cd7fdac461/types/module/module.go#L223-L231
 
-每当需要对模块集合执行操作时，都会在整个应用程序中使用模块管理器。它实现了以下方法: 
+モジュールのコレクションに対して操作を実行する必要がある場合は常に、アプリケーション全体でモジュールマネージャーが使用されます。次のメソッドを実装します。
 
-- `NewManager(modules ...AppModule)`:构造函数。它获取应用程序的“AppModule”列表并构建一个新的“Manager”。它通常从应用程序的主要[构造函数](../basics/app-anatomy.md#constructor-function) 调用。
-- `SetOrderInitGenesis(moduleNames ...string)`:设置应用程序第一次启动时每个模块的 [`InitGenesis`](./genesis.md#initgenesis) 函数的调用顺序。这个函数一般是从应用程序的主[构造函数](../basics/app-anatomy.md#constructor-function)调用的。
-- `SetOrderExportGenesis(moduleNames ...string)`:设置在导出的情况下每个模块的 [`ExportGenesis`](./genesis.md#exportgenesis) 函数将被调用的顺序。这个函数一般是从应用程序的主[构造函数](../basics/app-anatomy.md#constructor-function)调用的。
-- `SetOrderBeginBlockers(moduleNames ...string)`:设置在每个块的开头调用每个模块的`BeginBlock()`函数的顺序。这个函数一般是从应用程序的主[构造函数](../basics/app-anatomy.md#constructor-function)调用的。
-- `SetOrderEndBlockers(moduleNames ...string)`:设置在每个块的末尾调用每个模块的`EndBlock()`函数的顺序。这个函数一般是从应用程序的主[构造函数](../basics/app-anatomy.md#constructor-function)调用的。
-- `RegisterInvariants(ir sdk.InvariantRegistry)`:注册每个模块的[invariants](./invariants.md)。
-- `RegisterRoutes(router sdk.Router, queryRouter sdk.QueryRouter, legacyQuerierCdc *codec.LegacyAmino)`:注册遗留 [`Msg`](./messages-and-queries.md#messages) 和 [`querier`](./query-services.md#legacy-queriers) 路由。
-- `RegisterServices(cfg Configurator)`:注册所有模块服务。
-- `InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, genesisData map[string]json.RawMessage)`:在应用程序第一次调用时调用各个模块的[`InitGenesis`](./genesis.md#initgenesis)函数开始，按照 `OrderInitGenesis` 中定义的顺序。向底层共识引擎返回一个 `abci.ResponseInitChain`，其中可以包含验证器更新。
-- `ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec)`:按照`OrderExportGenesis`中定义的顺序调用每个模块的[`ExportGenesis`](./genesis.md#exportgenesis)函数。 export 从之前存在的状态构造一个创世文件，主要用于需要对链进行硬分叉升级的时候。
-- `BeginBlock(ctx sdk.Context, req abci.RequestBeginBlock)`:在每个块的开头，从 [`BaseApp`](../core/baseapp.md#beginblock) 调用这个函数，然后，调用每个模块的 [`BeginBlock`](./beginblock-endblock.md) 函数，按照 `OrderBeginBlockers` 中定义的顺序。它创建一个带有事件管理器的子 [context](../core/context.md) 来聚合从所有模块发出的 [events](../core/events.md)。该函数返回一个包含上述事件的 `abci.ResponseBeginBlock`。
-- `EndBlock(ctx sdk.Context, req abci.RequestEndBlock)`:在每个块的末尾，从 [`BaseApp`](../core/baseapp.md#endblock) 调用这个函数，然后，按照 `OrderEndBlockers` 中定义的顺序调用每个模块的 [`EndBlock`](./beginblock-endblock.md) 函数。它创建一个带有事件管理器的子 [context](../core/context.md) 来聚合从所有模块发出的 [events](../core/events.md)。该函数返回一个“abci.ResponseEndBlock”，其中包含上述事件以及验证器集更新)如果有)。
+-`NewManager(modules ... AppModule) `:コンストラクタ。アプリケーションの「AppModule」リストを取得し、新しい「Manager」を構築します。これは通常、アプリケーションのメイン[コンストラクター](../basics/app-anatomy.md#constructor-function)から呼び出されます。
+-`SetOrderInitGenesis(moduleNames ... string) `:アプリケーションを最初に起動したときの各モジュールの[` InitGenesis`](./genesis.md#initgenesis)関数の呼び出し順序を設定します。この関数は通常、アプリケーションのメイン[コンストラクター](../basics/app-anatomy.md#constructor-function)から呼び出されます。
+-`SetOrderExportGenesis(moduleNames ... string) `:エクスポートの場合に各モジュールの[` ExportGenesis`](./genesis.md#exportgenesis)関数が呼び出される順序を設定します。この関数は通常、アプリケーションのメイン[コンストラクター](../basics/app-anatomy.md#constructor-function)から呼び出されます。
+-`SetOrderBeginBlockers(moduleNames ... string) `:各モジュールの` BeginBlock() `関数が各ブロックの先頭で呼び出される順序を設定します。この関数は通常、アプリケーションのメイン[コンストラクター](../basics/app-anatomy.md#constructor-function)から呼び出されます。
+-`SetOrderEndBlockers(moduleNames ... string) `:各モジュールの` EndBlock() `関数が各ブロックの最後で呼び出される順序を設定します。この関数は通常、アプリケーションのメイン[コンストラクター](../basics/app-anatomy.md#constructor-function)から呼び出されます。
+-`RegisterInvariants(ir sdk.InvariantRegistry) `:各モジュールの[invariants](./invariants.md)を登録します。
+-`RegisterRoutes(router sdk.Router、queryRouter sdk.QueryRouter、legacyQuerierCdc * codec.LegacyAmino) `:レガシー[` Msg`](./messages-and-queries.md#messages)と[`querier`](を登録します。/query-services.md#legacy-queriers)ルーティング。
+-`RegisterServices(cfg Configurator) `:すべてのモジュールサービスを登録します。
+-`InitGenesis(ctx sdk.Context、cdc codec.JSONCodec、genesisData map[string] json.RawMessage) `:各モジュールの[` InitGenesis`](./genesis.md#initgenesisをアプリケーションが最初に呼び出されたときに呼び出す)関数`OrderInitGenesis`で定義された順序で開始します。 `abci.ResponseInitChain`を基盤となるコンセンサスエンジンに返します。コンセンサスエンジンには、バリデーターの更新を含めることができます。
+-`ExportGenesis(ctx sdk.Context、cdc codec.JSONCodec) `:各モジュールの[` ExportGenesis`](./genesis.md#exportgenesis)関数を `OrderExportGenesis`で定義された順序で呼び出します。 exportは、既存の状態からジェネシスファイルを作成します。これは、主にチェーンをハードフォークでアップグレードする必要がある場合に使用されます。
+-`BeginBlock(ctx sdk.Context、req abci.RequestBeginBlock) `:各ブロックの先頭で、[` BaseApp`](../core/baseapp.md#beginblock)からこの関数を呼び出してから、各ブロックを呼び出します。モジュールの[`BeginBlock`](./beginblock-endblock.md)関数は、` OrderBeginBlockers`で定義された順序に従います。すべてのモジュールから送信された[events](../core/events.md)を集約するために、イベントマネージャーを使用して子[context](../core/context.md)を作成します。この関数は、上記のイベントを含む `abci.ResponseBeginBlock`を返します。
+-`EndBlock(ctx sdk.Context、req abci.RequestEndBlock) `:各ブロックの最後で、[` BaseApp`](../core/baseapp.md#endblock)からこの関数を呼び出し、 `OrderEndBlockersに従います。各モジュールの[`EndBlock`](./beginblock-endblock.md)関数は、`で定義された順序で呼び出されます。すべてのモジュールから送信された[events](../core/events.md)を集約するために、イベントマネージャーを使用して子[context](../core/context.md)を作成します。この関数は、上記のイベントとバリデーターセットの更新(存在する場合)を含む「abci.ResponseEndBlock」を返します。
 
-以下是应用程序中具体集成的示例:
+以下は、アプリケーションでの特定の統合の例です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/2323f1ac0e9a69a0da6b43693061036134193464/simapp/app.go#L315-L362
 
-## 下一个 {hide}
+## 次へ{hide}
 
-详细了解 [`message`s 和 `queries`](./messages-and-queries.md) {hide} 
+[`message`sと` queries`](./messages-and-queries.md){hide}の詳細 

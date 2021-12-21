@@ -1,35 +1,35 @@
-# BeginBlocker 和 EndBlocker
+# BeginBlockerとEndBlocker
 
-`BeginBlocker` 和 `EndBlocker` 是模块开发人员可以在他们的模块中实现的可选方法。当 [`BeginBlock`](../core/baseapp.md#beginblock) 和 [`EndBlock`](../core/baseapp.md #endblock) 从底层共识引擎接收 ABCI 消息。 {概要}
+`BeginBlocker`と` EndBlocker`は、モジュール開発者がモジュールに実装できるオプションのメソッドです。[`BeginBlock`](../core/baseapp.md#beginblock)および[` EndBlock`](../core/baseapp.md #endblock)が基盤となるコンセンサスエンジンからABCIメッセージを受信した場合。 {まとめ}
 
-## 先决条件阅读
+## 読むための前提条件
 
-- [模块管理器](./module-manager.md) {prereq}
+-[モジュールマネージャー](。/module-manager.md){前提条件}
 
-## BeginBlocker 和 EndBlocker
+## BeginBlockerとEndBlocker
 
-`BeginBlocker` 和 `EndBlocker` 是模块开发人员向其模块添加逻辑自动执行的一种方式。这是一个应该谨慎使用的强大工具，因为复杂的自动功能可能会减慢甚至停止链条。
+`BeginBlocker`と` EndBlocker`は、モジュール開発者が自動実行のためにモジュールにロジックを追加するための方法です。これは強力なツールであり、複雑な自動機能によってチェーンの速度が低下したり、停止したりする可能性があるため、注意して使用する必要があります。
 
-需要时，`BeginBlocker` 和`EndBlocker` 作为[`AppModule` 接口](./module-manager.md#appmodule) 的一部分实现。 `module.go`中实现的接口的`BeginBlock`和`EndBlock`方法一般分别遵循`BeginBlocker`和`EndBlocker`方法，通常在`abci.go`中实现。
+必要に応じて、 `BeginBlocker`と` EndBlocker`は[`AppModule`インターフェース](./module-manager.md#appmodule)の一部として実装されます。 `module.go`に実装されているインターフェースの` BeginBlock`メソッドと `EndBlock`メソッドは、通常、それぞれ` BeginBlocker`メソッドと `EndBlocker`メソッドに従い、通常は` abci.go`に実装されています。
 
-`abci.go` 中 `BeginBlocker` 和 `EndBlocker` 的实际实现与 [`Msg` 服务](./msg-services.md) 的实现非常相似:
+`abci.go`での` BeginBlocker`と `EndBlocker`の実際の実装は、[` Msg` service](./msg-services.md)の実装と非常によく似ています。
 
-- 他们通常使用 [`keeper`](./keeper.md) 和 [`ctx`](../core/context.md) 来检索有关最新状态的信息。
-- 如果需要，他们使用 `keeper` 和 `ctx` 来触发状态转换。
-- 如果需要，他们可以通过 `ctx` 的 `EventManager` 发出 [`events`](../core/events.md)。
+-通常、[`keeper`](./keeper.md)と[` ctx`](../core/context.md)を使用して、最新の状態に関する情報を取得します。
+-必要に応じて、 `keeper`と` ctx`を使用して状態遷移をトリガーします。
+-必要に応じて、 `ctx`の` EventManager`を介して[`events`](../core/events.md)を発行できます。
 
-`EndBlocker` 的一个特殊性是它可以以 [`[]abci.ValidatorUpdates`](https://tendermint.com/docs/app-dev/abci- spec.html#validatorupdate)。这是实现自定义验证器更改的首选方式。
+`EndBlocker`の特徴の1つは、[`[] abci.ValidatorUpdates`](https://tendermint.com/docs/app-dev/abci-spec.html#validatorupdate)として使用できることです。これは、カスタムバリデーターの変更を実装するための推奨される方法です。
 
-开发人员可以通过模块的管理器“SetOrderBeginBlocker”/“SetOrderEndBlocker”方法定义每个应用程序模块的“BeginBlocker”/“EndBlocker”函数之间的执行顺序。有关模块管理器的更多信息，请单击 [此处](./module-manager.md#manager)。
+開発者は、モジュールマネージャーの「SetOrderBeginBlocker」/「SetOrderEndBlocker」メソッドを使用して、各アプリケーションモジュールの「BeginBlocker」/「EndBlocker」関数間の実行順序を定義できます。モジュールマネージャの詳細については、[ここ](./module-manager.md#manager)をクリックしてください。
 
-从 `disr` 模块查看 `BeginBlocker` 的示例实现:
+`disr`モジュールからの` BeginBlocker`の実装例をご覧ください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/f33749263f4ecc796115ad6e789cb0f7cddf9148/x/distribution/abci.go#L14-L38
 
-以及来自 `staking` 模块的 `EndBlocker` 的示例实现:
+そして、ステーキングモジュールからのEndBlockerの実装例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/f33749263f4ecc796115ad6e789cb0f7cddf9148/x/staking/abci.go#L22-L27
 
-## 下一个 {hide}
+##次へ{hide}
 
-了解 [`keeper`s](./keeper.md) {hide} 
+[`keeper`s](./keeper.md){hide}を理解する 

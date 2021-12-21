@@ -20,7 +20,7 @@ Cosmos SDK 中定义的 `querier` 类型将被弃用，以支持 [gRPC Services]
 - [`Context`](../core/context.md) 包含处理`query` 所需的所有必要信息，以及最新状态的一个分支。它主要由 [`keeper`](./keeper.md) 用来访问状态。
 - 结果 `res` 返回给 `BaseApp`，使用应用程序的 [`codec`](../core/encoding.md) 进行编组。
 
-##模块查询服务的实现
+## 模块查询服务的实现
 
 ### gRPC 服务
 

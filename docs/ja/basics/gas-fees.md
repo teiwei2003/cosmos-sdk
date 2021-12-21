@@ -1,54 +1,54 @@
-# 汽油和费用
+# ガソリンと費用
 
-本文档描述了在 Cosmos SDK 应用程序中处理 gas 和费用的默认策略。 {概要}
+このドキュメントでは、CosmosSDKアプリケーションでガスと料金を処理するためのデフォルトの戦略について説明します。 {まとめ}
 
-### 先决条件阅读
+### 読むための前提条件
 
-- [Cosmos SDK 应用剖析](./app-anatomy.md) {prereq}
+-[Cosmos SDKアプリケーション分析](./app-anatomy.md){前提条件}
 
-## `Gas` 和 `Fees` 介绍
+## `ガス`と `料金`の紹介
 
-在 Cosmos SDK 中，`gas` 是一个特殊的单元，用于跟踪执行过程中资源的消耗情况。 `gas` 通常在对存储进行读写时消耗，但如果需要进行昂贵的计算，它也可以消耗。它有两个主要目的/
+Cosmos SDKでは、 `gas`は実行中のリソース消費を追跡するために使用される特別なユニットです。 `gas`は通常、ストレージの読み取りと書き込み時に消費されますが、高価な計算が必要な場合にも消費される可能性があります。それには2つの主な目的があります/
 
-- 确保块不会消耗太多资源并且将被最终确定。这是通过 [block gas meter](#block-gas-meter) 在 Cosmos SDK 中默认实现的。
-- 防止来自最终用户的垃圾邮件和滥用。为此，在 [`message`](../building-modules/messages-and-queries.md#messages) 执行期间消耗的 `gas` 通常是定价的，从而产生 `fee`(`fees = gas * gas -价格`)。 “费用”通常必须由“消息”的发送者支付。请注意，Cosmos SDK 默认不强制执行`gas` 定价，因为可能有其他方法来防止垃圾邮件(例如带宽方案)。尽管如此，大多数应用程序将实施“费用”机制来防止垃圾邮件。这是通过 [`AnteHandler`](#antehandler) 完成的。
+-ブロックが多くのリソースを消費せず、ファイナライズされることを確認します。これは、デフォルトで[block gas Meter](#block-gas-meter)を介してCosmosSDKに実装されています。
+-エンドユーザーからのスパムや悪用を防ぎます。このため、[`message`](../building-modules/messages-and-queries.md#messages)の実行中に消費される` gas`は通常価格が設定され、結果として `fee`(` Fees = gas *ガス価格 `)。 「料金」は通常、「メッセージ」の送信者が支払う必要があります。 Cosmos SDKは、スパムを防ぐ他の方法(帯域幅プランなど)がある可能性があるため、デフォルトでは「ガス」料金を適用しないことに注意してください。それにもかかわらず、ほとんどのアプリケーションはスパムを防ぐために「料金」メカニズムを実装します。これは[`AnteHandler`](#antehandler)で行われます。
 
-## 煤气表
+## ガスメーター
 
-在 Cosmos SDK 中，`gas` 是 `uint64` 的简单别名，由一个名为 _gas meter_ 的对象管理。燃气表实现了`GasMeter`接口
+Cosmos SDKでは、 `gas`は` uint64`の単純なエイリアスであり、_gasmeter_という名前のオブジェクトによって管理されます。ガスメーターは `GasMeter`インターフェースを実装しています
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/store/types/gas.go#L34-L43
 
-在哪里/
+どこ/
 
-- `GasConsumed()` 返回燃气表实例消耗的燃气量。
-- `GasConsumedToLimit()` 返回燃气表实例消耗的燃气量，或者达到限制。
-- `Limit()` 返回燃气表实例的限制。 `0` 如果燃气表是无限的。
-- `ConsumeGas(amount Gas,descriptor string)`消耗提供的`gas`量。如果 `gas` 溢出，它会因 `descriptor` 消息而恐慌。如果燃气表不是无限的，如果消耗的`gas`超过限制，它就会恐慌。
-- 如果燃气表实例消耗的燃气量严格高于限制，则`IsPastLimit()` 返回`true`，否则返回`false`。
-- 如果燃气表实例消耗的燃气量高于或等于限制，则`IsOutOfGas()` 返回`true`，否则返回`false`。
+-`GasConsumed() `は、ガスメーターインスタンスによって消費されたガスの量を返します。
+-`GasConsumedToLimit() `は、ガスメーターインスタンスによって消費されたガスの量を返すか、制限に達しました。
+-`Limit() `は、ガスメーターインスタンスの制限を返します。 `0`ガスメーターが無制限の場合。
+-`ConsumeGas(amount Gas、descriptor string) `は、提供された` gas`の量を消費します。 `gas`がオーバーフローすると、` descriptor`メッセージでパニックになります。ガスメーターが無制限でない場合、「ガス」の消費量が制限を超えるとパニックになります。
+-ガスメーターインスタンスのガス消費量が制限よりも厳密に高い場合、 `IsPastLimit()`は `true`を返し、そうでない場合は` false`を返します。
+-ガスメーターインスタンスによって消費されるガスの量が制限以上の場合、 `IsOutOfGas()`は `true`を返し、そうでない場合は` false`を返します。
 
-gas 表一般保存在 [`ctx`](../core/context.md) 中，消耗 gas 的方式如下/
+ガステーブルは通常[`ctx`](../core/context.md)に格納されており、ガスの消費方法は次のとおりです。
 
 ```go
 ctx.GasMeter().ConsumeGas(amount, "description")
 ```
 
-默认情况下，Cosmos SDK 使用两种不同的燃气表，[主燃气表](#main-gas-metter[) 和[块燃气表](#block-gas-meter)。
+デフォルトでは、Cosmos SDKは2つの異なるガスメーター、[メインガスメーター](#main-gas-metter[)と[ブロックガスメーター](#block-gas-meter)を使用します。
 
-### 主燃气表
+### メインガスメーター
 
-`ctx.GasMeter()` 是应用程序的主要燃气表。主燃气表通过`setDeliverState`在`BeginBlock`中初始化，然后在导致状态转换的执行序列期间跟踪燃气消耗，即最初由[`BeginBlock`](../core/baseapp.md#触发的那些beginblock)、[`DeliverTx`](../core/baseapp.md#delivertx) 和 [`EndBlock`](../core/baseapp.md#endblock)。在每个 `DeliverTx` 开始时，[`AnteHandler`](#antehandler) 中的主燃气表**必须设置为 0**，以便它可以跟踪每笔交易的燃气消耗。
+`ctx.GasMeter()`は、アプリケーションのメインガスメーターです。メインガスメーターは `beginBlock`で` setDeliverState`によって初期化され、状態遷移につながる実行シーケンス中のガス消費量、つまり[`BeginBlock`](../によって最初にトリガーされるbeginblocks)を追跡します。 core/baseapp.md#)、[`DeliverTx`](../core/baseapp.md#delivertx)および[` EndBlock`](../core/baseapp.md#endblock)。各 `DeliverTx`の開始時に、[` AntiHandler`](#antehandler)のメインガスメーター**を0 **に設定して、各トランザクションのガス消費量を追跡できるようにする必要があります。
 
-Gas 消耗可以手动完成，通常由模块开发人员在 [`BeginBlocker`, `EndBlocker`](../building-modules/beginblock-endblock.md) 或 [`Msg` 服务](../building- modules/msg-services.md)，但大多数情况下，只要对存储进行读取或写入，它就会自动完成。这种自动gas消耗逻辑在一个名为[`GasKv`](../core/store.md#gaskv-store)的特殊存储中实现。
+ガス消費は手動で行うことができます。通常、モジュール開発者は[`BeginBlocker`、` EndBlocker`](../building-modules/beginblock-endblock.md)または[`Msg` service](../building-modules/msg-services.md)ですが、ほとんどの場合、ストレージの読み取りまたは書き込みが行われている限り、自動的に実行されます。この自動ガス消費ロジックは、[`GasKv`](../core/store.md#gaskv-store)という名前の特別なストアに実装されています。
 
-### 块煤气表
+### ブロックガスメーター
 
-`ctx.BlockGasMeter()` 是燃气表，用于跟踪每个区块的燃气消耗并确保它不会超过某个限制。每次调用 [`BeginBlock`](../core/baseapp.md#beginblock) 时都会创建一个 `BlockGasMeter` 的新实例。 `BlockGasMeter` 是有限的，每个区块的 gas 限制在应用程序的共识参数中定义。默认情况下，Cosmos SDK 应用程序使用 Tendermint 提供的默认共识参数/
+`ctx.BlockGasMeter()`はガスメーターであり、各ブロックのガス消費量を追跡し、特定の制限を超えないようにするために使用されます。[`BeginBlock`](../core/baseapp.md#beginblock)が呼び出されるたびに、` BlockGasMeter`の新しいインスタンスが作成されます。 `BlockGasMeter`は制限されており、各ブロックのガス制限はアプリケーションのコンセンサスパラメータで定義されています。デフォルトでは、Cosmos SDKアプリケーションは、Tendermint/によって提供されるデフォルトのコンセンサスパラメーターを使用します。
 
 +++ https://github.com/tendermint/tendermint/blob/v0.34.0-rc6/types/params.go#L34-L41
 
-当一个新的 [transaction](../core/transactions.md) 正在通过 `DeliverTx` 处理时，会检查 `BlockGasMeter` 的当前值是否超过限制。如果是，`DeliverTx` 立即返回。即使是区块中的第一笔交易，这种情况也可能发生，因为“BeginBlock”本身可以消耗 gas。如果不是，则交易正常处理。在`DeliverTx`结束时，`ctx.BlockGasMeter()`跟踪的gas增加了处理交易消耗的数量/ 
+新しい[transaction](../core/transaction.md)が `DeliverTx`によって処理されているとき、` BlockGasMeter`の現在の値が制限を超えているかどうかをチェックします。そうである場合、 `DeliverTx`はすぐに戻ります。 「BeginBlock」自体がガスを消費する可能性があるため、これはブロック内の最初のトランザクションでも発生する可能性があります。そうでない場合、トランザクションは正常に処理されます。 `DeliverTx`の終わりに、` ctx.BlockGasMeter() `によって追跡されるガスは、消費されるトランザクションの数を増やします/
 
 ```go
 ctx.BlockGasMeter().ConsumeGas(
@@ -59,27 +59,27 @@ ctx.BlockGasMeter().ConsumeGas(
 
 ## AnteHandler
 
-在“CheckTx”和“DeliverTx”期间为每个事务运行“AnteHandler”，在事务中每个“sdk.Msg”的 Protobuf“Msg”服务方法之前运行。 `AnteHandler`s 具有以下签名/ 
+「CheckTx」および「DeliverTx」中にトランザクションごとに「AnteHandler」を実行し、トランザクション内の各「sdk.Msg」Protobuf「Msg」サービスメソッドの前に実行します。 `AnteHandler`には次の署名があります/
 
 ```go
-// AnteHandler authenticates transactions, before their internal messages are handled.
-// If newCtx.IsZero(), ctx is used instead.
+//AnteHandler authenticates transactions, before their internal messages are handled.
+//If newCtx.IsZero(), ctx is used instead.
 type AnteHandler func(ctx Context, tx Tx, simulate bool) (newCtx Context, result Result, abort bool)
 ```
 
-`anteHandler` 不是在核心 Cosmos SDK 中实现的，而是在一个模块中实现的。这使开发人员可以选择适合其应用程序需要的 `AnteHandler` 版本。也就是说，今天的大多数应用程序都使用 [`auth` 模块](https://github.com/cosmos/cosmos-sdk/tree/master/x/auth) 中定义的默认实现。以下是`anteHandler` 在普通 Cosmos SDK 应用程序中的作用/
+`anteHandler`はコアCosmosSDKではなく、モジュールに実装されています。これにより、開発者はアプリケーションのニーズに合ったバージョンの `AnteHandler`を選択できます。つまり、今日のほとんどのアプリケーションは、[`auth`モジュール](https://github.com/cosmos/cosmos-sdk/tree/master/x/auth)で定義されているデフォルトの実装を使用しています。以下は、通常のCosmosSDKアプリケーションでの `anteHandler`の役割です/
 
-- 验证交易类型是否正确。事务类型在实现`anteHandler`的模块中定义，它们遵循事务接口/
+-トランザクションタイプが正しいことを確認します。トランザクションタイプは、 `anteHandler`を実装するモジュールで定義され、トランザクションインターフェイスに従います/
   +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/types/tx_msg.go#L49-L57
-  这使开发人员可以使用各种类型来处理他们的应用程序事务。在默认的 `auth` 模块中，默认的交易类型是 `Tx`/
+  これにより、開発者はさまざまなタイプを使用してアプリケーショントランザクションを処理できます。デフォルトの `auth`モジュールでは、デフォルトのトランザクションタイプは` Tx`/です。
   +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/proto/cosmos/tx/v1beta1/tx.proto#L12-L25
-- 验证交易中包含的每个 [`message`](../building-modules/messages-and-queries.md#messages) 的签名。每个“消息”应由一个或多个发送者签名，并且这些签名必须在“anteHandler”中进行验证。
-- 在`CheckTx`期间，验证交易提供的gas价格是否高于当地的`min-gas-prices`(提醒一下，gas-price可以从以下等式中扣除/`fees = gas * gas-价格`)。 `min-gas-prices` 是每个全节点的本地参数，在 `CheckTx` 期间用于丢弃不提供最低费用的交易。这确保了内存池不会被垃圾交易发送垃圾邮件。
-- 验证交易的发送者是否有足够的资金来支付“费用”。当最终用户生成交易时，他们必须指明以下 3 个参数中的 2 个(第三个是隐式参数)/`fees`、`gas` 和 `gas-prices`。这表明他们愿意为节点支付多少来执行他们的交易。提供的 `gas` 值存储在名为 `GasWanted` 的参数中以备后用。
-- 将 `newCtx.GasMeter` 设置为 0，限制为 `GasWanted`。 **这一步非常重要**，因为它不仅确保交易不会消耗无限的gas，而且在每个`DeliverTx`之间重置`ctx.GasMeter`(`ctx`设置为`newCtx`在运行`anteHandler` 之后，并且每次调用`DeliverTx` 时都会运行`anteHandler`)。
+-トランザクションに含まれる各[`message`](../building-modules/messages-and-queries.md#messages)の署名を確認します。各「メッセージ」は1人以上の送信者によって署名される必要があり、これらの署名は「anteHandler」で検証される必要があります。
+-`CheckTx`中に、トランザクションによって提供されるガス価格がローカルの `min-gas-prices`よりも高いかどうかを確認します(ガス価格は次の式から差し引くことができることに注意してください/`料金=ガス*ガス価格 ` )。 `min-gas-prices`は、各フルノードのローカルパラメータであり、` CheckTx`中に最低料金を提供しないトランザクションを破棄するために使用されます。これにより、メモリプールがスパムトランザクションによって送信されるスパムにならないことが保証されます。
+-トランザクションの送信者が「手数料」を支払うのに十分な資金を持っていることを確認します。エンドユーザーがトランザクションを生成するときは、次の3つのパラメーターのうち2つを指定する必要があります(3つ目は暗黙的なパラメーターです)/`fees`、` gas`、および `gas-prices`。これは、ノードがトランザクションを実行するために支払う意思がある金額を示しています。提供された `gas`値は、後で使用するために` GasWanted`という名前のパラメーターに保存されます。
+-`newCtx.GasMeter`を0に設定し、 `GasWanted`に制限します。 **この手順は非常に重要です**。これは、トランザクションが無制限のガスを消費しないようにするだけでなく、各 `DeliverTx`間で` ctx.GasMeter`をリセットするためです( `ctx`は`の実行中に `newCtx`に設定されますanteHandler `その後、` DeliverTx`が呼び出されるたびに、 `anteHandler`が実行されます)。
 
-如上所述，`anteHandler` 返回交易在执行期间可以消耗的最大 `gas` 限制，称为 `GasWanted`。最终消耗的实际数量以`GasUsed`计价，因此我们必须有`GasUsed =< GasWanted`。当 [`DeliverTx`](../core/baseapp.md#delivertx) 返回时，`GasWanted` 和 `GasUsed` 都被中继到底层共识引擎。
+前述のように、 `anteHandler`は、トランザクションが実行中に消費できる最大の` gas`制限を返します。これは `GasWanted`と呼ばれます。最終的に消費される実際の量は `GasUsed`で表されるため、` GasUsed = <GasWanted`である必要があります。[`DeliverTx`](../core/baseapp.md#delivertx)が戻ると、` GasWanted`と `GasUsed`の両方が基盤となるコンセンサスエンジンに中継されます。
 
-## 下一个 {hide}
+## 次へ{hide}
 
-了解 [baseapp](../core/baseapp.md) {hide} 
+[baseapp](../core/baseapp.md){hide}を理解する 

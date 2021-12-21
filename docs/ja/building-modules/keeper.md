@@ -1,81 +1,81 @@
-# 守门员
+# ゴールキーパー
 
-`Keeper` 是指 Cosmos SDK 抽象，其作用是管理对由各种模块定义的状态子集的访问。 `Keeper`s 是特定于模块的，即模块定义的状态子集只能由该模块中定义的 `keeper` 访问。如果一个模块需要访问另一个模块定义的状态子集，则需要将第二个模块内部 `keeper` 的引用传递给第一个模块。这是在模块管理器实例化期间在`app.go` 中完成的。 {概要}
+`Keeper`はCosmosSDKの抽象化を指し、その役割は、さまざまなモジュールによって定義された状態のサブセットへのアクセスを管理することです。 `Keeper`はモジュール固有です。つまり、モジュールによって定義された状態のサブセットには、モジュールで定義された` keeper`によってのみアクセスできます。モジュールが別のモジュールによって定義された状態のサブセットにアクセスする必要がある場合、2番目のモジュール内の「キーパー」の参照を最初のモジュールに渡す必要があります。これは、モジュールマネージャーのインスタンス化中に `app.go`で行われます。 {まとめ}
 
-## 先决条件阅读
+## 読むための前提条件
 
-- [Cosmos SDK 模块介绍](./intro.md) {prereq}
+-[Cosmos SDKモジュールの紹介](。/intro.md){前提条件}
 
-## 动机
+## 動機
 
-Cosmos SDK 是一个框架，它使开发人员可以轻松地从头开始构建复杂的去中心化应用程序，主要是通过将模块组合在一起。随着 Cosmos SDK 开源模块生态系统的扩展，由于开发人员的疏忽或恶意，其中一些模块包含漏洞的可能性越来越大。
+Cosmos SDKは、開発者が主にモジュールを組み合わせることにより、複雑な分散型アプリケーションを最初から簡単に構築できるようにするフレームワークです。 Cosmos SDKオープンソースモジュールエコシステムの拡張に伴い、これらのモジュールの一部には、開発者の過失または悪意による脆弱性が含まれている可能性が高くなっています。
 
-Cosmos SDK 采用[基于对象能力的方法](../core/ocap.md) 来帮助开发人员更好地保护他们的应用程序免受不需要的模块间交互的影响，而`keeper`s 是这种方法的核心。 `keeper` 可以从字面上理解为模块存储的看门人。模块中定义的每个存储(通常是 [`IAVL` Store](../core/store.md#iavl-store))都带有一个 `storeKey`，可以无限制地访问它。模块的 `keeper` 持有这个 `storeKey`(否则它应该保持不公开)，并定义 [methods](#implementing-methods) 以读取和写入存储。
+Cosmos SDKは、[Object Capability-Based Method](../core/ocap.md)を採用して、開発者がモジュール間の不要な相互作用からアプリケーションをより適切に保護できるようにします。このメソッドのコアは「キーパー」です。 `keeper`は、文字通りモジュールストレージのゲートキーパーとして理解できます。モジュールで定義された各ストア(通常は[`IAVL`ストア](../core/store.md#iavl-store))には` storeKey`があり、制限なしでアクセスできます。モジュールの `keeper`はこの` storeKey`を保持し(そうでない場合はプライベートに保つ必要があります)、ストレージの読み取りと書き込みを行う[methods](#implementing-methods)を定義します。
 
-对象能力方法背后的核心思想是只揭示完成工作所需的内容。在实践中，这意味着不是通过访问控制列表处理模块的权限，而是向模块 `keeper` 传递对它们需要访问的其他模块 `keeper` 的特定实例的引用(这是在[应用程序的构造函数](../basics/app-anatomy.md#constructor-function))。因此，一个模块只能通过另一个模块的“keeper”实例公开的方法与另一个模块中定义的状态子集交互。这是开发人员控制他们自己的模块与外部开发人员开发的模块之间的交互的好方法。
+オブジェクト機能メソッドの背後にある中心的な考え方は、ジョブを完了するために必要なものだけを明らかにすることです。実際には、これは、アクセス制御リストを介してモジュールのアクセス許可を処理する代わりに、モジュール `keeper`に、アクセスする必要のある他のモジュール` keeper`の特定のインスタンスへの参照が渡されることを意味します(これは[アプリケーションのコンストラクターにあります](../basics/app-anatomy.md#constructor-function))。したがって、モジュールは、他のモジュールの「キーパー」インスタンスによって公開されたメソッドを介してのみ、別のモジュールで定義された状態のサブセットと対話できます。これは、開発者が自分のモジュールと外部の開発者によって開発されたモジュールとの間の相互作用を制御するための優れた方法です。
 
-## 类型定义
+## タイプ定義
 
-`keeper`s 通常在位于模块文件夹中的 `/keeper/keeper.go` 文件中实现。按照惯例，模块的类型 `keeper` 简称为 `Keeper`，通常遵循以下结构: 
+`Keeper`は通常、モジュールフォルダにある`/keeper/keeper.go`ファイルに実装されます。慣例により、モジュール `keeper`のタイプは略して` Keeper`と呼ばれ、通常は次の構造に従います。 
 
 ```go
 type Keeper struct {
-    // External keepers, if any
+   //External keepers, if any
 
-    // Store key(s)
+   //Store key(s)
 
-    // codec
+   //codec
 }
 ```
 
-例如，这里是来自 `staking` 模块的 `keeper` 的类型定义:
+たとえば、 `stake`モジュールからの` keeper`の型定義は次のとおりです。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/3bafd8255a502e5a9cee07391cf8261538245dfd/x/staking/keeper/keeper.go#L23-L33
 
-让我们来看看不同的参数:
+さまざまなパラメータを見てみましょう。
 
-- 预期的“keeper”是模块外部的“keeper”，该模块的内部“keeper”需要该模块。外部“keeper”作为接口列在内部“keeper”的类型定义中。这些接口本身是在模块文件夹根目录下的“expected_keepers.go”文件中定义的。在这种情况下，接口用于减少依赖项的数量，以及方便模块本身的维护。
-- `storeKey`s 授予对模块管理的 [multistore](../core/store.md)存储的访问权限。它们应始终不暴露于外部模块。
-- `cdc` 是 [codec](../core/encoding.md) 用于将结构编组和解组到/从 `[]byte`。 `cdc` 可以是 `codec.BinaryCodec`、`codec.JSONCodec` 或 `codec.Codec` 中的任何一种，具体取决于您的要求。只要它们实现了这些接口，它就可以是 proto 或氨基编解码器。
+-予想される「キーパー」はモジュールの外部「キーパー」であり、モジュールの内部「キーパー」にはモジュールが必要です。外部の「キーパー」は、内部の「キーパー」のタイプ定義のインターフェースとしてリストされています。これらのインターフェイス自体は、モジュールフォルダのルートディレクトリにある「expected_keepers.go」ファイルで定義されています。この場合、インターフェースは依存関係の数を減らし、モジュール自体の保守を容易にするために使用されます。
+-`storeKey`sは、モジュールによって管理される[multistore](../core/store.md)ストレージへのアクセスを許可します。それらは外部モジュールにさらされるべきではありません。
+-`cdc`は、 `[] byte`との間で構造をマーシャリングおよびアンマーシャリングするための[codec](../core/encoding.md)です。 `cdc`は、要件に応じて、` codec.BinaryCodec`、 `codec.JSONCodec`、または` codec.Codec`のいずれかになります。それらがこれらのインターフェースを実装している限り、それはプロトまたはアミノコーデックである可能性があります。
 
-当然，可以为同一模块定义不同类型的内部 `keeper`(例如只读 `keeper`)。每种类型的 `keeper` 都有自己的构造函数，它是从 [应用程序的构造函数](../basics/app-anatomy.md) 调用的。这是实例化 `keeper` 的地方，开发人员确保将模块 `keeper` 的正确实例传递给需要它们的其他模块。
+もちろん、同じモジュールに対して異なるタイプの内部 `keeper`を定義することもできます(たとえば、読み取り専用の` keeper`)。 `keeper`の各タイプには、[アプリケーションコンストラクター](../basics/app-anatomy.md)から呼び出される独自のコンストラクターがあります。ここで `keeper`がインスタンス化され、開発者はモジュール` keeper`の正しいインスタンスをそれらを必要とする他のモジュールに確実に渡します。
 
-## 实现方法
+## 実装
 
-`Keeper`s 主要公开由其模块管理的存储的 getter 和 setter 方法。这些方法应该尽可能简单，并严格限于获取或设置请求的值，因为有效性检查应该已经通过 [`message`](./messages-and-) 的 `ValidateBasic()` 方法执行了query.md#messages) 和 [`Msg` 服务器](./msg-services.md) 当 `keeper`s' 方法被调用时。
+`Keeper`は主に、そのモジュールによって管理される保存されたgetterメソッドとsetterメソッドを公開します。妥当性チェックは[`message`](./messages-and-)クエリの` ValidateBasic() `メソッドに合格している必要があるため、これらのメソッドは可能な限り単純で、要求された値の取得または設定に厳密に制限する必要があります。 `keeper`s 'メソッドが呼び出されたときのmd#メッセージ)および[` Msg`サーバー](./msg-services.md)。
 
-通常，*getter* 方法将具有以下签名 
+通常、* getter *メソッドには次のシグネチャがあります 
 
 ```go
 func (k Keeper) Get(ctx sdk.Context, key string) returnType
 ```
 
-该方法将经过以下步骤:
+このメソッドは、次の手順を実行します。
 
-1. 使用 `storeKey` 从 `ctx` 中检索适当的存储。 这是通过 `ctx` 的 `KVStore(storeKey sdk.StoreKey)` 方法完成的。 然后，为了方便和安全，最好使用`prefix.Store` 来仅访问所需的有限的存储子集。
-2. 如果存在，则使用存储的`Get(key []byte)`方法获取存储在位置`[]byte(key)`的`[]byte`值。
-3. 使用编解码器 `cdc` 将检索到的值从 `[]byte` 解组为 `returnType`。 返回值。
+1. `storeKey`を使用して、` ctx`から適切なストアを取得します。 これは、 `ctx`の` KVStore(storeKey sdk.StoreKey) `メソッドによって行われます。 次に、利便性とセキュリティのために、 `prefix.Store`を使用して、必要なストレージの限られたサブセットのみにアクセスすることをお勧めします。
+2.存在する場合は、保存されている `Get(key[] byte)`メソッドを使用して、場所 `[] byte(key)`に保存されている `[] byte`値を取得します。
+3.コーデック `cdc`を使用して、取得した値を`[] byte`から `returnType`にアンマーシャリングします。 戻り値。
 
-同样，*setter* 方法将具有以下签名 
+同様に、* setter *メソッドには次の署名があります 
 
 ```go
 func (k Keeper) Set(ctx sdk.Context, key string, value valueType)
 ```
 
-该方法将经过以下步骤:
+このメソッドは、次の手順を実行します。
 
-1. 使用 `storeKey` 从 `ctx` 中检索适当的存储。这是通过 `ctx` 的 `KVStore(storeKey sdk.StoreKey)` 方法完成的。为了方便和安全，最好使用 `prefix.Store` 来仅访问所需的有限的存储子集。
-2. 使用编解码器 `cdc` 将 `value` 编组为 `[]byte`。
-3. 使用 store 的 `Set(key []byte, value []byte)` 方法在位置 `key` 的 store 中设置编码值。
+1. `storeKey`を使用して、` ctx`から適切なストアを取得します。これは、 `ctx`の` KVStore(storeKey sdk.StoreKey) `メソッドによって行われます。利便性とセキュリティのために、必要なストレージの限られたサブセットにのみアクセスするには、 `prefix.Store`を使用するのが最適です。
+2.コーデック `cdc`を使用して、` value`を `[] byte`にグループ化します。
+3.ストアの `Set(key[] byte、value[] byte)`メソッドを使用して、ストアの `key`の場所にエンコード値を設定します。
 
-有关更多信息，请参阅 `keeper` 的示例 [`staking` 模块中的方法实现](https://github.com/cosmos/cosmos-sdk/blob/3bafd8255a502e5a9cee07391cf8261538245dfd/x/staking/keeper/keeper.go )。
+詳細については、 `keeper`の例を参照してください[` stakeing`モジュールでのメソッドの実装](https://github.com/cosmos/cosmos-sdk/blob/3bafd8255a502e5a9cee07391cf8261538245dfd/x/staking/keeper/keeper.go )。
 
-[module `KVStore`](../core/store.md#kvstore-and-commitkvstore-interfaces) 还提供了一个 `Iterator()` 方法，该方法返回一个 `Iterator` 对象来迭代密钥域。
+[module `KVStore`](../core/store.md#kvstore-and-commitkvstore-interfaces)は、キーフィールドを反復するために` Iterator`オブジェクトを返す `Iterator()`メソッドも提供します。
 
-这是一个来自 `auth` 模块的示例，用于迭代帐户:
+これは、アカウントを反復するための `auth`モジュールの例です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/bf8809ef9840b4f5369887a38d8345e2380a567f/x/auth/keeper/account.go#L70-L83
 
-## 下一个 {hide}
+## 次へ{hide}
 
-了解 [不变量](./invariants.md) {hide} 
+[invariants](./invariants.md){hide}を理解する 
