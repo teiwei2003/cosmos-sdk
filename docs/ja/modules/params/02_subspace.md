@@ -1,34 +1,34 @@
-# Subspace
+# 子空间
 
-`Subspace` is a prefixed subspace of the parameter store. Each module which uses the
-parameter store will take a `Subspace` to isolate permission to access.
+`Subspace` 是参数存储的前缀子空间。每个模块使用
+参数存储将采用“子空间”来隔离访问权限。
 
-## Key
+## 钥匙
 
-Parameter keys are human readable alphanumeric strings. A parameter for the key
-`"ExampleParameter"` is stored under `[]byte("SubspaceName" + "/" + "ExampleParameter")`,
-	where `"SubspaceName"` is the name of the subspace.
+参数键是人类可读的字母数字字符串。密钥的参数
+`"ExampleParameter"` 存储在 `[]byte("SubspaceName" + "/" + "ExampleParameter")` 下，
+其中“SubspaceName”是子空间的名称。
 
-Subkeys are secondary parameter keys those are used along with a primary parameter key.
-Subkeys can be used for grouping or dynamic parameter key generation during runtime.
+子键是与主参数键一起使用的辅助参数键。
+子密钥可用于在运行时进行分组或动态参数密钥生成。
 
-## KeyTable
+## 密钥表
 
-All of the parameter keys that will be used should be registered at the compile
-time. `KeyTable` is essentially a `map[string]attribute`, where the `string` is a parameter key.
+所有将使用的参数键都应该在编译时注册
+时间。 `KeyTable` 本质上是一个 `map[string]attribute`，其中 `string` 是一个参数键。
 
-Currently, `attribute` consists of a `reflect.Type`, which indicates the parameter
-type to check that provided key and value are compatible and registered, as well as a function `ValueValidatorFn` to validate values.
+目前，`attribute` 包含一个 `reflect.Type`，表示参数
+type 来检查提供的键和值是否兼容和注册，以及一个函数 `ValueValidatorFn` 来验证值。
 
-Only primary keys have to be registered on the `KeyTable`. Subkeys inherit the
-attribute of the primary key.
+只有主键必须在“KeyTable”上注册。子键继承
+主键的属性。
 
-## ParamSet
+## 参数集
 
-Modules often define parameters as a proto message. The generated struct can implement
-`ParamSet` interface to be used with the following methods:
+模块通常将参数定义为 proto 消息。生成的结构体可以实现
+`ParamSet` 接口与以下方法一起使用:
 
-* `KeyTable.RegisterParamSet()`: registers all parameters in the struct
-* `Subspace.{Get, Set}ParamSet()`: Get to & Set from the struct
+* `KeyTable.RegisterParamSet()`:注册结构体中的所有参数
+* `Subspace.{Get, Set}ParamSet()`:从结构体中获取和设置
 
-The implementor should be a pointer in order to use `GetParamSet()`.
+为了使用`GetParamSet()`，实现者应该是一个指针。 

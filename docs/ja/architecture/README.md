@@ -1,78 +1,78 @@
-# Architecture Decision Records (ADR)
+# アーキテクチャ決定記録(ADR)
 
-This is a location to record all high-level architecture decisions in the Cosmos-SDK.
+これは、すべての高レベルのアーキテクチャ上の決定がCosmos-SDKに記録される場所です。
 
-An Architectural Decision (**AD**) is a software design choice that addresses a functional or non-functional requirement that is architecturally significant.
-An Architecturally Significant Requirement (**ASR**) is a requirement that has a measurable effect on a software system’s architecture and quality.
-An Architectural Decision Record (**ADR**) captures a single AD, such as often done when writing personal notes or meeting minutes; the collection of ADRs created and maintained in a project constitute its decision log. All these are within the topic of Architectural Knowledge Management (AKM).
+アーキテクチャー決定(** AD **)は、アーキテクチャー的に重要な機能要件または非機能要件を解決するために使用されるソフトウェア設計の選択です。
+アーキテクチャ上重要な要件(** ASR **)は、ソフトウェアシステムのアーキテクチャと品質に測定可能な影響を与える要件です。
+アーキテクチャ上の決定レコード(** ADR **)は、個人的なメモや議事録を作成するときによく行われることなど、単一のADをキャプチャします。プロジェクトで作成および維持されるADRのセットは、その決定ログを構成します。これらはすべて、建設知識管理(AKM)の対象です。
 
-You can read more about the ADR concept in this [blog post](https://product.reverb.com/documenting-architecture-decisions-the-reverb-way-a3563bb24bd0#.78xhdix6t).
+ADRの概念について詳しくは、この[ブログ投稿](https://product.reverb.com/documenting-architecture-decisions-the-reverb-way-a3563bb24bd0#.78xhdix6t)を参照してください。
 
-## Rationale
+## 基本的
 
-ADRs are intended to be the primary mechanism for proposing new feature designs and new processes, for collecting community input on an issue, and for documenting the design decisions.
-An ADR should provide:
+ADRは、新しい機能設計と新しいプロセスを提案し、特定の問題に関するコミュニティの意見を収集し、設計上の決定を記録するための主要なメカニズムになることを目的としています。
+ADRは以下を提供する必要があります。
 
-- Context on the relevant goals and the current state
-- Proposed changes to achieve the goals
-- Summary of pros and cons
-- References
-- Changelog
+-関連する目標の背景と現在の状況
+-目標を達成するために提案された変更
+-長所と短所の概要
+- 参照する
+-変更ログ
 
-Note the distinction between an ADR and a spec. The ADR provides the context, intuition, reasoning, and
-justification for a change in architecture, or for the architecture of something
-new. The spec is much more compressed and streamlined summary of everything as
-it stands today.
+ADRと仕様の違いに注意してください。 ADRは、コンテキスト、直感、推論、および
+構造を変更する理由、または何かの構造
+新着。仕様は、すべてのコンテンツのより圧縮された単純化された要約を提供します。
+今日は立っています。
 
-If recorded decisions turned out to be lacking, convene a discussion, record the new decisions here, and then modify the code to match.
+欠落している決定を見つけた場合は、ディスカッションに電話し、ここに新しい決定を記録してから、一致するようにコードを変更してください。
 
-## Creating new ADR
+## 新しいADRを作成する
 
-Read about the [PROCESS](./PROCESS.md).
+[PROCESS](..PROCESS.md)についてお読みください。
 
-#### Use RFC 2119 Keywords
+#### RFC2119キーワードを使用する
 
-When writing ADRs, follow the same best practices for writing RFCs. When writing RFCs, key words are used to signify the requirements in the specification. These words are often capitalized: "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL. They are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+ADRを作成するときは、RFCを作成するときと同じベストプラクティスに従ってください。 RFCを作成するとき、キーワードは仕様の要件を表すために使用されます。これらの単語は通常大文字で表記されます:「MUST」、「MUST NOT」、「REQUIRED」、「SHALL」、「SHALL NOT」、「SHOULD」、「SHOULD NOT」、「RECOMMENDED」、「MAY」、「OPTIONAL」。それらは[RFC2119](https://datatracker.ietf.org/doc/html/rfc2119)で説明されているように説明されます。
 
-## ADR Table of Contents
+## ADRディレクトリ
 
-### Accepted
+### 受け入れる
 
-- [ADR 002: SDK Documentation Structure](./adr-002-docs-structure.md)
-- [ADR 004: Split Denomination Keys](./adr-004-split-denomination-keys.md)
-- [ADR 006: Secret Store Replacement](./adr-006-secret-store-replacement.md)
-- [ADR 009: Evidence Module](./adr-009-evidence-module.md)
-- [ADR 010: Modular AnteHandler](./adr-010-modular-antehandler.md)
-- [ADR 019: Protocol Buffer State Encoding](./adr-019-protobuf-state-encoding.md)
-- [ADR 020: Protocol Buffer Transaction Encoding](./adr-020-protobuf-transaction-encoding.md)
-- [ADR 021: Protocol Buffer Query Encoding](./adr-021-protobuf-query-encoding.md)
-- [ADR 023: Protocol Buffer Naming and Versioning](./adr-023-protobuf-naming.md)
-- [ADR 029: Fee Grant Module](./adr-029-fee-grant-module.md)
-- [ADR 030: Message Authorization Module](./adr-030-authz-module.md)
-- [ADR 031: Protobuf Msg Services](./adr-031-msg-service.md)
+-[ADR 002:SDKドキュメント構造](..adr-002-docs-structure.md)
+-[ADR 004:分割金種キー](..adr-004-split-denomination-keys.md)
+-[ADR 006:シークレットストアの交換](..adr-006-secret-store-replacement.md)
+-[ADR 009:エビデンスモジュール](..adr-009-evidence-module.md)
+-[ADR 010:モジュラーAnteHandler](..adr-010-modular-antehandler.md)
+-[ADR 019:プロトコルバッファ状態エンコーディング](..adr-019-protobuf-state-encoding.md)
+-[ADR 020:プロトコルバッファトランザクションエンコーディング](..adr-020-protobuf-transaction-encoding.md)
+-[ADR 021:プロトコルバッファクエリエンコーディング](..adr-021-protobuf-query-encoding.md)
+-[ADR 023:プロトコルバッファの命名とバージョン管理](..adr-023-protobuf-naming.md)
+-[ADR 029:料金付与モジュール](..adr-029-fee-grant-module.md)
+-[ADR 030:メッセージ認証モジュール](..adr-030-authz-module.md)
+-[ADR 031:Protobufメッセージサービス](..adr-031-msg-service.md)
 
-### Proposed
+### 提案
 
-- [ADR 003: Dynamic Capability Store](./adr-003-dynamic-capability-store.md)
-- [ADR 011: Generalize Genesis Accounts](./adr-011-generalize-genesis-accounts.md)
-- [ADR 012: State Accessors](./adr-012-state-accessors.md)
-- [ADR 013: Metrics](./adr-013-metrics.md)
-- [ADR 016: Validator Consensus Key Rotation](./adr-016-validator-consensus-key-rotation.md)
-- [ADR 017: Historical Header Module](./adr-017-historical-header-module.md)
-- [ADR 018: Extendable Voting Periods](./adr-018-extendable-voting-period.md)
-- [ADR 022: Custom baseapp panic handling](./adr-022-custom-panic-handling.md)
-- [ADR 024: Coin Metadata](./adr-024-coin-metadata.md)
-- [ADR 027: Deterministic Protobuf Serialization](./adr-027-deterministic-protobuf-serialization.md)
-- [ADR 028: Public Key Addresses](./adr-028-public-key-addresses.md)
-- [ADR 032: Typed Events](./adr-032-typed-events.md)
-- [ADR 033: Inter-module RPC](./adr-033-protobuf-inter-module-comm.md)
-- [ADR 035: Rosetta API Support](./adr-035-rosetta-api-support.md)
-- [ADR 037: Governance Split Votes](./adr-037-gov-split-vote.md)
-- [ADR 038: State Listening](./adr-038-state-listening.md)
-- [ADR 039: Epoched Staking](./adr-039-epoched-staking.md)
-- [ADR 040: Storage and SMT State Commitments](./adr-040-storage-and-smt-state-commitments.md)
-- [ADR 046: Module Params](./adr-046-module-params.md)
+-[ADR 003:動的機能ストア](..adr-003-dynamic-capability-store.md)
+-[ADR 011:ジェネシスアカウントのプロモート](..adr-011-generalize-genesis-accounts.md)
+-[ADR 012:州のアクセサー](..adr-012-state-accessors.md)
+-[ADR 013:メトリクス](..adr-013-metrics.md)
+-[ADR 016:検証者のコンセンサスキーローテーション](..adr-016-validator-consensus-key-rotation.md)
+-[ADR 017:履歴ヘッダーモジュール](..adr-017-historical-header-module.md)
+-[ADR 018:延長可能な投票期間](..adr-018-extendable-voting-period.md)
+-[ADR 022:カスタムbaseappパニック処理](..adr-022-custom-panic-handling.md)
+-[ADR 024:コインメタデータ](..adr-024-coin-metadata.md)
+-[ADR 027:Deterministic Protobuf Serialization](..adr-027-deterministic-protobuf-serialization.md)
+-[ADR 028:公開鍵アドレス](..adr-028-public-key-addresses.md)
+-[ADR 032:型付きイベント](..adr-032-typed-events.md)
+-[ADR 033:モジュール間RPC](..adr-033-protobuf-inter-module-comm.md)
+-[ADR 035:Rosetta APIサポート](..adr-035-rosetta-api-support.md)
+-[ADR 037:ガバナンス分割投票](..adr-037-gov-split-vote.md)
+-[ADR 038:状態リスニング](..adr-038-state-listening.md)
+-[ADR 039:Epoched Stakeing](..adr-039-epoched-staking.md)
+-[ADR 040:ストレージとSMTの状態のコミットメント](..adr-040-storage-and-smt-state-commitments.md)
+-[ADR 046:モジュールパラメータ](..adr-046-module-params.md)
 
-### Draft
+### 下書き
 
-- [ADR 044: Guidelines for Updating Protobuf Definitions](./adr-044-protobuf-updates-guidelines.md)
+-[ADR 044:Protobuf定義更新ガイド](..adr-044-protobuf-updates-guidelines.md) 

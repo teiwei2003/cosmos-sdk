@@ -1,30 +1,30 @@
-# Concepts
+# 概念
 
-## Capabilities
+## 能力
 
-Capabilities are multi-owner. A scoped keeper can create a capability via `NewCapability`
-which creates a new unique, unforgeable object-capability reference. The newly
-created capability is automatically persisted; the calling module need not call
-`ClaimCapability`. Calling `NewCapability` will create the capability with the
-calling module and name as a tuple to be treated the capabilities first owner.
+能力是多所有者的。作用域的 keeper 可以通过 `NewCapability` 创建一个能力
+它创建了一个新的唯一的、不可伪造的对象能力引用。新的
+创建的能力会自动持久化；调用模块不需要调用
+“索赔能力”。调用 `NewCapability` 将创建具有
+调用模块和名称作为元组被视为功能第一所有者。
 
-Capabilities can be claimed by other modules which add them as owners. `ClaimCapability`
-allows a module to claim a capability key which it has received from another
-module so that future `GetCapability` calls will succeed. `ClaimCapability` MUST
-be called if a module which receives a capability wishes to access it by name in
-the future. Again, capabilities are multi-owner, so if multiple modules have a
-single Capability reference, they will all own it. If a module receives a capability
-from another module but does not call `ClaimCapability`, it may use it in the executing
-transaction but will not be able to access it afterwards.
+其他模块可以声明功能，这些模块将它们添加为所有者。 `索赔能力`
+允许一个模块声明它从另一个模块收到的能力密钥
+模块，以便未来的`GetCapability` 调用成功。 `ClaimCapability` 必须
+如果接收能力的模块希望通过名称访问它，则调用
+未来。同样，能力是多所有者的，所以如果多个模块有一个
+单一的能力参考，他们都将拥有它。如果一个模块收到一个能力
+来自另一个模块但不调用`ClaimCapability`，它可以在执行中使用它
+交易，但之后将无法访问它。
 
-`AuthenticateCapability` can be called by any module to check that a capability
-does in fact correspond to a particular name (the name can be un-trusted user input)
-with which the calling module previously associated it.
+任何模块都可以调用 AuthenticateCapability 来检查能力
+实际上确实对应于特定名称(名称可以是不受信任的用户输入)
+调用模块之前与之关联的。
 
-`GetCapability` allows a module to fetch a capability which it has previously
-claimed by name. The module is not allowed to retrieve capabilities which it does
-not own.
+`GetCapability` 允许模块获取它之前拥有的能力
+以名义声称。该模块不允许检索它所做的功能
+不是自己的。
 
-## Stores
+## 存储
 
-- MemStore
+- 记忆库 

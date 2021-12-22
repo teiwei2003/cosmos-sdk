@@ -1,123 +1,123 @@
-# Staking Tombstone
+# 放样墓碑
 
-## Abstract
+## 摘要
 
-In the current implementation of the `slashing` module, when the consensus engine
-informs the state machine of a validator's consensus fault, the validator is
-partially slashed, and put into a "jail period", a period of time in which they
-are not allowed to rejoin the validator set. However, because of the nature of
-consensus faults and ABCI, there can be a delay between an infraction occurring,
-and evidence of the infraction reaching the state machine (this is one of the
-primary reasons for the existence of the unbonding period).
+在当前的 `slashing` 模块实现中，当共识引擎
+通知状态机验证者的共识错误，验证者是
+部分削减，并进入“监禁期”，在一段时间内，他们
+不允许重新加入验证器集。但是，由于性质
+共识错误和 ABCI，在发生违规之间可能会有延迟，
+以及违规到达状态机的证据(这是其中之一
+解绑期存在的主要原因)。
 
-> Note: The tombstone concept, only applies to faults that have a delay between
-> the infraction occurring and evidence reaching the state machine. For example,
-> evidence of a validator double signing may take a while to reach the state machine
-> due to unpredictable evidence gossip layer delays and the ability of validators to
-> selectively reveal double-signatures (e.g. to infrequently-online light clients).
-> Liveness slashing, on the other hand, is detected immediately as soon as the
-> infraction occurs, and therefore no slashing period is needed. A validator is
-> immediately put into jail period, and they cannot commit another liveness fault
-> until they unjail. In the future, there may be other types of byzantine faults
-> that have delays (for example, submitting evidence of an invalid proposal as a transaction).
-> When implemented, it will have to be decided whether these future types of
-> byzantine faults will result in a tombstoning (and if not, the slash amounts
-> will not be capped by a slashing period).
+> 注意:tombstone 概念，仅适用于有延迟的故障
+> 发生的违规行为和到达状态机的证据。例如，
+> 验证者双重签名的证据可能需要一段时间才能到达状态机
+> 由于不可预测的证据八卦层延迟和验证者的能力
+> 选择性地显示双重签名(例如，对不常在线的轻客户端)。
+> 另一方面，一旦出现活跃度削减，就会立即检测到
+> 发生违规，因此不需要削减期。验证器是
+> 立即入狱，不能再犯活体过错
+> 直到他们出狱。未来可能还会出现其他类型的拜占庭断层
+> 有延迟(例如，提交无效提案的证据作为交易)。
+> 在实施时，必须决定这些未来类型的
+> 拜占庭故障将导致墓碑(如果没有，斜线数量
+> 不会受到削减期的限制)。
 
-In the current system design, once a validator is put in the jail for a consensus
-fault, after the `JailPeriod` they are allowed to send a transaction to `unjail`
-themselves, and thus rejoin the validator set.
+在目前的系统设计中，一旦验证者被投入监狱以达成共识
+错误，在“JailPeriod”之后，他们被允许向“unjail”发送交易
+自己，从而重新加入验证器集。
 
-One of the "design desires" of the `slashing` module is that if multiple
-infractions occur before evidence is executed (and a validator is put in jail),
-they should only be punished for single worst infraction, but not cumulatively.
-For example, if the sequence of events is:
+`slashing` 模块的“设计愿望”之一是，如果多个
+在执行证据之前发生违规(并且验证者被投入监狱)，
+他们应该只因一次最严重的违规行为而受到惩罚，而不是累积。
+例如，如果事件序列是:
 
-1. Validator A commits Infraction 1 (worth 30% slash)
-2. Validator A commits Infraction 2 (worth 40% slash)
-3. Validator A commits Infraction 3 (worth 35% slash)
-4. Evidence for Infraction 1 reaches state machine (and validator is put in jail)
-5. Evidence for Infraction 2 reaches state machine
-6. Evidence for Infraction 3 reaches state machine
+1. 验证者 A 提交违规 1(价值 30% 斜线)
+2. 验证者 A 提交违规 2(价值 40% 斜线)
+3. 验证者 A 提交违规 3(价值 35% 斜线)
+4. 违规 1 的证据到达状态机(验证者被关进监狱)
+5. 违规 2 的证据到达状态机
+6. 违规 3 的证据到达状态机
 
-Only Infraction 2 should have its slash take effect, as it is the highest. This
-is done, so that in the case of the compromise of a validator's consensus key,
-they will only be punished once, even if the hacker double-signs many blocks.
-Because, the unjailing has to be done with the validator's operator key, they
-have a chance to re-secure their consensus key, and then signal that they are
-ready using their operator key. We call this period during which we track only
-the max infraction, the "slashing period".
+只有违规 2 应使其斜线生效，因为它是最高的。这
+完成，以便在验证者的共识密钥妥协的情况下，
+即使黑客对许多块进行双重签名，他们也只会受到一次惩罚。
+因为，解禁必须使用验证器的操作员密钥来完成，他们
+有机会重新保护他们的共识密钥，然后表明他们是
+准备好使用他们的操作员密钥。我们将这段时间称为仅跟踪
+最大的违规，“削减期”。
 
-Once, a validator rejoins by unjailing themselves, we begin a new slashing period;
-if they commit a new infraction after unjailing, it gets slashed cumulatively on
-top of the worst infraction from the previous slashing period.
+一旦验证者通过出狱重新加入，我们就开始了新的削减期；
+如果他们在出狱后犯下新的违规行为，它将被累计削减
+上一罚单期间最严重的违规行为的顶部。
 
-However, while infractions are grouped based off of the slashing periods, because
-evidence can be submitted up to an `unbondingPeriod` after the infraction, we
-still have to allow for evidence to be submitted for previous slashing periods.
-For example, if the sequence of events is:
+然而，虽然违规行为是根据惩罚期进行分组的，因为
+证据可以在违规后提交至‘unbondingPeriod’，我们
+仍然必须允许提交先前削减期的证据。
+例如，如果事件序列是:
 
-1. Validator A commits Infraction 1 (worth 30% slash)
-2. Validator A commits Infraction 2 (worth 40% slash)
-3. Evidence for Infraction 1 reaches state machine (and Validator A is put in jail)
-4. Validator A unjails
+1. 验证者 A 提交违规 1(价值 30% 斜线)
+2. 验证者 A 提交违规 2(价值 40% 斜线)
+3. 违规 1 的证据到达状态机(并且验证者 A 被关进监狱)
+4. 验证者 A 出狱 
 
-We are now in a new slashing period, however we still have to keep the door open
-for the previous infraction, as the evidence for Infraction 2 may still come in.
-As the number of slashing periods increase, it creates more complexity as we have
-to keep track of the highest infraction amount for every single slashing period.
+我们现在处于新的削减期，但我们仍然要保持敞开大门
+对于之前的违规行为，因为违规行为 2 的证据可能仍然存在。
+随着削减周期数量的增加，它会产生更多的复杂性，因为我们有
+跟踪每个罚单期间的最高违规金额。
 
-> Note: Currently, according to the `slashing` module spec, a new slashing period
-> is created every time a validator is unbonded then rebonded. This should probably
-> be changed to jailed/unjailed. See issue [#3205](https://github.com/cosmos/cosmos-sdk/issues/3205)
-> for further details. For the remainder of this, I will assume that we only start
-> a new slashing period when a validator gets unjailed.
+> 注意:目前，根据`slashing`模块规范，一个新的slashing period
+> 每次验证器解除绑定然后重新绑定时都会创建。这大概应该
+> 更改为监禁/未监禁。见问题 [#3205](https://github.com/cosmos/cosmos-sdk/issues/3205)
+> 了解更多详情。对于剩下的部分，我将假设我们只开始
+> 当验证者被释放时，一个新的削减期。
 
-The maximum number of slashing periods is the `len(UnbondingPeriod) / len(JailPeriod)`.
-The current defaults in Gaia for the `UnbondingPeriod` and `JailPeriod` are 3 weeks
-and 2 days, respectively. This means there could potentially be up to 11 slashing
-periods concurrently being tracked per validator. If we set the `JailPeriod >= UnbondingPeriod`,
-we only have to track 1 slashing period (i.e not have to track slashing periods).
+slashing period 的最大数量是`len(UnbondingPeriod) / len(JailPeriod)`。
+当前 Gaia 中 `UnbondingPeriod` 和 `JailPeriod` 的默认值为 3 周
+和 2 天，分别。这意味着可能会有多达 11 次削减
+每个验证器同时跟踪的时间段。如果我们设置`JailPeriod >= UnbondingPeriod`，
+我们只需要跟踪 1 个削减期(即不必跟踪削减期)。
 
-Currently, in the jail period implementation, once a validator unjails, all of
-their delegators who are delegated to them (haven't unbonded / redelegated away),
-stay with them. Given that consensus safety faults are so egregious
-(way more so than liveness faults), it is probably prudent to have delegators not
-"auto-rebond" to the validator.
+目前，在监狱期间的实施中，一旦验证人出狱，所有的
+委派给他们的委派人(尚未解除绑定/重新委派)，
+和他们在一起。鉴于共识安全错误如此严重
+(比活性错误更重要)，让委托人不
+“自动重新绑定”到验证器。
 
-### Proposal: infinite jail
+### 提案:无限监狱
 
-We propose setting the "jail time" for a
-validator who commits a consensus safety fault, to `infinite` (i.e. a tombstone state).
-This essentially kicks the validator out of the validator set and does not allow
-them to re-enter the validator set. All of their delegators (including the operator themselves)
-have to either unbond or redelegate away. The validator operator can create a new
-validator if they would like, with a new operator key and consensus key, but they
-have to "re-earn" their delegations back.
+我们建议为一个人设定“监禁时间”
+提交共识安全错误的验证者，到“无限”(即墓碑状态)。
+这实质上是将验证器踢出验证器集并且不允许
+他们重新进入验证器集。他们所有的委托人(包括运营商自己)
+必须解除绑定或重新授权。验证器操作员可以创建一个新的
+验证器，如果他们愿意，可以使用新的操作员密钥和共识密钥，但他们
+必须“重新赚回”他们的代表团。
 
-Implementing the tombstone system and getting rid of the slashing period tracking
-will make the `slashing` module way simpler, especially because we can remove all
-of the hooks defined in the `slashing` module consumed by the `staking` module
-(the `slashing` module still consumes hooks defined in `staking`).
+实施墓碑制度，摆脱砍价期跟踪
+将使 `slashing` 模块的方式更简单，特别是因为我们可以删除所有
+`staking` 模块使用的 `slashing` 模块中定义的钩子
+(`slashing` 模块仍然使用 `staking` 中定义的钩子)。
 
-### Single slashing amount
+### 单次削减金额
 
-Another optimization that can be made is that if we assume that all ABCI faults
-for Tendermint consensus are slashed at the same level, we don't have to keep
-track of "max slash". Once an ABCI fault happens, we don't have to worry about
-comparing potential future ones to find the max.
+另一个可以进行的优化是，如果我们假设所有 ABCI 故障
+因为 Tendermint 共识被削减在同一水平，我们不必保持
+跟踪“最大斜线”。一旦发生ABCI故障，我们就不必担心
+比较潜在的未来以找到最大值。
 
-Currently the only Tendermint ABCI fault is:
+目前唯一的 Tendermint ABCI 故障是:
 
-- Unjustified precommits (double signs)
+- 不合理的预提交(双重符号)
 
-It is currently planned to include the following fault in the near future:
+目前计划在不久的将来包括以下故障:
 
-- Signing a precommit when you're in unbonding phase (needed to make light client bisection safe)
+- 在解除绑定阶段签署预提交(需要使轻客户端二分安全)
 
-Given that these faults are both attributable byzantine faults, we will likely
-want to slash them equally, and thus we can enact the above change.
+鉴于这些故障都是拜占庭故障，我们很可能会
+想要平等地削减它们，因此我们可以制定上述更改。
 
-> Note: This change may make sense for current Tendermint consensus, but maybe
-> not for a different consensus algorithm or future versions of Tendermint that
-> may want to punish at different levels (for example, partial slashing).
+> 注意:此更改可能对当前的 Tendermint 共识有意义，但也许
+> 不适用于不同的共识算法或 Tendermint 的未来版本
+> 可能要进行不同级别的惩罚(例如，部分削减)。 

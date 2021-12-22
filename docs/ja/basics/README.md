@@ -1,11 +1,11 @@
-# Basics
+# 基本
 
-This repository contains reference documentation on the basic concepts of the Cosmos SDK.
+このリポジトリには、CosmosSDKの基本概念に関するリファレンスドキュメントが含まれています。
 
-1. [Anatomy of a Cosmos SDK Application](./app-anatomy.md)
-2. [Lifecycle of a transaction](./tx-lifecycle.md)
-3. [Lifecycle of a query](./query-lifecycle.md)
-4. [Accounts](./accounts.md)
-5. [Gas and Fees](./gas-fees.md)
+1.[Cosmos SDKアプリケーション分析](./app-anatomy.md)
+2.[トランザクションライフサイクル](./tx-lifecycle.md)
+3.[クエリライフサイクル](./query-lifecycle.md)
+4.[アカウント](./accounts.md)
+5.[ガスと料金](./gas-fees.md)
 
-After reading the basics, head on to the [Core Reference](../core/README.md) for more advanced material.
+基本を読んだ後、[コアリファレンス](../core/README.md)にアクセスして、より高度な資料を入手してください。 

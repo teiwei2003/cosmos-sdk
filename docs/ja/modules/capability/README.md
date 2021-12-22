@@ -1,33 +1,33 @@
-# `capability`
+# `能力`
 
-## Overview
+## 概述
 
-`x/capability` is an implementation of a Cosmos SDK module, per [ADR 003](./../../../docs/architecture/adr-003-dynamic-capability-store.md),
-that allows for provisioning, tracking, and authenticating multi-owner capabilities
-at runtime.
+`x/capability` 是 Cosmos SDK 模块的实现，根据 [ADR 003](./../../../docs/architecture/adr-003-dynamic-capability-store.md)，
+允许配置、跟踪和验证多所有者功能
+在运行时。
 
-The keeper maintains two states: persistent and ephemeral in-memory. The persistent
-store maintains a globally unique auto-incrementing index and a mapping from
-capability index to a set of capability owners that are defined as a module and
-capability name tuple. The in-memory ephemeral state keeps track of the actual
-capabilities, represented as addresses in local memory, with both forward and reverse indexes.
-The forward index maps module name and capability tuples to the capability name. The
-reverse index maps between the module and capability name and the capability itself.
+keeper 维护两种状态:持久和短暂的内存。执着的
+store 维护一个全局唯一的自动递增索引和一个映射
+一组被定义为模块的能力所有者的能力索引和
+能力名称元组。内存中的临时状态跟踪实际
+能力，表示为本地内存中的地址，具有正向和反向索引。
+前向索引将模块名称和能力元组映射到能力名称。这
+模块和功能名称与功能本身之间的反向索引映射。
 
-The keeper allows the creation of "scoped" sub-keepers which are tied to a particular
-module by name. Scoped keepers must be created at application initialization and
-passed to modules, which can then use them to claim capabilities they receive and
-retrieve capabilities which they own by name, in addition to creating new capabilities
-& authenticating capabilities passed by other modules. A scoped keeper cannot escape its scope,
-so a module cannot interfere with or inspect capabilities owned by other modules.
+Keeper 允许创建“范围”的子管理器，这些子管理器与特定的
+模块名称。必须在应用程序初始化和
+传递给模块，然后模块可以使用它们来声明它们接收和
+除了创建新功能外，还可以检索他们按名称拥有的功能
+& 验证其他模块传递的功能。一个有范围的守护者无法逃脱它的范围，
+所以一个模块不能干扰或检查其他模块拥有的功能。
 
-The keeper provides no other core functionality that can be found in other modules
-like queriers, REST and CLI handlers, and genesis state.
+Keeper 不提供其他模块中可以找到的其他核心功能
+像查询器、REST 和 CLI 处理程序以及创世状态。
 
-## Initialization
+## 初始化
 
-During application initialization, the keeper must be instantiated with a persistent
-store key and an in-memory store key.
+在应用程序初始化期间，Keeper 必须用一个持久化的实例化
+存储密钥和内存存储密钥。 
 
 ```go
 type App struct {
@@ -66,4 +66,4 @@ func NewApp(...) *App {
 ## Contents
 
 1. **[Concepts](01_concepts.md)**
-1. **[State](02_state.md)**
+2. **[State](02_state.md)**

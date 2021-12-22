@@ -1,27 +1,27 @@
-# Messages
+# 消息
 
-## Proposal Submission
+## 提案提交
 
-Proposals can be submitted by any account via a `MsgSubmitProposal`
-transaction.
+任何帐户都可以通过“MsgSubmitProposal”提交提案
+交易。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/tx.proto#L24-L39
 
-The `Content` of a `MsgSubmitProposal` message must have an appropriate router
-set in the governance module.
+`MsgSubmitProposal` 消息的 `Content` 必须有一个合适的路由器
+在治理模块中设置。
 
-**State modifications:**
+**状态修改:**
 
-- Generate new `proposalID`
-- Create new `Proposal`
-- Initialise `Proposal`'s attributes
-- Decrease balance of sender by `InitialDeposit`
-- If `MinDeposit` is reached:
-    - Push `proposalID` in `ProposalProcessingQueue`
-- Transfer `InitialDeposit` from the `Proposer` to the governance `ModuleAccount`
+- 生成新的`proposalID`
+- 创建新的“提案”
+- 初始化`Proposal`的属性
+- 通过`InitialDeposit`减少发件人的余额
+- 如果达到`MinDeposit`:
+     - 在`ProposalProcessingQueue`中推送`proposalID`
+- 将 `InitialDeposit` 从 `Proposer` 转移到治理 `ModuleAccount`
 
-A `MsgSubmitProposal` transaction can be handled according to the following
-pseudocode.
+一个 `MsgSubmitProposal` 事务可以按照以下方式处理
+伪代码。 
 
 ```go
 // PSEUDOCODE //
@@ -65,25 +65,25 @@ upon receiving txGovSubmitProposal from sender do
   return proposalID
 ```
 
-## Deposit
+## 订金
 
-Once a proposal is submitted, if
-`Proposal.TotalDeposit < ActiveParam.MinDeposit`, Atom holders can send
-`MsgDeposit` transactions to increase the proposal's deposit.
+提交提案后，如果
+`Proposal.TotalDeposit < ActiveParam.MinDeposit`，Atom 持有者可以发送
+`MsgDeposit` 交易以增加提案的存款。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/tx.proto#L61-L72
 
-**State modifications:**
+**状态修改:**
 
-- Decrease balance of sender by `deposit`
-- Add `deposit` of sender in `proposal.Deposits`
-- Increase `proposal.TotalDeposit` by sender's `deposit`
-- If `MinDeposit` is reached:
-    - Push `proposalID` in `ProposalProcessingQueueEnd`
-- Transfer `Deposit` from the `proposer` to the governance `ModuleAccount`
+- 通过`存款`减少发件人的余额
+- 在`proposal.Deposits`中添加发件人的`deposit`
+- 通过发送者的`deposit`增加`proposal.TotalDeposit`
+- 如果达到`MinDeposit`:
+     - 在`ProposalProcessingQueueEnd`中推送`proposalID`
+- 将`Deposit`从`proposer`转移到治理`ModuleAccount`
 
-A `MsgDeposit` transaction has to go through a number of checks to be valid.
-These checks are outlined in the following pseudocode.
+`MsgDeposit` 交易必须经过多次检查才能有效。
+以下伪代码概述了这些检查。 
 
 ```go
 // PSEUDOCODE //
@@ -133,20 +133,20 @@ upon receiving txGovDeposit from sender do
 
 ## Vote
 
-Once `ActiveParam.MinDeposit` is reached, voting period starts. From there,
-bonded Atom holders are able to send `MsgVote` transactions to cast their
-vote on the proposal.
+一旦达到`ActiveParam.MinDeposit`，投票期开始。 从那里，
+绑定的 Atom 持有者能够发送“MsgVote”交易来投下他们的
+对该提案进行投票。 
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/tx.proto#L46-L56
 
-**State modifications:**
+**状态修改:**
 
-- Record `Vote` of sender
+- 记录发件人的“投票”
 
-_Note: Gas cost for this message has to take into account the future tallying of the vote in EndBlocker_
+_注意:此消息的 Gas 成本必须考虑到 EndBlocker 中未来的投票统计_
 
-Next is a pseudocode outline of the way `MsgVote` transactions are
-handled:
+接下来是“MsgVote”交易方式的伪代码概述
+处理: 
 
 ```go
   // PSEUDOCODE //

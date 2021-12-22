@@ -1,56 +1,56 @@
-# ADR 046: Module Params
+# ADR 046:モジュールパラメータ
 
-## Changelog
+## 変更ログ
 
-- Sep 22, 2021: Initial Draft
+-2021年9月22日:最初のドラフト
 
-## Status
+## 状態
 
-Proposed
+提案
 
-## Abstract
+## 概要
 
-This ADR describes an alternative approach to how Cosmos SDK modules use, interact,
-and store their respective parameters.
+このADRは、使用方法、相互作用方法、
+そして、それぞれのパラメータを保存します。
 
-## Context
+## 環境
 
-Currently, in the Cosmos SDK, modules that require the use of parameters use the
-`x/params` module. The `x/params` works by having modules define parameters,
-typically via a simple `Params` structure, and registering that structure in
-the `x/params` module via a unique `Subspace` that belongs to the respective
-registering module. The registering module then has unique access to its respective
-`Subspace`. Through this `Subspace`, the module can get and set its `Params`
-structure.
+現在、Cosmos SDKでは、パラメーターを使用する必要のあるモジュールが使用されています
+`x .params`モジュール。 `x .params`は、モジュールにパラメータを定義させることで機能します。
+通常、単純な「Params」構造を介して、構造をに登録します
+`x .params`モジュールは固有の` Subspace`を通過します
+モジュールを登録します。次に、登録モジュールはそれぞれに一意にアクセスできます
+`部分空間`。この `Subspace`を介して、モジュールはその` Params`を取得および設定できます。
+構造。
 
-In addition, the Cosmos SDK's `x/gov` module has direct support for changing
-parameters on-chain via a `ParamChangeProposal` governance proposal type, where
-stakeholders can vote on suggested parameter changes.
+さらに、CosmosSDKの `x .gov`モジュールは変更を直接サポートします
+「ParamChangeProposal」ガバナンス提案タイプを介してチェーンにパラメーターを設定します。ここで、
+利害関係者は、提案されたパラメーターの変更に投票できます。
 
-There are various tradeoffs to using the `x/params` module to manage individual
-module parameters. Namely, managing parameters essentially comes for "free" in
-that developers only need to define the `Params` struct, the `Subspace`, and the
-various auxiliary functions, e.g. `ParamSetPairs`, on the `Params` type. However,
-there are some notable drawbacks. These drawbacks include the fact that parameters
-are serialized in state via JSON which is extremely slow. In addition, parameter
-changes via `ParamChangeProposal` governance proposals have no way of reading from
-or writing to state. In other words, it is currently not possible to have any
-state transitions in the application during an attempt to change param(s).
+`x .params`モジュールを使用して単一を管理します
+モジュールパラメータ。言い換えれば、管理パラメータは本質的に「無料」です
+開発者は、 `Params`構造、` Subspace`、および
+`ParamSetPairs`などのさまざまな補助関数は` Params`タイプにあります。でも、
+明らかな欠点がいくつかあります。これらの欠点には、パラメータが含まれます
+非常に遅いJSONを介して状態でシリアル化します。さらに、パラメータ
+`ParamChangeProposal`ガバナンス提案を通じて行われた変更は読み取ることができません
+または国に書いてください。言い換えれば、
+パラメータを変更しようとしたときのアプリケーションの状態遷移。
 
-## Decision
+## 決定
 
-We will build off of the alignment of `x/gov` and `x/authz` work per
-[#9810](https://github.com/cosmos/cosmos-sdk/pull/9810). Namely, module developers
-will create one or more unique parameter data structures that must be serialized
-to state. The Param data structures must implement `sdk.Msg` interface with respective
-Protobuf Msg service method which will validate and update the parameters with all
-necessary changes. The `x/gov` module via the work done in
-[#9810](https://github.com/cosmos/cosmos-sdk/pull/9810), will dispatch Param
-messages, which will be handled by Protobuf Msg services.
+`x .gov`と` x .authz`の配置に基づいて構築します
+[#9810](https://github.com/cosmos/cosmos-sdk/pull/9810)。モジュール開発者
+シリアル化する必要がある1つ以上の一意のパラメータデータ構造を作成します
+声明。 Paramデータ構造は、 `sdk.Msg`インターフェースとそれぞれを実装する必要があります
+Protobuf Msgサービスメソッド、すべてのパラメータを検証および更新します
+必要な変更。 `x .gov`モジュールが渡されます
+[#9810](https://github.com/cosmos/cosmos-sdk/pull/9810)、Paramがスケジュールされます
+メッセージはProtobufMsgサービスによって処理されます。
 
-Note, it is up to developers to decide how to structure their parameters and
-the respective `sdk.Msg` messages. Consider the parameters currently defined in
-`x/auth` using the `x/params` module for parameter management:
+パラメータを構造化する方法を決定するのは開発者次第であることに注意してください。
+対応する `sdk.Msg`メッセージ。現在定義されているパラメータを検討してください
+`x .auth`はパラメータ管理に` x .params`モジュールを使用します。 
 
 ```protobuf
 message Params {
@@ -62,22 +62,21 @@ message Params {
 }
 ```
 
-Developers can choose to either create a unique data structure for every field in
-`Params` or they can create a single `Params` structure as outlined above in the
-case of `x/auth`.
+开发人员可以选择为每个字段创建唯一的数据结构
+`Params` 或者他们可以创建一个单一的 `Params` 结构，如上所述
+“x/auth”的情况。
 
-In the former, `x/params`, approach, a `sdk.Msg` would need to be created for every single
-field along with a handler. This can become burdensome if there are a lot of
-parameter fields. In the latter case, there is only a single data structure and
-thus only a single message handler, however, the message handler might have to be
-more sophisticated in that it might need to understand what parameters are being
-changed vs what parameters are untouched.
+在前者中，`x/params` 方法，需要为每个单独的创建一个 `sdk.Msg`
+字段以及处理程序。 如果有很多，这可能会成为负担
+参数字段。 在后一种情况下，只有一个数据结构和
+因此只有一个消息处理程序，但是，消息处理程序可能必须是
+更复杂，因为它可能需要了解正在使用的参数
+更改与未更改的参数。
 
-Params change proposals are made using the `x/gov` module. Execution is done through
-`x/authz` authorization to the root `x/gov` module's account.
+参数更改建议是使用 `x/gov` 模块提出的。 执行是通过
+`x/authz` 授权给根 `x/gov` 模块的帐户。
 
-Continuing to use `x/auth`, we demonstrate a more complete example:
-
+继续使用`x/auth`，我们演示一个更完整的例子: 
 ```go
 type Params struct {
 	MaxMemoCharacters      uint64
@@ -100,9 +99,9 @@ type MsgUpdateParamsResponse struct {}
 func (ms msgServer) UpdateParams(goCtx context.Context, msg *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
   ctx := sdk.UnwrapSDKContext(goCtx)
 
-  // verification logic...
+ ..verification logic...
 
-  // persist params
+ ..persist params
   params := ParamsFromMsg(msg)
   ms.SaveParams(ctx, params)
 
@@ -110,15 +109,15 @@ func (ms msgServer) UpdateParams(goCtx context.Context, msg *types.MsgUpdatePara
 }
 
 func ParamsFromMsg(msg *types.MsgUpdateParams) Params {
-  // ...
+ .....
 }
 ```
 
-A gRPC `Service` query should also be provided, for example:
+gRPCの `Service`クエリも提供する必要があります。次に例を示します。
 
 ```protobuf
 service Query {
-  // ...
+ .....
   
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/cosmos/<module>/v1beta1/params";
@@ -130,55 +129,53 @@ message QueryParamsResponse {
 }
 ```
 
-## Consequences
+## 結果
 
-As a result of implementing the module parameter methodology, we gain the ability
-for module parameter changes to be stateful and extensible to fit nearly every
-application's use case. We will be able to emit events (and trigger hooks registered
-to that events using the work proposed in [even hooks](https://github.com/cosmos/cosmos-sdk/discussions/9656)),
-call other Msg service methods or perform migration.
-In addition, there will be significant gains in performance when it comes to reading
-and writing parameters from and to state, especially if a specific set of parameters
-are read on a consistent basis.
+モジュールパラメータメソッドを実装した結果、
+モジュールパラメータの変更をステートフルで拡張可能にして、ほぼすべてに適応できるようにします
+アプリケーションのユースケース。イベントを発行する(そして登録されたフックをトリガーする)ことができるようになります
+[偶数フック](https://github.com/cosmos/cosmos-sdk/discussions/9656))で提案された作業のイベントを使用します。
+他のメッセージサービスメソッドを呼び出すか、移行を実行します。
+さらに、読書のパフォーマンスが大幅に向上します
+そして、特に特定のパラメータのセットの場合、状態との間でパラメータを書き込みます
+一貫して読んでください。
 
-However, this methodology will require developers to implement more types and
-Msg service metohds which can become burdensome if many parameters exist. In addition,
-developers are required to implement persistance logics of module parameters.
-However, this should be trivial.
+ただし、このアプローチでは、開発者はより多くのタイプを実装する必要があり、
+パラメータが多いと、メッセージサービスの方法が煩雑になる場合があります。また、
+開発者は、モジュールパラメータの永続ロジックを実装する必要があります。
+ただし、これは些細なことです。
 
-### Backwards Compatibility
+### 下位互換性
 
-The new method for working with module parameters is naturally not backwards
-compatible with the existing `x/params` module. However, the `x/params` will
-remain in the Cosmos SDK and will be marked as deprecated with no additional
-functionality being added apart from potential bug fixes. Note, the `x/params`
-module may be removed entirely in a future release.
+モジュールパラメータを処理する新しい方法は、当然、逆行しません。
+既存の `x .params`モジュールと互換性があります。ただし、 `x .params`は
+Cosmos SDKに保持し、非推奨としてマークされ、追加されなくなります
+潜在的なバグ修正に加えて、機能も追加されました。 `x .params`に注意してください
+モジュールは、将来のバージョンで完全に削除される可能性があります。
+### ポジティブ
 
-### Positive
+-モジュールパラメータをより効率的にシリアル化する
+-モジュールはパラメータの変更に反応し、他の操作を実行できます。
+-特別なイベントを発行して、フックをトリガーすることができます。
+### ネガティブ
 
-- Module parameters are serialized more efficiently
-- Modules are able to react on parameters changes and perform additional actions.
-- Special events can be emitted, allowing hooks to be triggered.
+-モジュールパラメータは、モジュール開発者にとって少し負担になります。
+     -モジュールは、パラメータ状態の永続化と取得を担当するようになりました
+     -モジュールには、パラメーターを処理するための一意のメッセージハンドラーが必要です。
+       各固有のパラメーターのデータ構造の変更。
 
-### Negative
+### ニュートラル
 
-- Module parameters becomes slightly more burdensome for module developers:
-    - Modules are now responsible for persisting and retrieving parameter state
-    - Modules are now required to have unique message handlers to handle parameter
-      changes per unique parameter data structure.
+-[#9810](https://github.com/cosmos/cosmos-sdk/pull/9810)を確認する必要があります
+  とマージされました。
 
-### Neutral
+<！-## さらなる議論
 
-- Requires [#9810](https://github.com/cosmos/cosmos-sdk/pull/9810) to be reviewed
-  and merged.
+ADRがドラフトまたは提案段階にある間、このセクションには、将来の反復で解決される問題の要約が含まれている必要があります(通常はプルリクエストディスカッションからのコメントを参照します)。
+後で、このセクションでは、このADRの分析中に作成者またはレビュー担当者が見つけたアイデアや改善点をオプションで一覧表示できます。->
 
-<!-- ## Further Discussions
+## 参照
 
-While an ADR is in the DRAFT or PROPOSED stage, this section should contain a summary of issues to be solved in future iterations (usually referencing comments from a pull-request discussion).
-Later, this section can optionally list ideas or improvements the author or reviewers found during the analysis of this ADR. -->
-
-## References
-
-- https://github.com/cosmos/cosmos-sdk/pull/9810
-- https://github.com/cosmos/cosmos-sdk/issues/9438
-- https://github.com/cosmos/cosmos-sdk/discussions/9913
+-https://github.com/cosmos/cosmos-sdk/pull/9810
+-https://github.com/cosmos/cosmos-sdk/issues/9438
+-https://github.com/cosmos/cosmos-sdk/discussions/9913 

@@ -1,58 +1,58 @@
-# ADR 016: Validator Consensus Key Rotation
+# ADR 016:ベリファイアコンセンサスキーローテーション
 
-## Changelog
+## 変更ログ
 
-- 2019 Oct 23: Initial draft
-- 2019 Nov 28: Add key rotation fee
+-2019年10月23日:最初のドラフト
+-2019年11月28日:キーローテーション料金を引き上げます
 
-## Context
+## 環境
 
-Validator consensus key rotation feature has been discussed and requested for a long time, for the sake of safer validator key management policy (e.g. https://github.com/tendermint/tendermint/issues/1136). So, we suggest one of the simplest form of validator consensus key rotation implementation mostly onto Cosmos SDK.
+より安全なベリファイアキー管理戦略(https://github.com/tendermint/tendermint/issues/1136など)のために、ベリファイアコンセンサスキーローテーション機能が長い間議論され、要求されてきました。したがって、CosmosSDKでバリデーターコンセンサスキーローテーションの最も単純な実装の1つを使用することをお勧めします。
 
-We don't need to make any update on consensus logic in Tendermint because Tendermint does not have any mapping information of consensus key and validator operator key, meaning that from Tendermint point of view, a consensus key rotation of a validator is simply a replacement of a consensus key to another.
+Tendermintにはコンセンサスキーとベリファイアオペレータキーの間のマッピング情報がないため、Tendermintのコンセンサスロジックを更新する必要はありません。つまり、Tendermintの観点からは、ベリファイアのコンセンサスキーローテーションは交換別のコンセンサスキー。
 
-Also, it should be noted that this ADR includes only the simplest form of consensus key rotation without considering multiple consensus keys concept. Such multiple consensus keys concept shall remain a long term goal of Tendermint and Cosmos SDK.
+さらに、このADRには、最も単純な形式のコンセンサスキーローテーションのみが含まれ、複数のコンセンサスキーの概念は考慮されていないことに注意してください。複数のコンセンサスキーのこの概念は、TendermintおよびCosmosSDKの長期的な目標であり続けます。
 
-## Decision
+## 決定
 
-### Pseudo procedure for consensus key rotation
+###コンセンサスキーローテーションの疑似プロセス
 
-- create new random consensus key.
-- create and broadcast a transaction with a `MsgRotateConsPubKey` that states the new consensus key is now coupled with the validator operator with signature from the validator's operator key.
-- old consensus key becomes unable to participate on consensus immediately after the update of key mapping state on-chain.
-- start validating with new consensus key.
-- validators using HSM and KMS should update the consensus key in HSM to use the new rotated key after the height `h` when `MsgRotateConsPubKey` committed to the blockchain.
+-新しいランダムコンセンサスキーを作成します。
+-「MsgRotateConsPubKey」を使用して、新しいコンセンサスキーがバリデーターオペレーターと結合され、バリデーターオペレーターキーからの署名があることを宣言するトランザクションを作成してブロードキャストします。
+-チェーンのキーマッピングステータスが更新された直後は、古いコンセンサスキーをコンセンサスに参加させることはできません。
+-検証のために新しいコンセンサスキーの使用を開始します。
+-`MsgRotateConsPubKey`がブロックチェーンに送信されると、HSMとKMSを使用するバリデーターは、 `h`の高さの後に新しいローテーションキーを使用するようにHSMのコンセンサスキーを更新する必要があります。
 
-### Considerations
+###予防
 
-- consensus key mapping information management strategy
-    - store history of each key mapping changes in the kvstore.
-    - the state machine can search corresponding consensus key paired with given validator operator for any arbitrary height in a recent unbonding period.
-    - the state machine does not need any historical mapping information which is past more than unbonding period.
-- key rotation costs related to LCD and IBC
-    - LCD and IBC will have traffic/computation burden when there exists frequent power changes
-    - In current Tendermint design, consensus key rotations are seen as power changes from LCD or IBC perspective
-    - Therefore, to minimize unnecessary frequent key rotation behavior, we limited maximum number of rotation in recent unbonding period and also applied exponentially increasing rotation fee
-- limits
-    - a validator cannot rotate its consensus key more than `MaxConsPubKeyRotations` time for any unbonding period, to prevent spam.
-    - parameters can be decided by governance and stored in genesis file.
-- key rotation fee
-    - a validator should pay `KeyRotationFee` to rotate the consensus key which is calculated as below
-    - `KeyRotationFee` = (max(`VotingPowerPercentage` *100, 1)* `InitialKeyRotationFee`) * 2^(number of rotations in `ConsPubKeyRotationHistory` in recent unbonding period)
-- evidence module
-    - evidence module can search corresponding consensus key for any height from slashing keeper so that it can decide which consensus key is supposed to be used for given height.
-- abci.ValidatorUpdate
-    - tendermint already has ability to change a consensus key by ABCI communication(`ValidatorUpdate`).
-    - validator consensus key update can be done via creating new + delete old by change the power to zero.
-    - therefore, we expect we even do not need to change tendermint codebase at all to implement this feature.
-- new genesis parameters in `staking` module
-    - `MaxConsPubKeyRotations` : maximum number of rotation can be executed by a validator in recent unbonding period. default value 10 is suggested(11th key rotation will be rejected)
-    - `InitialKeyRotationFee` : the initial key rotation fee when no key rotation has happened in recent unbonding period. default value 1atom is suggested(1atom fee for the first key rotation in recent unbonding period)
+-コンセンサスキーマッピング情報管理戦略
+    -各キーマッピングの変更の履歴をkvstoreに保存します。
+    -ステートマシンは、最新のバインド解除期間中に、特定のバリデーターオペレーターとペアになっている任意の高さの対応するコンセンサスキーを検索できます。
+    -ステートマシンは、バインド解除期間を超えて履歴マッピング情報を必要としません。
+-LCDおよびIBCに関連するキーローテーションコスト
+    -LCDとIBCは、電源が頻繁に変更されると、フロー/計算の負担が発生します
+    -現在のテンダーミントの設計では、コンセンサスキーの回転は、LCDまたはIBCの観点からは電力の変化と見なされます
+    -したがって、不必要な頻繁なキーローテーション動作を最小限に抑えるために、最新のバインド解除期間中の最大ローテーション数を制限し、指数関数的に増加したローテーション料金も適用しました
+-制限
+    -バリデーターは、スパムを防ぐために、バインド解除期間中、コンセンサスキーを `MaxConsPubKeyRotations`より長くローテーションすることはできません。
+    -パラメータはガバナンスによって決定され、ジェネシスファイルに保存されます。
+-キーローテーション料金
+    -検証者は、コンセンサスキーをローテーションするために `KeyRotationFee`を支払う必要があります。これは、次のように計算されます。
+    -`KeyRotationFee` =(max( `VotingPowerPercentage` * 100、1)*` InitialKeyRotationFee`)* 2 ^(最新のバインド解除中の `ConsPubKeyRotationHistory`の回転数)
+-証​​拠モジュール
+    -証​​拠モジュールは、スラッシュキーパーから任意の高さの対応するコンセンサスキーを検索できるため、特定の高さに使用するコンセンサスキーを決定できます。
+-abci.ValidatorUpdate
+    -Tendermintは、ABCI通信( `ValidatorUpdate`)を介してコンセンサスキーを変更できるようになりました。
+    -ベリファイアのコンセンサスキーの更新は、パワーをゼロに変更して新しいものを作成し、古いものを削除することで実行できます。
+    -したがって、この機能を実現するために、テンダーミントのコードベースを変更する必要さえないことを願っています。
+-`stakeing`モジュールの新しい作成パラメータ
+    -`MaxConsPubKeyRotations`:バリデーターが最新のバインド解除期間中に実行できる回転の最大数。デフォルト値の10を使用することをお勧めします(11番目のキーローテーションは拒否されます)
+    -`InitialKeyRotationFee`:直近のバインド解除期間中にキーローテーションが発生しなかった場合の初期キーローテーション料金。デフォルト値の1atomを使用することをお勧めします(最近のバインド解除期間中の最初のキーローテーションのコストは1atomです)
 
-### Workflow
+### ワークフロー
 
-1. The validator generates a new consensus keypair.
-2. The validator generates and signs a `MsgRotateConsPubKey` tx with their operator key and new ConsPubKey
+1.ベリファイアは、新しいコンセンサスキーペアを生成します。
+2.バリデーターは、オペレーターキーと新しいConsPubKeyを使用して、 `MsgRotateConsPubKey`txを生成して署名します。 
 
     ```go
     type MsgRotateConsPubKey struct {
@@ -61,16 +61,16 @@ Also, it should be noted that this ADR includes only the simplest form of consen
     }
     ```
 
-3. `handleMsgRotateConsPubKey` gets `MsgRotateConsPubKey`, calls `RotateConsPubKey` with emits event
-4. `RotateConsPubKey`
-    - checks if `NewPubKey` is not duplicated on `ValidatorsByConsAddr`
-    - checks if the validator is does not exceed parameter `MaxConsPubKeyRotations` by iterating `ConsPubKeyRotationHistory`
-    - checks if the signing account has enough balance to pay `KeyRotationFee`
-    - pays `KeyRotationFee` to community fund
-    - overwrites `NewPubKey` in `validator.ConsPubKey`
-    - deletes old `ValidatorByConsAddr`
-    - `SetValidatorByConsAddr` for `NewPubKey`
-    - Add `ConsPubKeyRotationHistory` for tracking rotation
+3.`handleMsgRotateConsPubKey`は `MsgRotateConsPubKey`を取得し、emitsイベントで` RotateConsPubKey`を呼び出します
+4.`RotateConsPubKey`
+      -`NewPubKey`が `ValidatorsByConsAddr`に複製されていないかどうかを確認します
+      -`ConsPubKeyRotationHistory`を繰り返して、バリデーターがパラメーター `MaxConsPubKeyRotations`を超えていないかどうかを確認します。
+      -署名アカウントに `KeyRotationFee`を支払うのに十分な残高があるかどうかを確認します
+      -コミュニティ基金に `KeyRotationFee`を支払う
+      -`validator.ConsPubKey`の `NewPubKey`をオーバーライドします
+      -古い `ValidatorByConsAddr`を削除します
+      -`NewPubKey`の `SetValidatorByConsAddr`
+      -回転を追跡するために `ConsPubKeyRotationHistory`を追加しました 
 
     ```go
     type ConsPubKeyRotationHistory struct {
@@ -81,7 +81,7 @@ Also, it should be noted that this ADR includes only the simplest form of consen
     }
     ```
 
-5. `ApplyAndReturnValidatorSetUpdates` checks if there is `ConsPubKeyRotationHistory` with `ConsPubKeyRotationHistory.RotatedHeight == ctx.BlockHeight()` and if so, generates 2 `ValidatorUpdate` , one for a remove validator and one for create new validator
+5. `ApplyAndReturnValidatorSetUpdates`は、` ConsPubKeyRotationHistory`と `ConsPubKeyRotationHistory.RotatedHeight == ctx.BlockHeight()`があるかどうかをチェックします。 
 
     ```go
     abci.ValidatorUpdate{
@@ -95,31 +95,30 @@ Also, it should be noted that this ADR includes only the simplest form of consen
     }
     ```
 
-6. at `previousVotes` Iteration logic of `AllocateTokens`,  `previousVote` using `OldConsPubKey` match up with `ConsPubKeyRotationHistory`, and replace validator for token allocation
-7. Migrate `ValidatorSigningInfo` and `ValidatorMissedBlockBitArray` from `OldConsPubKey` to `NewConsPubKey`
+6.`AllocateTokens`の `previousVotes`の反復ロジックでは、` previousVote`は `OldConsPubKey`を使用して` ConsPubKeyRotationHistory`と一致し、トークン配布のバリデーターを置き換えます
+7.`ValidatorSigningInfo`と `ValidatorMissedBlockBitArray`を` OldConsPubKey`から `NewConsPubKey`に移行します
 
-- Note : All above features shall be implemented in `staking` module.
+-注:上記のすべての関数は、 `stakeing`モジュールに実装する必要があります。
 
-## Status
+## 状態
 
-Proposed
+提案
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-- Validators can immediately or periodically rotate their consensus key to have better security policy
-- improved security against Long-Range attacks (https://nearprotocol.com/blog/long-range-attacks-and-a-new-fork-choice-rule) given a validator throws away the old consensus key(s)
+-検証者は、セキュリティポリシーを向上させるために、コンセンサスキーを即座にまたは定期的にローテーションできます
+-バリデーターが古いコンセンサスキーを破棄するため、リモート攻撃に対するセキュリティが向上しました(https://nearprotocol.com/blog/long-range-attacks-and-a-new-fork-choice-rule)
 
-### Negative
+### ネガティブ
 
-- Slash module needs more computation because it needs to lookup corresponding consensus key of validators for each height
-- frequent key rotations will make light client bisection less efficient
+-スラッシュモジュールは、高さごとに対応するバリデーターコンセンサスキーを見つける必要があるため、より多くの計算が必要です
+-キーを頻繁に回転させると、軽いクライアントの二分法の効率が低下します
+### ニュートラル
 
-### Neutral
+## 参照
 
-## References
-
-- on tendermint repo : https://github.com/tendermint/tendermint/issues/1136
-- on cosmos-sdk repo : https://github.com/cosmos/cosmos-sdk/issues/5231
-- about multiple consensus keys : https://github.com/tendermint/tendermint/issues/1758#issuecomment-545291698
+-テンダーミントリポジトリ:https://github.com/tendermint/tendermint/issues/1136
+-cosmos-sdkリポジトリ:https://github.com/cosmos/cosmos-sdk/issues/5231
+-複数のコンセンサスキーについて:https://github.com/tendermint/tendermint/issues/1758#issuecomment-545291698 

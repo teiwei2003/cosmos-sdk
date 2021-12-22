@@ -1,54 +1,54 @@
-# ADR 006: Secret Store Replacement
+# ADR 006:シークレットストレージの交換
 
-## Changelog
+## 変更ログ
 
-- July 29th, 2019: Initial draft
-- September 11th, 2019: Work has started
-- November 4th: Cosmos SDK changes merged in
-- November 18th: Gaia changes merged in
+-2019年7月29日:最初のドラフト
+-2019年9月11日:作業が開始されました
+-11月4日:CosmosSDKの変更がマージ
+-11月18日:ガイアの変更がマージ
 
-## Context
+## 環境
 
-Currently, a Cosmos SDK application's CLI directory stores key material and metadata in a plain text database in the user’s home directory.  Key material is encrypted by a passphrase, protected by bcrypt hashing algorithm. Metadata (e.g. addresses, public keys, key storage details) is available in plain text.
+現在、Cosmos SDKアプリケーションのCLIディレクトリには、ユーザーのホームディレクトリにあるプレーンテキストデータベースに主要な資料とメタデータが格納されています。キーマテリアルはパスワードで暗号化され、bcryptハッシュアルゴリズムで保護されています。メタデータ(アドレス、公開鍵、鍵ストレージの詳細など)はプレーンテキストで提供されます。
 
-This is not desirable for a number of reasons. Perhaps the biggest reason is insufficient security protection of key material and metadata. Leaking the plain text allows an attacker to surveil what keys a given computer controls via a number of techniques, like compromised dependencies without any privilege execution. This could be followed by a more targeted attack on a particular user/computer.
+これは多くの理由で望ましくありません。おそらく最大の理由は、主要な資料とメタデータのセキュリティ保護が不十分なことです。プレーンテキストが漏洩すると、攻撃者は、特権を実行せずに依存関係を破棄するなど、さまざまな手法で特定のコンピューター制御キーを監視できます。特定のユーザー/コンピューターに対するより標的を絞った攻撃が続く可能性があります。
 
-All modern desktop computers OS (Ubuntu, Debian, MacOS, Windows) provide a built-in secret store that is designed to allow applications to store information that is isolated from all other applications and requires passphrase entry to access the data.
+最新のデスクトップコンピューターオペレーティングシステム(Ubuntu、Debian、MacOS、Windows)はすべて、アプリケーションが他のすべてのアプリケーションから分離された情報を保存し、データにアクセスするためにパスワードを必要とするように設計された組み込みのシークレットストレージを提供します。
 
-We are seeking solution that provides a common abstraction layer to the many different backends and reasonable fallback for minimal platforms that don’t provide a native secret store.
+私たちは、多くの異なるバックエンドに共通の抽象化レイヤーを提供し、ネイティブシークレットストレージを提供しない最小のプラットフォームに合理的なフォールバックを提供するソリューションを探しています。
 
-## Decision
+## 決定
 
-We recommend replacing the current Keybase backend based on LevelDB with [Keyring](https://github.com/99designs/keyring) by 99 designs. This application is designed to provide a common abstraction and uniform interface between many secret stores and is used by AWS Vault application by 99-designs application.
+LevelDBに基づく現在のKeybaseバックエンドを99デザインの[Keyring](https://github.com/99designs/keyring)に置き換えることをお勧めします。このアプリケーションは、多くのシークレットストア間で共通の抽象化と統一されたインターフェースを提供するように設計されており、99-designsアプリケーションによってAWSVaultアプリケーションによって使用されます。
 
-This appears to fulfill the requirement of protecting both key material and metadata from rouge software on a user’s machine.
+これは、ユーザーのマシンに対するマルウェア攻撃から主要なマテリアルとメタデータを保護するための要件を満たしているようです。
 
-## Status
+## ステータス
 
-Accepted
+受け入れられました
 
-## Consequences
+## 結果
 
-### Positive
+### 目的
 
-Increased safety for users.
+ユーザーのセキュリティを強化します。
 
-### Negative
+### ネガティブ
 
-Users must manually migrate.
+ユーザーは手動で移行する必要があります。
 
-Testing against all supported backends is difficult.
+サポートされているすべてのバックエンドに対してテストすることは困難です。
 
-Running tests locally on a Mac require numerous repetitive password entries.
+Macでローカルにテストを実行するには、パスワードを複数回再入力する必要があります。
 
-### Neutral
+### ニュートラル
 
-{neutral consequences}
+{中立的な結果}
 
-## References
+## 参照する
 
-- #4754 Switch secret store to the keyring secret store (original PR by @poldsam) [__CLOSED__]
-- #5029 Add support for github.com/99designs/keyring-backed keybases [__MERGED__]
-- #5097 Add keys migrate command [__MERGED__]
-- #5180 Drop on-disk keybase in favor of keyring [_PENDING_REVIEW_]
-- cosmos/gaia#164 Drop on-disk keybase in favor of keyring (gaia's changes) [_PENDING_REVIEW_]
+-#4754シークレットストレージをキーリングシークレットストレージに切り替えます(@poldsamの元のPR)[__ CLOSED__]
+-#5029 github.com/99designs/keyring-backed keystore [__ MERGED__]のサポートを追加
+-#5097キー移行コマンドの追加[__MERGED__]
+-#5180キーリングをサポートするためにディスクキーストアを削除します[_PENDING_REVIEW_]
+-cosmos/gaia#164キーリングをサポートするためにディスクキーストアを削除します(gaiaの変更)[_ PENDING_REVIEW_] 

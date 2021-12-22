@@ -1,30 +1,30 @@
-# ADR 034: Account Rekeying
+# ADR 034:アカウントのキーの再生成
 
-## Changelog
+## 変更ログ
 
-- 30-09-2020: Initial Draft
+2020年9月30日:最初のドラフト
 
-## Status
+## 状態
 
-PROPOSED
+提案
 
-## Abstract
+## 概要
 
-Account rekeying is a process hat allows an account to replace its authentication pubkey with a new one.
+アカウントの再暗号化は、アカウントが認証用の公開鍵を新しい公開鍵に置き換えることを可能にするプロセスです。
 
-## Context
+## 環境
 
-Currently, in the Cosmos SDK, the address of an auth `BaseAccount` is based on the hash of the public key.  Once an account is created, the public key for the account is set in stone, and cannot be changed.  This can be a problem for users, as key rotation is a useful security practice, but is not possible currently.  Furthermore, as multisigs are a type of pubkey, once a multisig for an account is set, it can not be updated.  This is problematic, as multisigs are often used by organizations or companies, who may need to change their set of multisig signers for internal reasons.
+現在、Cosmos SDKでは、auth`BaseAccount`のアドレスは公開鍵のハッシュ値に基づいています。アカウントが作成された後、アカウントの公開鍵は不変であり、変更することはできません。キーローテーションは便利なセキュリティプラクティスであるため、これはユーザーにとって問題になる可能性がありますが、現在は不可能です。また、マルチ署名は一種の公開鍵であるため、アカウントのマルチ署名を設定すると更新できなくなります。組織や企業はマルチシグニチャを使用することが多く、内部的な理由により、マルチシグニチャセットを変更する必要がある場合があるため、これは問題があります。
 
-Transferring all the assets of an account to a new account with the updated pubkey is not sufficient, because some "engagements" of an account are not easily transferable.  For example, in staking, to transfer bonded Atoms, an account would have to unbond all delegations and wait the three week unbonding period.  Even more significantly, for validator operators, ownership over a validator is not transferrable at all, meaning that the operator key for a validator can never be updated, leading to poor operational security for validators.
+アカウントの一部の「参加」は簡単に転送できないため、更新された公開鍵を使用してアカウントのすべての資産を新しいアカウントに転送するだけでは不十分です。たとえば、ステーキングでは、バインドされたAtomを転送するために、アカウントはすべての委任を解放し、3週間のバインド解除期間を待つ必要があります。さらに重要なことに、検証者のオペレーターの場合、検証者の所有権は基本的に譲渡できません。つまり、検証者のオペレーターキーを更新できないため、検証者の運用上のセキュリティが低下します。
 
-## Decision
+## 決定
 
-We propose the addition of a new feature to `x/auth` that allows accounts to update the public key associated with their account, while keeping the address the same.
+`x .auth`に新機能を追加することをお勧めします。これにより、アカウントは、アドレスを変更せずに、アカウントに関連付けられた公開鍵を更新できます。
 
-This is possible because the Cosmos SDK `BaseAccount` stores the public key for an account in state, instead of making the assumption that the public key is included in the transaction (whether explicitly or implicitly through the signature) as in other blockchains such as Bitcoin and Ethereum.  Because the public key is stored on chain, it is okay for the public key to not hash to the address of an account, as the address is not pertinent to the signature checking process.
+これが可能なのは、Cosmos SDKの `BaseAccount`が、他のブロックチェーン(ビットコインなど)のように公開鍵がトランザクション(明示的または暗黙的)に含まれていると想定するのではなく、アカウントの公開鍵を状態で保存するためです。 )およびEthereum。公開鍵はチェーンに格納されているため、アドレスは署名チェックプロセスとは関係がないため、公開鍵がアカウントアドレスにハッシュされていない可能性があります。
 
-To build this system, we design a new Msg type as follows:
+このシステムを構築するために、次のように新しいMsgタイプを設計しました。 
 
 ```protobuf
 service Msg {
@@ -39,38 +39,37 @@ message MsgChangePubKey {
 message MsgChangePubKeyResponse {}
 ```
 
-The MsgChangePubKey transaction needs to be signed by the existing pubkey in state.
+MsgChangePubKeyトランザクションは、州内の既存の公開鍵によって署名される必要があります。
 
-Once, approved, the handler for this message type, which takes in the AccountKeeper, will update the in-state pubkey for the account and replace it with the pubkey from the Msg.
+承認されると、このメッセージタイプのハンドラー(AccountKeeperを受け入れる)は、アカウントの状態公開鍵を更新し、メッセージ内の公開鍵に置き換えます。
 
-An account that has had its pubkey changed cannot be automatically pruned from state.  This is because if pruned, the original pubkey of the account would be needed to recreate the same address, but the owner of the address may not have the original pubkey anymore.  Currently, we do not automatically prune any accounts anyways, but we would like to keep this option open the road (this is the purpose of account numbers).  To resolve this, we charge an additional gas fee for this operation to compensate for this this externality (this bound gas amount is configured as parameter `PubKeyChangeCost`). The bonus gas is charged inside the handler, using the `ConsumeGas` function.  Furthermore, in the future, we can allow accounts that have rekeyed manually prune themselves using a new Msg type such as `MsgDeleteAccount`.  Manually pruning accounts can give a gas refund as an incentive for performing the action.
+公開鍵が変更されたアカウントは、状態から自動的に削除することはできません。 これは、プルーニングされた場合、アカウントの元の公開鍵で同じアドレスを再作成する必要がありますが、アドレスの所有者が元の公開鍵を所有していない可能性があるためです。 現在、アカウントを自動的にトリミングすることはありませんが、このオプションを妨げないようにします(これがアカウントの目的です)。 この問題を解決するために、この外部性を補うために、この操作に追加のガス料金を請求します(バインドされたガス量はパラメーター `PubKeyChangeCost`として構成されます)。 `ConsumeGas`関数を使用して、ハンドラー内の余分なガスを充電します。 さらに、将来的には、新しいMsgタイプ(「MsgDeleteAccount」など)を使用するアカウントが、セルフプルーニング用のキーを手動で再生成できるようにすることができます。 アカウントの手動プルーニングは、操作を実行するためのインセンティブとしてガスの払い戻しを提供できます。
 
 ```go
 	amount := ak.GetParams(ctx).PubKeyChangeCost
 	ctx.GasMeter().ConsumeGas(amount, "pubkey change fee")
 ```
 
-Everytime a key for an address is changed, we will store a log of this change in the state of the chain, thus creating a stack of all previous keys for an address and the time intervals for which they were active.  This allows dapps and clients to easily query past keys for an account which may be useful for features such as verifying timestamped off-chain signed messages.
+アドレスのキーが変更されるたびに、この変更のログがチェーンの状態に保存され、アドレスの以前のすべてのキーとそれらがアクティブである時間間隔のスタックが作成されます。これにより、dappsとクライアントは、アカウントの過去のキーを簡単に照会できます。これは、タイムスタンプ付きのオフチェーン署名付きメッセージの検証などの機能に役立つ場合があります。
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-* Will allow users and validator operators to employ better operational security practices with key rotation.
-* Will allow organizations or groups to easily change and add/remove multisig signers.
+*ユーザーと検証者のオペレーターは、キーローテーションを通じてより優れた運用セキュリティ慣行を採用できるようになります。
+*組織またはグループがマルチ署名を簡単に変更および追加/削除できるようになります。
 
-### Negative
+### ネガティブ
 
-Breaks the current assumed relationship between address and pubkeys as H(pubkey) = address. This has a couple of consequences.
+H(pubkey)= addressであるため、アドレスと公開鍵の間で現在想定されている関係を解除します。これにはいくつかの結果があります。
 
-* This makes wallets that support this feature more complicated. For example, if an address on chain was updated, the corresponding key in the CLI wallet also needs to be updated.
-* Cannot automatically prune accounts with 0 balance that have had their pubkey changed.
+*これにより、この機能をサポートするウォレットがより複雑になります。たとえば、チェーン上のアドレスが更新された場合、CLIウォレットの対応するキーも更新する必要があります。
+*変更された公開鍵の残高が0のアカウントは、自動的にプルーニングできません。
+### ニュートラル
 
-### Neutral
+*これの目的は、アカウント所有者が所有する新しい公開鍵に更新できるようにすることですが、技術的には、これを使用してアカウントの所有権を新しい所有者に譲渡することもできます。たとえば、これを使用して、拘束力を解除せずに、既得のトークンを持つ住宅ローンのポジションまたはアカウントを販売できます。ただし、基本的には非常に具体的な店頭取引として行われる必要があるため、この摩擦は非常に高くなります。さらに、属性トークンを持つアカウントがこの機能を使用できないようにするために、追加の制約を追加できます。
+*ジェネシスエクスポートに含める必要があるアカウントの公開鍵を含めます。
 
-* While the purpose of this is intended to allow the owner of an account to update to a new pubkey they own, this could technically also be used to transfer ownership of an account to a new owner.  For example, this could be use used to sell a staked position without unbonding or an account that has vesting tokens.  However, the friction of this is very high as this would essentially have to be done as a very specific OTC trade. Furthermore, additional constraints could be added to prevent accouns with Vesting tokens to use this feature.
-* Will require that PubKeys for an account are included in the genesis exports.
+## 参照
 
-## References
-
-+ https://www.algorand.com/resources/blog/announcing-rekeying
++ https://www.algorand.com/resources/blog/announcing-rekeying 

@@ -1,16 +1,16 @@
-# State
+# 状态
 
-The internal state of the `x/upgrade` module is relatively minimal and simple. The
-state contains the currently active upgrade `Plan` (if one exists) by key
-`0x0` and if a `Plan` is marked as "done" by key `0x1`. The state
-contains the consensus versions of all app modules in the application. The versions
-are stored as big endian `uint64`, and can be accessed with prefix `0x2` appended
-by the corresponding module name of type `string`. The state maintains a
-`Protocol Version` which can be accessed by key `0x3`.
+`x/upgrade` 模块的内部状态相对最小和简单。 这
+state 包含当前活动的升级`Plan`(如果存在)键
+`0x0` 并且如果 `Plan` 被键 `0x1` 标记为“完成”。 国家
+包含应用程序中所有应用程序模块的共识版本。 版本
+存储为 big endian `uint64`，可以通过附加前缀 `0x2` 访问
+通过类型为`string`的相应模块名称。 国家维持一个
+可以通过密钥“0x3”访问的“协议版本”。
 
-- Plan: `0x0 -> Plan`
-- Done: `0x1 | byte(plan name)  -> BigEndian(Block Height)`
-- ConsensusVersion: `0x2 | byte(module name)  -> BigEndian(Module Consensus Version)`
-- ProtocolVersion: `0x3 -> BigEndian(Protocol Version)`
+- 计划:`0x0 -> 计划`
+- 完成:`0x1 | 字节(计划名称)-> BigEndian(块高度)`
+- 共识版本:`0x2 | 字节(模块名称)-> BigEndian(模块共识版本)`
+- 协议版本:`0x3 -> BigEndian(协议版本)`
 
-The `x/upgrade` module contains no genesis state.
+`x/upgrade` 模块不包含创世状态。 

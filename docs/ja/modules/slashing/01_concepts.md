@@ -1,33 +1,32 @@
-# Concepts
+# 概念
 
-## States
+## 状态
 
-At any given time, there are any number of validators registered in the state
-machine. Each block, the top `MaxValidators` (defined by `x/staking`) validators
-who are not jailed become _bonded_, meaning that they may propose and vote on
-blocks. Validators who are _bonded_ are _at stake_, meaning that part or all of
-their stake and their delegators' stake is at risk if they commit a protocol fault.
+在任何给定时间，都有任意数量的验证器在该状态中注册
+机器。每个区块，顶部的 `MaxValidators`(由 `x/staking` 定义)验证器
+没有入狱的人成为 _bonded_，这意味着他们可以提议并投票
+块。 _bonded_ 的验证者是 _at stock_，这意味着部分或全部
+如果他们犯了协议错误，他们的利益和他们的委托人的利益就会面临风险。
 
-For each of these validators we keep a `ValidatorSigningInfo` record that contains
-information partaining to validator's liveness and other infraction related
-attributes.
+对于这些验证器中的每一个，我们都保留了一个 `ValidatorSigningInfo` 记录，其中包含
+与验证者的活跃度和其他违规相关的信息
+属性。
 
-## Tombstone Caps
+## 墓碑帽
 
-In order to mitigate the impact of initially likely categories of non-malicious
-protocol faults, the Cosmos Hub implements for each validator
-a _tombstone_ cap, which only allows a validator to be slashed once for a double
-sign fault. For example, if you misconfigure your HSM and double-sign a bunch of
-old blocks, you'll only be punished for the first double-sign (and then immediately tombstombed). This will still be quite expensive and desirable to avoid, but tombstone caps
-somewhat blunt the economic impact of unintentional misconfiguration.
+为了减轻最初可能的非恶意类别的影响
+协议错误，Cosmos Hub 为每个验证器实现
+_tombstone_ cap，它只允许验证器被削减一次以获得双倍
+签错。例如，如果您错误地配置了 HSM 并对一堆
+旧块，您只会因第一个双重标志而受到惩罚(然后立即被墓葬)。这仍然会非常昂贵并且需要避免，但是墓碑帽
+在某种程度上减弱了无意配置错误的经济影响。
 
-Liveness faults do not have caps, as they can't stack upon each other. Liveness bugs are "detected" as soon as the infraction occurs, and the validators are immediately put in jail, so it is not possible for them to commit multiple liveness faults without unjailing in between.
+活性错误没有上限，因为它们不能相互叠加。一旦违规发生，活性错误就会被“检测到”，并且验证器会立即被关进监狱，因此他们不可能在没有释放的情况下犯下多个活性错误。
 
-## Infraction Timelines
+## 违规时间表
 
-To illustrate how the `x/slashing` module handles submitted evidence through
-Tendermint consensus, consider the following examples:
-
+为了说明 `x/slashing` 模块如何通过以下方式处理提交的证据
+Tendermint 共识，请考虑以下示例: 
 **Definitions**:
 
 _[_ : timeline start  
@@ -42,14 +41,14 @@ _V<sub>u</sub>_ : validator unbonded
 <----------------->
 [----------C<sub>1</sub>----D<sub>1</sub>,V<sub>u</sub>-----]
 
-A single infraction is committed then later discovered, at which point the
-validator is unbonded and slashed at the full amount for the infraction.
+犯了一个单一的违规行为，然后被发现，此时
+验证器被解除绑定并因违规而被全额削减。 
 
 ### Multiple Double Sign Infractions
 
 <--------------------------->
 [----------C<sub>1</sub>--C<sub>2</sub>---C<sub>3</sub>---D<sub>1</sub>,D<sub>2</sub>,D<sub>3</sub>V<sub>u</sub>-----]
 
-Multiple infractions are committed and then later discovered, at which point the
-validator is jailed and slashed for only one infraction. Because the validator
-is also tombstoned, they can not rejoin the validator set.
+犯下多次违规行为，然后被发现，此时
+验证者仅因一次违规而被判入狱并受到惩罚。 因为验证器
+也是墓碑，他们不能重新加入验证器集。 

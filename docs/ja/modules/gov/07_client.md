@@ -1,12 +1,12 @@
-# Client
+# 客户
 
-## CLI
+##命令行界面
 
-A user can query and interact with the `gov` module using the CLI.
+用户可以使用 CLI 查询“gov”模块并与之交互。
 
-### Query
+### 询问
 
-The `query` commands allow users to query `gov` state.
+`query` 命令允许用户查询 `gov` 状态。 
 
 ```bash
 simd query gov --help
@@ -14,7 +14,7 @@ simd query gov --help
 
 #### deposit
 
-The `deposit` command allows users to query a deposit for a given proposal from a given depositor.
+`deposit` 命令允许用户从给定存款人处查询给定提案的存款。 
 
 ```bash
 simd query gov deposit [proposal-id] [depositer-addr] [flags]

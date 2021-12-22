@@ -141,7 +141,7 @@ func (k Keeper) SubmitEvidence(ctx Context, evidence Evidence) error {
 }
 ```
 
-###创世纪
+### 创世纪
 
 最后，我们需要表示 `x/evidence` 模块的创世状态。 这
 模块只需要所有提交的有效违规和任何必要参数的列表

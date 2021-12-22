@@ -3,30 +3,30 @@ layout: homepage
 title: Cosmos SDK Documentation
 description: Cosmos SDK is the world’s most popular framework for building application-specific blockchains.
 sections:
-  - title: 紹介
-    desc: High-level overview of the Cosmos SDK.
-    url: /ja/intro/overview.html
+  - title: 介绍
+    desc: 高级介绍 Cosmos SDK.
+    url: /zh/intro/overview.html
     icon: introduction
-  - title: 基本
+  - title: 基础
     desc: Anatomy of a blockchain, transaction lifecycle, accounts and more.
     icon: basics
-    url: /ja/basics/app-anatomy.html
-  - title: コアコンセプト
+    url: /zh/basics/app-anatomy.html
+  - title: 核心概念
     desc: Read about the core concepts like baseapp, the store, or the server.
     icon: core
-    url: /ja/core/baseapp.html
-  - title: モジュール構築
+    url: /zh/core/baseapp.html
+  - title: 模块构筑
     desc: Discover how to build modules for the Cosmos SDK.
     icon: modules
-    url: /ja/building-modules/intro.html
-  - title: ノードを稼働する
+    url: /zh/building-modules/intro.html
+  - title: 运行一个节点
     desc: Running and interacting with nodes using the CLI and API.
     icon: interfaces
-    url: /ja/run-node/
-  - title: モジュール
+    url: /zh/run-node/
+  - title: 模块
     desc: Explore existing modules to build your application with.
     icon: specifications
-    url: /ja/modules/
+    url: /zh/modules/
 stack:
   - title: Cosmos Hub
     desc: The first of thousands of interconnected blockchains on the Cosmos Network.
@@ -43,39 +43,39 @@ footer:
 aside: false
 -->
 
-# Cosmos SDK Documentation
+# Cosmos SDK 文档
 
-## Get Started
+## 开始
 
-- **[Cosmos SDK Intro](./intro/overview.md)**: High-level overview of the Cosmos SDK.
-- **[Starport](https://docs.starport.network/)**: A developer-friendly interface to the Cosmos SDK to scaffold, launch, and maintain any crypto application on a sovereign and secured blockchain.
-- **[SDK Tutorials](https://tutorials.cosmos.network/)**: Tutorials that showcase how to build Cosmos SDK-based blockchains from scratch and explain the basic Cosmos SDK principles in the process.
+- **[Cosmos SDK Intro](./intro/overview.md)**:Cosmos SDK 的高级概述。
+- **[Starport](https://docs.starport.network/)**:Cosmos SDK 的开发人员友好界面，用于在主权和安全的区块链上搭建、启动和维护任何加密应用程序。
+- **[SDK 教程](https://tutorials.cosmos.network/)**:展示如何从头开始构建基于 Cosmos SDK 的区块链的教程，并解释了该过程中的基本 Cosmos SDK 原理。
 
-## Reference Docs
+## 参考文档
 
-- **[Basics](./basics/)**: Basic concepts of the Cosmos SDK, including the standard anatomy of an application, the transaction lifecycle, and accounts management.
-- **[Core](./core/)**: Core concepts of the Cosmos SDK, including `baseapp`, the `store`, or the `server`.
-- **[Building Modules](./building-modules/)**: Important concepts for module developers like `message`, `keeper`, and `querier`.
-- **[IBC](./ibc/)**: IBC protocol integration and concepts.
-- **[Running a Node, API, CLI](./run-node/)**: How to run a node and interact with the node using the CLI and the API.
-- **[Migrations](./migrations/)**: Migration guides for updating to newer versions of Cosmos SDK.
+- **[Basics](./basics/)**:Cosmos SDK 的基本概念，包括应用的标准剖析、交易生命周期和账户管理。
+- **[Core](./core/)**:Cosmos SDK 的核心概念，包括`baseapp`、`store` 或`server`。
+- **[Building Modules](./building-modules/)**:模块开发人员的重要概念，如`message`、`keeper`和`querier`。
+- **[IBC](./ibc/)**:IBC 协议集成和概念。
+- **[运行节点、API、CLI](./run-node/)**:如何使用 CLI 和 API 运行节点并与节点交互。
+- **[Migrations](./migrations/)**:更新到新版本 Cosmos SDK 的迁移指南。
 
-## Other Resources
+## 其他资源
 
-- **[Module Directory](../x/)**: Cosmos SDK module implementations and their respective documentation.
-- **[Specifications](./spec/)**: Specifications of modules and other parts of the Cosmos SDK.
-- **[Cosmos SDK API Reference](https://godoc.org/github.com/cosmos/cosmos-sdk)**: Godocs of the Cosmos SDK.
-- **[REST and RPC Endpoints](https://cosmos.network/rpc/)**: List of endpoints to interact with a `gaia` full-node.
-- **[Rosetta API](./run-node/rosetta.md)**: Rosetta API integration.
+- **[模块目录](../x/)**:Cosmos SDK 模块实现及其各自的文档。
+- **[Specifications](./spec/)**:Cosmos SDK 的模块和其他部分的规范。
+- **[Cosmos SDK API 参考](https://godoc.org/github.com/cosmos/cosmos-sdk)**:Cosmos SDK 的 Godocs。
+- **[REST 和 RPC 端点](https://cosmos.network/rpc/)**:与`gaia` 全节点交互的端点列表。
+- **[Rosetta API](./run-node/rosetta.md)**:Rosetta API 集成。
 
 ## Cosmos Hub
 
-The Cosmos Hub (`gaia`) docs have moved to [github.com/cosmos/gaia](https://github.com/cosmos/gaia/tree/master/docs).
+Cosmos Hub (`gaia`) 文档已移至 [github.com/cosmos/gaia](https://github.com/cosmos/gaia/tree/master/docs)。
 
-## Languages
+## 开发语言
 
-The Cosmos SDK is written in [Golang](https://golang.org/), though the framework could be implemented similarly in other languages. Contact us for information about funding an implementation in another language.
+Cosmos SDK 是用 [Golang](https://golang.org/) 编写的，尽管该框架可以用其他语言类似地实现。联系我们以获取有关为另一种语言的实施提供资金的信息。
 
-## Contribute
+## 贡献
 
-See the [DOCS_README.md](https://github.com/cosmos/cosmos-sdk/blob/master/docs/DOCS_README.md) for details of the build process and considerations when making changes.
+有关构建过程的详细信息和进行更改时的注意事项，请参阅 [DOCS_README.md](https://github.com/cosmos/cosmos-sdk/blob/master/docs/DOCS_README.md)。 

@@ -1,14 +1,14 @@
-# State
+# 状态
 
-## Signing Info (Liveness)
+## 签名信息(活力)
 
-Every block includes a set of precommits by the validators for the previous block,
-known as the `LastCommitInfo` provided by Tendermint. A `LastCommitInfo` is valid so
-long as it contains precommits from +2/3 of total voting power.
+每个区块都包含一组验证者对前一个区块的预提交，
+称为 Tendermint 提供的“LastCommitInfo”。 `LastCommitInfo` 是有效的，所以
+只要它包含来自总投票权的 +2/3 的预提交。
 
-Proposers are incentivized to include precommits from all validators in the Tendermint `LastCommitInfo`
-by receiving additional fees proportional to the difference between the voting
-power included in the `LastCommitInfo` and +2/3 (see [fee distribution](x/distribution/spec/03_begin_block.md)).
+提议者被激励在 Tendermint 的“LastCommitInfo”中包含来自所有验证者的预提交
+通过收取与投票之间的差异成比例的额外费用
+`LastCommitInfo` 和 +2/3 中包含的权力(参见 [费用分配](x/distribution/spec/03_begin_block.md))。 
 
 ```
 type LastCommitInfo struct {
@@ -17,31 +17,31 @@ type LastCommitInfo struct {
 }
 ```
 
-Validators are penalized for failing to be included in the `LastCommitInfo` for some
-number of blocks by being automatically jailed, potentially slashed, and unbonded.
+验证器因某些原因未能包含在“LastCommitInfo”中而受到惩罚
+通过被自动监禁、可能被削减和解除绑定来减少块的数量。
 
-Information about validator's liveness activity is tracked through `ValidatorSigningInfo`.
-It is indexed in the store as follows:
+有关验证器活跃度活动的信息通过“ValidatorSigningInfo”进行跟踪。
+它在存储中的索引如下:
 
-- ValidatorSigningInfo: `0x01 | ConsAddrLen (1 byte) | ConsAddress -> ProtocolBuffer(ValSigningInfo)`
-- MissedBlocksBitArray: `0x02 | ConsAddrLen (1 byte) | ConsAddress | LittleEndianUint64(signArrayIndex) -> VarInt(didMiss)` (varint is a number encoding format)
+- ValidatorSigningInfo: `0x01 | ConsAddrLen (1 字节) | ConsAddress -> ProtocolBuffer(ValSigningInfo)`
+- MissedBlocksBitArray:`0x02 | ConsAddrLen (1 字节) |约束地址 | LittleEndianUint64(signArrayIndex) -> VarInt(didMiss)`(varint 是一种数字编码格式)
 
-The first mapping allows us to easily lookup the recent signing info for a
-validator based on the validator's consensus address.
+第一个映射允许我们轻松查找最近的签名信息
+验证者基于验证者的共识地址。
 
-The second mapping (`MissedBlocksBitArray`) acts
-as a bit-array of size `SignedBlocksWindow` that tells us if the validator missed
-the block for a given index in the bit-array. The index in the bit-array is given
-as little endian uint64.
-The result is a `varint` that takes on `0` or `1`, where `0` indicates the
-validator did not miss (did sign) the corresponding block, and `1` indicates
-they missed the block (did not sign).
+第二个映射(`MissedBlocksBitArray`)作用
+作为一个大小为“SignedBlocksWindow”的位数组，它告诉我们验证器是否错过了
+位数组中给定索引的块。给出位数组中的索引
+作为小端 uint64。
+结果是一个 `varint` 取为 `0` 或 `1`，其中 `0` 表示
+验证器没有错过(确实签名)相应的块，并且`1`表示
+他们错过了街区(没有签名)。
 
-Note that the `MissedBlocksBitArray` is not explicitly initialized up-front. Keys
-are added as we progress through the first `SignedBlocksWindow` blocks for a newly
-bonded validator. The `SignedBlocksWindow` parameter defines the size
-(number of blocks) of the sliding window used to track validator liveness.
+请注意，“MissedBlocksBitArray”并未预先明确初始化。钥匙
+当我们通过第一个“SignedBlocksWindow”块进行新的
+绑定验证器。 `SignedBlocksWindow` 参数定义了大小
+(块数)用于跟踪验证器活跃度的滑动窗口。
 
-The information stored for tracking validator liveness is as follows:
+存储的用于跟踪验证者活跃度的信息如下:
 
-+++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/slashing/v1beta1/slashing.proto#L11-L33
++++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/slashing/v1beta1/slashing.proto#L11-L33 

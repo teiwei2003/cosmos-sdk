@@ -1,55 +1,54 @@
-# ADR 14: Proportional Slashing
+# ADR 14:比率の削減
 
-## Changelog
+## 変更ログ
 
-- 2019-10-15: Initial draft
-- 2020-05-25: Removed correlation root slashing
-- 2020-07-01: Updated to include S-curve function instead of linear
+-2019-10-15:最初のドラフト
+-2020-05-25:関連するルートカットを削除しました
+-2020-07-01:線形関数の代わりにSカーブ関数を含めるように更新
 
-## Context
+## 環境
 
-In Proof of Stake-based chains, centralization of consensus power amongst a small set of validators can cause harm to the network due to increased risk of censorship, liveness failure, fork attacks, etc.  However, while this centralization causes a negative externality to the network, it is not directly felt by the delegators contributing towards delegating towards already large validators.  We would like a way to pass on the negative externality cost of centralization onto those large validators and their delegators.
+権利の証明に基づくチェーンでは、検閲、ライブネス障害、分岐攻撃などのリスクが高まるため、少数の検証者にコンセンサスパワーを集中させると、ネットワークに損傷を与える可能性があります。 ネットワーク、委任者は、それがすでに大きな検証者への委任に貢献していると直接感じることはありません。 中央集権化の負の外部性コストをそれらの大規模なバリデーターとその委任者に転嫁する方法があることを願っています。
 
-## Decision
+## 決定
 
-### Design
+### 設計
 
-To solve this problem, we will implement a procedure called Proportional Slashing.  The desire is that the larger a validator is, the more they should be slashed.  The first naive attempt is to make a validator's slash percent proportional to their share of consensus voting power.
-
-```
-slash_amount = k * power // power is the faulting validator's voting power and k is some on-chain constant
-```
-
-However, this will incentivize validators with large amounts of stake to split up their voting power amongst accounts (sybil attack), so that if they fault, they all get slashed at a lower percent.  The solution to this is to take into account not just a validator's own voting percentage, but also the voting percentage of all the other validators who get slashed in a specified time frame.
+この問題を解決するために、比例縮小と呼ばれる手順を実装します。 バリデーターが大きいほど、より多くのバリデーターを削減する必要があります。 最初の素朴な試みは、検証者のスラッシュのパーセンテージをコンセンサス投票権のシェアに比例させることです。 
 
 ```
-slash_amount = k * (power_1 + power_2 + ... + power_n) // where power_i is the voting power of the ith validator faulting in the specified time frame and k is some on-chain constant
+slash_amount = k * power//power is the faulting validator's voting power and k is some on-chain constant
 ```
 
-Now, if someone splits a validator of 10% into two validators of 5% each which both fault, then they both fault in the same time frame, they both will get slashed at the sum 10% amount.
+ただし、これにより、大きな利害関係を持つ検証者がアカウント間で投票権を分配するように動機付けられ(魔女の攻撃)、ミスを犯した場合、すべての検証者の割合が低くなります。 これに対する解決策は、検証者自身の投票率を考慮するだけでなく、指定された時間枠内に削減された他のすべてのバリデーターの投票率も考慮することです。 
 
-However in practice, we likely don't want a linear relation between amount of stake at fault, and the percentage of stake to slash. In particular, solely 5% of stake double signing effectively did nothing to majorly threaten security, whereas 30% of stake being at fault clearly merits a large slashing factor, due to being very close to the point at which Tendermint security is threatened. A linear relation would require a factor of 6 gap between these two, whereas the difference in risk posed to the network is much larger. We propose using S-curves (formally [logistic functions](https://en.wikipedia.org/wiki/Logistic_function) to solve this). S-Curves capture the desired criterion quite well. They allow the slashing factor to be minimal for small values, and then grow very rapidly near some threshold point where the risk posed becomes notable.
+```
+slash_amount = k * (power_1 + power_2 + ... + power_n)//where power_i is the voting power of the ith validator faulting in the specified time frame and k is some on-chain constant
+```
 
-#### Parameterization
+ここで、誰かが10％のバリデーターを2つの5％のバリデーターに分割し、それぞれがミスを犯した場合、それらはすべて同じ時間枠でミスを犯し、すべて10％削減されます。
 
-This requires parameterizing a logistic function. It is very well understood how to parameterize this. It has four parameters:
+ただし、実際には、誤ったエクイティの量とエクイティの割合を減らすことの間の線形関係を望まない場合があります。特に、エクイティのわずか5％の二重署名は、実際にはセキュリティに大きな脅威をもたらすことはなく、エクイティの30％のエラーは、テンダーミントのセキュリティのポイントに非常に近いため、明らかに大幅に削減する価値があります。脅かされています。線形関係では、2つの間に6倍のギャップが必要になり、ネットワークへのリスクにははるかに大きな違いがあります。この問題を解決するには、Sカーブ(公式には[論理関数](https://en.wikipedia.org/wiki/Logistic_function))を使用することをお勧めします。 Sカーブは、必要な標準を非常によく捉えています。それらは、小さな値の減少係数を最小化することを可能にし、その後、もたらされるリスクが重要になる特定のしきい値ポイントの近くで急速に成長します。
+パラメータ化する####
 
-1) A minimum slashing factor
-2) A maximum slashing factor
-3) The inflection point of the S-curve (essentially where do you want to center the S)
-4) The rate of growth of the S-curve (How elongated is the S)
+これには、パラメーター化された論理関数が必要です。これをパラメータ化する方法をよく理解している。 4つのパラメータがあります。
 
-#### Correlation across non-sybil validators
+1)最小削減係数
+2)最大削減係数
+3)S曲線の変曲点(基本的にSを置きたい場所)
+4)S曲線の成長率(Sの伸び度)
 
-One will note, that this model doesn't differentiate between multiple validators run by the same operators vs validators run by different operators.  This can be seen as an additional benefit in fact.  It incentivizes validators to differentiate their setups from other validators, to avoid having correlated faults with them or else they risk a higher slash.  So for example, operators should avoid using the same popular cloud hosting platforms or using the same Staking as a Service providers.  This will lead to a more resilient and decentralized network.
+#### 非魔女バリデーター間の相関
 
-#### Griefing
+モデルは、同じオペレーターによって実行される複数のバリデーターと、異なるオペレーターによって実行されるバリデーターを区別しないことに気付くでしょう。これは実際には追加のメリットと見なすことができます。バリデーターが他のバリデーターと設定を区別して、それらに関連するエラーを回避するように促します。そうしないと、バリデーターが削減されるリスクが高くなります。したがって、たとえば、事業者は、同じ人気のあるクラウドホスティングプラットフォームを使用したり、サービスプロバイダーと同じステーキングを使用したりすることは避けてください。これにより、より回復力のある分散型ネットワークが実現します。
 
-Griefing, the act of intentionally getting oneself slashed in order to make another's slash worse, could be a concern here.  However, using the protocol described here, the attacker also gets equally impacted by the grief as the victim, so it would not provide much benefit to the griefer.
+#### 悲しい
 
-### Implementation
+ここでは、他人のチョップを悪化させるために故意に自分をチョップする行為である哀悼が問題になる可能性があります。ただし、ここで説明するプロトコルを使用すると、攻撃者は被害者と同じ悲しみの影響も受けるため、悲しみに暮れる人にはあまりメリットがありません。
 
-In the slashing module, we will add two queues that will track all of the recent slash events.  For double sign faults, we will define "recent slashes" as ones that have occurred within the last `unbonding period`.  For liveness faults, we will define "recent slashes" as ones that have occurred withing the last `jail period`.
+### 埋め込む
+
+スラッシュモジュールでは、最近のすべてのスラッシュイベントを追跡するために2つのキューを追加します。ダブルシンボル障害の場合、「最近のスラッシュ」は、最後の「バインド解除期間」中に発生したスラッシュとして定義されます。活気エラーについては、「最近のスラッシュ」を最後の「投獄期間」中に発生したスラッシュと定義します。  
 
 ```
 type SlashEvent struct {
@@ -59,27 +58,26 @@ type SlashEvent struct {
 }
 ```
 
-These slash events will be pruned from the queue once they are older than their respective "recent slash period".
+これらのスラッシュイベントがそれぞれの「最近のスラッシュ期間」よりも早くなると、キューから削除されます。
 
-Whenever a new slash occurs, a `SlashEvent` struct is created with the faulting validator's voting percent and a `SlashedSoFar` of 0.  Because recent slash events are pruned before the unbonding period and unjail period expires, it should not be possible for the same validator to have multiple SlashEvents in the same Queue at the same time.
+新しいスラッシュが表示されるたびに、失敗したバリデーターの投票率が0であるSlashEvent構造が作成されます。バリデーターには、同じキューに同時に複数のSlashEventがあります。
 
-We then will iterate over all the SlashEvents in the queue, adding their `ValidatorVotingPercent` to calculate the new percent to slash all the validators in the queue at, using the "Square of Sum of Roots" formula introduced above.
+次に、キュー内のすべてのSlashEventを繰り返し、それらのValidatorVotingPercentを追加して、上記で紹介した「ルート合計の2乗」式を使用して、キュー内のすべてのバリデーターを減らす新しいパーセンテージを計算します。
 
-Once we have the `NewSlashPercent`, we then iterate over all the `SlashEvent`s in the queue once again, and if `NewSlashPercent > SlashedSoFar` for that SlashEvent, we call the `staking.Slash(slashEvent.Address, slashEvent.Power, Math.Min(Math.Max(minSlashPercent, NewSlashPercent - SlashedSoFar), maxSlashPercent)` (we pass in the power of the validator before any slashes occurred, so that we slash the right amount of tokens).  We then set `SlashEvent.SlashedSoFar` amount to `NewSlashPercent`.
+`NewSlashPercent`を取得したら、キュー内のすべての` SlashEvent`を再度トラバースします。SlashEventの `NewSlashPercent> SlashedSoFar`の場合、` staking.Slash(slashEvent.Address、slashEvent.Power、Math.Min(Math .Max(minSlashPercent、NewSlashPercent-SlashedSoFar)、maxSlashPercent) `(正しい数のトークンをカットできるように、スラッシュが発生する前にバリデーターのパワーを渡します)。次に、`SlashEvent。SlashedSoFar`を `と同等に設定します。 NewSlashPercent`。
+## 状態
 
-## Status
+提案
 
-Proposed
+## 結果
 
-## Consequences
+### ポジティブ
 
-### Positive
+-大規模なバリデーターへの委任を阻止することにより、分散化を促進します
+-バリデーターのインセンティブ非相関
+-偶発的な失敗よりも厳しく攻撃を罰する
+-削減率のパラメータ化における柔軟性の向上
 
-- Increases decentralization by disincentivizing delegating to large validators
-- Incentivizes Decorrelation of Validators
-- More severely punishes attacks than accidental faults
-- More flexibility in slashing rates parameterization
+### ネガティブ
 
-### Negative
-
-- More computationally expensive than current implementation.  Will require more data about "recent slashing events" to be stored on chain.
+-現在の実装よりも高価な計算。チェーンの「最近のカット」に関するより多くのデータを保存します。 

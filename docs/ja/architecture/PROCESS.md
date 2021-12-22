@@ -1,38 +1,38 @@
-# ADR Creation Process
+# ADR作成プロセス
 
-1. Copy the `adr-template.md` file. Use the following filename pattern: `adr-next_number-title.md`
-2. Create a draft Pull Request if you want to get an early feedback.
-3. Make sure the context and a solution is clear and well documented.
-4. Add an entry to a list in the [README](./README.md) file.
-5. Create a Pull Request to propose a new ADR.
+1.`adr-template.md`ファイルをコピーします。次のファイル名パターンを使用します: `adr-next_number-title.md`
+2.早期のフィードバックを受け取りたい場合は、ドラフトプルリクエストを作成してください。
+3.コンテキストとソリューションが明確で、十分に文書化されていることを確認します。
+4. [README](..README.md)ファイルのリストにエントリを追加します。
+5.プルリクエストを作成して、新しいADRを提案します。
 
-## ADR life cycle
+## ADRライフサイクル
 
-ADR creation is an **iterative** process. Instead of trying to solve all decisions in a single ADR pull request, we MUST firstly understand the problem and collect feedback through a GitHub Issue.
+ADRの作成は、**反復**プロセスです。単一のADRプルリクエストですべての決定を解決しようとするのではなく、最初に問題を理解し、GitHubの問題を通じてフィードバックを収集する必要があります。
 
-1. Every proposal SHOULD start with a new GitHub Issue or be a result of existing Issues. The Issue should contain just a brief proposal summary.
+1.各提案は、新しいGitHubの問題で開始するか、既存の問題の結果である必要があります。質問には、提案の短い要約のみを含める必要があります。
 
-2. Once the motivation is validated, a GitHub Pull Request (PR) is created with a new document based on the `adr-template.md`.
+2.動機が確認されると、GitHubプルリクエスト(PR)は `adr-template.md`に基づいて新しいドキュメントを作成します。
 
-3. An ADR doesn't have to arrive to `master` with an _accepted_ status in a single PR. If the motivation is clear and the solution is sound, we SHOULD be able to merge it and keep a _proposed_ status. It's preferable to have an iterative approach rather than long, not merged Pull Requests.
+3. ADRは、単一のPRで_accepted_状態の `master`に到達する必要はありません。動機が明確で解決策が合理的である場合、それをマージして_提案された_状態を維持できるはずです。長くて統合されていないプルリクエストではなく、反復的なアプローチを使用することをお勧めします。
 
-4. If a _proposed_ ADR is merged, then it should clearly document outstanding issues either in ADR document notes or in a GitHub Issue.
+4. _proposed_ ADRがマージされる場合、ADRドキュメントまたはGitHubの問題で未解決の問題を明確に文書化する必要があります。
 
-5. The PR SHOULD always be merged. In the case of a faulty ADR, we still prefer to  merge it with a _rejected_ status. The only time the ADR SHOULD NOT be merged is if the author abandons it.
+5.PRは常にマージする必要があります。 ADRの問題の場合でも、それを_rejected_ステータスとマージする傾向があります。 ADRをマージしてはならないのは、作成者がADRを放棄したときだけです。
 
-6. Merged ADRs SHOULD NOT be pruned.
+6.結合されたADRはトリミングしないでください。
 
-### ADR status
+### ADRステータス
 
-Status has two components:
+状態には2つの要素があります。
 
 ```
 {CONSENSUS STATUS} {IMPLEMENTATION STATUS}
 ```
 
-IMPLEMENTATION STATUS is either `Implemented` or `Not Implemented`.
+実装ステータスは「実装済み」または「未実装」です。
 
-#### Consensus Status
+#### コンセンサスステータス 
 
 ```
 DRAFT -> PROPOSED -> LAST CALL yyyy-mm-dd -> ACCEPTED | REJECTED -> SUPERSEDED by ADR-xxx
@@ -42,15 +42,15 @@ DRAFT -> PROPOSED -> LAST CALL yyyy-mm-dd -> ACCEPTED | REJECTED -> SUPERSEDED b
                      ABANDONED
 ```
 
-+ `DRAFT`: [optional] an ADR which is work in progress, not being ready for a general review. This is to present an early work and get an early feedback in a Draft Pull Request form.
-+ `PROPOSED`: an ADR covering a full solution architecture and still in the review - project stakeholders haven't reached an agreed yet.
-+ `LAST CALL <date for the last call>`: [optional] clear notify that we are close to accept updates. Changing a status to `LAST CALL` means that social consensus (of Cosmos SDK maintainers) has been reached and we still want to give it a time to let the community react or analyze.
-+ `ACCEPTED`: ADR which will represent a currently implemented or to be implemented architecture design.
-+ `REJECTED`: ADR can go from PROPOSED or ACCEPTED to rejected if the consensus among project stakeholders will decide so.
-+ `SUPERSEEDED by ADR-xxx`: ADR which has been superseded by a new ADR.
-+ `ABANDONED`: the ADR is no longer pursued by the original authors.
++ `ドラフト`:[オプション] ADRは進行中ですが、まだ一般的なレビューの準備ができていません。 これは、初期の作業を示し、ドラフトプルリクエストフォームで早期のフィードバックを取得するためのものです。
++ `提案`:完全なソリューションアーキテクチャをカバーするADRはまだ検討中です-プロジェクトの利害関係者はまだ合意に達していません。
++ `LAST CALL <最後の呼び出しの日付>`:[オプション]更新を受け入れようとしていることを明確に通知します。 ステータスを「LASTCALL」に変更するということは、(Cosmos SDKメンテナの)社会的コンセンサスに達したことを意味します。それでも、コミュニティが反応または分析する時間を与えたいと考えています。
++ `ACCEPTED`:ADRは、実装された、または実装される予定の現在のアーキテクチャ設計を表します。
++ `拒否`:プロジェクトの利害関係者が合意に達した場合、ADRは提案または承認から拒否に変更できます。
++ `SUPERSEEDED by ADR-xxx`:新しいADRに置き換えられたADR。
++ `ABANDONED`:元の作者はADRを追求しなくなりました。
 
-## Language used in ADR
+## ADRで使用される言語
 
-+ The context/background should be written in the present tense.
-+ Avoid using a first, personal form.
++文脈/背景は現在形で書く必要があります。
++最初の個人用フォームの使用は避けてください。 

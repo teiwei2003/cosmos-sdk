@@ -1,26 +1,26 @@
-# ADR 037: Governance split votes
+# ADR 037:ガバナンス分割投票
 
-## Changelog
+## 変更ログ
 
-- 2020/10/28: Intial draft
+-2020/10/28:最初のドラフト
 
-## Status
+## 状態
 
-Accepted
+受け入れられました
 
-## Abstract
+## 概要
 
-This ADR defines a modification to the the governance module that would allow a staker to split their votes into several voting options. For example, it could use 70% of its voting power to vote Yes and 30% of its voting power to vote No.
+ADRは、ガバナンスモジュールの変更を定義し、利害関係者が投票をいくつかの投票オプションに分割できるようにします。たとえば、議決権の70％を使用して賛成票を投じ、議決権の30％を反対票を投じることができます。
 
-## Context
+## 環境
 
-Currently, an address can cast a vote with only one options (Yes/No/Abstain/NoWithVeto) and use their full voting power behind that choice.
+現在、アドレスは1つのオプション(yes .no .abstention .veto)でのみ投票でき、すべての投票権はオプションの背後で使用されます。
 
-However, often times the entity owning that address might not be a single individual.  For example, a company might have different stakeholders who want to vote differently, and so it makes sense to allow them to split their voting power.  Another example use case is exchanges.  Many centralized exchanges often stake a portion of their users' tokens in their custody.  Currently, it is not possible for them to do "passthrough voting" and giving their users voting rights over their tokens.  However, with this system, exchanges can poll their users for voting preferences, and then vote on-chain proportionally to the results of the poll.
+ただし、アドレスを所有するエンティティは通常、個人ではない場合があります。たとえば、会社にはさまざまな方法で投票したいさまざまな利害関係者がいる可能性があるため、議決権の分配を許可することは理にかなっています。別のユースケースの例は交換です。多くの集中型取引所は通常、ユーザーのトークンの一部を保管しています。現在、「パススルー投票」を実施して、ユーザーにトークンに投票する権利を与えることはできません。ただし、このシステムにより、取引所はユーザーの投票設定に投票し、投票結果に比例してチェーンに投票することができます。
 
-## Decision
+## 決定
 
-We modify the vote structs to be
+投票構造を次のように変更します 
 
 ```
 type WeightedVoteOption struct {
@@ -35,7 +35,7 @@ type Vote struct {
 }
 ```
 
-And for backwards compatibility, we introduce `MsgVoteWeighted` while keeping `MsgVote`.
+下位互換性のために、 `MsgVote`を保持しながら、` MsgVoteWeighted`を導入しました。 
 
 ```
 type MsgVote struct {
@@ -51,12 +51,12 @@ type MsgVoteWeighted struct {
 }
 ```
 
-The `ValidateBasic` of a `MsgVoteWeighted` struct would require that
+`MsgVoteWeighted`構造の` ValidateBasic`には
 
-1. The sum of all the Rates is equal to 1.0
-2. No Option is repeated
+1.すべての金利の合計は1.0に等しい
+2.重複するオプションはありません
 
-The governance tally function will iterate over all the options in a vote and add to the tally the result of the voter's voting power * the rate for that option.
+ガバナンスカウント機能は、投票のすべてのオプションを繰り返し、投票者の投票権の結果*このオプションのカウントに対する比率を追加します。
 
 ```
 tally() {
@@ -70,7 +70,7 @@ tally() {
 }
 ```
 
-The CLI command for creating a multi-option vote would be as such:
+複数選択投票を作成するために使用されるCLIコマンドは次のとおりです。 
 
 ```sh
 simd tx gov vote 1 "yes=0.6,no=0.3,abstain=0.05,no_with_veto=0.05" --from mykey
@@ -90,22 +90,22 @@ simd tx gov vote 1 yes --from mykey
 
 to maintain backwards compatibility.
 
-## Consequences
+## 結果
 
-### Backwards Compatibility
+### 下位互換性
 
-- Previous VoteMsg types will remain the same and so clients will not have to update their procedure unless they want to support the WeightedVoteMsg feature.
-- When querying a Vote struct from state, its structure will be different, and so clients wanting to display all voters and their respective votes will have to handle the new format and the fact that a single voter can have split votes.
-- The result of querying the tally function should have the same API for clients.
+-以前のVoteMsgタイプは変更されないため、WeightedVoteMsg関数をサポートする必要がない限り、顧客はプログラムを更新する必要はありません。
+-州から投票構造を照会する場合、その構造は異なるため、すべての投票者とそれぞれの投票を表示したい顧客は、新しい形式と1人の投票者が分割投票を持つことができるという事実に対処する必要があります。
+-tally関数をクエリした結果は、クライアントと同じAPIを持つ必要があります。
 
-### Positive
+### ポジティブ
 
-- Can make the voting process more accurate for addresses representing multiple stakeholders, often some of the largest addresses.
+-複数の利害関係者を表す住所(通常は最大の住所の一部)の投票プロセスをより正確にすることができます。
 
-### Negative
+### ネガティブ
 
-- Is more complex than simple voting, and so may be harder to explain to users.  However, this is mostly mitigated because the feature is opt-in.
+-単純な投票よりも複雑なので、ユーザーに説明するのが難しい場合があります。 ただし、この機能はオプションであるため、これは大幅に軽減されます。
 
-### Neutral
+### ニュートラル
 
-- Relatively minor change to governance tally function.
+-ガバナンス集計機能の変化は比較的小さい。 

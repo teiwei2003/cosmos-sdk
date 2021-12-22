@@ -1,17 +1,17 @@
-# Building Modules
+# モジュールの構築
 
-This repository contains documentation on concepts developers need to know in order to build modules for Cosmos SDK applications.
+このリポジトリには、CosmosSDKアプリケーションモジュールを構築するために開発者が理解する必要のある概念に関するドキュメントが含まれています。
 
-1. [Introduction to Cosmos SDK Modules](./intro.md)
-2. [`AppModule` Interface and Module Manager](./module-manager.md)
-3. [Messages and Queries](./messages-and-queries.md)
-4. [`Msg` services - Processing Messages](./msg-services.md)
-5. [Query Services - Processing Queries](./query-services.md)
-6. [BeginBlocker and EndBlocker](./beginblock-endblock.md)
-7. [`Keeper`s](./keeper.md)
-8. [Invariants](./invariants.md)
-9. [Genesis](./genesis.md)
-10. [Module Interfaces](./module-interfaces.md)
-11. [Standard Module Structure](./structure.md)
-12. [Errors](./errors.md)
-13. [In-Place Store Migrations](./upgrade.md)
+1.[Cosmos SDKモジュールの紹介](./intro.md)
+2.[`AppModule`インターフェイスとモジュールマネージャー](。/module-manager.md)
+3.[メッセージとクエリ](./messages-and-queries.md)
+4.[`Msg`Service-Processing Message](./msg-services.md)
+5.[クエリサービス-クエリの処理](./query-services.md)
+6.[BeginBlockerおよびEndBlocker](./beginblock-endblock.md)
+7.[`Keeper`s](./keeper.md)
+8.[不変量](./invariants.md)
+9.[ジェネシス](./genesis.md)
+10.[モジュールインターフェイス](./module-interfaces.md)
+11.[標準モジュール構造](./structure.md)
+12.[エラー](./errors.md)
+13.[インプレースストレージ移行](./upgrade.md) 

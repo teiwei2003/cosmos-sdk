@@ -1,95 +1,96 @@
-# ADR 020: Protocol Buffer Transaction Encoding
+# ADR 020:プロトコルバッファトランザクションコーディング
 
-## Changelog
+## 変更ログ
 
-- 2020 March 06: Initial Draft
-- 2020 March 12: API Updates
-- 2020 April 13: Added details on interface `oneof` handling
-- 2020 April 30: Switch to `Any`
-- 2020 May 14: Describe public key encoding
-- 2020 June 08: Store `TxBody` and `AuthInfo` as bytes in `SignDoc`; Document `TxRaw` as broadcast and storage type.
-- 2020 August 07: Use ADR 027 for serializing `SignDoc`.
-- 2020 August 19: Move sequence field from `SignDoc` to `SignerInfo`, as discussed in [#6966](https://github.com/cosmos/cosmos-sdk/issues/6966).
-- 2020 September 25: Remove `PublicKey` type in favor of `secp256k1.PubKey`, `ed25519.PubKey` and `multisig.LegacyAminoPubKey`.
-- 2020 October 15: Add `GetAccount` and `GetAccountWithHeight` methods to the `AccountRetriever` interface.
-- 2021 Feb 24: The Cosmos SDK does not use Tendermint's `PubKey` interface anymore, but its own `cryptotypes.PubKey`. Updates to reflect this.
-- 2021 May 3: Rename `clientCtx.JSONMarshaler` to `clientCtx.JSONCodec`.
-- 2021 June 10: Add `clientCtx.Codec: codec.Codec`.
+-2020年3月6日:最初のドラフト
+-2020年3月12日:APIアップデート
+-2020年4月13日:「oneof」インターフェースの処理に関する詳細情報を追加
+-2020年4月30日:「任意」に切り替えます
+-2020年5月14日:公開鍵のエンコーディングについて説明する
+-2020年6月8日:「TxBody」と「AuthInfo」をバイトとして「SignDoc」に保存します。ドキュメント「TxRaw」をブロードキャストおよびストレージタイプとして保存します。
+-2020年8月7日:ADR027を使用して `SignDoc`をシリアル化します。
+-2020年8月19日:[#6966](https://github.com/cosmos/cosmos-sdk/issues/6966)の説明に従って、シーケンスフィールドを `SignDoc`から` SignerInfo`に移動します。
+-2020年9月25日:「PublicKey」タイプを削除し、「secp256k1.PubKey」、「ed25519.PubKey」、「multisig.LegacyAminoPubKey」に置き換えます。
+-2020年10月15日:「AccountRetriever」インターフェースに「GetAccount」メソッドと「GetAccountWithHeight」メソッドを追加しました。
+-2021年2月24日:Cosmos SDKはTendermintの `PubKey`インターフェースを使用しなくなりましたが、独自の` cryptotypes.PubKey`を使用しています。これを反映するように更新します。
+-2021年5月3日: `clientCtx.JSONMarshaler`の名前を` clientCtx.JSONCodec`に変更しました。
+-2021年6月10日: `clientCtx.Codec:codec.Codec`を追加します。
 
-## Status
+## 状態
 
-Accepted
+受け入れられました
 
-## Context
+## 環境
 
-This ADR is a continuation of the motivation, design, and context established in
-[ADR 019](./adr-019-protobuf-state-encoding.md), namely, we aim to design the
-Protocol Buffer migration path for the client-side of the Cosmos SDK.
+ADRは
+[ADR 019](..adr-019-protobuf-state-encoding.md)、つまり、私たちの目標は設計することです
+CosmosSDKクライアントのプロトコルバッファ移行パス。
 
-Specifically, the client-side migration path primarily includes tx generation and
-signing, message construction and routing, in addition to CLI & REST handlers and
-business logic (i.e. queriers).
+具体的には、クライアント移行パスには主にtx生成と
+署名、メッセージの作成とルーティング、およびCLIとRESTハンドラーと
+ビジネスロジック(つまり、クエリア)。
 
-With this in mind, we will tackle the migration path via two main areas, txs and
-querying. However, this ADR solely focuses on transactions. Querying should be
-addressed in a future ADR, but it should build off of these proposals.
+これを念頭に置いて、2つの主要な領域であるtxsと
+お問い合わせください。ただし、このADRはトランザクションのみに焦点を当てています。クエリは
+これは将来のADRで解決される予定ですが、これらの推奨事項に基づいている必要があります。
 
-Based on detailed discussions ([\#6030](https://github.com/cosmos/cosmos-sdk/issues/6030)
-and [\#6078](https://github.com/cosmos/cosmos-sdk/issues/6078)), the original
-design for transactions was changed substantially from an `oneof` /JSON-signing
-approach to the approach described below.
+詳細なディスカッションに基づく([\#6030](https://github.com/cosmos/cosmos-sdk/issues/6030)
+そして[\#6078](https://github.com/cosmos/cosmos-sdk/issues/6078))、オリジナル
+トランザクションの設計は、 `oneof` .JSON署名から大幅に変更されました
+以下に説明する方法の方法。
 
-## Decision
+## 決定
 
-### Transactions
+### トレード
 
-Since interface values are encoded with `google.protobuf.Any` in state (see [ADR 019](adr-019-protobuf-state-encoding.md)),
-`sdk.Msg`s are encoding with `Any` in transactions.
+インターフェイス値は、状態で `google.protobuf.Any`を使用してエンコードされるため([ADR 019](adr-019-protobuf-state-encoding.md)を参照)、
+`sdk.Msg`sは、トランザクションでのエンコードに` Any`を使用します。
 
-One of the main goals of using `Any` to encode interface values is to have a
-core set of types which is reused by apps so that
-clients can safely be compatible with as many chains as possible.
+`Any`を使用してインターフェース値をエンコードする主な目標の1つは、
+アプリケーションが再利用するタイプのコアセット
+クライアントは、可能な限り多くのチェーンと安全に互換性があります。
 
-It is one of the goals of this specification to provide a flexible cross-chain transaction
-format that can serve a wide variety of use cases without breaking client
-compatibility.
+柔軟なクロスチェーントランザクションを提供することは、この仕様の目標の1つです。
+クライアントを壊すことなく、さまざまなユースケースにサービスを提供できるフォーマット
+互換性。
 
-In order to facilitate signing, transactions are separated into `TxBody`,
-which will be re-used by `SignDoc` below, and `signatures`:
+署名を容易にするために、トランザクションは `TxBody`に分割されます。
+次の `SignDoc`と` signatures`はそれを再利用します: 
+
 
 ```proto
-// types/types.proto
+/.types/types.proto
 package cosmos_sdk.v1;
 
 message Tx {
     TxBody body = 1;
     AuthInfo auth_info = 2;
-    // A list of signatures that matches the length and order of AuthInfo's signer_infos to
-    // allow connecting signature meta information like public key and signing mode by position.
+   ..A list of signatures that matches the length and order of AuthInfo's signer_infos to
+   ..allow connecting signature meta information like public key and signing mode by position.
     repeated bytes signatures = 3;
 }
 
-// A variant of Tx that pins the signer's exact binary represenation of body and
-// auth_info. This is used for signing, broadcasting and verification. The binary
-// `serialize(tx: TxRaw)` is stored in Tendermint and the hash `sha256(serialize(tx: TxRaw))`
-// becomes the "txhash", commonly used as the transaction ID.
+/.A variant of Tx that pins the signer's exact binary represenation of body and
+/.auth_info. This is used for signing, broadcasting and verification. The binary
+/.`serialize(tx: TxRaw)` is stored in Tendermint and the hash `sha256(serialize(tx: TxRaw))`
+/.becomes the "txhash", commonly used as the transaction ID.
 message TxRaw {
-    // A protobuf serialization of a TxBody that matches the representation in SignDoc.
+   ..A protobuf serialization of a TxBody that matches the representation in SignDoc.
     bytes body = 1;
-    // A protobuf serialization of an AuthInfo that matches the representation in SignDoc.
+   ..A protobuf serialization of an AuthInfo that matches the representation in SignDoc.
     bytes auth_info = 2;
-    // A list of signatures that matches the length and order of AuthInfo's signer_infos to
-    // allow connecting signature meta information like public key and signing mode by position.
+   ..A list of signatures that matches the length and order of AuthInfo's signer_infos to
+   ..allow connecting signature meta information like public key and signing mode by position.
     repeated bytes signatures = 3;
 }
 
 message TxBody {
-    // A list of messages to be executed. The required signers of those messages define
-    // the number and order of elements in AuthInfo's signer_infos and Tx's signatures.
-    // Each required signer address is added to the list only the first time it occurs.
-    //
-    // By convention, the first required signer (usually from the first message) is referred
-    // to as the primary signer and pays the fee for the whole transaction.
+   ..A list of messages to be executed. The required signers of those messages define
+   ..the number and order of elements in AuthInfo's signer_infos and Tx's signatures.
+   ..Each required signer address is added to the list only the first time it occurs.
+   ./
+   ..By convention, the first required signer (usually from the first message) is referred
+   ..to as the primary signer and pays the fee for the whole transaction.
     repeated google.protobuf.Any messages = 1;
     string memo = 2;
     int64 timeout_height = 3;
@@ -97,24 +98,24 @@ message TxBody {
 }
 
 message AuthInfo {
-    // This list defines the signing modes for the required signers. The number
-    // and order of elements must match the required signers from TxBody's messages.
-    // The first element is the primary signer and the one which pays the fee.
+   ..This list defines the signing modes for the required signers. The number
+   ..and order of elements must match the required signers from TxBody's messages.
+   ..The first element is the primary signer and the one which pays the fee.
     repeated SignerInfo signer_infos = 1;
-    // The fee can be calculated based on the cost of evaluating the body and doing signature verification of the signers. This can be estimated via simulation.
+   ..The fee can be calculated based on the cost of evaluating the body and doing signature verification of the signers. This can be estimated via simulation.
     Fee fee = 2;
 }
 
 message SignerInfo {
-    // The public key is optional for accounts that already exist in state. If unset, the
-    // verifier can use the required signer address for this position and lookup the public key.
+   ..The public key is optional for accounts that already exist in state. If unset, the
+   ..verifier can use the required signer address for this position and lookup the public key.
     google.protobuf.Any public_key = 1;
-    // ModeInfo describes the signing mode of the signer and is a nested
-    // structure to support nested multisig pubkey's
+   ..ModeInfo describes the signing mode of the signer and is a nested
+   ..structure to support nested multisig pubkey's
     ModeInfo mode_info = 2;
-    // sequence is the sequence of the account, which describes the
-    // number of committed transactions signed by a given address. It is used to prevent
-    // replay attacks.
+   ..sequence is the sequence of the account, which describes the
+   ..number of committed transactions signed by a given address. It is used to prevent
+   ..replay attacks.
     uint64 sequence = 3;
 }
 
@@ -124,18 +125,18 @@ message ModeInfo {
         Multi multi = 2;
     }
 
-    // Single is the mode info for a single signer. It is structured as a message
-    // to allow for additional fields such as locale for SIGN_MODE_TEXTUAL in the future
+   ..Single is the mode info for a single signer. It is structured as a message
+   ..to allow for additional fields such as locale for SIGN_MODE_TEXTUAL in the future
     message Single {
         SignMode mode = 1;
     }
 
-    // Multi is the mode info for a multisig public key
+   ..Multi is the mode info for a multisig public key
     message Multi {
-        // bitarray specifies which keys within the multisig are signing
+       ..bitarray specifies which keys within the multisig are signing
         CompactBitArray bitarray = 1;
-        // mode_infos is the corresponding modes of the signers of the multisig
-        // which could include nested multisig public keys
+       ..mode_infos is the corresponding modes of the signers of the multisig
+       ..which could include nested multisig public keys
         repeated ModeInfo mode_infos = 2;
     }
 }
@@ -151,149 +152,148 @@ enum SignMode {
 }
 ```
 
-As will be discussed below, in order to include as much of the `Tx` as possible
-in the `SignDoc`, `SignerInfo` is separated from signatures so that only the
-raw signatures themselves live outside of what is signed over.
+以下で説明するように、できるだけ多くの「Tx」を含めるために
+`SignDoc`では、` SignerInfo`は署名から分離されているため、
+元の署名自体は、署名されたコンテンツの外部に存在します。
 
-Because we are aiming for a flexible, extensible cross-chain transaction
-format, new transaction processing options should be added to `TxBody` as soon
-those use cases are discovered, even if they can't be implemented yet.
+私たちの目標は柔軟でスケーラブルなクロスチェーントランザクションであるため
+フォーマット、新しいトランザクション処理オプションをできるだけ早く `TxBody`に追加する必要があります
+これらのユースケースは、まだ実現されていなくても発見されています。
 
-Because there is coordination overhead in this, `TxBody` includes an
-`extension_options` field which can be used for any transaction processing
-options that are not already covered. App developers should, nevertheless,
-attempt to upstream important improvements to `Tx`.
+ここには調整のオーバーヘッドがあるため、 `TxBody`には
+`extension_options`フィールドは、任意のトランザクションに使用できます
+オプションはまだカバーされていません。それでも、アプリケーション開発者は
+「Tx」の重要な上流の改善を試してください。
 
-### Signing
+### サイン
 
-All of the signing modes below aim to provide the following guarantees:
+次のすべての署名モードは、次の保証を提供するように設計されています。
 
-- **No Malleability**: `TxBody` and `AuthInfo` cannot change once the transaction
-  is signed
-- **Predictable Gas**: if I am signing a transaction where I am paying a fee,
-  the final gas is fully dependent on what I am signing
+-**可鍛性なし**:一度取引すると、 `TxBody`と` AuthInfo`は変更できません
+  署名
+-**予測可能なガス**:料金を支払う取引に署名する場合、
+  最終的なガスは私が署名したものに完全に依存します
 
-These guarantees give the maximum amount confidence to message signers that
-manipulation of `Tx`s by intermediaries can't result in any meaningful changes.
+これらの保証は、メッセージ署名者に最大の自信を提供します
+仲介者による「Tx」の操作は、意味のある変更を引き起こしません。
 
 #### `SIGN_MODE_DIRECT`
 
-The "direct" signing behavior is to sign the raw `TxBody` bytes as broadcast over
-the wire. This has the advantages of:
+「直接」署名動作は、元の「TxBody」バイトをブロードキャストとして署名することです。
+電線。これには次の利点があります。
 
-- requiring the minimum additional client capabilities beyond a standard protocol
-  buffers implementation
-- leaving effectively zero holes for transaction malleability (i.e. there are no
-  subtle differences between the signing and encoding formats which could
-  potentially be exploited by an attacker)
+-標準プロトコルを超える最小限の追加クライアント機能が必要です
+  バッファの実装
+-トランザクションの順応性のために効果的なゼロの抜け穴を残します(つまり、
+  署名とエンコード形式の微妙な違いは
+  攻撃者によって悪用される可能性があります)
 
-Signatures are structured using the `SignDoc` below which reuses the serialization of
-`TxBody` and `AuthInfo` and only adds the fields which are needed for signatures:
+署名は次の `SignDoc`で構成され、再利用されます
+`TxBody`と` AuthInfo`は、署名に必要なフィールドのみを追加します。 
 
 ```proto
-// types/types.proto
+/.types/types.proto
 message SignDoc {
-    // A protobuf serialization of a TxBody that matches the representation in TxRaw.
+   ..A protobuf serialization of a TxBody that matches the representation in TxRaw.
     bytes body = 1;
-    // A protobuf serialization of an AuthInfo that matches the representation in TxRaw.
+   ..A protobuf serialization of an AuthInfo that matches the representation in TxRaw.
     bytes auth_info = 2;
     string chain_id = 3;
     uint64 account_number = 4;
 }
 ```
 
-In order to sign in the default mode, clients take the following steps:
+デフォルトモードでログインするために、クライアントは次の手順を実行します。
 
-1. Serialize `TxBody` and `AuthInfo` using any valid protobuf implementation.
-2. Create a `SignDoc` and serialize it using [ADR 027](./adr-027-deterministic-protobuf-serialization.md).
-3. Sign the encoded `SignDoc` bytes.
-4. Build a `TxRaw` and serialize it for broadcasting.
+1.有効なprotobufを使用して、 `TxBody`と` AuthInfo`をシリアル化します。
+2. `SignDoc`を作成し、[ADR 027](..adr-027-deterministic-protobuf-serialization.md)を使用してシリアル化します。
+3.エンコードされた `SignDoc`バイトに署名します。
+4. `TxRaw`を作成し、ブロードキャスト用にシリアル化します。
 
-Signature verification is based on comparing the raw `TxBody` and `AuthInfo`
-bytes encoded in `TxRaw` not based on any ["canonicalization"](https://github.com/regen-network/canonical-proto3)
-algorithm which creates added complexity for clients in addition to preventing
-some forms of upgradeability (to be addressed later in this document).
+署名の検証は、より原始的な「TxBody」と「AuthInfo」に基づいています
+`TxRaw`でエンコードされたバイトは、["正規化 "](https://github.com/regen-network/canonical-proto3)に基づいていません。
+防止することに加えて
+アップグレード可能性のいくつかの形式(このドキュメントの後半で説明します)。
 
-Signature verifiers do:
+署名ベリファイアは次のことを行います。
 
-1. Deserialize a `TxRaw` and pull out `body` and `auth_info`.
-2. Create a list of required signer addresses from the messages.
-3. For each required signer:
-   - Pull account number and sequence from the state.
-   - Obtain the public key either from state or `AuthInfo`'s `signer_infos`.
-   - Create a `SignDoc` and serialize it using [ADR 027](./adr-027-deterministic-protobuf-serialization.md).
-   - Verify the signature at the the same list position against the serialized `SignDoc`.
+1. `TxRaw`を逆シリアル化し、` body`と `auth_info`を引き出します。
+2.メッセージに基づいて必要な署名者アドレスのリストを作成します。
+3.必要な署名者ごとに:
+   -ステータスからアカウント番号とシーケンスを抽出します。
+   -状態または `AuthInfo`の` signer_infos`から公開鍵を取得します。
+   -`SignDoc`を作成し、[ADR 027](..adr-027-deterministic-protobuf-serialization.md)を使用してシリアル化します。
+   -シリアル化された「SignDoc」に対して同じリスト位置の署名を確認します。
 
 #### `SIGN_MODE_LEGACY_AMINO`
 
-In order to support legacy wallets and exchanges, Amino JSON will be temporarily
-supported transaction signing. Once wallets and exchanges have had a
-chance to upgrade to protobuf based signing, this option will be disabled. In
-the meantime, it is foreseen that disabling the current Amino signing would cause
-too much breakage to be feasible. Note that this is mainly a requirement of the
-Cosmos Hub and other chains may choose to disable Amino signing immediately.
+古いウォレットと交換をサポートするために、AminoJSONは一時的に
+トランザクション署名をサポートします。ウォレットとエクスチェンジが
+protobufベースの署名にアップグレードする機会がある場合、このオプションは無効になります。存在
+同時に、現在のAmino署名を無効にすると、次のようになることが予測されます。
+あまりにも多くの破損は実行可能ではありません。これは主に要件であることに注意してください
+Cosmos Hubおよびその他のチェーンは、Amino署名をすぐに無効にすることを選択できます。
 
-Legacy clients will be able to sign a transaction using the current Amino
-JSON format and have it encoded to protobuf using the REST `/tx/encode`
-endpoint before broadcasting.
+古い顧客は、現在のAminoを使用してトランザクションに署名できるようになります
+JSON形式で、REST `.tx .encode`を使用してprotobufとしてエンコードします
+ブロードキャスト前のエンドポイント。
 
 #### `SIGN_MODE_TEXTUAL`
 
-As was discussed extensively in [\#6078](https://github.com/cosmos/cosmos-sdk/issues/6078),
-there is a desire for a human-readable signing encoding, especially for hardware
-wallets like the [Ledger](https://www.ledger.com) which display
-transaction contents to users before signing. JSON was an attempt at this but
-falls short of the ideal.
+[\#6078](https://github.com/cosmos/cosmos-sdk/issues/6078)で詳しく説明されているように、
+人間が読める署名エンコーディング、特にハードウェアが必要
+[元帳](https://www.ledger.com)のように表示されるウォレット
+トランザクションの内容は、署名する前にユーザーに通知されます。 JSONは試みですが、
+理想に達していません。
 
-`SIGN_MODE_TEXTUAL` is intended as a placeholder for a human-readable
-encoding which will replace Amino JSON. This new encoding should be even more
-focused on readability than JSON, possibly based on formatting strings like
-[MessageFormat](http://userguide.icu-project.org/formatparse/messages).
+`SIGN_MODE_TEXTUAL`は、人間が読める形式のプレースホルダーとして意図されています
+アミノJSONのエンコーディングが置き換えられます。この新しいエンコーディングはもっと必要です
+読みやすさはJSONよりも重要であり、次のようなフォーマットされた文字列に基づいている場合があります。
+[メッセージ形式](http://userguide.icu-project.org/formatparse/messages)。
 
-In order to ensure that the new human-readable format does not suffer from
-transaction malleability issues, `SIGN_MODE_TEXTUAL`
-requires that the _human-readable bytes are concatenated with the raw `SignDoc`_
-to generate sign bytes.
+新しい人間が読める形式が影響を受けないようにするため
+トランザクションの可鍛性の問題、 `SIGN_MODE_TEXTUAL`
+_人間が読めるバイトと元の `SignDoc`_を連結する必要があります
+シンボルバイトを生成します。
 
-Multiple human-readable formats (maybe even localized messages) may be supported
-by `SIGN_MODE_TEXTUAL` when it is implemented.
+複数の人間が読める形式をサポートする可能性があります(おそらくローカライズされたメッセージでさえ)
+実装中に `SIGN_MODE_TEXTUAL`を渡します。
 
-### Unknown Field Filtering
+### 不明なフィールドフィルタリング
 
-Unknown fields in protobuf messages should generally be rejected by transaction
-processors because:
+protobufメッセージの不明なフィールドは、通常、トランザクションによって拒否されます。
+プロセッサの理由:
 
-- important data may be present in the unknown fields, that if ignored, will
-  cause unexpected behavior for clients
-- they present a malleability vulnerability where attackers can bloat tx size
-  by adding random uninterpreted data to unsigned content (i.e. the master `Tx`,
-  not `TxBody`)
+-重要なデータが不明なフィールドに存在する可能性があります。省略した場合は、
+  顧客の予期しない行動を引き起こす
+-彼らは、攻撃者がtxサイズを膨らませることができる可鍛性の抜け穴を提案しました
+  説明されていないランダムなデータを署名されていないコンテンツ(つまり、メインの「Tx」)に追加することにより、
+  `TxBody`ではありません)
 
-There are also scenarios where we may choose to safely ignore unknown fields
-(https://github.com/cosmos/cosmos-sdk/issues/6078#issuecomment-624400188) to
-provide graceful forwards compatibility with newer clients.
+未知のフィールドを安全に無視することを選択できるシナリオがまだいくつかあります
+(https://github.com/cosmos/cosmos-sdk/issues/6078#issuecomment-624400188)から
+新しいクライアントとのエレガントな上位互換性を提供します。
 
-We propose that field numbers with bit 11 set (for most use cases this is
-the range of 1024-2047) be considered non-critical fields that can safely be
-ignored if unknown.
+11番目のフィールド番号を設定することをお勧めします(ほとんどのユースケースでは、これは
+1024〜2047の範囲)は、安全で重要ではない領域と見なされます
+不明な場合は無視してください。
 
-To handle this we will need a unknown field filter that:
+この問題を解決するには、未知のフィールドフィルターが必要です。
 
-- always rejects unknown fields in unsigned content (i.e. top-level `Tx` and
-  unsigned parts of `AuthInfo` if present based on the signing mode)
-- rejects unknown fields in all messages (including nested `Any`s) other than
-  fields with bit 11 set
+-署名されていないコンテンツの不明なフィールドを常に拒否します(つまり、トップレベルの `Tx`と
+  `AuthInfo`の符号なし部分(署名モードに基づいて存在する場合)
+-すべてのメッセージ(ネストされた `Any`を含む)の不明なフィールドを拒否します。
+  11番目のビットが設定されたフィールド 
 
-This will likely need to be a custom protobuf parser pass that takes message bytes
-and `FileDescriptor`s and returns a boolean result.
+これには、メッセージバイトを受け入れるカスタムprotobufパーサーを渡す必要がある場合があります
+そして `FileDescriptor`sとブール結果を返します。
 
-### Public Key Encoding
+### 公開鍵エンコーディング
 
-Public keys in the Cosmos SDK implement the `cryptotypes.PubKey` interface.
-We propose to use `Any` for protobuf encoding as we are doing with other interfaces (for example, in `BaseAccount.PubKey` and `SignerInfo.PublicKey`).
-The following public keys are implemented: secp256k1, secp256r1, ed25519 and legacy-multisignature.
-
-Ex:
+Cosmos SDKの公開鍵は、 `cryptotypes.PubKey`インターフェースを実装します。
+他のインターフェース(たとえば、 `BaseAccount.PubKey`や` SignerInfo.PublicKey`)を使用するのと同じように、protobufエンコーディングには `Any`を使用することをお勧めします。
+次の公開鍵が実装されています:secp256k1、secp256r1、ed25519およびlegacy-multisignature。 
+Ex: 
 
 ```proto
 message PubKey {
@@ -301,21 +301,21 @@ message PubKey {
 }
 ```
 
-`multisig.LegacyAminoPubKey` has an array of `Any`'s member to support any
-protobuf public key type.
+`multisig.LegacyAminoPubKey`には、任意のをサポートするための` Any`のメンバー配列があります
+protobuf公開鍵タイプ。
 
-Apps should only attempt to handle a registered set of public keys that they
-have tested. The provided signature verification ante handler decorators will
-enforce this.
+アプリケーションは、登録した公開鍵のセットのみを処理しようとする必要があります
+テスト済みです。 提供された署名検証アンティハンドラデコレータは
+この操作を実行します。
 
-### CLI & REST
+### CLIとREST
 
-Currently, the REST and CLI handlers encode and decode types and txs via Amino
-JSON encoding using a concrete Amino codec. Being that some of the types dealt with
-in the client can be interfaces, similar to how we described in [ADR 019](./adr-019-protobuf-state-encoding.md),
-the client logic will now need to take a codec interface that knows not only how
-to handle all the types, but also knows how to generate transactions, signatures,
-and messages.
+現在、RESTおよびCLIハンドラーは、Aminoを介してタイプとTXをエンコードおよびデコードします
+特定のAminoコーデックのJSONエンコーディングを使用します。 特定の種類の処理のため
+[ADR 019](..adr-019-protobuf-state-encoding.md)で説明したのと同様に、クライアントのインターフェイスにすることができます。
+クライアントロジックは、次の方法を知っているだけでなく、コーデックインターフェイスを採用する必要があります。
+すべてのタイプを処理しますが、トランザクション、署名、
+そしてニュース。  
 
 ```go
 type AccountRetriever interface {
@@ -345,13 +345,13 @@ type TxBuilder interface {
 }
 ```
 
-We then update `Context` to have new fields: `Codec`, `TxGenerator`,
-and `AccountRetriever`, and we update `AppModuleBasic.GetTxCmd` to take
-a `Context` which should have all of these fields pre-populated.
+次に、 `Context`を更新して、新しいフィールドを取得します:` Codec`、 `TxGenerator`、
+そして `AccountRetriever`、` AppModuleBasic.GetTxCmd`を更新します
+「コンテキスト」。これらすべてのフィールドに事前入力する必要があります。
 
-Each client method should then use one of the `Init` methods to re-initialize
-the pre-populated `Context`. `tx.GenerateOrBroadcastTx` can be used to
-generate or broadcast a transaction. For example:
+次に、各クライアントメソッドは「Init」メソッドの1つを使用して再初期化する必要があります
+事前入力された「コンテキスト」。 `tx.GenerateOrBroadcastTx`を使用できます
+トランザクションを生成またはブロードキャストします。 例えば:
 
 ```go
 import "github.com/spf13/cobra"
@@ -369,96 +369,95 @@ func NewCmdDoSomething(clientCtx client.Context) *cobra.Command {
 }
 ```
 
-## Future Improvements
+## 将来の改善
 
-### `SIGN_MODE_TEXTUAL` specification
+### `SIGN_MODE_TEXTUAL`仕様
 
-A concrete specification and implementation of `SIGN_MODE_TEXTUAL` is intended
-as a near-term future improvement so that the ledger app and other wallets
-can gracefully transition away from Amino JSON.
+「SIGN_MODE_TEXTUAL」の特定の仕様と実装は、
+元帳アプリケーションやその他のウォレットを可能にするための短期的な将来の改善として
+AminoJSONから正常に移行できます。
 
 ### `SIGN_MODE_DIRECT_AUX`
 
-(\*Documented as option (3) in https://github.com/cosmos/cosmos-sdk/issues/6078#issuecomment-628026933)
+(\ * https://github.com/cosmos/cosmos-sdk/issues/6078#issuecomment-628026933にオプション(3)として記録されています)
 
-We could add a mode `SIGN_MODE_DIRECT_AUX`
-to support scenarios where multiple signatures
-are being gathered into a single transaction but the message composer does not
-yet know which signatures will be included in the final transaction. For instance,
-I may have a 3/5 multisig wallet and want to send a `TxBody` to all 5
-signers to see who signs first. As soon as I have 3 signatures then I will go
-ahead and build the full transaction.
+モード `SIGN_MODE_DIRECT_AUX`を追加できます
+複数の署名シナリオをサポートする
+単一のトランザクションに収集されていますが、メッセージエディタは収集されません
+最終的なトランザクションにどの署名が含まれるかもわかっています。例えば、
+3/5のマルチシグニチャウォレットを持っていて、5人全員に「TxBody」を送信したい場合があります
+署名者は、誰が最初に署名するかを確認します。署名が3つあるとすぐに行きます
+完全なトランザクションを進めて確立します。
 
-With `SIGN_MODE_DIRECT`, each signer needs
-to sign the full `AuthInfo` which includes the full list of all signers and
-their signing modes, making the above scenario very hard.
+`SIGN_MODE_DIRECT`を使用するには、各署名者は
+すべての署名者の完全なリストを含む完全な「AuthInfo」に署名し、
+それらの署名モードは、上記のシナリオを非常に困難にします。
 
-`SIGN_MODE_DIRECT_AUX` would allow "auxiliary" signers to create their signature
-using only `TxBody` and their own `PublicKey`. This allows the full list of
-signers in `AuthInfo` to be delayed until signatures have been collected.
+`SIGN_MODE_DIRECT_AUX`は、「補助」署名者が署名を作成できるようにします
+`TxBody`と独自の` PublicKey`のみを使用してください。これにより、完全なリストが可能になります
+AuthInfoの署名者は、署名が収集されるまで遅延されます。
 
-An "auxiliary" signer is any signer besides the primary signer who is paying
-the fee. For the primary signer, the full `AuthInfo` is actually needed to calculate gas and fees
-because that is dependent on how many signers and which key types and signing
-modes they are using. Auxiliary signers, however, do not need to worry about
-fees or gas and thus can just sign `TxBody`.
+「セカンダリ」署名者は、メイン署名者以外の署名者です。
+料金。メインの署名者の場合、ガスと料金を計算するには、実際には完全なAuthInfoが必要です
+署名者の数と、キーの種類と署名によって異なります。
+彼らが使用しているモード。ただし、二次署名者は心配する必要はありません
+コストまたはガソリンなので、「TxBody」に署名するだけです。
 
-To generate a signature in `SIGN_MODE_DIRECT_AUX` these steps would be followed:
+「SIGN_MODE_DIRECT_AUX」で署名を生成するには、次の手順に従います。
 
-1. Encode `SignDocAux` (with the same requirement that fields must be serialized
-   in order):
+1. `SignDocAux`のエンコード(フィールドをシリアル化する必要があるという要件と同じ)
+   にとって):  
 
 ```proto
-// types/types.proto
+/.types/types.proto
 message SignDocAux {
     bytes body_bytes = 1;
-    // PublicKey is included in SignDocAux :
-    // 1. as a special case for multisig public keys. For multisig public keys,
-    // the signer should use the top-level multisig public key they are signing
-    // against, not their own public key. This is to prevent against a form
-    // of malleability where a signature could be taken out of context of the
-    // multisig key that was intended to be signed for
-    // 2. to guard against scenario where configuration information is encoded
-    // in public keys (it has been proposed) such that two keys can generate
-    // the same signature but have different security properties
-    //
-    // By including it here, the composer of AuthInfo cannot reference the
-    // a public key variant the signer did not intend to use
+   ..PublicKey is included in SignDocAux :
+   ..1. as a special case for multisig public keys. For multisig public keys,
+   ..the signer should use the top-level multisig public key they are signing
+   ..against, not their own public key. This is to prevent against a form
+   ..of malleability where a signature could be taken out of context of the
+   ..multisig key that was intended to be signed for
+   ..2. to guard against scenario where configuration information is encoded
+   ..in public keys (it has been proposed) such that two keys can generate
+   ..the same signature but have different security properties
+   ./
+   ..By including it here, the composer of AuthInfo cannot reference the
+   ..a public key variant the signer did not intend to use
     PublicKey public_key = 2;
     string chain_id = 3;
     uint64 account_number = 4;
 }
 ```
 
-2. Sign the encoded `SignDocAux` bytes
-3. Send their signature and `SignerInfo` to primary signer who will then
-   sign and broadcast the final transaction (with `SIGN_MODE_DIRECT` and `AuthInfo`
-   added) once enough signatures have been collected
-
+2.エンコードされた `SignDocAux`バイトに署名します
+3.署名と `SignerInfo`をメインの署名者に送信すると、
+    最終トランザクションに署名してブロードキャストします(「SIGN_MODE_DIRECT」と「AuthInfo」を使用)
+    追加)十分な数の署名が収集されたら
 ### `SIGN_MODE_DIRECT_RELAXED`
 
-(_Documented as option (1)(a) in https://github.com/cosmos/cosmos-sdk/issues/6078#issuecomment-628026933_)
+(_https://github.com/cosmos/cosmos-sdk/issues/6078#issuecomment-628026933_のオプション(1)(a)として文書化されています)
 
-This is a variation of `SIGN_MODE_DIRECT` where multiple signers wouldn't need to
-coordinate public keys and signing modes in advance. It would involve an alternate
-`SignDoc` similar to `SignDocAux` above with fee. This could be added in the future
-if client developers found the burden of collecting public keys and modes in advance
-too burdensome.
+これは「SIGN_MODE_DIRECT」の変形であり、複数の署名者は必要ありません
+公開鍵と署名モードを事前に調整します。これには代替手段が含まれます
+`SignDoc`は上記の` SignDocAux`と似ていますが、有料です。これは将来追加することができます
+クライアント開発者が公開鍵とパターンを事前に収集する負担を見つけた場合
+面倒すぎる。
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-- Significant performance gains.
-- Supports backward and forward type compatibility.
-- Better support for cross-language clients.
-- Multiple signing modes allow for greater protocol evolution
+-大幅なパフォーマンスの向上。
+-後方および前方タイプの互換性をサポートします。
+-クロスランゲージクライアントのサポートが向上しました。
+-複数のシグニチャモードにより、より大きなプロトコルの進化が可能になります
 
-### Negative
+### ネガティブ
 
-- `google.protobuf.Any` type URLs increase transaction size although the effect
-  may be negligible or compression may be able to mitigate it.
+-`google.protobuf.Any`タイプのURLはトランザクションサイズを増やします
+   それは無視できるかもしれません、または圧縮はそれを軽減することができます。
 
-### Neutral
+### ニュートラル
 
-## References
+## 参照 

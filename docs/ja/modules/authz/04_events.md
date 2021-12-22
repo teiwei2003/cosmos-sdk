@@ -1,3 +1,3 @@
-# Events
+# 事件
 
-The authz module emits proto events defined in [the Protobuf reference](../../../core/proto-docs.md#cosmos/authz/v1beta1/event.proto).
+authz 模块发出在 [Protobuf 参考](../../../core/proto-docs.md#cosmos/authz/v1beta1/event.proto) 中定义的 proto 事件。

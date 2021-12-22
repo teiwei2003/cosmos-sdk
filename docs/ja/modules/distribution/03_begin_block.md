@@ -1,45 +1,45 @@
-# Begin Block
+# 开始块
 
-At each `BeginBlock`, all fees received in the previous block are transferred to
-the distribution `ModuleAccount` account. When a delegator or validator
-withdraws their rewards, they are taken out of the `ModuleAccount`. During begin
-block, the different claims on the fees collected are updated as follows:
+在每个“BeginBlock”，前一个区块中收到的所有费用都转移到
+分发 `ModuleAccount` 帐户。当委托人或验证人
+撤回他们的奖励，他们被从`ModuleAccount` 中取出。开始时
+块，对收取的费用的不同索赔更新如下:
 
-- The block proposer of the previous height and its delegators receive between 1% and 5% of fee rewards.
-- The reserve community tax is charged.
-- The remainder is distributed proportionally by voting power to all bonded validators
+- 前一个高度的区块提议者及其委托人获得 1% 到 5% 的费用奖励。
+- 收取储备社区税。
+- 剩余部分通过投票权按比例分配给所有绑定验证者
 
-To incentivize validators to wait and include additional pre-commits in the block, the block proposer reward is calculated from Tendermint pre-commit messages.
+为了激励验证者等待并在区块中包含额外的预提交，区块提议者奖励是根据 Tendermint 预提交消息计算的。
 
-## The Distribution Scheme
+## 分配方案
 
-See [params](07_params.md) for description of parameters.
+参数说明见[params](07_params.md)。
 
-Let `fees` be the total fees collected in the previous block, including
-inflationary rewards to the stake. All fees are collected in a specific module
-account during the block. During `BeginBlock`, they are sent to the
-`"distribution"` `ModuleAccount`. No other sending of tokens occurs. Instead, the
-rewards each account is entitled to are stored, and withdrawals can be triggered
-through the messages `FundCommunityPool`, `WithdrawValidatorCommission` and
-`WithdrawDelegatorReward`.
+令 `fees` 为前一个区块收取的总费用，包括
+对股权的通货膨胀奖励。所有费用都在特定模块中收取
+阻止期间的帐户。在“BeginBlock”期间，它们被发送到
+`“分发”` `ModuleAccount`。不会发生其他令牌发送。相反，
+每个账户有权获得的奖励被存储，并且可以触发提款
+通过消息 `FundCommunityPool`、`WithdrawValidatorCommission` 和
+`WithdrawDelegatorReward`。
 
-### Reward to the Community Pool
+### 奖励给社区池
 
-The community pool gets `community_tax * fees`, plus any remaining dust after
-validators get their rewards that are always rounded down to the nearest
-integer value.
+社区池获得`community_tax *费用`，加上之后的任何剩余灰尘
+验证者获得的奖励总是四舍五入到最接近的
+整数值。
 
-### Reward To the Validators
+### 奖励验证者
 
-The proposer receives a base reward of `fees * baseproposerreward` and a bonus
-of `fees * bonusproposerreward * P`, where `P = (total power of validators with
-included precommits / total bonded validator power)`. The more precommits the
-proposer includes, the larger `P` is. `P` can never be larger than `1.00` (since
-only bonded validators can supply valid precommits) and is always larger than
-`2/3`.
+提议者获得‘费用 * baseproposerreward’的基础奖励和奖金
+`fees * bonusproposerreward * P`，其中`P =(验证者的总权力与
+包括预提交/总绑定验证器功率)`。预提交越多
+提议者包括，较大的“P”是。 `P` 永远不能大于 `1.00`(因为
+只有绑定的验证器可以提供有效的预提交)并且总是大于
+`2/3`。
 
-Any remaining fees are distributed among all the bonded validators, including
-the proposer, in proportion to their consensus power.
+任何剩余的费用都分配给所有绑定的验证器，包括
+提议者，与他们的共识权力成比例。
 
 ```
 powFrac = validator power / total bonded validator power
@@ -47,33 +47,33 @@ proposerMul = baseproposerreward + bonusproposerreward * P
 voteMul = 1 - communitytax - proposerMul
 ```
 
-In total, the proposer receives `fees  * (voteMul * powFrac + proposerMul)`.
-All other validators receive `fees * voteMul * powFrac`.
+总的来说，提议者收到`fees * (voteMul * powFrac + ProposerMul)`。
+所有其他验证器都会收到 `fees * voteMul * powFrac`。
 
-### Rewards to Delegators
+### 对委托人的奖励
 
-Each validator's rewards are distributed to its delegators. The validator also
-has a self-delegation that is treated like a regular delegation in
-distribution calculations.
+每个验证者的奖励都分配给其委托人。验证器也
+有一个自我授权，被视为一个普通的授权
+分布计算。
 
-The validator sets a commission rate. The commission rate is flexible, but each
-validator sets a maximum rate and a maximum daily increase. These maximums cannot be exceeded and protect delegators from sudden increases of validator commission rates to prevent validators from taking all of the rewards.
+验证器设置佣金率。佣金率是灵活的，但每个
+验证器设置最大速率和最大每日增量。这些最大值不能被超过，并保护委托人免受验证人佣金率突然增加的影响，以防止验证人获得所有奖励。
 
-The outstanding rewards that the operator is entitled to are stored in
-`ValidatorAccumulatedCommission`, while the rewards the delegators are entitled
-to are stored in `ValidatorCurrentRewards`. The [F1 fee distribution
-scheme](01_concepts.md) is used to calculate the rewards per delegator as they
-withdraw or update their delegation, and is thus not handled in `BeginBlock`.
+运营商有权获得的未兑现奖励存储在
+`ValidatorAccumulatedCommission`，而委托人获得的奖励
+存储在“ValidatorCurrentRewards”中。 [F1费用分配
+scheme](01_concepts.md) 用于计算每个委托人的奖励，因为他们
+撤回或更新他们的委托，因此不在“BeginBlock”中处理。
 
-### Example Distribution
+### 示例分布
 
-For this example distribution, the underlying consensus engine selects block proposers in
-proportion to their power relative to the entire bonded power.
+对于这个示例分布，底层共识引擎在
+与他们的权力相对于整个保税权力的比例。
 
-All validators are equally performant at including pre-commits in their proposed
-blocks. Then hold `(precommits included) / (total bonded validator power)`
-constant so that the amortized block reward for the validator is `( validator power / total bonded power) * (1 - community tax rate)` of
-the total rewards. Consequently, the reward for a single delegator is:
+所有验证者在将预提交包括在他们的提议中的表现是一样的
+块。然后持有`(包括预提交)/(总绑定验证器权力)`
+常数，因此验证者的摊销区块奖励为`(验证者权力/总绑定权力)*(1 - 社区税率)`
+总奖励。因此，单个委托人的奖励是: 
 
 ```
 (delegator proportion of the validator power / validator power) * (validator power / total bonded power)

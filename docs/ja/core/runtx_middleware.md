@@ -1,37 +1,37 @@
-# RunTx recovery middleware
+# RunTx 恢复中间件
 
-`BaseApp.runTx()` function handles Golang panics that might occur during transactions execution, for example, keeper has faced an invalid state and paniced.
-Depending on the panic type different handler is used, for instance the default one prints an error log message.
-Recovery middleware is used to add custom panic recovery for Cosmos SDK application developers.
+`BaseApp.runTx()` 函数处理在事务执行过程中可能发生的 Golang 恐慌，例如，keeper 面临无效状态并出现恐慌。
+根据恐慌类型使用不同的处理程序，例如默认的一个打印错误日志消息。
+恢复中间件用于为 Cosmos SDK 应用程序开发人员添加自定义紧急恢复。
 
-More context could be found in the corresponding [ADR-022](../architecture/adr-022-custom-panic-handling.md).
+更多上下文可以在相应的 [ADR-022](../architecture/adr-022-custom-panic-handling.md) 中找到。
 
-Implementation could be found in the [recovery.go](../../baseapp/recovery.go) file.
+可以在 [recovery.go](../../baseapp/recovery.go) 文件中找到实现。
 
-## Interface
+## 界面 
 
 ```go
 type RecoveryHandler func(recoveryObj interface{}) error
 ```
 
-`recoveryObj` is a return value for `recover()` function from the `buildin` Golang package.
+`recoveryObj` 是 `buildin` Golang 包中 `recover()` 函数的返回值。
 
-**Contract:**
+**合同:**
 
-- RecoveryHandler returns `nil` if `recoveryObj` wasn't handled and should be passed to the next recovery middleware;
-- RecoveryHandler returns a non-nil `error` if `recoveryObj` was handled;
+- 如果 `recoveryObj` 没有被处理并且应该传递给下一个恢复中间件，RecoveryHandler 返回 `nil`；
+- 如果处理了 `recoveryObj`，RecoveryHandler 返回一个非零的 `error`；
 
-## Custom RecoveryHandler register
+##自定义RecoveryHandler注册
 
 `BaseApp.AddRunTxRecoveryHandler(handlers ...RecoveryHandler)`
 
-BaseApp method adds recovery middleware to the default recovery chain.
+BaseApp 方法将恢复中间件添加到默认恢复链中。
 
-## Example
+## 例子
 
-Lets assume we want to emit the "Consensus failure" chain state if some particular error occurred.
+假设我们想要在发生某些特定错误时发出“共识失败”链状态。
 
-We have a module keeper that panics:
+我们有一个恐慌的模块管理员: 
 
 ```go
 func (k FooKeeper) Do(obj interface{}) {
@@ -43,7 +43,7 @@ func (k FooKeeper) Do(obj interface{}) {
 }
 ```
 
-By default that panic would be recovered and an error message will be printed to log. To override that behaviour we should register a custom RecoveryHandler:
+默认情况下，恐慌会被恢复，错误信息将被打印到日志中。 要覆盖该行为，我们应该注册一个自定义 RecoveryHandler: 
 
 ```go
 // Cosmos SDK application constructor
@@ -64,6 +64,6 @@ baseApp := baseapp.NewBaseApp(...)
 baseApp.AddRunTxRecoveryHandler(customHandler)
 ```
 
-## Next {hide}
+## 下一个 {hide}
 
-Learn about the [IBC](./../ibc/README.md) protocol {hide}
+了解 [IBC](./../ibc/README.md) 协议 {hide} 

@@ -1,50 +1,50 @@
-# ADR 024: Coin Metadata
+# ADR 024:コインメタデータ
 
-## Changelog
+## 変更ログ
 
-- 05/19/2020: Initial draft
+2020年5月19日:最初のドラフト
 
-## Status
+## 状態
 
-Proposed
+提案
 
-## Context
+## 環境
 
-Assets in the Cosmos SDK are represented via a `Coins` type that consists of an `amount` and a `denom`,
-where the `amount` can be any arbitrarily large or small value. In addition, the Cosmos SDK uses an
-account-based model where there are two types of primary accounts -- basic accounts and module accounts.
-All account types have a set of balances that are composed of `Coins`. The `x/bank` module keeps
-track of all balances for all accounts and also keeps track of the total supply of balances in an
-application.
+Cosmos SDKのアセットは、「amount」と「denom」で構成される「Coins」タイプで表されます。
+「金額」は、任意の大きい値または小さい値にすることができます。さらに、CosmosSDKは
+アカウントベースのモデルには、基本アカウントとモジュールアカウントの2種類のメインアカウントがあります。
+すべてのアカウントタイプには、「コイン」で構成される一連の残高があります。 `x .bank`モジュールの保持
+すべてのアカウントのすべての残高を追跡し、1つのアカウントの残高の合計供給を追跡します
+応用。
 
-With regards to a balance `amount`, the Cosmos SDK assumes a static and fixed unit of denomination,
-regardless of the denomination itself. In other words, clients and apps built atop a Cosmos-SDK-based
-chain may choose to define and use arbitrary units of denomination to provide a richer UX, however, by
-the time a tx or operation reaches the Cosmos SDK state machine, the `amount` is treated as a single
-unit. For example, for the Cosmos Hub (Gaia), clients assume 1 ATOM = 10^6 uatom, and so all txs and
-operations in the Cosmos SDK work off of units of 10^6.
+残高の「金額」に関して、Cosmos SDKは、静的および固定の額面単位を想定しています。
+金種自体に関係なく。つまり、クライアントとアプリケーションはCosmos-SDKベースで構築されています
+チェーンは、より豊かなユーザーエクスペリエンスを提供するために、任意の金種単位を定義して使用することを選択できますが、
+txまたは操作がCosmosSDKステートマシンに到達すると、 `amount`は単一として扱われます
+ユニット。たとえば、Cosmos Hub(Gaia)の場合、クライアントは1 ATOM = 10 ^ 6 uatomと想定しているため、すべてのtxと
+Cosmos SDKの操作は、10 ^ 6の単位で機能します。
 
-This clearly provides a poor and limited UX especially as interoperability of networks increases and
-as a result the total amount of asset types increases. We propose to have `x/bank` additionally keep
-track of metadata per `denom` in order to help clients, wallet providers, and explorers improve their
-UX and remove the requirement for making any assumptions on the unit of denomination.
+これは明らかに、特にネットワークの相互運用性が向上し、
+その結果、資産タイプの総数が増加しました。 `x .bank`を保持することをお勧めします
+各「デノム」のメタデータを追跡して、顧客、ウォレットプロバイダー、およびエクスプローラーが
+UXを実行し、金種単位に関する仮定を行うための要件を削除します。
 
-## Decision
+## 決定
 
-The `x/bank` module will be updated to store and index metadata by `denom`, specifically the "base" or
-smallest unit -- the unit the Cosmos SDK state-machine works with.
+`x .bank`モジュールは、` denom`、特に "base"または
+最小単位-CosmosSDKステートマシンで使用される単位。
 
-Metadata may also include a non-zero length list of denominations. Each entry contains the name of
-the denomination `denom`, the exponent to the base and a list of aliases. An entry is to be
-interpreted as `1 denom = 10^exponent base_denom` (e.g. `1 ETH = 10^18 wei` and `1 uatom = 10^0 uatom`).
+メタデータには、ゼロ以外の長さの宗派リストを含めることもできます。各エントリに含まれる名前
+宗派 `denom`、ベースインデックスおよびエイリアスのリスト。エントリは
+「1denom = 10 ^ exponent base_denom」として解釈されます(たとえば、「1 ETH = 10 ^ 18wei」および「1uatom = 10 ^ 0uatom」)。
 
-There are two denominations that are of high importance for clients: the `base`, which is the smallest
-possible unit and the `display`, which is the unit that is commonly referred to in human communication
-and on exchanges. The values in those fields link to an entry in the list of denominations.
+顧客にとって非常に重要な2つの宗派があります:最小の「ベース」
+人間のコミュニケーションで通常言及される単位である可能な単位と「ディスプレイ」
+そして通信します。これらのフィールドの値は、金種リストのエントリにリンクされています。
 
-The list in `denom_units` and the `display` entry may be changed via governance.
+`denom_units`および` display`エントリのリストは、管理によって変更できます。
 
-As a result, we can define the type as follows:
+したがって、タイプは次のように定義できます。 
 
 ```protobuf
 message DenomUnit {
@@ -61,7 +61,7 @@ message Metadata {
 }
 ```
 
-As an example, the ATOM's metadata can be defined as follows:
+たとえば、ATOMのメタデータは次のように定義できます。 
 
 ```json
 {
@@ -91,20 +91,20 @@ As an example, the ATOM's metadata can be defined as follows:
 }
 ```
 
-Given the above metadata, a client may infer the following things:
+上記のメタデータが与えられると、クライアントは次のことを推測できます。
 
-- 4.3atom = 4.3 * (10^6) = 4,300,000uatom
-- The string "atom" can be used as a display name in a list of tokens.
-- The balance 4300000 can be displayed as 4,300,000uatom or 4,300matom or 4.3atom.
-  The `display` denomination 4.3atom is a good default if the authors of the client don't make
-  an explicit decision to choose a different representation.
+-4.3atom = 4.3 *(10 ^ 6)= 4,300,000uatom
+-タグリストの表示名は文字列「atom」が使用できます。
+-バランス4300000は、4,300,000uatomまたは4,300matomまたは4.3atomとして表示できます。
+    クライアントの作成者が作成しなかった場合は、4.3atomの `display`単位が適切なデフォルト値です。
+    別の表現を選択するという明確な決定。
 
-A client should be able to query for metadata by denom both via the CLI and REST interfaces. In
-addition, we will add handlers to these interfaces to convert from any unit to another given unit,
-as the base framework for this already exists in the Cosmos SDK.
+クライアントは、CLIおよびRESTインターフェースを介して名前でメタデータを照会できる必要があります。 存在
+さらに、これらのインターフェイスにハンドラーを追加して、任意のユニットを別の特定のユニットに変換します。
+この基本的なフレームワークはすでにCosmosSDKに存在しているためです。
 
-Finally, we need to ensure metadata exists in the `GenesisState` of the `x/bank` module which is also
-indexed by the base `denom`.
+最後に、メタデータが `x .bank`モジュールの` GenesisState`に存在することを確認する必要があります。これも
+ベース `denom`によってインデックス付けされます。  
 
 ```go
 type GenesisState struct {
@@ -115,25 +115,24 @@ type GenesisState struct {
 }
 ```
 
-## Future Work
+## 将来の仕事
 
-In order for clients to avoid having to convert assets to the base denomination -- either manually or
-via an endpoint, we may consider supporting automatic conversion of a given unit input.
+顧客が資産を基本的な金種に変換する必要を回避できるようにするために-手動または
+エンドポイントを通じて、特定の単位入力の自動変換をサポートすることを検討できます。
+## 結果
 
-## Consequences
+### ポジティブ
 
-### Positive
+-顧客、ウォレットプロバイダー、ブロックエクスプローラーに追加データを提供する
+    ユーザーエクスペリエンスを改善し、仮定の必要性を排除するための資産の種類
+    宗派単位。
 
-- Provides clients, wallet providers and block explorers with additional data on
-  asset denomination to improve UX and remove any need to make assumptions on
-  denomination units.
+### ネガティブ
 
-### Negative
+-`x .bank`モジュールに必要な少量の追加ストレージスペース。 量
+    総資産の量はすべきではないため、追加のストレージの量は最小限にする必要があります
+    大きい。
 
-- A small amount of required additional storage in the `x/bank` module. The amount
-  of additional storage should be minimal as the amount of total assets should not
-  be large.
+### ニュートラル
 
-### Neutral
-
-## References
+## 参照 

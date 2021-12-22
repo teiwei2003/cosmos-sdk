@@ -1,102 +1,102 @@
-# `Msg` Services
+# `Msg`サービス
 
-A Protobuf `Msg` service processes [messages](./messages-and-queries.md#messages). Protobuf `Msg` services are specific to the module in which they are defined, and only process messages defined within the said module. They are called from `BaseApp` during [`DeliverTx`](../core/baseapp.md#delivertx). {synopsis}
+Protobuf `Msg`サービス処理[メッセージ](./messages-and-queries.md#messages)。 Protobuf `Msg`サービスは、それらが定義されているモジュールに固有であり、モジュールで定義されているメッセージのみを処理します。これらは、[`DeliverTx`](../core/baseapp.md#delivertx)中に` BaseApp`から呼び出されます。 {まとめ}
 
-## Pre-requisite Readings
+## 読むための前提条件
 
-- [Module Manager](./module-manager.md) {prereq}
-- [Messages and Queries](./messages-and-queries.md) {prereq}
+-[モジュールマネージャー](。/module-manager.md){前提条件}
+-[メッセージとクエリ](./messages-and-queries.md){prereq}
 
-## Implementation of a module `Msg` service
+## モジュール `Msg`サービスの実装
 
-Each module should define a Protobuf `Msg` service, which will be responsible for processing requests (implementing `sdk.Msg`) and returning responses.
+各モジュールは、Protobuf `Msg`サービスを定義する必要があります。このサービスは、要求の処理(` sdk.Msg`の実装)と応答の返送を担当します。
 
-As further described in [ADR 031](../architecture/adr-031-msg-service.md), this approach has the advantage of clearly specifying return types and generating server and client code.
+[ADR 031](../architecture/adr-031-msg-service.md)でさらに説明されているように、このメソッドの利点は、リターンタイプが明確に指定され、サーバーコードとクライアントコードが生成されることです。
 
-Protobuf generates a `MsgServer` interface based on a definition of `Msg` service. It is the role of the module developer to implement this interface, by implementing the state transition logic that should happen upon receival of each `sdk.Msg`. As an example, here is the generated `MsgServer` interface for `x/bank`, which exposes two `sdk.Msg`s:
+Protobufは、 `Msg`サービスの定義に従って` MsgServer`インターフェースを生成します。モジュール開発者の責任は、各 `sdk.Msg`が受信されたときに発生するはずの状態遷移ロジックを実装することによってこのインターフェイスを実装することです。たとえば、次は `x/bank`用に生成された` MsgServer`インターフェースで、2つの `sdk.Msg`を公開します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/x/bank/types/tx.pb.go#L285-L291
 
-When possible, the existing module's [`Keeper`](keeper.md) should implement `MsgServer`, otherwise a `msgServer` struct that embeds the `Keeper` can be created, typically in `./keeper/msg_server.go`:
+可能であれば、既存のモジュールの[`Keeper`](keeper.md)は` MsgServer`を実装する必要があります。そうでない場合は、通常は `。/keeper/msg_server.go`に` Keeper`が埋め込まれた `msgServer`構造を作成できます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc1/x/bank/keeper/msg_server.go#L14-L16
 
-`msgServer` methods can retrieve the `sdk.Context` from the `context.Context` parameter method using the `sdk.UnwrapSDKContext`:
+`msgServer`メソッドは` sdk.UnwrapSDKContext`を使用して、 `context.Context`パラメータメソッドから` sdk.Context`を取得できます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc1/x/bank/keeper/msg_server.go#L27-L28
 
-`sdk.Msg` processing usually follows these 2 steps:
+`sdk.Msg`の処理は通常、次の2つの手順に従います。
 
-- First, they perform *stateful* checks to make sure the `message` is valid. At this stage, the `message`'s `ValidateBasic()` method has already been called, meaning *stateless* checks on the message (like making sure parameters are correctly formatted) have already been performed. Checks performed in the `msgServer` method can be more expensive and require access to the state. For example, a `msgServer` method for a `transfer` message might check that the sending account has enough funds to actually perform the transfer. To access the state, the `msgServer` method needs to call the [`keeper`'s](./keeper.md) getter functions.
-- Then, if the checks are successful, the `msgServer` method calls the [`keeper`'s](./keeper.md) setter functions to actually perform the state transition.
+-最初に、「ステートフル」チェックを実行して、「メッセージ」が有効であることを確認します。この段階で、 `message`の` ValidateBasic() `メソッドが呼び出されました。これは、メッセージの*ステートレス*チェックが実行されたことを意味します(たとえば、パラメーター形式が正しいことを確認するため)。 `msgServer`メソッドで実行されるチェックは、よりコストがかかり、状態へのアクセスが必要になる可能性があります。たとえば、「転送」メッセージの「msgServer」メソッドは、送信アカウントに実際に転送を実行するのに十分な資金があるかどうかを確認する場合があります。状態にアクセスするには、 `msgServer`メソッドが[` keeper`'s](./keeper.md)のgetter関数を呼び出す必要があります。
+-次に、チェックが成功すると、 `msgServer`メソッドは[` keeper`s](./keeper.md)setter関数を呼び出して、実際に状態遷移を実行します。
 
-Before returning, `msgServer` methods generally emit one or more [events](../core/events.md) via the `EventManager` held in the `ctx`:
+戻る前に、 `msgServer`メソッドは通常、` ctx`に保存されている `EventManager`を介して1つ以上の[events](../core/events.md)を送信します。
 
 ```go
-ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			eventType,  // e.g. sdk.EventTypeMessage for a message, types.CustomEventType for a custom event defined in the module
-			sdk.NewAttribute(attributeKey, attributeValue),
-		),
-    )
+ctx.EventManager()。EmitEvent(
+sdk.NewEvent(
+eventType、//例:メッセージの場合はsdk.EventTypeMessage、モジュールで定義されたカスタムイベントの場合はtypes.CustomEventType
+sdk.NewAttribute(attributeKey、attributeValue)、
+)、
+    )。
 ```
 
-These events are relayed back to the underlying consensus engine and can be used by service providers to implement services around the application. Click [here](../core/events.md) to learn more about events.
+これらのイベントは基盤となるコンセンサスエンジンに転送され、サービスプロバイダーはこれらのイベントを使用してアプリケーションの周囲にサービスを実装できます。イベントの詳細については、[こちら](../core/events.md)をクリックしてください。
 
-The invoked `msgServer` method returns a `proto.Message` response and an `error`. These return values are then wrapped into an `*sdk.Result` or an `error` using `sdk.WrapServiceResult(ctx sdk.Context, res proto.Message, err error)`:
+呼び出された `msgServer`メソッドは、` proto.Message`応答と `error`を返します。次に、 `sdk.WrapServiceResult(ctx sdk.Context、res proto.Message、err error)`を使用して、これらの戻り値を `* sdk.Result`または` error`にラップします。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc2/baseapp/msg_service_router.go#L104-L104
 
-This method takes care of marshaling the `res` parameter to protobuf and attaching any events on the `ctx.EventManager()` to the `sdk.Result`.
+このメソッドは、 `res`パラメーターをprotobufにマーシャリングし、` ctx.EventManager() `のイベントを` sdk.Result`にアタッチする役割を果たします。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/d55c1a26657a0af937fa2273b38dcfa1bb3cff9f/proto/cosmos/base/abci/v1beta1/abci.proto#L81-L95
 
-This diagram shows a typical structure of a Protobuf `Msg` service, and how the message propagates through the module.
+この図は、Protobuf `Msg`サービスの一般的な構造と、メッセージがモジュールを介してどのように伝播されるかを示しています。
 
-![Transaction flow](../uml/svg/transaction_flow.svg)
+！[トランザクションフロー](../uml/svg/transaction_flow.svg)
 
-## Amino `LegacyMsg`s
+## Amino`LegacyMsg`s
 
-### `handler` type
+### `ハンドラー`タイプ
 
-The `handler` type defined in the Cosmos SDK will be deprecated in favor of [`Msg` Services](#implementation-of-a-module-msg-service).
+CosmosSDKで定義されている `handler`タイプは非推奨になり、[` Msg` service](#implementation-of-a-module-msg-service)に置き換えられます。
 
-Here is the typical structure of a `handler` function:
+以下は、 `handler`関数の典型的な構造です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc2/types/handler.go#L4-L4
 
-Let us break it down:
+それを分解しましょう:
 
-- The [`LegacyMsg`](./messages-and-queries.md#messages) is the actual object being processed.
-- The [`Context`](../core/context.md) contains all the necessary information needed to process the `msg`, as well as a branch of the latest state. If the `msg` is successfully processed, the branched version of the state contained in the `ctx` will be written to the main state (branch).
-- The `*Result` returned to `BaseApp` contains (among other things) information on the execution of the `handler` and [events](../core/events.md).
+-[`LegacyMsg`](./messages-and-queries.md#messages)は、処理されている実際のオブジェクトです。
+-[`Context`](../core/context.md)には、` msg`の処理に必要なすべての情報と、ブランチの最新の状態が含まれています。 `msg`プロセスが成功すると、` ctx`に含まれる状態のブランチバージョンがメイン状態(ブランチ)に書き込まれます。
+-「BaseApp」に返される「* Result」には、(とりわけ)「handler」と[events](../core/events.md)の実行に関する情報が含まれています。
 
-Module `handler`s are typically implemented in a `./handler.go` file inside the module's folder. The [module manager](./module-manager.md) is used to add the module's `handler`s to the
-[application's `router`](../core/baseapp.md#message-routing) via the `Route()` method. Typically,
-the manager's `Route()` method simply constructs a Route that calls a `NewHandler()` method defined in `handler.go`.
+モジュール「handler」は通常、モジュールフォルダの「./handler.go」ファイルに実装されています。[モジュールマネージャー](./module-manager.md)は、モジュールの `ハンドラー`をに追加するために使用されます
+[アプリの `router`](../core/baseapp.md#message-routing)` Route() `メソッドを使用します。いつもの、
+マネージャの `Route()`メソッドは、 `handler.go`で定義された` NewHandler() `メソッドを呼び出すルートを作成するだけです。
 
-+++ https://github.com/cosmos/cosmos-sdk/blob/228728cce2af8d494c8b4e996d011492139b04ab/x/gov/module.go#L143-L146
++++ https://github.com/cosmos/cosmos-sdk/blob/228728cce2af8d494c8b4e996d011492139b04ab/x/gov/module.go#L143-L146 
 
-### Implementation
+### 埋め込む
 
-`NewHandler` function dispatches a `LegacyMsg` to appropriate handler function, usually by using a switch statement:
+`NewHandler`関数は、通常はswitchステートメントを使用して、` LegacyMsg`を適切な処理関数に割り当てます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/d55c1a26657a0af937fa2273b38dcfa1bb3cff9f/x/bank/handler.go#L13-L29
 
-First, `NewHandler` function sets a new `EventManager` to the context to isolate events per `msg`.
-Then, a simple switch calls the appropriate `handler` based on the `LegacyMsg` type.
+まず、 `NewHandler`関数は、コンテキストに新しい` EventManager`を設定して、各 `msg`イベントを分離します。
+次に、単純なスイッチが、 `LegacyMsg`タイプに基づいて適切な` handler`を呼び出します。
 
-In this regard, `handler`s functions need to be implemented for each module `LegacyMsg`. This will also involve manual handler registration of `LegacyMsg` types.
-`handler`s functions should return a `*Result` and an `error`.
+この点で、各モジュール `LegacyMsg`は` handler`の機能を実装する必要があります。 これには、LegacyMsgタイプの手動ハンドラー登録も含まれます。
+`handler`の関数は、` * Result`と `error`を返す必要があります。
 
-## Telemetry
+## テレメトリ
 
-New [telemetry metrics](../core/telemetry.md) can be created from `msgServer` methods when handling messages.
+メッセージを処理するときに、 `msgServer`メソッドから新しい[テレメトリインジケーター](../core/telemetry.md)を作成できます。
 
-This is an example from the `x/auth/vesting` module:
+これは、 `x/auth/vesting`モジュールの例です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc1/x/auth/vesting/msg_server.go#L73-L85
 
-## Next {hide}
+## 次へ{hide}
 
-Learn about [query services](./query-services.md) {hide}
+[クエリサービス](./query-services.md){hide}を理解する 

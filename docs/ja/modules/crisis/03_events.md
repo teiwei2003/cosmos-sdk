@@ -1,6 +1,6 @@
-# Events
+# 事件
 
-The crisis module emits the following events:
+危机模块发出以下事件: 
 
 ## Handlers
 

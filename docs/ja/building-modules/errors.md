@@ -1,46 +1,46 @@
-# Errors
+# エラー
 
-This document outlines the recommended usage and APIs for error handling in Cosmos SDK modules. {synopsis}
+このドキュメントでは、CosmosSDKモジュールでのエラー処理に推奨される使用法とAPIの概要を説明します。 {まとめ}
 
-Modules are encouraged to define and register their own errors to provide better
-context on failed message or handler execution. Typically, these errors should be
-common or general errors which can be further wrapped to provide additional specific
-execution context.
+モジュールが独自のエラーを定義および登録して、より良いものを提供するように促します
+失敗メッセージまたはハンドラー実行のコンテキスト。一般的に、これらのエラーは
+さらにパッケージ化して、特定のエラーの一般的なエラーまたは一般的なエラーを追加することができます
+実行コンテキスト。
 
-## Registration
+## 登録
 
-Modules should define and register their custom errors in `x/{module}/errors.go`. Registration
-of errors is handled via the `types/errors` package.
+モジュールは、カスタムエラーを定義して `x/{module}/errors.go`に登録する必要があります。登録
+エラーは `types/errors`パッケージで処理されます。
 
-Example:
+例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.43.0/x/distribution/types/errors.go#L1-L21
 
-Each custom module error must provide the codespace, which is typically the module name
-(e.g. "distribution") and is unique per module, and a uint32 code. Together, the codespace and code
-provide a globally unique Cosmos SDK error. Typically, the code is monotonically increasing but does not
-necessarily have to be. The only restrictions on error codes are the following:
+すべてのカスタムモジュールエラーは、コードスペース、通常はモジュール名を提供する必要があります
+(「配布」など)および各モジュールは一意であり、uint32コードです。一緒に、コードスペースとコード
+世界で唯一のCosmosSDKエラーを提供します。通常、コードは単調に増加しますが、そうではありません
+でなければなりません。エラーコードの唯一の制限は次のとおりです。
 
-* Must be greater than one, as a code value of one is reserved for internal errors.
-* Must be unique within the module.
+*コード値1は内部エラー用に予約されているため、1より大きくする必要があります。
+*モジュール内で一意である必要があります。
 
-Note, the Cosmos SDK provides a core set of *common* errors. These errors are defined in `types/errors/errors.go`.
+Cosmos SDKは、*一般的な*エラーのコアセットを提供することに注意してください。これらのエラーは `types/errors/errors.go`で定義されています。
 
-## Wrapping
+## パッケージ
 
-The custom module errors can be returned as their concrete type as they already fulfill the `error`
-interface. However, module errors can be wrapped to provide further context and meaning to failed
-execution.
+カスタムモジュールエラーは、 `エラー`を満たしているため、具体的なタイプとして返​​すことができます。
+インターフェース。ただし、モジュールエラーをラップして、失敗するコンテキストと意味をさらに提供することができます
+埋め込む。
 
-Example:
+例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/b2d48a9e815fe534a7faeec6ca2adb0874252b81/x/bank/keeper/keeper.go#L85-L122
 
-Regardless if an error is wrapped or not, the Cosmos SDK's `errors` package provides an API to determine if
-an error is of a particular kind via `Is`.
+エラーがラップされているかどうかに関係なく、CosmosSDKの `errors`パッケージは、エラーがラップされているかどうかを判断するためのAPIを提供します。
+エラーは、 `Is`によって生成される特殊なタイプです。
 
 ## ABCI
 
-If a module error is registered, the Cosmos SDK `errors` package allows ABCI information to be extracted
-through the `ABCIInfo` API. The package also provides `ResponseCheckTx` and `ResponseDeliverTx` as
-auxiliary APIs to automatically get `CheckTx` and `DeliverTx` responses from an error.
+モジュールエラーが登録されている場合、CosmosSDKの `errors`パッケージでABCI情報を抽出できます
+`ABCIInfo`APIを介して。このパッケージは、 `ResponseCheckTx`と` ResponseDeliverTx`も提供します。
+補助APIは、エラーから `CheckTx`および` DeliverTx`応答を自動的に取得できます。 

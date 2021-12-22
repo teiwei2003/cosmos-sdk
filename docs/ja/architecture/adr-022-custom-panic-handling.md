@@ -1,62 +1,61 @@
-# ADR 022: Custom BaseApp panic handling
+#ADR 022:カスタムBaseAppパニック処理
 
-## Changelog
+##変更ログ
 
-- 2020 Apr 24: Initial Draft
-- 2021 Sep 14: Superseded by ADR-045
+-2020年4月24日:最初のドラフト
+-2021年9月14日:ADR-045に置き換えられました
 
-## Status
+## 状態
 
-SUPERSEDED by ADR-045
+ADR-045に置き換えられました
 
-## Context
+## 環境
 
-The current implementation of BaseApp does not allow developers to write custom error handlers during panic recovery
+BaseAppの現在の実装では、開発者はパニックリカバリ中にカスタムエラーハンドラーを作成できません。
 [runTx()](https://github.com/cosmos/cosmos-sdk/blob/bad4ca75f58b182f600396ca350ad844c18fc80b/baseapp/baseapp.go#L539)
-method. We think that this method can be more flexible and can give Cosmos SDK users more options for customizations without
-the need to rewrite whole BaseApp. Also there's one special case for `sdk.ErrorOutOfGas` error handling, that case
-might be handled in a "standard" way (middleware) alongside the others.
+方法。この方法はより柔軟で、CosmosSDKユーザーにカスタマイズオプションを提供できると考えています。
+BaseApp全体を書き直す必要があります。 `sdk.ErrorOutOfGas`エラー処理の特殊なケースがあります。これはケースです。
+他の方法と一緒に「標準」の方法(ミドルウェア)で処理される場合があります。
 
-We propose middleware-solution, which could help developers implement the following cases:
+開発者が次のケースを実装するのに役立つミドルウェアソリューションを提案しました。
 
-* add external logging (let's say sending reports to external services like [Sentry](https://sentry.io));
-* call panic for specific error cases;
+*外部ログレコードを追加します(レポートが[Sentry](https://sentry.io)などの外部サービスに送信されると想定)。
+*特定のエラー状態に対してパニックを引き起こします。
 
-It will also make `OutOfGas` case and `default` case one of the middlewares.
-`Default` case wraps recovery object to an error and logs it ([example middleware implementation](#Recovery-middleware)).
+また、 `OutOfGas`ケースと` default`ケースをミドルウェアの1つにします。
+`Default`の場合は、リカバリオブジェクトをエラーとしてラップし、それを記録します([Sample Middleware Implementation](#Recovery-middleware))。
 
-Our project has a sidecar service running alongside the blockchain node (smart contracts virtual machine). It is
-essential that node <-> sidecar connectivity stays stable for TXs processing. So when the communication breaks we need
-to crash the node and reboot it once the problem is solved. That behaviour makes node's state machine execution
-deterministic. As all keeper panics are caught by runTx's `defer()` handler, we have to adjust the BaseApp code
-in order to customize it.
+私たちのプロジェクトには、ブロックチェーンノード(スマートコントラクト仮想マシン)で実行されるサイドカーサービスがあります。それは
+ノード<->サイドカー接続は、TX処理の安定性に不可欠です。したがって、通信が中断された場合、
+ノードをクラッシュさせ、問題が解決した後で再起動します。この動作により、ノードのステートマシンが実行されます
+決定論的。 runTxの `defer()`ハンドラーがすべてのキーパーパニックをキャッチしたため、BaseAppコードを調整する必要があります
+それをカスタマイズするために。
+## 決断
 
-## Decision
+### 設計
 
-### Design
+#### 概要
 
-#### Overview
+カスタムエラー処理をBaseAppにハードコーディングする代わりに、カスタマイズ可能なミドルウェアのセットを使用することをお勧めします
+外部であり、開発者は必要な数のカスタムエラーハンドラーを使用できます。テストによって達成
+ここ(https://github.com/cosmos/cosmos-sdk/pull/6053)にあります。
 
-Instead of hardcoding custom error handling into BaseApp we suggest using set of middlewares which can be customized
-externally and will allow developers use as many custom error handlers as they want. Implementation with tests
-can be found [here](https://github.com/cosmos/cosmos-sdk/pull/6053).
+####実装の詳細
 
-#### Implementation details
+#####リカバリハンドラ
 
-##### Recovery handler
-
-New `RecoveryHandler` type added. `recoveryObj` input argument is an object returned by the standard Go function
-`recover()` from the `builtin` package.
+新しい「RecoveryHandler」タイプが追加されました。 `recoveryObj`入力パラメータは、標準のGo関数によって返されるオブジェクトです。
+`builtin`パッケージから` recover() `。 
 
 ```go
 type RecoveryHandler func(recoveryObj interface{}) error
 ```
 
-Handler should type assert (or other methods) an object to define if object should be handled.
-`nil` should be returned if input object can't be handled by that `RecoveryHandler` (not a handler's target type).
-Not `nil` error should be returned if input object was handled and middleware chain execution should be stopped.
+ハンドラーは、オブジェクトにアサーション(または他のメソッド)を入力して、オブジェクトを処理する必要があるかどうかを定義する必要があります。
+入力オブジェクトがその `RecoveryHandler`(ハンドラーのターゲットタイプではない)で処理できない場合は、` nil`を返す必要があります。
+入力オブジェクトが処理され、ミドルウェアチェーンの実行を停止する必要がある場合、「nil」エラーは返されません。
 
-An example:
+一例: 
 
 ```go
 func exampleErrHandler(recoveryObj interface{}) error {
@@ -71,14 +70,13 @@ func exampleErrHandler(recoveryObj interface{}) error {
 }
 ```
 
-This example breaks the application execution, but it also might enrich the error's context like the `OutOfGas` handler.
+この例では、アプリケーションの実行が中断されますが、 `OutOfGas`ハンドラーなどのエラーコンテキストが強化される場合もあります。
 
-##### Recovery middleware
+##### リカバリミドルウェア
 
-We also add a middleware type (decorator). That function type wraps `RecoveryHandler` and returns the next middleware in
-execution chain and handler's `error`. Type is used to separate actual `recovery()` object handling from middleware
-chain processing.
-
+ミドルウェアタイプ(デコレータ)も追加しました。 この関数型は `RecoveryHandler`をラップし、次のミドルウェアを返します
+実行チェーンとハンドラーの「エラー」。 タイプは、 `recovery()`オブジェクトの実際の処理をミドルウェアから分離するために使用されます
+チェーン処理。 
 ```go
 type recoveryMiddleware func(recoveryObj interface{}) (recoveryMiddleware, error)
 
@@ -92,14 +90,13 @@ func newRecoveryMiddleware(handler RecoveryHandler, next recoveryMiddleware) rec
 }
 ```
 
-Function receives a `recoveryObj` object and returns:
+この例では、アプリケーションの実行が中断されますが、 `OutOfGas`ハンドラーなどのエラーコンテキストが強化される場合もあります。
 
-* (next `recoveryMiddleware`, `nil`) if object wasn't handled (not a target type) by `RecoveryHandler`;
-* (`nil`, not nil `error`) if input object was handled and other middlewares in the chain should not be executed;
-* (`nil`, `nil`) in case of invalid behavior. Panic recovery might not have been properly handled;
-this can be avoided by always using a `default` as a rightmost middleware in the chain (always returns an `error`');
+##### リカバリミドルウェア
 
-`OutOfGas` middleware example:
+ミドルウェアタイプ(デコレータ)も追加しました。 この関数型は `RecoveryHandler`をラップし、次のミドルウェアを返します
+実行チェーンとハンドラーの「エラー」。 タイプは、 `recovery()`オブジェクトの実際の処理をミドルウェアから分離するために使用されます
+チェーン処理。 
 
 ```go
 func newOutOfGasRecoveryMiddleware(gasWanted uint64, ctx sdk.Context, next recoveryMiddleware) recoveryMiddleware {
@@ -118,7 +115,7 @@ func newOutOfGasRecoveryMiddleware(gasWanted uint64, ctx sdk.Context, next recov
 }
 ```
 
-`Default` middleware example:
+`default`ミドルウェアの例: 
 
 ```go
 func newDefaultRecoveryMiddleware() recoveryMiddleware {
@@ -132,9 +129,9 @@ func newDefaultRecoveryMiddleware() recoveryMiddleware {
 }
 ```
 
-##### Recovery processing
+##### 回復処理
 
-Basic chain of middlewares processing would look like:
+ミドルウェア処理の基本的なチェーンは次のとおりです。 
 
 ```go
 func processRecovery(recoveryObj interface{}, middleware recoveryMiddleware) error {
@@ -148,26 +145,26 @@ func processRecovery(recoveryObj interface{}, middleware recoveryMiddleware) err
 }
 ```
 
-That way we can create a middleware chain which is executed from left to right, the rightmost middleware is a
-`default` handler which must return an `error`.
+このようにして、左から右に実行されるミドルウェアチェーンを作成できます。右端のミドルウェアは
+`default`ハンドラーは` error`を返す必要があります。
 
-##### BaseApp changes
+##### BaseAppの変更
 
-The `default` middleware chain must exist in a `BaseApp` object. `Baseapp` modifications:
+`default`ミドルウェアチェーンは` BaseApp`オブジェクトに存在する必要があります。 `Baseapp`の変更: 
 
 ```go
 type BaseApp struct {
-    // ...
+   .....
     runTxRecoveryMiddleware recoveryMiddleware
 }
 
 func NewBaseApp(...) {
-    // ...
+   .....
     app.runTxRecoveryMiddleware = newDefaultRecoveryMiddleware()
 }
 
 func (app *BaseApp) runTx(...) {
-    // ...
+   .....
     defer func() {
         if r := recover(); r != nil {
             recoveryMW := newOutOfGasRecoveryMiddleware(gasWanted, ctx, app.runTxRecoveryMiddleware)
@@ -176,11 +173,11 @@ func (app *BaseApp) runTx(...) {
 
         gInfo = sdk.GasInfo{GasWanted: gasWanted, GasUsed: ctx.GasMeter().GasConsumed()}
     }()
-    // ...
+   .....
 }
 ```
 
-Developers can add their custom `RecoveryHandler`s by providing `AddRunTxRecoveryHandler` as a BaseApp option parameter to the `NewBaseapp` constructor:
+開発者は、BaseAppオプションパラメーターとして `AddRunTxRecoveryHandler`を` NewBaseapp`コンストラクターに提供することにより、カスタムの `RecoveryHandler`を追加できます。 
 
 ```go
 func (app *BaseApp) AddRunTxRecoveryHandler(handlers ...RecoveryHandler) {
@@ -190,29 +187,29 @@ func (app *BaseApp) AddRunTxRecoveryHandler(handlers ...RecoveryHandler) {
 }
 ```
 
-This method would prepend handlers to an existing chain.
+このメソッドは、ハンドラーを既存のチェーンに追加します。 
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-- Developers of Cosmos SDK based projects can add custom panic handlers to:
-    * add error context for custom panic sources (panic inside of custom keepers);
-    * emit `panic()`: passthrough recovery object to the Tendermint core;
-    * other necessary handling;
-- Developers can use standard Cosmos SDK `BaseApp` implementation, rather that rewriting it in their projects;
-- Proposed solution doesn't break the current "standard" `runTx()` flow;
+-Cosmos SDKベースのプロジェクトの開発者は、カスタムパニックハンドラーを次の場所に追加できます。
+      *カスタムパニックソース(カスタムキーパー内のパニック)にエラーコンテキストを追加します。
+      * `panic()`を発行します:リカバリオブジェクトをTendermintコアに渡します。
+      *その他の必要な処理。
+-開発者は、プロジェクトで書き直す代わりに、標準のCosmos SDK`BaseApp`実装を使用できます。
+-提案されたソリューションは、現在の「標準」の `runTx()`プロセスを中断しません。
 
-### Negative
+### ネガティブ
 
-- Introduces changes to the execution model design.
+-実行モデルの設計に変更が導入されました。
 
-### Neutral
+### ニュートラル
 
-- `OutOfGas` error handler becomes one of the middlewares;
-- Default panic handler becomes one of the middlewares;
+-`OutOfGas`エラーハンドラーはミドルウェアの1つになります。
+-デフォルトのパニックハンドラーはミドルウェアの1つになります。
 
-## References
+## 参照
 
-- [PR-6053 with proposed solution](https://github.com/cosmos/cosmos-sdk/pull/6053)
-- [Similar solution. ADR-010 Modular AnteHandler](https://github.com/cosmos/cosmos-sdk/blob/v0.38.3/docs/architecture/adr-010-modular-antehandler.md)
+-[提案されたソリューションを使用したPR-6053](https://github.com/cosmos/cosmos-sdk/pull/6053)
+-[同様のソリューション。ADR-010モジュラーAnteHandler](https://github.com/cosmos/cosmos-sdk/blob/v0.38.3/docs/architecture/adr-010-modular-antehandler.md) 

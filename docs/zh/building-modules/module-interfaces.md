@@ -6,7 +6,7 @@
 
 - [构建模块介绍](./intro.md) {prereq}
 
-##命令行界面
+## 命令行界面
 
 应用程序的主要界面之一是[命令行界面](../core/cli.md)。此入口点添加来自应用程序模块的命令，使最终用户能够创建包裹在事务中的 [**messages**](./messages-and-queries.md#messages) 和 [**queries**](./messages-和-queries.md#queries)。 CLI 文件通常位于模块的`./client/cli` 文件夹中。
 

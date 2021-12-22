@@ -4,7 +4,7 @@
 
 - 2021 年 2 月 10 日:初稿
 
-##作者
+## 作者
 
 - Dev Ojha (@valardragon)
 - Sunny Aggarwal (@sunnya97)

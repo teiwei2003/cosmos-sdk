@@ -1,103 +1,103 @@
-# ADR 028: Public Key Addresses
+# ADR 028:公開鍵アドレス
 
-## Changelog
+## 変更ログ
 
-- 2020/08/18: Initial version
-- 2021/01/15: Analysis and algorithm update
+-2020/08/18:初期バージョン
+-2021 .01/15:分析とアルゴリズムの更新
 
-## Status
+## 状態
 
-Proposed
+提案
 
-## Abstract
+## 概要
 
-This ADR defines an address format for all addressable Cosmos SDK accounts. That includes: new public key algorithms, multisig public keys, and module accounts.
+このADRは、アドレス可能なすべてのCosmosSDKアカウントのアドレス形式を定義します。これには、新しい公開鍵アルゴリズム、マルチ署名公開鍵、およびモジュールアカウントが含まれます。
 
-## Context
+## 環境
 
-Issue [\#3685](https://github.com/cosmos/cosmos-sdk/issues/3685) identified that public key
-address spaces are currently overlapping. We confirmed that it significantly decreases security of Cosmos SDK.
+問題[\#3685](https://github.com/cosmos/cosmos-sdk/issues/3685)で公開鍵が確認されました
+アドレス空間は現在重複しています。 CosmosSDKのセキュリティが大幅に低下することを確認しました。
 
-### Problem
+### 問題
 
-An attacker can control an input for an address generation function. This leads to a birthday attack, which significantly decreases the security space.
-To overcome this, we need to separate the inputs for different kind of account types:
-a security break of one account type shouldn't impact the security of other account types.
+攻撃者はアドレス生成機能の入力を制御できます。これは誕生日攻撃につながる可能性があり、セキュリティスペースが大幅に減少します。
+この問題を克服するには、さまざまな種類の口座の入力を分離する必要があります。
+1つのアカウントタイプのセキュリティの中断は、他のアカウントタイプのセキュリティに影響を与えるべきではありません。
 
-### Initial proposals
+### 予備的な提案
 
-One initial proposal was extending the address length and
-adding prefixes for different types of addresses.
+最初の提案は、住所の長さを延長し、
+さまざまなタイプのアドレスにプレフィックスを追加します。
 
-@ethanfrey explained an alternate approach originally used in https://github.com/iov-one/weave:
+@ethanfreyは、https://github.com/iov-one/weaveで最初に使用された代替方法について説明しました。
 
-> I spent quite a bit of time thinking about this issue while building weave... The other cosmos Sdk.
-> Basically I define a condition to be a type and format as human readable string with some binary data appended. This condition is hashed into an Address (again at 20 bytes). The use of this prefix makes it impossible to find a preimage for a given address with a different condition (eg ed25519 vs secp256k1).
-> This is explained in depth here https://weave.readthedocs.io/en/latest/design/permissions.html
-> And the code is here, look mainly at the top where we process conditions. https://github.com/iov-one/weave/blob/master/conditions.go
+>ウィーブを構築するときに、これについて考えることに多くの時間を費やしました...別のユニバースSDK。
+>基本的に、条件をタイプとフォーマット、人間が読める文字列として定義し、いくつかのバイナリデータを追加します。この条件は、アドレス(これも20バイト)にハッシュされます。このプレフィックスを使用すると、条件が異なる特定のアドレスのプレイメージを見つけることができなくなります(たとえば、ed25519とsecp256k1)。
+>ここに詳細な説明がありますhttps://weave.readthedocs.io/en/latest/design/permissions.html
+>そして、コードはここにあり、主に処理条件の最上位にあります。 https://github.com/iov-one/weave/blob/master/conditions.go
 
-And explained how this approach should be sufficiently collision resistant:
+また、この方法がどのように衝突に対して十分に耐性があるべきかについても説明します。
 
-> Yeah, AFAIK, 20 bytes should be collision resistance when the preimages are unique and not malleable. A space of 2^160 would expect some collision to be likely around 2^80 elements (birthday paradox). And if you want to find a collision for some existing element in the database, it is still 2^160. 2^80 only is if all these elements are written to state.
-> The good example you brought up was eg. a public key bytes being a valid public key on two algorithms supported by the codec. Meaning if either was broken, you would break accounts even if they were secured with the safer variant. This is only as the issue when no differentiating type info is present in the preimage (before hashing into an address).
-> I would like to hear an argument if the 20 bytes space is an actual issue for security, as I would be happy to increase my address sizes in weave. I just figured cosmos and ethereum and bitcoin all use 20 bytes, it should be good enough. And the arguments above which made me feel it was secure. But I have not done a deeper analysis.
+>はい、AFAIK、元の画像が一意で拡張不可能な場合、20バイトは衝突耐性が必要です。 2 ^ 160スペースでは、2 ^ 80要素の近くで衝突が発生すると予想されます(誕生日のパラドックス)。データベース内の既存の要素の競合を見つけたい場合でも、2 ^ 160です。 2 ^ 80これらすべての要素が状態で書き込まれる場合のみ。
+>あなたの良い例は例えばです。公開鍵バイトは、コーデックでサポートされている2つのアルゴリズムの有効な公開鍵です。これは、それらのいずれかが侵害された場合、それらがより安全な亜種によって保護されていても、アカウントを侵害することを意味します。これは、元の画像に識別可能なタイプ情報がない場合にのみ問題になります(アドレスにハッシュする前)。
+> 20バイトのスペースが実際のセキュリティの問題である場合、編み物中にアドレスサイズを増やして喜んでいるので、議論を聞きたいと思います。コスモス、イーサリアム、ビットコインはすべて20バイトを使用していると思いますが、これで十分です。そして、上記の議論は私にそれが安全であると感じさせます。しかし、私はこれ以上詳細な分析はしませんでした。
 
-This led to the first proposal (which we proved to be not good enough):
-we concatenate a key type with a public key, hash it and take the first 20 bytes of that hash, summarized as `sha256(keyTypePrefix || keybytes)[:20]`.
+これが最初の提案につながりました(私たちはそれが十分ではないことを証明しました):
+キータイプを公開キーと連結し、ハッシュしてハッシュの最初の20バイトを取得し、合計して `sha256(keyTypePrefix || keybytes)[:20]`とします。
 
-### Review and Discussions
+### レビューとディスカッション
 
-In [\#5694](https://github.com/cosmos/cosmos-sdk/issues/5694) we discussed various solutions.
-We agreed that 20 bytes it's not future proof, and extending the address length is the only way to allow addresses of different types, various signature types, etc.
-This disqualifies the initial proposal.
+[\#5694](https://github.com/cosmos/cosmos-sdk/issues/5694)では、さまざまなソリューションについて説明しました。
+20バイトは将来の証拠ではなく、アドレス長を延長することが、さまざまなタイプ、さまざまな署名タイプなどのアドレスを許可する唯一の方法であることに同意します。
+これにより、元の提案は失格となりました。
 
-In the issue we discussed various modifications:
+この質問では、さまざまな変更について説明しました。
 
-+ Choice of the hash function.
-+ Move the prefix out of the hash function: `keyTypePrefix + sha256(keybytes)[:20]` [post-hash-prefix-proposal].
-+ Use double hashing: `sha256(keyTypePrefix + sha256(keybytes)[:20])`.
-+ Increase to keybytes hash slice from 20 byte to 32 or 40 bytes. We concluded that 32 bytes, produced by a good hash functions is future secure.
++ハッシュ関数の選択。
++プレフィックスをハッシュ関数から移動します: `keyTypePrefix + sha256(keybytes)[:20]` [post-hash-prefix-proposal]。
++ダブルハッシュを使用します: `sha256(keyTypePrefix + sha256(keybytes)[:20])`。
++キーバイトのハッシュスライスを20バイトから32バイトまたは40バイトに増やします。優れたハッシュ関数によって生成された32バイトは、将来的に安全であると結論付けました。
 
-### Requirements
+### 要件
 
-+ Support currently used tools - we don't want to break an ecosystem, or add a long adaptation period. Ref: https://github.com/cosmos/cosmos-sdk/issues/8041
-+ Try to keep the address length small - addresses are widely used in state, both as part of a key and object value.
++現在使用されているツールをサポートする-エコシステムに損害を与えたり、適応期間を長くしたりしたくありません。参照:https://github.com/cosmos/cosmos-sdk/issues/8041
++アドレスの長さをできるだけ短くするようにしてください。アドレスは、キーとオブジェクトの値の一部として状態で広く使用されています。
 
-### Scope
+### スコープ
 
-This ADR only defines a process for the generation of address bytes. For end-user interactions with addresses (through the API, or CLI, etc.), we still use bech32 to format these addresses as strings. This ADR doesn't change that.
-Using Bech32 for string encoding gives us support for checksum error codes and handling of user typos.
+ADRは、アドレスバイトを生成するためのプロセスのみを定義します。エンドユーザーとアドレス間の対話(APIやCLIなどを介した)では、引き続きbech32を使用してこれらのアドレスを文字列にフォーマットします。 ADRはこれを変更しません。
+文字列エンコーディングにBech32を使用すると、チェックサムエラーコードとユーザースペルエラーの処理がサポートされます。
 
-## Decision
+## 決定
 
-We define the following account types, for which we define the address function:
+次のアカウントタイプを定義し、それらのアドレス関数を定義しました。
 
-1. simple accounts: represented by a regular public key (ie: secp256k1, sr25519)
-2. naive multisig: accounts composed by other addressable objects (ie: naive multisig)
-3. composed accounts with a native address key (ie: bls, group module accounts)
-4. module accounts: basically any accounts which cannot sign transactions and which are managed internally by modules
+1.単純なアカウント:共通の公開鍵で表されます(例:secp256k1、sr25519)
+2. naive multisig:他のアドレス可能なオブジェクトで構成されるアカウント(例:naive multisig)
+3.ローカルアドレスキーの組み合わせアカウント(例:bls、グループモジュールアカウント)を使用します
+4.モジュールアカウント:基本的に、トランザクションに署名できず、モジュールによって内部的に管理されるすべてのアカウント 
 
-### Legacy Public Key Addresses Don't Change
+###レガシー公開鍵アドレスは変更されません
 
-Currently (Jan 2021), the only officially supported Cosmos SDK user accounts are `secp256k1` basic accounts and legacy amino multisig.
-They are used in existing Cosmos SDK zones. They use the following address formats:
+現在(2021年1月)、公式にサポートされているCosmos SDKユーザーアカウントは、「secp256k1」基本アカウントと従来のアミ​​ノマルチシグニチャのみです。
+これらは、既存のCosmosSDKエリアで使用されます。次のアドレス形式を使用します。
 
-- secp256k1: `ripemd160(sha256(pk_bytes))[:20]`
-- legacy amino multisig: `sha256(aminoCdc.Marshal(pk))[:20]`
+-secp256k1: `ripemd160(sha256(pk_bytes))[:20]`
+-従来のアミ​​ノマルチ署名: `sha256(aminoCdc.Marshal(pk))[:20]`
 
-We don't want to change existing addresses. So the addresses for these two key types will remain the same.
+既存の住所を変更したくありません。したがって、これら2つのキータイプのアドレスは変更されません。
 
-The current multisig public keys use amino serialization to generate the address. We will retain
-those public keys and their address formatting, and call them "legacy amino" multisig public keys
-in protobuf. We will also create multisig public keys without amino addresses to be described below.
+現在のマルチ署名公開鍵は、アミノシリアル化を使用してアドレスを生成します。維持します
+それらの公開鍵とそのアドレス形式、およびそれらを「従来のアミ​​ノ」マルチ署名公開鍵と呼びます
+protobufで。また、以下に説明するように、アミノアドレスのないマルチ署名公開鍵を作成します。
 
-### Hash Function Choice
+###ハッシュ関数の選択
 
-As in other parts of the Cosmos SDK, we will use `sha256`.
+Cosmos SDKの他の部分と同様に、sha256を使用します。
 
-### Basic Address
+### ベースアドレス
 
-We start with defining a base hash algorithm for generating addresses. Notably, it's used for accounts represented by a single key pair. For each public key schema we have to have an associated `typ` string, which we discuss in a section below. `hash` is the cryptographic hash function defined in the previous section.
+まず、アドレスの生成に使用される基本的なハッシュアルゴリズムを定義します。単一のキーペアで表されるアカウントに使用されることは注目に値します。公開鍵モードごとに、関連付けられた `typ`文字列が必要です。これについては、次のセクションで説明します。 `hash`は、前のセクションで定義した暗号化ハッシュ関数です。  
 
 ```go
 const A_LEN = 32
@@ -107,26 +107,26 @@ func Hash(typ string, key []byte) []byte {
 }
 ```
 
-The `+` is bytes concatenation, which doesn't use any separator.
+`+`は、区切り文字のないバイト連結です。
 
-This algorithm is the outcome of a consultation session with a professional cryptographer.
-Motivation: this algorithm keeps the address relatively small (length of the `typ` doesn't impact the length of the final address)
-and it's more secure than [post-hash-prefix-proposal] (which uses the first 20 bytes of a pubkey hash, significantly reducing the address space).
-Moreover the cryptographer motivated the choice of adding `typ` in the hash to protect against a switch table attack.
+アルゴリズムは、プロの暗号学者との協議の結果です。
+動機:アルゴリズムはアドレスを比較的小さく保ちます( `typ`の長さは最終的なアドレスの長さに影響しません)
+また、[post-hash-prefix-proposal]よりも安全です(公開鍵ハッシュの最初の20バイトを使用して、アドレス空間を大幅に削減します)。
+さらに、暗号技術者は、スイッチテーブル攻撃を防ぐためにハッシュに「typ」を追加することを選択するよう促しました。
 
-We use the `address.Hash` function for generating addresses for all accounts represented by a single key:
+`address.Hash`関数を使用して、単一のキーで表されるすべてのアカウントのアドレスを生成します。
 
-* simple public keys: `address.Hash(keyType, pubkey)`
+*単純な公開鍵: `address.Hash(keyType、pubkey)`
 
-+ aggregated keys (eg: BLS): `address.Hash(keyType, aggregatedPubKey)`
-+ modules: `address.Hash("module", moduleName)`
++集約キー(例:BLS): `address.Hash(keyType、aggregatedPubKey)`
++モジュール: `address.Hash(" module "、moduleName)`
 
-### Composed Addresses
+### 結合されたアドレス
 
-For simple composed accounts (like new naive multisig), we generalize the `address.Hash`. The address is constructed by recursively creating addresses for the sub accounts, sorting the addresses and composing them into a single address. It ensures that the ordering of keys doesn't impact the resulting address.
+単純な組み合わせアカウント(新しい単純なマルチ署名など)の場合、「address.Hash」を一般化します。 アドレスは、サブアカウントのアドレスを再帰的に作成し、アドレスを並べ替えて、それらを1つのアドレスに結合することによって作成されます。 キーの順序が結果のアドレスに影響を与えないようにします。 
 
 ```go
-// We don't need a PubKey interface - we need anything which is addressable.
+/.We don't need a PubKey interface - we need anything which is addressable.
 type Addressable interface {
     Address() []byte
 }
@@ -138,17 +138,17 @@ func Composed(typ string, subaccounts []Addressable) []byte {
 }
 ```
 
-The `typ` parameter should be a schema descriptor, containing all significant attributes with deterministic serialization (eg: utf8 string).
-`LengthPrefix` is a function which prepends 1 byte to the address. The value of that byte is the length of the address bits before prepending. The address must be at most 255 bits long.
-We are using `LengthPrefix` to eliminate conflicts - it assures, that for 2 lists of addresses: `as = {a1, a2, ..., an}` and `bs = {b1, b2, ..., bm}` such that every `bi` and `ai` is at most 255 long, `concatenate(map(as, \a -> LengthPrefix(a))) = map(bs, \b -> LengthPrefix(b))` iff `as = bs`.
+`typ`パラメータは、決定論的なシリアル化を伴うすべての重要な属性を含むパターン記述子である必要があります(例:utf8文字列)。
+`LengthPrefix`は、アドレスの1バイト前に追加する関数です。 このバイトの値は、フロントの前のアドレスビットの長さです。 アドレスの長さは最大255ビットです。
+競合を排除するために `LengthPrefix`を使用します-2つのアドレスリストに対して` as =(a1、a2、...、an} `と` bs =(b1、b2、...、bm) `すべての `bi`と` ai`の長さは最大255です。`concatenate(map(as、\ a-> LengthPrefix(a)))= map(bs、\ b-> LengthPrefix(b)) `iff` as = bs`。
 
-Implementation Tip: account implementations should cache addresses.
+実装のヒント:アカウントの実装では、アドレスをキャッシュする必要があります。 
 
-#### Multisig Addresses
+#### マルチシグニチャアドレス
 
-For new multisig public keys, we define the `typ` parameter not based on any encoding scheme (amino or protobuf). This avoids issues with non-determinism in the encoding scheme.
+新しいマルチ署名公開鍵では、エンコードスキーム(aminoまたはprotobuf)に基づかない `typ`パラメーターを定義します。 これにより、コーディングスキームの不確実性の問題が回避されます。
 
-Example:
+例:
 
 ```proto
 package cosmos.crypto.multisig;
@@ -161,32 +161,32 @@ message PubKey {
 
 ```go
 func (multisig PubKey) Address() {
-  // first gather all nested pub keys
-  var keys []address.Addressable  // cryptotypes.PubKey implements Addressable
+ ..first gather all nested pub keys
+  var keys []address.Addressable ..cryptotypes.PubKey implements Addressable
   for _, _key := range multisig.Pubkeys {
     keys = append(keys, key.GetCachedValue().(cryptotypes.PubKey))
   }
 
-  // form the type from the message name (cosmos.crypto.multisig.PubKey) and the threshold joined together
+ ..form the type from the message name (cosmos.crypto.multisig.PubKey) and the threshold joined together
   prefix := fmt.Sprintf("%s/%d", proto.MessageName(multisig), multisig.Threshold)
 
-  // use the Composed function defined above
+ ..use the Composed function defined above
   return address.Composed(prefix, keys)
 }
 ```
 
-#### Module Account Addresses
+#### モジュールアカウントアドレス
 
-NOTE: this section is not finalize and it's in active discussion.
+注:このセクションはまだ完了しておらず、活発に議論されています。
 
-In Basic Address section we defined a module account address as:
+基本アドレスの部分では、モジュールアカウントアドレスを次のように定義します。
 
 ```go
 address.Hash("module", moduleName)
 ```
 
-We use `"module"` as a schema type for all module derived addresses. Module accounts can have sub accounts. The derivation process has a defined order: module name, submodule key, subsubmodule key.
-Module account addresses are heavily used in the Cosmos SDK so it makes sense to optimize the derivation process: instead of using of using `LengthPrefix` for the module name, we use a null byte (`'\x00'`) as a separator. This works, because null byte is not a part of a valid module name.
+すべてのモジュール派生アドレスのパターンタイプとして「モジュール」を使用します。 モジュールアカウントはサブアカウントを持つことができます。 派生プロセスには、モジュール名、サブモジュールキー、サブサブモジュールキーの定義されたシーケンスがあります。
+モジュールアカウントアドレスはCosmosSDKで広く使用されているため、派生プロセスを最適化することは理にかなっています。モジュール名として `LengthPrefix`ではなく、区切り文字としてnullバイト(` '\ x00'`)を使用します。 nullバイトは有効なモジュール名の一部ではないため、これは有効です。 
 
 ```go
 func Module(moduleName string, key []byte) []byte{
@@ -200,15 +200,15 @@ func Module(moduleName string, key []byte) []byte{
 btcPool := address.Module("lending", btc.Addrress()})
 ```
 
-If we want to create an address for a module account depending on more than one key, we can concatenate them:
+複数のキーに基づいてモジュールアカウントのアドレスを作成する場合は、それらを接続できます。 
 
 ```
 btcAtomAMM := address.Module("amm", btc.Addrress() + atom.Address()})
 ```
 
-#### Derived Addresses
+#### 派生アドレス
 
-We must be able to cryptographically derive one address from another one. The derivation process must guarantee hash properties, hence we use the already defined `Hash` function:
+パスワードを使用して、別のアドレスからアドレスを取得できる必要があります。 派生プロセスはハッシュ属性を保証する必要があるため、すでに定義されている `Hash`関数を使用します。
 
 ```go
 func Derive(address []byte, derivationKey []byte) []byte {
@@ -216,20 +216,20 @@ func Derive(address []byte, derivationKey []byte) []byte {
 }
 ```
 
-Note: `Module` is a special case of the more general _derived_ address, where we set the `"module"` string for the _from address_.
+注: `モジュール`は、より普通家族_derivative_稼の特別なケースであり、_fromaddress_に文字列 `"モジュール "`を設定します。
 
-**Example**  For a cosmwasm smart-contract address we could use the following construction:
+**例** cosmwasmの場合、時間の構造であるスマートコントラクトを使用します。  
 
 ```
 smartContractAddr := Derived(Module("cosmwasm", smartContractsNamespace), []{smartContractKey})
 ```
 
-### Schema Types
+### スキーマタイプ
 
-A `typ` parameter used in `Hash` function SHOULD be unique for each account type.
-Since all Cosmos SDK account types are serialized in the state, we propose to use the protobuf message name string.
+`Hash`関数で使用される` typ`パラメータは、アカウントタイプごとに一意である必要があります。
+すべてのCosmosSDKアカウントタイプは状態でシリアル化されるため、protobufメッセージ名文字列を使用することをお勧めします。
 
-Example: all public key types have a unique protobuf message type similar to:
+例:すべての公開鍵タイプには、次のような一意のprotobufメッセージタイプがあります。 
 
 ```proto
 package cosmos.crypto.sr25519;
@@ -239,91 +239,91 @@ message PubKey {
 }
 ```
 
-All protobuf messages have unique fully qualified names, in this example `cosmos.crypto.sr25519.PubKey`.
-These names are derived directly from .proto files in a standardized way and used
-in other places such as the type URL in `Any`s. We can easily obtain the name using
-`proto.MessageName(msg)`.
+すべてのprotobufメッセージには、一意の完全修飾名があります。この例では、「cosmos.crypto.sr25519.PubKey」です。
+これらの名前は、標準化された方法で.protoファイルから直接派生して使用されます
+`Any`sのタイプURLなどの他の場所。次の方法で簡単に名前を取得できます
+`proto.MessageName(msg)`。
 
-## Consequences
+## 結果
 
-### Backwards Compatibility
+###下位互換性
 
-This ADR is compatible with what was committed and directly supported in the Cosmos SDK repository.
+このADRは、Cosmos SDKリポジトリで送信され、直接サポートされているコンテンツと互換性があります。
 
-### Positive
+### ポジティブ
 
-- a simple algorithm for generating addresses for new public keys, complex accounts and modules
-- the algorithm generalizes _native composed keys_
-- increased security and collision resistance of addresses
-- the approach is extensible for future use-cases - one can use other address types, as long as they don't conflict with the address length specified here (20 or 32 bytes).
-- support new account types.
+-新しい公開鍵、複雑なアカウント、モジュールのアドレスを生成するためのシンプルなアルゴリズム
+-アルゴリズムは_ネイティブキーの組み合わせ_を要約します
+-アドレスのセキュリティと衝突防止を改善します
+-この方法は、将来のユースケースに拡張できます。-ここで指定されたアドレス長(20または32バイト)と競合しない限り、他のアドレスタイプを使用できます。
+-新しいアカウントタイプをサポートします。
 
-### Negative
+### ネガティブ
 
-- addresses do not communicate key type, a prefixed approach would have done this
-- addresses are 60% longer and will consume more storage space
-- requires a refactor of KVStore store keys to handle variable length addresses
+-アドレスはキータイプを伝達しません。プレフィックスメソッドはこれを実行できます
+-アドレスが60％長くなり、より多くのストレージスペースを消費します
+-可変長アドレスを処理するためにKVStoreストレージキーを再構築する必要があります
 
-### Neutral
+### ニュートラル
 
-- protobuf message names are used as key type prefixes
+-protobufメッセージ名はキータイププレフィックスとして使用されます
 
-## Further Discussions
+##さらなる議論
 
-Some accounts can have a fixed name or may be constructed in other way (eg: modules). We were discussing an idea of an account with a predefined name (eg: `me.regen`), which could be used by institutions.
-Without going into details, these kinds of addresses are compatible with the hash based addresses described here as long as they don't have the same length.
-More specifically, any special account address must not have a length equal to 20 or 32 bytes.
+一部のアカウントには固定名を付けることも、他の方法で作成することもできます(例:モジュール)。組織で使用できる事前定義された名前(例: `me.regen`)を持つアカウントのアイデアについて話し合っています。
+言うまでもなく、これらのタイプのアドレスは、長さが異なる限り、ここで説明するハッシュベースのアドレスと互換性があります。
+より具体的には、特別なアカウントアドレスの長さは20バイトまたは32バイトに等しくてはなりません。
 
-## Appendix: Consulting session
+##付録:コンサルティングセッション
 
-End of Dec 2020 we had a session with [Alan Szepieniec](https://scholar.google.be/citations?user=4LyZn8oAAAAJ&hl=en) to consult the approach presented above.
+2020年12月末に、[Alan Szepieniec](https://scholar.google.be/citations?user=4LyZn8oAAAAJ&hl=en)とミーティングを行い、上記の方法について相談しました。
 
-Alan general observations:
+アランの一般的なコメント:
 
-+ we don’t need 2-preimage resistance
-+ we need 32bytes address space for collision resistance
-+ when an attacker can control an input for object with an address then we have a problem with birthday attack
-+ there is an issue with smart-contracts for hashing
-+ sha2 mining can be use to breaking address pre-image
++2つのプリイメージ抵抗は必要ありません
++衝突に抵抗するために32バイトのアドレス空間が必要です
++攻撃者がアドレスを介してオブジェクトの入力を制御できる場合、誕生日攻撃の問題が発生します
++ハッシュに使用されるスマートコントラクトに問題があります
++ sha2マイニングを使用して、元のアドレスを解読できます
 
-Hashing algorithm
+ハッシュアルゴリズム
 
-+ any attack breaking blake3 will break blake2
-+ Alan is pretty confident about the current security analysis of the blake hash algorithm. It was a finalist, and the author is well known in security analysis.
++ blake3を破壊する攻撃は、blake2を破壊します
++ Alanは、ブレイクハッシュアルゴリズムの現在のセキュリティ分析に非常に自信を持っています。決勝戦の最終候補に挙げられた著者は、証券分析でよく知られています。
 
-Algorithm:
+アルゴリズム:
 
-+ Alan recommends to hash the prefix: `address(pub_key) = hash(hash(key_type) + pub_key)[:32]`, main benefits:
-    + we are free to user arbitrary long prefix names
-    + we still don’t risk collisions
-    + switch tables
-+ discussion about penalization -> about adding prefix post hash
-+ Aaron asked about post hash prefixes (`address(pub_key) = key_type + hash(pub_key)`) and differences. Alan noted that this approach has longer address space and it’s stronger.
++ Alanは、プレフィックスをハッシュすることを提案しています: `address(pub_key)= hash(hash(key_type)+ pub_key)[:32]`、主な利点:
+    +任意の長いプレフィックス名を自由に使用できます
+    +私たちはまだ衝突の危険を冒しません
+    +スイッチテーブル
++罰についての議論->プレフィックスを追加した後のハッシュについて
++ Aaronは、ハッシュ後のプレフィックス( `address(pub_key)= key_type + hash(pub_key)`)とその違いについて質問しました。 Alanは、この方法はアドレススペースが長く、より強力であると指摘しました。
 
-Algorithm for complex / composed keys:
+複雑な/結合されたキーのアルゴリズム:
 
-+ merging tree like addresses with same algorithm are fine
++同じアルゴリズムを使用して類似したアドレスを持つツリーをマージするのは良いことです
 
-Module addresses: Should module addresses have different size to differentiate it?
+モジュールアドレス:モジュールアドレスは、それらを区別するために異なるサイズにする必要がありますか？
 
-+ we will need to set a pre-image prefix for module addresse to keept them in 32-byte space: `hash(hash('module') + module_key)`
-+ Aaron observation: we already need to deal with variable length (to not break secp256k1 keys).
++モジュールアドレスのプレイメージプレフィックスを設定して、32バイトのスペースに保持する必要があります: `hash(hash( 'module')+ module_key)`
++アーロンの観察:(secp256k1キーを破壊しないために)可変長を処理する必要があります。
 
-Discssion about arithmetic hash function for ZKP
+ZKP算術ハッシュ関数に関する議論
 
-+ Posseidon / Rescue
-+ Problem: much bigger risk because we don’t know much techniques and history of crypto-analysis of arithmetic constructions. It’s still a new ground and area of active research.
++ポセイドン/レスキュー
++問題:暗号解読技術と算術構造の歴史についてほとんど知らないため、リスクははるかに大きくなります。これはまだ新しい分野であり、活発な研究の分野です。
 
-Post quantum signature size
+ポスト量子署名のサイズ
 
-+ Alan suggestion: Falcon: speed / size ration - very good.
-+ Aaron - should we think about it?
-  Alan: based on early extrapolation this thing will get able to break EC cryptography in 2050 . But that’s a lot of uncertainty. But there is magic happening with recurions / linking / simulation and that can speedup the progress.
++アランの提案:ファルコン:速度/体のサイズの比率-とても良い。
++アーロン-私たちはそれについて考えるべきですか？
+  アラン:初期の推論によると、これは2050年にEC暗号を解読できるようになるでしょう。しかし、多くの不確実性があります。しかし、魔法のようなことが再帰/リンク/シミュレーションで起こり、進行をスピードアップすることができます。
 
-Other ideas
+その他のアイデア
 
-+ Let’s say we use same key and two different address algorithms for 2 different use cases. Is it still safe to use it? Alan: if we want to hide the public key (which is not our use case), then it’s less secure but there are fixes.
++2つの異なるユースケースに同じキーと2つの異なるアドレスアルゴリズムを使用するとします。それでも安全に使用できますか？アラン:公開鍵を非表示にしたい場合(これは私たちのユースケースではありません)、そのセキュリティは低下しますが、それを修正する方法があります。
 
-### References
+### 参照
 
-+ [Notes](https://hackmd.io/_NGWI4xZSbKzj1BkCqyZMw)
++ [メモ](https://hackmd.io/_NGWI4xZSbKzj1BkCqyZMw) 

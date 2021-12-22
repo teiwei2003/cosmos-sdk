@@ -1,138 +1,138 @@
-# ADR 044: Guidelines for Updating Protobuf Definitions
+# ADR 044:Protobuf定義更新ガイド
 
-## Changelog
+## 変更ログ
 
-- 28.06.2021: Initial Draft
-- 02.12.2021: Add `Since:` comment for new fields
+-28.06.2021:最初のドラフト
+-02.12.2021:新しいフィールドに `Since:`コメントを追加
 
-## Status
+## 状態
 
-Draft
+下書き
 
-## Abstract
+## 概要
 
-This ADR provides guidelines and recommended practices when updating Protobuf definitions. These guidelines are targeting module developers.
+このADRは、Protobufの定義を更新する際のガイドラインと推奨プラクティスを提供します。これらのガイドラインは、モジュール開発者を対象としています。
 
-## Context
+## 環境
 
-The Cosmos SDK maintains a set of [Protobuf definitions](https://github.com/cosmos/cosmos-sdk/tree/master/proto/cosmos). It is important to correctly design Protobuf definitions to avoid any breaking changes within the same version. The reasons are to not break tooling (including indexers and explorers), wallets and other third-party integrations.
+Cosmos SDKは、一連の[Protobuf定義](https://github.com/cosmos/cosmos-sdk/tree/master/proto/cosmos)を維持しています。同じバージョンでの破壊的な変更を避けるために、Protobuf定義を正しく設計することが重要です。その理由は、ツール(インデクサーやリソースマネージャーを含む)、ウォレット、その他のサードパーティの統合を壊さないためです。
 
-When making changes to these Protobuf definitions, the Cosmos SDK currently only follows [Buf's](https://docs.buf.build/) recommendations. We noticed however that Buf's recommendations might still result in breaking changes in the SDK in some cases. For example:
+これらのProtobuf定義を変更する場合、Cosmos SDKは現在、[Buf](https://docs.buf.build/)の推奨事項のみに従います。ただし、場合によっては、Bufの提案によってSDKに大きな変更が加えられる可能性があることに気づきました。例えば:
 
-- Adding fields to `Msg`s. Adding fields is a not a Protobuf spec-breaking operation. However, when adding new fields to `Msg`s, the unknown field rejection will throw an error when sending the new `Msg` to an older node.
-- Marking fields as `reserved`. Protobuf proposes the `reserved` keyword for removing fields without the need to bump the package version. However, by doing so, client backwards compatibility is broken as Protobuf doesn't generate anything for `reserved` fields. See [#9446](https://github.com/cosmos/cosmos-sdk/issues/9446) for more details on this issue.
+-`Msg`にフィールドを追加します。フィールドの追加は、Protobuf仕様によって破られる操作ではありません。ただし、 `Msg`に新しいフィールドを追加すると、不明なフィールドの拒否により、新しい` Msg`が古いノードに送信されるときにエラーがスローされます。
+-フィールドを「予約済み」としてマークします。 Protobufは、パッケージのバージョンを変更せずにフィールドを削除するには、 `reserved`キーワードを使用することをお勧めします。ただし、Protobufは「予約済み」フィールドに対して何も生成しないため、これを行うと、クライアントの下位互換性が失われます。この問題の詳細については、[#9446](https://github.com/cosmos/cosmos-sdk/issues/9446)を参照してください。
 
-Moreover, module developers often face other questions around Protobuf definitions such as "Can I rename a field?" or "Can I deprecate a field?" This ADR aims to answer all these questions by providing clear guidelines about allowed updates for Protobuf definitions.
+さらに、モジュール開発者は、「フィールドの名前を変更できますか？」や「フィールドを破棄できますか？」など、Protobufの定義に関する他の質問に直面することがよくあります。これらすべての質問に答えてください。
 
-## Decision
+## 決定
 
-We decide to keep [Buf's](https://docs.buf.build/) recommendations with the following exceptions:
+次の場合を除いて、[Buf](https://docs.buf.build/)の提案を保持することにしました。
 
-- `UNARY_RPC`: the Cosmos SDK currently does not support streaming RPCs.
-- `COMMENT_FIELD`: the Cosmos SDK allows fields with no comments.
-- `SERVICE_SUFFIX`: we use the `Query` and `Msg` service naming convention, which doesn't use the `-Service` suffix.
-- `PACKAGE_VERSION_SUFFIX`: some packages, such as `cosmos.crypto.ed25519`, don't use a version suffix.
-- `RPC_REQUEST_STANDARD_NAME`: Requests for the `Msg` service don't have the `-Request` suffix to keep backwards compatibility.
+-`UNARY_RPC`:Cosmos SDKは現在、ストリーミングRPCをサポートしていません。
+-`COMMENT_FIELD`:Cosmos SDKでは、コメントなしのフィールドを使用できます。
+-`SERVICE_SUFFIX`: `Query`および` Msg`サービスの命名規則を使用し、 `-Service`サフィックスは使用しません。
+-`PACKAGE_VERSION_SUFFIX`: `cosmos.crypto.ed25519`などの一部のパッケージは、バージョンサフィックスを使用しません。
+-`RPC_REQUEST_STANDARD_NAME`: `Msg`サービスへのリクエストには、下位互換性を維持するための` -Request`サフィックスがありません。
 
-On top of Buf's recommendations we add the following guidelines that are specific to the Cosmos SDK.
+Bufの提案に加えて、次のCosmosSDK固有のガイドを追加しました。
 
-### Updating Protobuf Definition Without Bumping Version
+### 衝突バージョンなしでProtobuf定義を更新
 
-#### 1. `Msg`s MUST NOT have new fields
+#### 1.`Msg`sは新しいフィールドを持つことができません
 
-When processing `Msg`s, the Cosmos SDK's antehandlers are strict and don't allow unknown fields in `Msg`s. This is checked by the unknown field rejection in the [`codec/unknownproto` package](https://github.com/cosmos/cosmos-sdk/blob/master/codec/unknownproto).
+`Msg`を処理する場合、Cosmos SDKの前処理手順は厳密であり、` Msg`で不明なフィールドを使用することはできません。これは、[`codec .unknownproto`パッケージ](https://github.com/cosmos/cosmos-sdk/blob/master/codec/unknownproto)の不明なフィールドを拒否することでチェックされます。
 
-Now imagine a v0.43 node accepting a `MsgExample` transaction, and in v0.44 the chain developer decides to add a field to `MsgExample`. A client developer, which only manipulates Protobuf definitions, would see that `MsgExample` has a new field, and will populate it. However, sending the new `MsgExample` to an old v0.43 node would cause the v0.43 node to reject the `MsgExample` because of the unknown field. The expectation that the same Protobuf version can be used across multiple node versions MUST be guaranteed.
+ここで、v0.43ノードが `MsgExample`トランザクションを受け入れ、v0.44で、チェーン開発者が` MsgExample`にフィールドを追加することを決定したと想像してください。 Protobuf定義のみを操作するクライアント開発者は、 `MsgExample`に新しいフィールドがあることを確認し、それを入力します。ただし、新しい「MsgExample」を古いv0.43ノードに送信すると、フィールドが不明であるため、v0.43ノードは「MsgExample」を拒否します。同じProtobufバージョンが複数のノードバージョンで使用できるという期待を保証する必要があります。 
 
-For this reason, module developers MUST NOT add new fields to existing `Msg`s.
+このため、モジュール開発者は既存の `Msg`に新しいフィールドを追加してはなりません。
 
-It is worth mentioning that this does not limit adding fields to a `Msg`, but also to all nested structs and `Any`s inside a `Msg`.
+これは、 `Msg`へのフィールドの追加を制限するのではなく、すべてのネストされた構造と` Msg`の `Any`へのフィールドの追加も制限することに注意してください。
 
-#### 2. Non-`Msg`-related Protobuf definitions MAY have new fields, but MUST add a `Since:` comment
+#### 2. `Msg`に関係のないProtobuf定義には新しいフィールドがあるかもしれませんが、` since: `コメントを追加する必要があります
 
-On the other hand, module developers MAY add new fields to Protobuf definitions related to the `Query` service or to objects which are saved in the store. This recommendation follows the Protobuf specification, but is added in this document for clarity.
+一方、モジュール開発者は、ストレージに格納されている「クエリ」サービスまたはオブジェクトに関連するProtobuf定義に新しいフィールドを追加できます。 この推奨事項はProtobuf仕様に従いますが、わかりやすくするためにこのドキュメントに追加されています。
 
-The SDK requires the Protobuf comment of the new field to contain one line with the following format:
+SDKでは、新しいフィールドのProtobufコメントに次の形式の1行が含まれている必要があります。 
 
 ```protobuf
-// Since: cosmos-sdk <version>{, <version>...}
+/.Since: cosmos-sdk <version>{, <version>...}
 ```
 
-Where each `version` denotes a minor ("0.45") or patch ("0.44.5") version from which the field is available. This will greatly help client libraries, who can optionally use reflection or custom code generation to show/hide these fields depending on the targetted node version.
+各 `version`は、フィールドで使用可能なマイナー(" 0.45 ")またはパッチ(" 0.44.5 ")バージョンを表します。 これはクライアントライブラリに大いに役立ちます。クライアントライブラリは、リフレクションまたはカスタムコード生成を使用して、ターゲットノードのバージョンに基づいてこれらのフィールドを表示/非表示にすることを選択できます。
 
-As examples, the following comments are valid:
+たとえば、次のコメントが有効です。
 
 ```protobuf
-// Since: cosmos-sdk 0.44
+/.Since: cosmos-sdk 0.44
 
-// Since: cosmos-sdk 0.42.11, 0.44.5
+/.Since: cosmos-sdk 0.42.11, 0.44.5
 ```
 
 and the following ones are NOT valid:
 
 ```protobuf
-// Since cosmos-sdk v0.44
+/.Since cosmos-sdk v0.44
 
-// since: cosmos-sdk 0.44
+/.since: cosmos-sdk 0.44
 
-// Since: cosmos-sdk 0.42.11 0.44.5
+/.Since: cosmos-sdk 0.42.11 0.44.5
 
-// Since: Cosmos SDK 0.42.11, 0.44.5
+/.Since: Cosmos SDK 0.42.11, 0.44.5
 ```
 
-#### 3. Fields MAY be marked as `deprecated`, and nodes MAY implement a protocol-breaking change for handling these fields
+#### 3.フィールドは「非推奨」としてマークでき、ノードはこれらのフィールドを処理するためにプロトコルに破壊的な変更を実装できます
 
-Protobuf supports the [`deprecated` field option](https://developers.google.com/protocol-buffers/docs/proto#options), and this option MAY be used on any field, including `Msg` fields. If a node handles a Protobuf message with a non-empty deprecated field, the node MAY change its behavior upon processing it, even in a protocol-breaking way. When possible, the node MUST handle backwards compatibility without breaking the consensus (unless we increment the proto version).
+Protobufは[`deprecated`フィールドオプション](https://developers.google.com/protocol-buffers/docs/proto#options)をサポートしており、このオプションは` Msg`フィールドを含むすべてのフィールドに使用できます。ノードが空でない非推奨フィールドを使用してProtobufメッセージを処理する場合、プロトコルに違反する方法であっても、ノードはメッセージの処理中に動作を変更する可能性があります。可能であれば、ノードはコンセンサスを壊すことなく下位互換性を処理する必要があります(プロトタイプバージョンを増やす場合を除く)。
 
-As an example, the Cosmos SDK v0.42 to v0.43 update contained two Protobuf-breaking changes, listed below. Instead of bumping the package versions from `v1beta1` to `v1`, the SDK team decided to follow this guideline, by reverting the breaking changes, marking those changes as deprecated, and modifying the node implementation when processing messages with deprecated fields. More specifically:
+たとえば、Cosmos SDK v0.42からv0.43へのアップデートには、以下に示すProtobufに対する2つの重大な変更が含まれています。 SDKチームはパッケージバージョンを `v1beta1`から` v1`にアップグレードしませんでしたが、重大な変更を元に戻し、これらの変更を非推奨としてマークし、非推奨フィールドを処理することにより、このガイドラインに従うことにしました。メッセージ中にノードの実装を変更します。さらに:
 
-- The Cosmos SDK recently removed support for [time-based software upgrades](https://github.com/cosmos/cosmos-sdk/pull/8849). As such, the `time` field has been marked as deprecated in `cosmos.upgrade.v1beta1.Plan`. Moreover, the node will reject any proposal containing an upgrade Plan whose `time` field is non-empty.
-- The Cosmos SDK now supports [governance split votes](./adr-037-gov-split-vote.md). When querying for votes, the returned `cosmos.gov.v1beta1.Vote` message has its `option` field (used for 1 vote option) deprecated in favor of its `options` field (allowing multiple vote options). Whenever possible, the SDK still populates the deprecated `option` field, that is, if and only if the `len(options) == 1` and `options[0].Weight == 1.0`.
+-Cosmos SDKは最近、[Time-Based Software Upgrade](https://github.com/cosmos/cosmos-sdk/pull/8849)のサポートをキャンセルしました。したがって、「time」フィールドは「cosmos.upgrade.v1beta1.Plan」で非推奨としてマークされています。さらに、ノードは、空でない「時間」フィールドを含むアップグレード計画の提案を拒否します。
+-Cosmos SDKは、[Governance Split Voting](..adr-037-gov-split-vote.md)をサポートするようになりました。投票をクエリする場合、返された `cosmos.gov.v1beta1.Vote`メッセージの` option`フィールド(1投票オプションの場合)は非推奨になり、その `options`フィールド(複数の投票オプションを許可)に置き換えられます。可能な場合は常に、SDKは非推奨の `option`フィールドに入力します。つまり、` len(options)== 1`および `options [0] .Weight == 1.0`の場合に限ります。
 
-#### 4. Fields MUST NOT be renamed
+#### 4。フィールドの名前を変更することはできません
 
-Whereas the official Protobuf recommendations do not prohibit renaming fields, as it does not break the Protobuf binary representation, the SDK explicitly forbids renaming fields in Protobuf structs. The main reason for this choice is to avoid introducing breaking changes for clients, which often rely on hard-coded fields from generated types. Moreover, renaming fields will lead to client-breaking JSON representations of Protobuf definitions, used in REST endpoints and in the CLI.
+公式のProtobufは、Protobufバイナリ表現を破壊しないため、フィールドの名前変更を禁止しないことを推奨していますが、SDKはProtobuf構造内のフィールドの名前変更を明示的に禁止しています。この選択の主な理由は、クライアントに破壊的な変更を導入しないようにすることです。これは通常、生成タイプのハードコードされたフィールドに依存します。さらに、フィールドの名前を変更すると、Protobufによって定義されたクライアントがRESTエンドポイントとCLIのJSON表現を壊します。
 
-### Incrementing Protobuf Package Version
+### Protobufパッケージバージョンをインクリメント
 
-TODO, needs architecture review. Some topics:
+TODO、アーキテクチャのレビューが必要です。いくつかのトピック:
 
-- Bumping versions frequency
-- When bumping versions, should the Cosmos SDK support both versions?
-  - i.e. v1beta1 -> v1, should we have two folders in the Cosmos SDK, and handlers for both versions?
-- mention ADR-023 Protobuf naming
+-衝突バージョンの頻度
+-バージョンを衝突させる場合、Cosmos SDKは2つのバージョンをサポートする必要がありますか？
+  -つまり、v1beta1-> v1であり、Cosmos SDKに2つのフォルダーと、2つのバージョンのハンドラーが必要ですか？
+-メンションADR-023Protobufの命名
 
-## Consequences
+## 結果
 
-> This section describes the resulting context, after applying the decision. All consequences should be listed here, not just the "positive" ones. A particular decision may have positive, negative, and neutral consequences, but all of them affect the team and project in the future.
+>このセクションでは、決定を適用した後の結果コンテキストについて説明します。 「ポジティブ」な結果だけでなく、すべての結果をここにリストする必要があります。特定の決定は、ポジティブ、ネガティブ、ニュートラルな結果をもたらす可能性がありますが、これらはすべて、将来のチームやプロジェクトに影響を及ぼします。
 
-### Backwards Compatibility
+### 下位互換性
 
-> All ADRs that introduce backwards incompatibilities must include a section describing these incompatibilities and their severity. The ADR must explain how the author proposes to deal with these incompatibilities. ADR submissions without a sufficient backwards compatibility treatise may be rejected outright.
+>後方非互換性を導入するすべてのADRには、非互換性とその重大度を説明するセクションを含める必要があります。 ADRは、作成者がこれらの非互換性にどのように対処するつもりかを説明する必要があります。十分な下位互換性に関する書類がないADRの提出は、完全に拒否される可能性があります。
 
-### Positive
+### ポジティブ
 
-- less pain to tool developers
-- more compatibility in the ecosystem
-- ...
+-ツール開発者の苦痛を軽減します
+-エコシステムの互換性の向上
+-..。
 
-### Negative
+### ネガティブ
 
-{negative consequences}
+{否定的な結果}
 
-### Neutral
+### ニュートラル
 
-- more rigor in Protobuf review
+-Protobufレビューの厳密性
 
-## Further Discussions
+## さらなる議論
 
-This ADR is still in the DRAFT stage, and the "Incrementing Protobuf Package Version" will be filled in once we make a decision on how to correctly do it.
+このADRはまだドラフト段階にあります。正しく行う方法を決定したら、「インクリメンタルProtobufパッケージバージョン」に入力します。
 
-## Test Cases [optional]
+## テストケース[オプション]
 
-Test cases for an implementation are mandatory for ADRs that are affecting consensus changes. Other ADRs can choose to include links to test cases if applicable.
+コンセンサスの変更に影響を与えるADRの場合、実装されたテストケースは必須です。該当する場合、他のADRがテストケースへのリンクを含めることを選択する場合があります。
 
-## References
+## 参照する
 
-- [#9445](https://github.com/cosmos/cosmos-sdk/issues/9445) Release proto definitions v1
-- [#9446](https://github.com/cosmos/cosmos-sdk/issues/9446) Address v1beta1 proto breaking changes
+-[#9445](https://github.com/cosmos/cosmos-sdk/issues/9445)プロト定義v1をリリース
+-[#9446](https://github.com/cosmos/cosmos-sdk/issues/9446)v1beta1プロトの主要な変更を解決します 

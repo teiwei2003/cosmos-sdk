@@ -1,30 +1,30 @@
-# Query Services
+# クエリサービス
 
-A Protobuf Query service processes [`queries`](./messages-and-queries.md#queries). Query services are specific to the module in which they are defined, and only process `queries` defined within said module. They are called from `BaseApp`'s [`Query` method](../core/baseapp.md#query). {synopsis}
+Protobufクエリサービス処理[`queries`](./messages-and-queries.md#queries)。クエリサービスは、それらが定義されているモジュールに固有であり、モジュールで定義されている「クエリ」のみを処理します。これらは、 `BaseApp`の[` Query`メソッド](../core/baseapp.md#query)から呼び出されます。 {まとめ}
 
-## Pre-requisite Readings
+## 読むための前提条件
 
-- [Module Manager](./module-manager.md) {prereq}
-- [Messages and Queries](./messages-and-queries.md) {prereq}
+-[モジュールマネージャー](。/module-manager.md){前提条件}
+-[メッセージとクエリ](./messages-and-queries.md){prereq}
 
-## `Querier` type
+## `Queryer`タイプ
 
-The `querier` type defined in the Cosmos SDK will be deprecated in favor of [gRPC Services](#grpc-service). It specifies the typical structure of a `querier` function:
+Cosmos SDKで定義されている `querier`タイプは、[gRPC Services](#grpc-service)をサポートするために非推奨になります。これは、 `querier`関数の典型的な構造を指定します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/9a183ffbcc0163c8deb71c7fd5f8089a83e58f05/types/queryable.go#L9
 
-Let us break it down:
+それを分解しましょう:
 
-- The `path` is an array of `string`s that contains the type of the query, and that can also contain `query` arguments. See [`queries`](./messages-and-queries.md#queries) for more information.
-- The `req` itself is primarily used to retrieve arguments if they are too large to fit in the `path`. This is done using the `Data` field of `req`.
-- The [`Context`](../core/context.md) contains all the necessary information needed to process the `query`, as well as a branch of the latest state. It is primarily used by the [`keeper`](./keeper.md) to access the state.
-- The result `res` returned to `BaseApp`, marshalled using the application's [`codec`](../core/encoding.md).
+-`path`はクエリタイプを含む `string`配列であり、` query`パラメータを含めることもできます。詳細については、[`queries`](./messages-and-queries.md#queries)を参照してください。
+-`req`自体は主に、 `path`に入れるには大きすぎるパラメータを取得するために使用されます。これは、「req」の「Data」フィールドを使用して行われます。
+-[`Context`](../core/context.md)には、` query`と最新の状態のブランチを処理するために必要なすべての情報が含まれています。これは主に[`keeper`](./keeper.md)が状態にアクセスするために使用します。
+-`res`の結果は `BaseApp`に返され、アプリケーションの[` codec`](../core/encoding.md)がグループ化に使用されます。
 
-## Implementation of a module query service
+## モジュールクエリサービスの実装
 
-### gRPC Service
+### gRPCサービス
 
-When defining a Protobuf `Query` service, a `QueryServer` interface is generated for each module with all the service methods:
+Protobufの `Query`サービスを定義すると、すべてのサービスメソッドを備えた` QueryServer`インターフェースがモジュールごとに生成されます。 
 
 ```go
 type QueryServer interface {
@@ -33,21 +33,21 @@ type QueryServer interface {
 }
 ```
 
-These custom queries methods should be implemented by a module's keeper, typically in `./keeper/grpc_query.go`. The first parameter of these methods is a generic `context.Context`, whereas querier methods generally need an instance of `sdk.Context` to read
-from the store. Therefore, the Cosmos SDK provides a function `sdk.UnwrapSDKContext` to retrieve the `sdk.Context` from the provided
-`context.Context`.
+これらのカスタムクエリメソッドは、モジュールのキーパーによって、通常は `。/keeper/grpc_query.go`に実装する必要があります。 これらのメソッドの最初のパラメータは一般的な `context.Context`であり、クエリメソッドは一般的に読み取るために` sdk.Context`のインスタンスを必要とします
+ストレージから。 したがって、Cosmos SDKは、提供されたオブジェクトから `sdk.Context`を取得するための関数` sdk.UnwrapSDKContext`を提供します。
+`コンテキスト。 コンテキスト `。
 
-Here's an example implementation for the bank module:
+これは、銀行モジュールの実装例です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/d55c1a26657a0af937fa2273b38dcfa1bb3cff9f/x/bank/keeper/grpc_query.go
 
-### Legacy Queriers
+###従来のクエリツール
 
-Module legacy `querier`s are typically implemented in a `./keeper/querier.go` file inside the module's folder. The [module manager](./module-manager.md) is used to add the module's `querier`s to the [application's `queryRouter`](../core/baseapp.md#query-routing) via the `NewQuerier()` method. Typically, the manager's `NewQuerier()` method simply calls a `NewQuerier()` method defined in `keeper/querier.go`, which looks like the following:
+モジュールによって残された「クエリア」は、通常、モジュールフォルダの「./keeper/querier.go」ファイルに実装されます。[Module Manager](./module-manager.md)は、モジュールの `querier`を[application's`queryRouter`](../core/baseapp.md#query-routing)に` NewQuerier()を介して追加するために使用されます。 `メソッド。 通常、マネージャの `NewQuerier()`メソッドは、 `keeper/querier.go`で定義されている` NewQuerier() `メソッドを次のように呼び出すだけです。  
 
 ```go
 func NewQuerier(keeper Keeper) sdk.Querier {
-	return func(ctx sdk.Context, path []string, req abci.RequestQuery) ([]byte, error) {
+	return func(ctx sdk.Context, path[]string, req abci.RequestQuery) ([]byte, error) {
 		switch path[0] {
 		case QueryType1:
 			return queryType1(ctx, path[1:], req, keeper)
@@ -62,12 +62,12 @@ func NewQuerier(keeper Keeper) sdk.Querier {
 }
 ```
 
-This simple switch returns a `querier` function specific to the type of the received `query`. At this point of the [query lifecycle](../basics/query-lifecycle.md), the first element of the `path` (`path[0]`) contains the type of the query. The following elements are either empty or contain arguments needed to process the query.
+この単純なスイッチは、受信した `query`タイプに固有の` querier`関数を返します。[Query Lifecycle](../basics/query-lifecycle.md)のこの時点で、 `path`(` path[0] `)の最初の要素にはクエリのタイプが含まれています。 次の要素は空であるか、クエリの処理に必要なパラメータが含まれています。
 
-The `querier` functions themselves are pretty straighforward. They generally fetch a value or values from the state using the [`keeper`](./keeper.md). Then, they marshall the value(s) using the [`codec`](../core/encoding.md) and return the `[]byte` obtained as result.
+`querier`関数自体は非常に単純です。 通常、[`keeper`](./keeper.md)を使用して、状態から1つ以上の値を取得します。 次に、[`codec`](../core/encoding.md)を使用して値をマーシャリングし、結果の`[] byte`を返します。
 
-For a deeper look at `querier`s, see this [example implementation of a `querier` function](https://github.com/cosmos/cosmos-sdk/blob/7f59723d889b69ca19966167f0b3a7fec7a39e53/x/gov/keeper/querier.go) from the bank module.
+`querier`の詳細については、この[` querier`関数の実装例](https://github.com/cosmos/cosmos-sdk/blob/7f59723d889b69ca19966167f0b3a7fec7a39e53/x/gov/keeper/querier.go)を参照してください。バンクモジュールから。
 
-## Next {hide}
+## 次へ{hide}
 
-Learn about [`BeginBlocker` and `EndBlocker`](./beginblock-endblock.md) {hide}
+[`BeginBlocker`と` EndBlocker`](./beginblock-endblock.md){hide}を理解する 

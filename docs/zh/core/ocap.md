@@ -44,7 +44,7 @@ Cosmos SDK 旨在通过成为
 例如，以下代码片段违反了对象功能
 原则:
 
-```去
+```Go
 输入 AppAccount 结构 {...}
 帐户 := &AppAccount{
     地址:pub.Address(),

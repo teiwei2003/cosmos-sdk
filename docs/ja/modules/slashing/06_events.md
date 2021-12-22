@@ -1,7 +1,6 @@
-# Events
+# 事件
 
-The slashing module emits the following events:
-
+slashing 模块发出以下事件: 
 ## MsgServer
 
 ### MsgUnjail

@@ -1,55 +1,55 @@
-# ADR 009: Evidence Module
+# ADR 009:証拠モジュール
 
-## Changelog
+## 変更ログ
 
-- 2019 July 31: Initial draft
-- 2019 October 24: Initial implementation
+-2019年7月31日:最初のドラフト
+-2019年10月24日:初期実装
 
-## Status
+## 状態
 
-Accepted
+受け入れられました
 
-## Context
+## 環境
 
-In order to support building highly secure, robust and interoperable blockchain
-applications, it is vital for the Cosmos SDK to expose a mechanism in which arbitrary
-evidence can be submitted, evaluated and verified resulting in some agreed upon
-penalty for any misbehavior committed by a validator, such as equivocation (double-voting),
-signing when unbonded, signing an incorrect state transition (in the future), etc.
-Furthermore, such a mechanism is paramount for any
-[IBC](https://github.com/cosmos/ics/blob/master/ibc/2_IBC_ARCHITECTURE.md) or
-cross-chain validation protocol implementation in order to support the ability
-for any misbehavior to be relayed back from a collateralized chain to a primary
-chain so that the equivocating validator(s) can be slashed.
+安全性が高く、堅牢で相互運用可能なブロックチェーンの構築をサポートするため
+アプリケーション、CosmosSDKがメカニズムを公開することは非常に重要です。
+証拠を提出、評価、検証して、コンセンサスに達することができます
+あいまいさ(二重投票)など、検証者による不正行為に対する罰則、
+バインドされていない場合の署名、署名が正しくない場合の状態遷移(将来)など。
+さらに、このメカニズムはすべての人に効果的です
+[IBC](https://github.com/cosmos/ics/blob/master/ibc/2_IBC_ARCHITECTURE.md)または
+機能をサポートするためのクロスチェーン検証プロトコルの実装
+住宅ローンチェーンからメインチェーンに不適切な動作を渡します
+あいまいなバリデーターをカットできるようにチェーンします。
 
-## Decision
+## 決定
 
-We will implement an evidence module in the Cosmos SDK supporting the following
-functionality:
+次の機能をサポートする証拠モジュールをCosmosSDKに実装します
+特徴:
 
-- Provide developers with the abstractions and interfaces necessary to define
-  custom evidence messages, message handlers, and methods to slash and penalize
-  accordingly for misbehavior.
-- Support the ability to route evidence messages to handlers in any module to
-  determine the validity of submitted misbehavior.
-- Support the ability, through governance, to modify slashing penalties of any
-  evidence type.
-- Querier implementation to support querying params, evidence types, params, and
-  all submitted valid misbehavior.
+-定義に必要な抽象化とインターフェースを開発者に提供します
+  証拠メッセージ、メッセージ処理手順、および削減と罰の方法をカスタマイズします
+  それに対応して、それは不適切な振る舞いです。
+-証​​拠メッセージを任意のモジュールのハンドラーにルーティングする機能をサポートします
+  提出された違法行為の正当性を判断します。
+-ガバナンスサポートを通じて罰を変更する機能
+  証拠の種類。
+-クエリパラメータ、エビデンスタイプ、パラメータ、および
+  提出されたすべての有効な違法行為。
 
-### Types
+### タイプ
 
-First, we define the `Evidence` interface type. The `x/evidence` module may implement
-its own types that can be used by many chains (e.g. `CounterFactualEvidence`).
-In addition, other modules may implement their own `Evidence` types in a similar
-manner in which governance is extensible. It is important to note any concrete
-type implementing the `Evidence` interface may include arbitrary fields such as
-an infraction time. We want the `Evidence` type to remain as flexible as possible.
+まず、 `Evidence`インターフェースタイプを定義します。 `x/evidence`モジュールを実装できます
+独自のタイプは、多くのチェーンで使用できます(例: `CounterFactualEvidence`)。
+さらに、他のモジュールも同様の方法で独自の「証拠」タイプを実装できます。
+スケーラブルな方法でのガバナンス。特定のことに注意を払うことが重要です
+`Evidence`インターフェースを実装するタイプには、たとえば任意のフィールドが含まれる場合があります
+違反時間。 `Evidence`タイプは可能な限り柔軟なままにしておく必要があります。
 
-When submitting evidence to the `x/evidence` module, the concrete type must provide
-the validator's consensus address, which should be known by the `x/slashing`
-module (assuming the infraction is valid), the height at which the infraction
-occurred and the validator's power at same height in which the infraction occurred.
+`x/evidence`モジュールに証拠を提出するときは、特定のタイプを提供する必要があります
+検証者のコンセンサスアドレス。これは `x/slashing`で認識されている必要があります
+モジュール(違反が有効であると仮定)、違反の高さ
+発生し、検証者のパワーは違反が発生したのと同じ高さになります。 
 
 ```go
 type Evidence interface {
@@ -59,24 +59,24 @@ type Evidence interface {
   Hash() HexBytes
   ValidateBasic() error
 
-  // The consensus address of the malicious validator at time of infraction
+./The consensus address of the malicious validator at time of infraction
   GetConsensusAddress() ConsAddress
 
-  // Height at which the infraction occurred
+./Height at which the infraction occurred
   GetHeight() int64
 
-  // The total power of the malicious validator at time of infraction
+./The total power of the malicious validator at time of infraction
   GetValidatorPower() int64
 
-  // The total validator set power at time of infraction
+./The total validator set power at time of infraction
   GetTotalPower() int64
 }
 ```
 
-### Routing & Handling
+### ルーティングと処理
 
-Each `Evidence` type must map to a specific unique route and be registered with
-the `x/evidence` module. It accomplishes this through the `Router` implementation.
+各「証拠」タイプは、特定の一意のルートにマッピングされ、登録されている必要があります
+`x/evidence`モジュール。 これは、 `Router`の実装を通じて実現されます。  
 
 ```go
 type Router interface {
@@ -87,16 +87,16 @@ type Router interface {
 }
 ```
 
-Upon successful routing through the `x/evidence` module, the `Evidence` type
-is passed through a `Handler`. This `Handler` is responsible for executing all
-corresponding business logic necessary for verifying the evidence as valid. In
-addition, the `Handler` may execute any necessary slashing and potential jailing.
-Since slashing fractions will typically result from some form of static functions,
-allow the `Handler` to do this provides the greatest flexibility. An example could
-be `k * evidence.GetValidatorPower()` where `k` is an on-chain parameter controlled
-by governance. The `Evidence` type should provide all the external information
-necessary in order for the `Handler` to make the necessary state transitions.
-If no error is returned, the `Evidence` is considered valid.
+`x/evidence`モジュールを正常にルーティングした後、` Evidence`タイプ
+`Handler`によって渡されます。 この `ハンドラー`はすべてを実行する責任があります
+証拠が有効であることを確認するために必要な対応するビジネスロジック。 存在
+さらに、 `ハンドラー`は必要なカットと潜在的な投獄を実行することができます。
+スラッシュスコアは通常、何らかの形の静的関数によって生成されるため、
+`Handler`にそうすることを許可することは、最大の柔軟性を提供します。 例はできます
+`k * Estate.GetValidatorPower()`です。ここで、 `k`は制御されたチェーンパラメータです。
+ガバナンスを通じて。 `Evidence`タイプは、すべての外部情報を提供する必要があります
+これは、「処理プログラム」が必要な状態遷移を実行するために必要です。
+エラーが返されない場合、「証拠」は有効であると見なされます。 
 
 ```go
 type Handler func(Context, Evidence) error
@@ -104,8 +104,8 @@ type Handler func(Context, Evidence) error
 
 ### Submission
 
-`Evidence` is submitted through a `MsgSubmitEvidence` message type which is internally
-handled by the `x/evidence` module's `SubmitEvidence`.
+`Evidence`は、内部の` MsgSubmitEvidence`メッセージタイプを介して送信されます
+これは、 `x/evidence`モジュールの` SubmitEvidence`によって処理されます。 
 
 ```go
 type MsgSubmitEvidence struct {
@@ -117,17 +117,17 @@ func handleMsgSubmitEvidence(ctx Context, keeper Keeper, msg MsgSubmitEvidence) 
     return err.Result()
   }
 
-  // emit events...
+./emit events...
 
   return Result{
-    // ...
+  ./...
   }
 }
 ```
 
-The `x/evidence` module's keeper is responsible for matching the `Evidence` against
-the module's router and invoking the corresponding `Handler` which may include
-slashing and jailing the validator. Upon success, the submitted evidence is persisted.
+`x/evidence`モジュールのキーパーは、` Evidence`をと接続する責任があります
+モジュールのルーターであり、対応する `Handler`を呼び出します。
+バリデーターをカットして投獄します。 成功後、提出された証拠は保持されます。 
 
 ```go
 func (k Keeper) SubmitEvidence(ctx Context, evidence Evidence) error {
@@ -141,13 +141,13 @@ func (k Keeper) SubmitEvidence(ctx Context, evidence Evidence) error {
 }
 ```
 
-### Genesis
+### 創世記
 
-Finally, we need to represent the genesis state of the `x/evidence` module. The
-module only needs a list of all submitted valid infractions and any necessary params
-for which the module needs in order to handle submitted evidence. The `x/evidence`
-module will naturally define and route native evidence types for which it'll most
-likely need slashing penalty constants for.
+最後に、 `x/evidence`モジュールの作成状態を表す必要があります。 この
+モジュールには、送信されたすべての有効な違反と必要なパラメーターのリストのみが必要です。
+モジュールは提出された証拠を処理する必要があります。 `x/証拠`
+モジュールは、最も必要なローカル証拠のタイプを自然に定義してルーティングします
+ペナルティ定数を減らす必要があるかもしれません。 
 
 ```go
 type GenesisState struct {
@@ -156,27 +156,26 @@ type GenesisState struct {
 }
 ```
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-- Allows the state machine to process misbehavior submitted on-chain and penalize
-  validators based on agreed upon slashing parameters.
-- Allows evidence types to be defined and handled by any module. This further allows
-  slashing and jailing to be defined by more complex mechanisms.
-- Does not solely rely on Tendermint to submit evidence.
+-ステートマシンがチェーンに送信された不適切な動作を処理および罰することを許可します
+    合意された削減パラメータに基づくバリデーター。
+-任意のモジュールが証拠タイプを定義および処理できるようにします。 これにより、さらに
+    削減と投獄は、より複雑なメカニズムによって定義されます。
+-証​​拠の提出をテンダーミントだけに頼らないでください。
+### ネガティブ
 
-### Negative
+-リアルタイムのオンチェーンガバナンスを通じて新しいタイプの証拠を導入することは容易ではありません
+    新しいタイプの証拠に対応する手順を導入できないため
 
-- No easy way to introduce new evidence types through governance on a live chain
-  due to the inability to introduce the new evidence type's corresponding handler
+### ニュートラル
 
-### Neutral
+-私たちは無期限に違反を続けるべきですか？ それとも、イベントにもっと依存する必要がありますか？
 
-- Should we persist infractions indefinitely? Or should we rather rely on events?
+## 参照
 
-## References
-
-- [ICS](https://github.com/cosmos/ics)
-- [IBC Architecture](https://github.com/cosmos/ics/blob/master/ibc/1_IBC_ARCHITECTURE.md)
-- [Tendermint Fork Accountability](https://github.com/tendermint/spec/blob/7b3138e69490f410768d9b1ffc7a17abc23ea397/spec/consensus/fork-accountability.md)
+-[ICS](https://github.com/cosmos/ics)
+-[IBCアーキテクチャ](https://github.com/cosmos/ics/blob/master/ibc/1_IBC_ARCHITECTURE.md)
+-[テンダーミントフォークの説明責任](https://github.com/tendermint/spec/blob/7b3138e69490f410768d9b1ffc7a17abc23ea397/spec/consensus/fork-accountability.md) 

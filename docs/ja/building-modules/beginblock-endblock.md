@@ -1,35 +1,35 @@
-# BeginBlocker and EndBlocker
+# BeginBlockerとEndBlocker
 
-`BeginBlocker` and `EndBlocker` are optional methods module developers can implement in their module. They will be triggered at the beginning and at the end of each block respectively, when the [`BeginBlock`](../core/baseapp.md#beginblock) and [`EndBlock`](../core/baseapp.md#endblock) ABCI messages are received from the underlying consensus engine. {synopsis}
+`BeginBlocker`と` EndBlocker`は、モジュール開発者がモジュールに実装できるオプションのメソッドです。[`BeginBlock`](../core/baseapp.md#beginblock)および[` EndBlock`](../core/baseapp.md #endblock)が基盤となるコンセンサスエンジンからABCIメッセージを受信した場合。 {まとめ}
 
-## Pre-requisite Readings
+## 読むための前提条件
 
-- [Module Manager](./module-manager.md) {prereq}
+-[モジュールマネージャー](。/module-manager.md){前提条件}
 
-## BeginBlocker and EndBlocker
+## BeginBlockerとEndBlocker
 
-`BeginBlocker` and `EndBlocker` are a way for module developers to add automatic execution of logic to their module. This is a powerful tool that should be used carefully, as complex automatic functions can slow down or even halt the chain.
+`BeginBlocker`と` EndBlocker`は、モジュール開発者が自動実行のためにモジュールにロジックを追加するための方法です。これは強力なツールであり、複雑な自動機能によってチェーンの速度が低下したり、停止したりする可能性があるため、注意して使用する必要があります。
 
-When needed, `BeginBlocker` and `EndBlocker` are implemented as part of the [`AppModule` interface](./module-manager.md#appmodule). The `BeginBlock` and `EndBlock` methods of the interface implemented in `module.go` generally defer to `BeginBlocker` and `EndBlocker` methods respectively, which are usually implemented in `abci.go`.
+必要に応じて、 `BeginBlocker`と` EndBlocker`は[`AppModule`インターフェース](./module-manager.md#appmodule)の一部として実装されます。 `module.go`に実装されているインターフェースの` BeginBlock`メソッドと `EndBlock`メソッドは、通常、それぞれ` BeginBlocker`メソッドと `EndBlocker`メソッドに従い、通常は` abci.go`に実装されています。
 
-The actual implementation of `BeginBlocker` and `EndBlocker` in `abci.go` are very similar to that of a [`Msg` service](./msg-services.md):
+`abci.go`での` BeginBlocker`と `EndBlocker`の実際の実装は、[` Msg` service](./msg-services.md)の実装と非常によく似ています。
 
-- They generally use the [`keeper`](./keeper.md) and [`ctx`](../core/context.md) to retrieve information about the latest state.
-- If needed, they use the `keeper` and `ctx` to trigger state-transitions.
-- If needed, they can emit [`events`](../core/events.md) via the `ctx`'s `EventManager`.
+-通常、[`keeper`](./keeper.md)と[` ctx`](../core/context.md)を使用して、最新の状態に関する情報を取得します。
+-必要に応じて、 `keeper`と` ctx`を使用して状態遷移をトリガーします。
+-必要に応じて、 `ctx`の` EventManager`を介して[`events`](../core/events.md)を発行できます。
 
-A specificity of the `EndBlocker` is that it can return validator updates to the underlying consensus engine in the form of an [`[]abci.ValidatorUpdates`](https://tendermint.com/docs/app-dev/abci-spec.html#validatorupdate). This is the preferred way to implement custom validator changes.
+`EndBlocker`の特徴の1つは、[`[] abci.ValidatorUpdates`](https://tendermint.com/docs/app-dev/abci-spec.html#validatorupdate)として使用できることです。これは、カスタムバリデーターの変更を実装するための推奨される方法です。
 
-It is possible for developers to define the order of execution between the `BeginBlocker`/`EndBlocker` functions of each of their application's modules via the module's manager `SetOrderBeginBlocker`/`SetOrderEndBlocker` methods. For more on the module manager, click [here](./module-manager.md#manager).
+開発者は、モジュールマネージャーの「SetOrderBeginBlocker」/「SetOrderEndBlocker」メソッドを使用して、各アプリケーションモジュールの「BeginBlocker」/「EndBlocker」関数間の実行順序を定義できます。モジュールマネージャの詳細については、[ここ](./module-manager.md#manager)をクリックしてください。
 
-See an example implementation of `BeginBlocker` from the `distr` module:
+`disr`モジュールからの` BeginBlocker`の実装例をご覧ください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/f33749263f4ecc796115ad6e789cb0f7cddf9148/x/distribution/abci.go#L14-L38
 
-and an example implementation of `EndBlocker` from the `staking` module:
+そして、ステーキングモジュールからのEndBlockerの実装例:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/f33749263f4ecc796115ad6e789cb0f7cddf9148/x/staking/abci.go#L22-L27
 
-## Next {hide}
+##次へ{hide}
 
-Learn about [`keeper`s](./keeper.md) {hide}
+[`keeper`s](./keeper.md){hide}を理解する 

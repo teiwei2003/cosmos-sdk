@@ -1,36 +1,36 @@
-# Invariants
+# 常数
 
-An invariant is a property of the application that should always be true. In the context of the Cosmos SDK, an `Invariant` is a function that checks for a particular invariant. These functions are useful to detect bugs early on and act upon them to limit their potential consequences (e.g. by halting the chain). They are also useful in the development process of the application to detect bugs via simulations. {synopsis}
+不変条件はアプリケーションの属性であり、常に真である必要があります。 Cosmos SDKのコンテキストでは、「不変条件」は特定の不変条件をチェックする関数です。これらの関数を使用して、エラーを早期に検出し、それらに対してアクションを実行して、潜在的な結果を制限することができます(たとえば、チェーンを停止することによって)。また、アプリケーションの開発にも非常に役立ち、シミュレーションを通じてエラーを検出するために使用できます。 {まとめ}
 
-## Pre-requisite Readings
+## 読むための前提条件
 
-- [Keepers](./keeper.md) {prereq}
+-[キーパー](。/keeper.md){前提条件}
 
-## Implementing `Invariant`s
+## `Invariant`を実装する
 
-An `Invariant` is a function that checks for a particular invariant within a module. Module `Invariant`s must follow the `Invariant` type:
+`Invariant`は、モジュール内の特定の不変条件をチェックする関数です。モジュール `Invariant`は` Invariant`タイプに従う必要があります。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/types/invariant.go#L9
 
-The `string` return value is the invariant message, which can be used when printing logs, and the `bool` return value is the actual result of the invariant check.
+`string`の戻り値は不変のメッセージであり、ログを出力するときに使用できます。`bool`の戻り値は、不変のチェックの実際の結果です。
 
-In practice, each module implements `Invariant`s in a `./keeper/invariants.go` file within the module's folder. The standard is to implement one `Invariant` function per logical grouping of invariants with the following model:
+実際、各モジュールは、モジュールフォルダのファイル `。/keeper/invariants.go`に` Invariant`を実装しています。標準では、次のモデルを使用して、不変条件の論理グループごとに「不変条件」関数を実装します。 
 
 ```go
-// Example for an Invariant that checks balance-related invariants
+//Example for an Invariant that checks balance-related invariants
 
 func BalanceInvariants(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) (string, bool) {
-        // Implement checks for balance-related invariants
+       //Implement checks for balance-related invariants
     }
 }
 ```
 
-Additionally, module developers should generally implement an `AllInvariants` function that runs all the `Invariant`s functions of the module:
+さらに、モジュール開発者は通常、モジュールのすべての `Invariant`関数を実行するために` AllInvariants`関数を実装する必要があります。 
 
 ```go
-// AllInvariants runs all invariants of the module.
-// In this example, the module implements two Invariants: BalanceInvariants and DepositsInvariants
+//AllInvariants runs all invariants of the module.
+//In this example, the module implements two Invariants: BalanceInvariants and DepositsInvariants
 
 func AllInvariants(k Keeper) sdk.Invariant {
 
@@ -45,10 +45,10 @@ func AllInvariants(k Keeper) sdk.Invariant {
 }
 ```
 
-Finally, module developers need to implement the `RegisterInvariants` method as part of the [`AppModule` interface](./module-manager.md#appmodule). Indeed, the `RegisterInvariants` method of the module, implemented in the `module/module.go` file, typically only defers the call to a `RegisterInvariants` method implemented in the `keeper/invariants.go` file. The `RegisterInvariants` method registers a route for each `Invariant` function in the [`InvariantRegistry`](#invariant-registry):
+最後に、モジュール開発者は、[`AppModule`インターフェース](./module-manager.md#appmodule)の一部として` RegisterInvariants`メソッドを実装する必要があります。 実際、 `module/module.go`ファイルに実装されたモジュールの` RegisterInvariants`メソッドは、通常、 `keeper/invariants.go`ファイルに実装された` RegisterInvariants`メソッドの呼び出しを遅らせるだけです。 `RegisterInvariants`メソッドは、[` InvariantRegistry`](#invariant-registry)の各 `Invariant`関数のルートを登録します。 
 
 ```go
-// RegisterInvariants registers all staking invariants
+//RegisterInvariants registers all staking invariants
 func RegisterInvariants(ir sdk.InvariantRegistry, k Keeper) {
 	ir.RegisterRoute(types.ModuleName, "module-accounts",
 		BalanceInvariants(k))
@@ -57,28 +57,28 @@ func RegisterInvariants(ir sdk.InvariantRegistry, k Keeper) {
 }
 ```
 
-For more, see an example of [`Invariant`s implementation from the `staking` module](https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/x/staking/keeper/invariants.go).
+詳細については、[`stakeing`モジュールでの` Invariant`実装の例](https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/x/staking/keeper/invariants.go)を参照してください。
 
-## Invariant Registry
+## 変更されていないレジストリ
 
-The `InvariantRegistry` is a registry where the `Invariant`s of all the modules of an application are registered. There is only one `InvariantRegistry` per **application**, meaning module developers need not implement their own `InvariantRegistry` when building a module. **All module developers need to do is to register their modules' invariants in the `InvariantRegistry`, as explained in the section above**. The rest of this section gives more information on the `InvariantRegistry` itself, and does not contain anything directly relevant to module developers.
+`InvariantRegistry`は、アプリケーションのすべてのモジュールの` Invariant`が登録されているレジストリです。 **アプリケーション**ごとに `InvariantRegistry`は1つだけです。つまり、モジュール開発者は、モジュールを構築するときに独自の` InvariantRegistry`を実装する必要はありません。 **モジュール開発者が行う必要があるのは、前のセクションで説明したように、モジュールの不変条件を `InvariantRegistry`に登録することだけです**。このセクションの残りの部分では、 `InvariantRegistry`自体に関する詳細情報を提供し、モジュール開発者に直接関連するものは含まれていません。
 
-At its core, the `InvariantRegistry` is defined in the Cosmos SDK as an interface:
+基本的に、 `InvariantRegistry`は、CosmosSDKのインターフェイスとして定義されています。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/types/invariant.go#L14-L17
 
-Typically, this interface is implemented in the `keeper` of a specific module. The most used implementation of an `InvariantRegistry` can be found in the `crisis` module:
+通常、このインターフェースは特定のモジュールの「キーパー」に実装されます。 `InvariantRegistry`の最も一般的に使用される実装は、` crisis`モジュールにあります。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/crisis/keeper/keeper.go#L50-L54
 
- The `InvariantRegistry` is therefore typically instantiated by instantiating the `keeper` of the `crisis` module in the [application's constructor function](../basics/app-anatomy.md#constructor-function).
+ したがって、 `InvariantRegistry`は通常、[アプリケーションコンストラクター](../basics/app-anatomy.md#constructor-function)の` crisis`モジュールの `keeper`をインスタンス化することによってインスタンス化されます。
 
-`Invariant`s can be checked manually via [`message`s](./messages-and-queries.md), but most often they are checked automatically at the end of each block. Here is an example from the `crisis` module:
+`Invariant`は、[` message`s](./messages-and-queries.md)を介して手動でチェックできますが、ほとんどの場合、各ブロックの最後で自動的にチェックされます。 「crisis」モジュールの例を次に示します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/x/crisis/abci.go#L7-L14
 
-In both cases, if one of the `Invariant`s returns false, the `InvariantRegistry` can trigger special logic (e.g. have the application panic and print the `Invariant`s message in the log).
+どちらの場合も、 `Invariant`の1つがfalseを返すと、` InvariantRegistry`は特別なロジックをトリガーできます(たとえば、アプリケーションをパニックにし、 `Invariant`メッセージをログに出力します)。
 
-## Next {hide}
+## 次へ{hide}
 
-Learn about [genesis functionalities](./genesis.md) {hide}
+[作成関数](./genesis.md)を理解する{hide} 

@@ -1,64 +1,64 @@
-# ADR 042: Group Module
+# ADR 042:グループモジュール
 
-## Changelog
+## 変更ログ
 
-- 2020/04/09: Initial Draft
+-2020/04/09:最初のドラフト
 
-## Status
+## 状態
 
-Draft
+下書き
 
-## Abstract
+## 概要
 
-This ADR defines the `x/group` module which allows the creation and management of on-chain multi-signature accounts and enables voting for message execution based on configurable decision policies.
+ADRは、「x .group」モジュールを定義します。これにより、チェーン上のマルチシグニチャアカウントの作成と管理が可能になり、構成可能な決定ポリシーに基づいてメッセージ実行に投票できるようになります。
 
-## Context
+## 環境
 
-The legacy amino multi-signature mechanism of the Cosmos SDK has certain limitations:
+Cosmos SDKによって残されたアミノマルチシグニチャメカニズムには、特定の制限があります。
 
-- Key rotation is not possible, although this can be solved with [account rekeying](adr-034-account-rekeying.md).
-- Thresholds can't be changed.
-- UX is cumbersome for non-technical users ([#5661](https://github.com/cosmos/cosmos-sdk/issues/5661)).
-- It requires `legacy_amino` sign mode ([#8141](https://github.com/cosmos/cosmos-sdk/issues/8141)).
+-キーのローテーションはできませんが、[アカウントのキーの再生成](adr-034-account-rekeying.md)で解決できます。
+-しきい値は変更できません。
+-UXは、技術者以外のユーザーにとっては厄介です([#5661](https://github.com/cosmos/cosmos-sdk/issues/5661))。
+-`legacy_amino`シンボルパターン([#8141](https://github.com/cosmos/cosmos-sdk/issues/8141))が必要です。
 
-While the group module is not meant to be a total replacement for the current multi-signature accounts, it provides a solution to the limitations described above, with a more flexible key management system where keys can be added, updated or removed, as well as configurable thresholds.
-It's meant to be used with other access control modules such as [`x/feegrant`](./adr-029-fee-grant-module.md) ans [`x/authz`](adr-030-authz-module.md) to simplify key management for individuals and organizations.
+グループモジュールは、現在のマルチ署名アカウントを完全に置き換えることを意図したものではありませんが、上記の制限を解決する方法を提供し、キーを追加、更新、または削除できる、より柔軟なキー管理システムと、構成可能なしきい値を備えています。
+[`x .feegrant`](..adr-029-fee-grant-module.md)ans [` x .authz`](adr-030-authz)などの他のアクセス制御モジュールで使用することを目的としています。 -module .md)個人および組織のキー管理を簡素化します。
 
-The proof of concept of the group module can be found in https://github.com/regen-network/regen-ledger/tree/master/proto/regen/group/v1alpha1 and https://github.com/regen-network/regen-ledger/tree/master/x/group.
+グループモジュールの概念実証は、https://github.com/regen-network/regen-ledger/tree/master/proto/regen/group/v1alpha1およびhttps://github.com/regen-にあります。 network .regen-ledger .tree .master .x .group。
 
-## Decision
+## 決定
 
-We propose merging the `x/group` module with its supporting [ORM/Table Store package](https://github.com/regen-network/regen-ledger/tree/master/orm) ([#7098](https://github.com/cosmos/cosmos-sdk/issues/7098)) into the Cosmos SDK and continuing development here. There will be a dedicated ADR for the ORM package.
+`x .group`モジュールをサポートされている[ORM .Table Storeパッケージ](https://github.com/regen-network/regen-ledger/tree/master/orm)([#7098](https ://github.com/cosmos/cosmos-sdk/issues/7098))Cosmos SDKに入り、ここで開発を続行します。 ORMパッケージには専用のADRがあります。
 
-### Group
+### グループ
 
-A group is a composition of accounts with associated weights. It is not
-an account and doesn't have a balance. It doesn't in and of itself have any
-sort of voting or decision weight.
-Group members can create proposals and vote on them through group accounts using different decision policies.
+グループは、関連する重みを持つアカウントの組み合わせです。そうではない
+アカウントと残高なし。何もありません
+特定の投票の重みまたは決定の重み。
+グループメンバーは、さまざまな意思決定戦略を使用して提案を作成し、グループアカウントを通じて投票することができます。
 
-It has an `admin` account which can manage members in the group, update the group
-metadata and set a new admin.
+グループメンバーを管理し、グループを更新できる「admin」アカウントがあります
+メタデータを作成し、新しい管理者を設定します。  
 
 ```proto
 message GroupInfo {
 
-    // group_id is the unique ID of this group.
+   ..group_id is the unique ID of this group.
     uint64 group_id = 1;
 
-    // admin is the account address of the group's admin.
+   ..admin is the account address of the group's admin.
     string admin = 2;
 
-    // metadata is any arbitrary metadata to attached to the group.
+   ..metadata is any arbitrary metadata to attached to the group.
     bytes metadata = 3;
 
-    // version is used to track changes to a group's membership structure that
-    // would break existing proposals. Whenever a member weight has changed,
-    // or any member is added or removed, the version is incremented and will
-    // invalidate all proposals from older versions.
+   ..version is used to track changes to a group's membership structure that
+   ..would break existing proposals. Whenever a member weight has changed,
+   ..or any member is added or removed, the version is incremented and will
+   ..invalidate all proposals from older versions.
     uint64 version = 4;
 
-    // total_weight is the sum of the group members' weights.
+   ..total_weight is the sum of the group members' weights.
     string total_weight = 5;
 }
 ```
@@ -66,84 +66,84 @@ message GroupInfo {
 ```proto
 message GroupMember {
 
-    // group_id is the unique ID of the group.
+   ..group_id is the unique ID of the group.
     uint64 group_id = 1;
 
-    // member is the member data.
+   ..member is the member data.
     Member member = 2;
 }
 
-// Member represents a group member with an account address,
-// non-zero weight and metadata.
+/.Member represents a group member with an account address,
+/.non-zero weight and metadata.
 message Member {
 
-    // address is the member's account address.
+   ..address is the member's account address.
     string address = 1;
 
-    // weight is the member's voting weight that should be greater than 0.
+   ..weight is the member's voting weight that should be greater than 0.
     string weight = 2;
 
-    // metadata is any arbitrary metadata to attached to the member.
+   ..metadata is any arbitrary metadata to attached to the member.
     bytes metadata = 3;
 }
 ```
 
-### Group Account
+### グループアカウント
 
-A group account is an account associated with a group and a decision policy.
-A group account does have a balance.
+グループアカウントは、グループおよび意思決定戦略に関連付けられたアカウントです。
+グループアカウントには残高があります。
 
-Group accounts are abstracted from groups because a single group may have
-multiple decision policies for different types of actions. Managing group
-membership separately from decision policies results in the least overhead
-and keeps membership consistent across different policies. The pattern that
-is recommended is to have a single master group account for a given group,
-and then to create separate group accounts with different decision policies
-and delegate the desired permissions from the master account to
-those "sub-accounts" using the [`x/authz` module](adr-030-authz-module.md).
+単一のグループが持っている可能性があるため、グループアカウントはグループから抽象化されます
+さまざまなタイプのアクションに対する複数の意思決定戦略。 経営陣
+意思決定戦略とは別のメンバーシップは、最小限のオーバーヘッドにつながります
+また、さまざまなポリシーで一貫したメンバーシップを維持します。 そのパターン
+特定のグループのプライマリグループアカウントを設定することをお勧めします。
+次に、異なる意思決定戦略で個別のグループアカウントを作成します
+そして、必要な権限をマスターアカウントからに委任します
+[`x .authz`モジュール](adr-030-authz-module.md)を使用する「サブアカウント」。 
 
 ```proto
 message GroupAccountInfo {
 
-    // address is the group account address.
+   ..address is the group account address.
     string address = 1;
 
-    // group_id is the ID of the Group the GroupAccount belongs to.
+   ..group_id is the ID of the Group the GroupAccount belongs to.
     uint64 group_id = 2;
 
-    // admin is the account address of the group admin.
+   ..admin is the account address of the group admin.
     string admin = 3;
 
-    // metadata is any arbitrary metadata of this group account.
+   ..metadata is any arbitrary metadata of this group account.
     bytes metadata = 4;
 
-    // version is used to track changes to a group's GroupAccountInfo structure that
-    // invalidates active proposal from old versions.
+   ..version is used to track changes to a group's GroupAccountInfo structure that
+   ..invalidates active proposal from old versions.
     uint64 version = 5;
 
-    // decision_policy specifies the group account's decision policy.
+   ..decision_policy specifies the group account's decision policy.
     google.protobuf.Any decision_policy = 6 [(cosmos_proto.accepts_interface) = "DecisionPolicy"];
 }
 ```
 
-Similarly to a group admin, a group account admin can update its metadata, decision policy or set a new group account admin.
+グループ管理者と同様に、グループアカウント管理者は、メタデータ、意思決定ポリシーを更新したり、新しいグループアカウント管理者を設定したりできます。
 
-A group account can also be an admin or a member of a group.
-For instance, a group admin could be another group account which could "elects" the members or it could be the same group that elects itself.
+グループアカウントは、管理者またはグループメンバーになることもできます。
+たとえば、グループ管理者は、メンバーを「選出」できる別のグループアカウントにすることも、自分自身を選出する同じグループにすることもできます。
 
-### Decision Policy
+### 決定ポリシー
 
-A decision policy is the mechanism by which members of a group can vote on
-proposals.
+意思決定戦略は、グループメンバーが投票できるメカニズムです。
+提案。
 
-All decision policies should have a minimum and maximum voting window.
-The minimum voting window is the minimum duration that must pass in order
-for a proposal to potentially pass, and it may be set to 0. The maximum voting
-window is the maximum time that a proposal may be voted on and executed if
-it reached enough support before it is closed.
-Both of these values must be less than a chain-wide max voting window parameter.
+すべての意思決定戦略には、最小および最大の投票ウィンドウが必要です。
+最小投票ウィンドウは、順番に通過する必要がある最短の期間です
+提案の可能性があるため、0に設定できます。 最大投票数
+ウィンドウは、プロポーザルに投票して実行できる最大時間です。
+閉店前に十分なサポートを受けました。
+これらの値は両方とも、チェーン全体の最大投票ウィンドウパラメータよりも小さくする必要があります。
 
-We define the `DecisionPolicy` interface that all decision policies must implement:
+すべての決定ポリシーが実装する必要がある `DecisionPolicy`インターフェースを定義します。  
 
 ```go
 type DecisionPolicy interface {
@@ -161,119 +161,119 @@ type DecisionPolicyResult struct {
 }
 ```
 
-#### Threshold decision policy
+#### しきい値決定戦略
 
-A threshold decision policy defines a minimum support votes (_yes_), based on a tally
-of voter weights, for a proposal to pass. For
-this decision policy, abstain and veto are treated as no support (_no_).
+しきい値決定戦略は、カウントに基づいてサポート投票の最小数を定義します(_yes_)
+有権者は提案に合格するように加重されます。 にとって
+この決定ポリシー、棄権、拒否権はサポートされていないと見なされます(_no_)。 
 
 ```proto
 message ThresholdDecisionPolicy {
 
-    // threshold is the minimum weighted sum of support votes for a proposal to succeed.
+   ..threshold is the minimum weighted sum of support votes for a proposal to succeed.
     string threshold = 1;
 
-    // voting_period is the duration from submission of a proposal to the end of voting period
-    // Within this period, votes and exec messages can be submitted.
+   ..voting_period is the duration from submission of a proposal to the end of voting period
+   ..Within this period, votes and exec messages can be submitted.
     google.protobuf.Duration voting_period = 2 [(gogoproto.nullable) = false];
 }
 ```
 
-### Proposal
+### 提案
 
-Any member of a group can submit a proposal for a group account to decide upon.
-A proposal consists of a set of `sdk.Msg`s that will be executed if the proposal
-passes as well as any metadata associated with the proposal. These `sdk.Msg`s get validated as part of the `Msg/CreateProposal` request validation. They should also have their signer set as the group account.
+グループのメンバーは誰でも、グループアカウントが決定するための提案を提出できます。
+提案の場合、提案は一連の `sdk.Msg`で構成されます
+パスと提案に関連するメタデータ。 これらの `sdk.Msg`は、` Msg .CreateProposal`リクエスト検証の一部として検証されます。 また、署名者をグループアカウントとして設定する必要があります。
 
-Internally, a proposal also tracks:
+内部的には、提案は以下も追跡します。
 
-- its current `Status`: submitted, closed or aborted
-- its `Result`: unfinalized, accepted or rejected
-- its `VoteState` in the form of a `Tally`, which is calculated on new votes and when executing the proposal.
+-現在の「ステータス」:送信済み、クローズ済み、または中止済み
+-その「結果」:不完全、承認、または拒否
+-その「VoteState」は「Tally」の形式であり、新しい投票と提案の実行に基づいて計算されます。 
 
 ```proto
-// Tally represents the sum of weighted votes.
+/.Tally represents the sum of weighted votes.
 message Tally {
     option (gogoproto.goproto_getters) = false;
 
-    // yes_count is the weighted sum of yes votes.
+   ..yes_count is the weighted sum of yes votes.
     string yes_count = 1;
 
-    // no_count is the weighted sum of no votes.
+   ..no_count is the weighted sum of no votes.
     string no_count = 2;
 
-    // abstain_count is the weighted sum of abstainers.
+   ..abstain_count is the weighted sum of abstainers.
     string abstain_count = 3;
 
-    // veto_count is the weighted sum of vetoes.
+   ..veto_count is the weighted sum of vetoes.
     string veto_count = 4;
 }
 ```
 
-### Voting
+### 投票
 
-Members of a group can vote on proposals. There are four choices to choose while voting - yes, no, abstain and veto. Not
-all decision policies will support them. Votes can contain some optional metadata.
-In the current implementation, the voting window begins as soon as a proposal
-is submitted.
+グループメンバーは提案に投票できます。投票するときは、「はい」、「いいえ」、「棄権」、「拒否」の4つの選択肢があります。いいえ
+すべての意思決定ポリシーがそれらをサポートします。投票には、オプションのメタデータを含めることができます。
+現在の実装では、投票ウィンドウは提案の直後に開始されます
+提出されました。
 
-Voting internally updates the proposal `VoteState` as well as `Status` and `Result` if needed.
+必要に応じて、投票により提案「VoteState」と「Status」および「Result」が内部で更新されます。
 
-### Executing Proposals
+### 提案を実行する
 
-Proposals will not be automatically executed by the chain in this current design,
-but rather a user must submit a `Msg/Exec` transaction to attempt to execute the
-proposal based on the current votes and decision policy. A future upgrade could
-automate this and have the group account (or a fee granter) pay.
+現在の設計では、チェーンは提案を自動的に実行しません。
+代わりに、ユーザーは実行を試みるために `Msg .Exec`トランザクションを送信する必要があります
+現在の投票および意思決定方針に基づく提案。将来のアップグレードの可能性
+これを自動的に行い、グループアカウント(または手数料の付与者)に支払いを依頼します。
 
-#### Changing Group Membership
+#### グループメンバーシップを変更する
 
-In the current implementation, updating a group or a group account after submitting a proposal will make it invalid. It will simply fail if someone calls `Msg/Exec` and will eventually be garbage collected.
+現在の実装では、提案を送信した後にグループまたはグループアカウントを更新すると、それが無効になります。誰かが `Msg .Exec`を呼び出すと、失敗するだけで、最終的にはガベージコレクションされます。
 
-### Notes on current implementation
+### 現在の実装に関する注意
 
-This section outlines the current implementation used in the proof of concept of the group module but this could be subject to changes and iterated on.
+このセクションでは、グループモジュールの概念実証で使用されている現在の実装の概要を説明しますが、これは変更および反復される可能性があります。
 
 #### ORM
 
-The [ORM package](https://github.com/cosmos/cosmos-sdk/discussions/9156) defines tables, sequences and secondary indexes which are used in the group module.
+[ORMパッケージ](https://github.com/cosmos/cosmos-sdk/discussions/9156)は、グループモジュールで使用されるテーブル、シーケンス、およびセカンダリインデックスを定義します。
 
-Groups are stored in state as part of a `groupTable`, the `group_id` being an auto-increment integer. Group members are stored in a `groupMemberTable`.
+グループは「groupTable」の一部として状態に格納され、「group_id」は自動インクリメント整数です。グループメンバーは「groupMemberTable」に保存されます。
 
-Group accounts are stored in a `groupAccountTable`. The group account address is generated based on an auto-increment integer which is used to derive the group module `RootModuleKey` into a `DerivedModuleKey`, as stated in [ADR-033](adr-033-protobuf-inter-module-comm.md#modulekeys-and-moduleids). The group account is added as a new `ModuleAccount` through `x/auth`.
+グループアカウントは「groupAccountTable」に保存されます。グループアカウントアドレスは、自動インクリメント整数に基づいて生成されます。この整数は、グループモジュール `RootModuleKey`を[ADR-033](adr-033-protobuf-inter-module-commなどの` DerivedModuleKey`に派生させるために使用されます。 md#modulekeys-および-moduleids)。グループアカウントは、 `x .auth`を介して新しい` ModuleAccount`として追加されます。
 
-Proposals are stored as part of the `proposalTable` using the `Proposal` type. The `proposal_id` is an auto-increment integer.
+プロポーザルは、「proposalTable」の一部として保存される「Proposal」タイプを使用します。 `proposal_id`は自動インクリメント整数です。
 
-Votes are stored in the `voteTable`. The primary key is based on the vote's `proposal_id` and `voter` account address.
+投票は「voteTable」に保存されます。主キーは、投票された `proposal_id`と` voter`アカウントアドレスに基づいています。
 
-#### ADR-033 to route proposal messages
+#### ADR-033プロポーザルニュースによるルート
 
-Inter-module communication introduced by [ADR-033](adr-033-protobuf-inter-module-comm.md) can be used to route a proposal's messages using the `DerivedModuleKey` corresponding to the proposal's group account.
+[ADR-033](adr-033-protobuf-inter-module-comm.md)導入されたモジュール間通信は、プロポーザルのグループアカウントに対応する「DerivedModuleKey」を使用してプロポーザルのメッセージをルーティングするために使用できます。
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-- Improved UX for multi-signature accounts allowing key rotation and custom decision policies.
+-マルチ署名アカウントのUXを改善し、キーローテーションとカスタム意思決定戦略を可能にしました。
 
-### Negative
+### ネガティブ
 
-### Neutral
+### ニュートラル
 
-- It uses ADR 033 so it will need to be implemented within the Cosmos SDK, but this doesn't imply necessarily any large refactoring of existing Cosmos SDK modules.
-- The current implementation of the group module uses the ORM package.
+-ADR 033を使用しているため、Cosmos SDKに実装する必要がありますが、これは既存のCosmosSDKモジュールの大規模なリファクタリングを意味するものではありません。
+-グループモジュールの現在の実装では、ORMパッケージを使用しています。
 
-## Further Discussions
+## さらなる議論
 
-- Convergence of `/group` and `x/gov` as both support proposals and voting: https://github.com/cosmos/cosmos-sdk/discussions/9066
-- `x/group` possible future improvements:
-    - Execute proposals on submission (https://github.com/regen-network/regen-ledger/issues/288)
-    - Withdraw a proposal (https://github.com/regen-network/cosmos-modules/issues/41)
-    - Make `Tally` more flexible and support non-binary choices
+-` .group`と `x .gov`は、提案と投票の収束をサポートするために使用されます:https://github.com/cosmos/cosmos-sdk/discussions/9066
+-`x .group`の将来の改善の可能性:
+     -提出時に提案を実行します(https://github.com/regen-network/regen-ledger/issues/288)
+     -提案を撤回します(https://github.com/regen-network/cosmos-modules/issues/41)
+     -「タリー」をより柔軟にし、非バイナリオプションをサポートします
 
-## References
+## 参照する
 
-- Initial specification:
-    - https://gist.github.com/aaronc/b60628017352df5983791cad30babe56#group-module
-    - [#5236](https://github.com/cosmos/cosmos-sdk/pull/5236)
-- Proposal to add `x/group` into the Cosmos SDK: [#7633](https://github.com/cosmos/cosmos-sdk/issues/7633)
+-初期仕様:
+     -https://gist.github.com/aaronc/b60628017352df5983791cad30babe56#group-module
+     -[#5236](https://github.com/cosmos/cosmos-sdk/pull/5236)
+-CosmosSDKに `x .group`を追加する提案:[#7633](https://github.com/cosmos/cosmos-sdk/issues/7633) 

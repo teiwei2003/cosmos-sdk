@@ -1,81 +1,81 @@
-# Keepers
+# ゴールキーパー
 
-`Keeper`s refer to a Cosmos SDK abstraction whose role is to manage access to the subset of the state defined by various modules. `Keeper`s are module-specific, i.e. the subset of state defined by a module can only be accessed by a `keeper` defined in said module. If a module needs to access the subset of state defined by another module, a reference to the second module's internal `keeper` needs to be passed to the first one. This is done in `app.go` during the instantiation of module keepers. {synopsis}
+`Keeper`はCosmosSDKの抽象化を指し、その役割は、さまざまなモジュールによって定義された状態のサブセットへのアクセスを管理することです。 `Keeper`はモジュール固有です。つまり、モジュールによって定義された状態のサブセットには、モジュールで定義された` keeper`によってのみアクセスできます。モジュールが別のモジュールによって定義された状態のサブセットにアクセスする必要がある場合、2番目のモジュール内の「キーパー」の参照を最初のモジュールに渡す必要があります。これは、モジュールマネージャーのインスタンス化中に `app.go`で行われます。 {まとめ}
 
-## Pre-requisite Readings
+## 読むための前提条件
 
-- [Introduction to Cosmos SDK Modules](./intro.md) {prereq}
+-[Cosmos SDKモジュールの紹介](。/intro.md){前提条件}
 
-## Motivation
+## 動機
 
-The Cosmos SDK is a framework that makes it easy for developers to build complex decentralised applications from scratch, mainly by composing modules together. As the ecosystem of open source modules for the Cosmos SDK expands, it will become increasingly likely that some of these modules contain vulnerabilities, as a result of the negligence or malice of their developer.
+Cosmos SDKは、開発者が主にモジュールを組み合わせることにより、複雑な分散型アプリケーションを最初から簡単に構築できるようにするフレームワークです。 Cosmos SDKオープンソースモジュールエコシステムの拡張に伴い、これらのモジュールの一部には、開発者の過失または悪意による脆弱性が含まれている可能性が高くなっています。
 
-The Cosmos SDK adopts an [object-capabilities-based approach](../core/ocap.md) to help developers better protect their application from unwanted inter-module interactions, and `keeper`s are at the core of this approach. A `keeper` can be thought of quite literally as the gatekeeper of a module's store(s). Each store (typically an [`IAVL` Store](../core/store.md#iavl-store)) defined within a module comes with a `storeKey`, which grants unlimited access to it. The module's `keeper` holds this `storeKey` (which should otherwise remain unexposed), and defines [methods](#implementing-methods) for reading and writing to the store(s).
+Cosmos SDKは、[Object Capability-Based Method](../core/ocap.md)を採用して、開発者がモジュール間の不要な相互作用からアプリケーションをより適切に保護できるようにします。このメソッドのコアは「キーパー」です。 `keeper`は、文字通りモジュールストレージのゲートキーパーとして理解できます。モジュールで定義された各ストア(通常は[`IAVL`ストア](../core/store.md#iavl-store))には` storeKey`があり、制限なしでアクセスできます。モジュールの `keeper`はこの` storeKey`を保持し(そうでない場合はプライベートに保つ必要があります)、ストレージの読み取りと書き込みを行う[methods](#implementing-methods)を定義します。
 
-The core idea behind the object-capabilities approach is to only reveal what is necessary to get the work done. In practice, this means that instead of handling permissions of modules through access-control lists, module `keeper`s are passed a reference to the specific instance of the other modules' `keeper`s that they need to access (this is done in the [application's constructor function](../basics/app-anatomy.md#constructor-function)). As a consequence, a module can only interact with the subset of state defined in another module via the methods exposed by the instance of the other module's `keeper`. This is a great way for developers to control the interactions that their own module can have with modules developed by external developers.
+オブジェクト機能メソッドの背後にある中心的な考え方は、ジョブを完了するために必要なものだけを明らかにすることです。実際には、これは、アクセス制御リストを介してモジュールのアクセス許可を処理する代わりに、モジュール `keeper`に、アクセスする必要のある他のモジュール` keeper`の特定のインスタンスへの参照が渡されることを意味します(これは[アプリケーションのコンストラクターにあります](../basics/app-anatomy.md#constructor-function))。したがって、モジュールは、他のモジュールの「キーパー」インスタンスによって公開されたメソッドを介してのみ、別のモジュールで定義された状態のサブセットと対話できます。これは、開発者が自分のモジュールと外部の開発者によって開発されたモジュールとの間の相互作用を制御するための優れた方法です。
 
-## Type Definition
+## タイプ定義
 
-`keeper`s are generally implemented in a `/keeper/keeper.go` file located in the module's folder. By convention, the type `keeper` of a module is simply named `Keeper` and usually follows the following structure:
+`Keeper`は通常、モジュールフォルダにある`/keeper/keeper.go`ファイルに実装されます。慣例により、モジュール `keeper`のタイプは略して` Keeper`と呼ばれ、通常は次の構造に従います。 
 
 ```go
 type Keeper struct {
-    // External keepers, if any
+   //External keepers, if any
 
-    // Store key(s)
+   //Store key(s)
 
-    // codec
+   //codec
 }
 ```
 
-For example, here is the type definition of the `keeper` from the `staking` module:
+たとえば、 `stake`モジュールからの` keeper`の型定義は次のとおりです。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/3bafd8255a502e5a9cee07391cf8261538245dfd/x/staking/keeper/keeper.go#L23-L33
 
-Let us go through the different parameters:
+さまざまなパラメータを見てみましょう。
 
-- An expected `keeper` is a `keeper` external to a module that is required by the internal `keeper` of said module. External `keeper`s are listed in the internal `keeper`'s type definition as interfaces. These interfaces are themselves defined in an `expected_keepers.go` file in the root of the module's folder. In this context, interfaces are used to reduce the number of dependencies, as well as to facilitate the maintenance of the module itself.
-- `storeKey`s grant access to the store(s) of the [multistore](../core/store.md) managed by the module. They should always remain unexposed to external modules.
-- `cdc` is the [codec](../core/encoding.md) used to marshall and unmarshall structs to/from `[]byte`. The `cdc` can be any of `codec.BinaryCodec`, `codec.JSONCodec` or `codec.Codec` based on your requirements. It can be either a proto or amino codec as long as they implement these interfaces.
+-予想される「キーパー」はモジュールの外部「キーパー」であり、モジュールの内部「キーパー」にはモジュールが必要です。外部の「キーパー」は、内部の「キーパー」のタイプ定義のインターフェースとしてリストされています。これらのインターフェイス自体は、モジュールフォルダのルートディレクトリにある「expected_keepers.go」ファイルで定義されています。この場合、インターフェースは依存関係の数を減らし、モジュール自体の保守を容易にするために使用されます。
+-`storeKey`sは、モジュールによって管理される[multistore](../core/store.md)ストレージへのアクセスを許可します。それらは外部モジュールにさらされるべきではありません。
+-`cdc`は、 `[] byte`との間で構造をマーシャリングおよびアンマーシャリングするための[codec](../core/encoding.md)です。 `cdc`は、要件に応じて、` codec.BinaryCodec`、 `codec.JSONCodec`、または` codec.Codec`のいずれかになります。それらがこれらのインターフェースを実装している限り、それはプロトまたはアミノコーデックである可能性があります。
 
-Of course, it is possible to define different types of internal `keeper`s for the same module (e.g. a read-only `keeper`). Each type of `keeper` comes with its own constructor function, which is called from the [application's constructor function](../basics/app-anatomy.md). This is where `keeper`s are instantiated, and where developers make sure to pass correct instances of modules' `keeper`s to other modules that require them.
+もちろん、同じモジュールに対して異なるタイプの内部 `keeper`を定義することもできます(たとえば、読み取り専用の` keeper`)。 `keeper`の各タイプには、[アプリケーションコンストラクター](../basics/app-anatomy.md)から呼び出される独自のコンストラクターがあります。ここで `keeper`がインスタンス化され、開発者はモジュール` keeper`の正しいインスタンスをそれらを必要とする他のモジュールに確実に渡します。
 
-## Implementing Methods
+## 実装
 
-`Keeper`s primarily expose getter and setter methods for the store(s) managed by their module. These methods should remain as simple as possible and strictly be limited to getting or setting the requested value, as validity checks should have already been performed via the `ValidateBasic()` method of the [`message`](./messages-and-queries.md#messages) and the [`Msg` server](./msg-services.md) when `keeper`s' methods are called.
+`Keeper`は主に、そのモジュールによって管理される保存されたgetterメソッドとsetterメソッドを公開します。妥当性チェックは[`message`](./messages-and-)クエリの` ValidateBasic() `メソッドに合格している必要があるため、これらのメソッドは可能な限り単純で、要求された値の取得または設定に厳密に制限する必要があります。 `keeper`s 'メソッドが呼び出されたときのmd#メッセージ)および[` Msg`サーバー](./msg-services.md)。
 
-Typically, a *getter* method will have the following signature
+通常、* getter *メソッドには次のシグネチャがあります 
 
 ```go
 func (k Keeper) Get(ctx sdk.Context, key string) returnType
 ```
 
-and the method will go through the following steps:
+このメソッドは、次の手順を実行します。
 
-1. Retrieve the appropriate store from the `ctx` using the `storeKey`. This is done through the `KVStore(storeKey sdk.StoreKey)` method of the `ctx`. Then it's prefered to use the `prefix.Store` to access only the desired limited subset of the store for convenience and safety.
-2. If it exists, get the `[]byte` value stored at location `[]byte(key)` using the `Get(key []byte)` method of the store.
-3. Unmarshall the retrieved value from `[]byte` to `returnType` using the codec `cdc`. Return the value.
+1. `storeKey`を使用して、` ctx`から適切なストアを取得します。 これは、 `ctx`の` KVStore(storeKey sdk.StoreKey) `メソッドによって行われます。 次に、利便性とセキュリティのために、 `prefix.Store`を使用して、必要なストレージの限られたサブセットのみにアクセスすることをお勧めします。
+2.存在する場合は、保存されている `Get(key[] byte)`メソッドを使用して、場所 `[] byte(key)`に保存されている `[] byte`値を取得します。
+3.コーデック `cdc`を使用して、取得した値を`[] byte`から `returnType`にアンマーシャリングします。 戻り値。
 
-Similarly, a *setter* method will have the following signature
+同様に、* setter *メソッドには次の署名があります 
 
 ```go
 func (k Keeper) Set(ctx sdk.Context, key string, value valueType)
 ```
 
-and the method will go through the following steps:
+このメソッドは、次の手順を実行します。
 
-1. Retrieve the appropriate store from the `ctx` using the `storeKey`. This is done through the `KVStore(storeKey sdk.StoreKey)` method of the `ctx`. It's preferred to use the `prefix.Store` to access only the desired limited subset of the store for convenience and safety.
-2. Marshal `value` to `[]byte` using the codec `cdc`.
-3. Set the encoded value in the store at location `key` using the `Set(key []byte, value []byte)` method of the store.
+1. `storeKey`を使用して、` ctx`から適切なストアを取得します。これは、 `ctx`の` KVStore(storeKey sdk.StoreKey) `メソッドによって行われます。利便性とセキュリティのために、必要なストレージの限られたサブセットにのみアクセスするには、 `prefix.Store`を使用するのが最適です。
+2.コーデック `cdc`を使用して、` value`を `[] byte`にグループ化します。
+3.ストアの `Set(key[] byte、value[] byte)`メソッドを使用して、ストアの `key`の場所にエンコード値を設定します。
 
-For more, see an example of `keeper`'s [methods implementation from the `staking` module](https://github.com/cosmos/cosmos-sdk/blob/3bafd8255a502e5a9cee07391cf8261538245dfd/x/staking/keeper/keeper.go).
+詳細については、 `keeper`の例を参照してください[` stakeing`モジュールでのメソッドの実装](https://github.com/cosmos/cosmos-sdk/blob/3bafd8255a502e5a9cee07391cf8261538245dfd/x/staking/keeper/keeper.go )。
 
-The [module `KVStore`](../core/store.md#kvstore-and-commitkvstore-interfaces) also provides an `Iterator()` method which returns an `Iterator` object to iterate over a domain of keys.
+[module `KVStore`](../core/store.md#kvstore-and-commitkvstore-interfaces)は、キーフィールドを反復するために` Iterator`オブジェクトを返す `Iterator()`メソッドも提供します。
 
-This is an example from the `auth` module to iterate accounts:
+これは、アカウントを反復するための `auth`モジュールの例です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/bf8809ef9840b4f5369887a38d8345e2380a567f/x/auth/keeper/account.go#L70-L83
 
-## Next {hide}
+## 次へ{hide}
 
-Learn about [invariants](./invariants.md) {hide}
+[invariants](./invariants.md){hide}を理解する 

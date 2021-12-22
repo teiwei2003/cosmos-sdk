@@ -1,18 +1,18 @@
-# BeginBlock
+# 开始块
 
-## Evidence Handling
+## 证据处理
 
-Tendermint blocks can include
-[Evidence](https://github.com/tendermint/tendermint/blob/master/docs/spec/blockchain/blockchain.md#evidence) that indicates if a validator committed malicious behavior. The relevant information is forwarded to the application as ABCI Evidence in `abci.RequestBeginBlock` so that the validator can be punished accordingly.
+Tendermint 块可以包括
+[证据](https://github.com/tendermint/tendermint/blob/master/docs/spec/blockchain/blockchain.md#evidence) 表明验证者是否有恶意行为。 相关信息将作为 ABCI 证据在 abci.RequestBeginBlock 中转发给应用程序，以便验证器可以受到相应的惩罚。
 
-### Equivocation
+### 模棱两可
 
-Currently, the SDK handles two types of evidence inside the ABCI `BeginBlock`:
+目前，SDK 在 ABCI `BeginBlock` 中处理两种类型的证据:
 
-- `DuplicateVoteEvidence`,
-- `LightClientAttackEvidence`.
+-`DuplicateVoteEvidence`，
+- `LightClientAttackEvidence`。
 
-The evidence module handles these two evidence types the same way. First, the SDK converts the Tendermint concrete evidence type to a SDK `Evidence` interface using `Equivocation` as the concrete type.
+证据模块以相同的方式处理这两种证据类型。 首先，SDK 将 Tendermint 的具体证据类型转换为 SDK 的 `Evidence` 接口，使用 `Equivocation` 作为具体类型。 
 
 ```proto
 // Equivocation implements the Evidence interface.
@@ -24,25 +24,25 @@ message Equivocation {
 }
 ```
 
-For some `Equivocation` submitted in `block` to be valid, it must satisfy:
+对于在 `block` 中提交的某些 `Equivocation` 有效，它必须满足:
 
 `Evidence.Timestamp >= block.Timestamp - MaxEvidenceAge`
 
-Where:
+在哪里:
 
-- `Evidence.Timestamp` is the timestamp in the block at height `Evidence.Height`
-- `block.Timestamp` is the current block timestamp.
+- `Evidence.Timestamp` 是块中高度为 `Evidence.Height` 的时间戳
+- `block.Timestamp` 是当前区块的时间戳。
 
-If valid `Equivocation` evidence is included in a block, the validator's stake is
-reduced (slashed) by `SlashFractionDoubleSign` as defined by the `x/slashing` module
-of what their stake was when the infraction occurred, rather than when the evidence was discovered.
-We want to "follow the stake", i.e., the stake that contributed to the infraction
-should be slashed, even if it has since been redelegated or started unbonding.
+如果一个区块中包含有效的“Equivocation”证据，则验证者的权益为
+由 `x/slashing` 模块定义的 `SlashFractionDoubleSign` 减少(斜线)
+他们的利害关系是在违规发生时，而不是在发现证据时。
+我们想要“关注赌注”，即导致违规的赌注
+应该削减，即使它已经被重新授权或开始解除绑定。
 
-In addition, the validator is permanently jailed and tombstoned to make it impossible for that
-validator to ever re-enter the validator set.
+此外，验证者被永久监禁和墓碑化，使其不可能
+验证器永远重新进入验证器集。
 
-The `Equivocation` evidence is handled as follows:
+`Equivocation` 证据处理如下: 
 
 ```go
 func (k Keeper) HandleEquivocationEvidence(ctx sdk.Context, evidence *types.Equivocation) {
@@ -145,6 +145,6 @@ func (k Keeper) HandleEquivocationEvidence(ctx sdk.Context, evidence *types.Equi
 }
 ```
 
-Note, the slashing, jailing, and tombstoning calls are delegated through the `x/slashing` module
-that emits informative events and finally delegates calls to the `x/staking` module. See documentation
-on slashing and jailing in [x/staking spec](/.././cosmos-sdk/x/staking/spec/02_state_transitions.md).
+注意，slashing、jailing 和 tombstoning 调用是通过 `x/slashing` 模块委托的
+发出信息事件并最终将调用委托给 `x/staking` 模块。 查看文档
+关于 [x/staking spec](/.././cosmos-sdk/x/staking/spec/02_state_transitions.md) 中的削减和监禁。

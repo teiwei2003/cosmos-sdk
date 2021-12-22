@@ -1,7 +1,6 @@
-# Keeper
+# 守门员
 
-In the app initialization stage, [subspaces](02_subspace.md) can be allocated for other modules' keeper using `Keeper.Subspace` and are stored in `Keeper.spaces`. Then, those modules can have a reference to their specific parameter store through `Keeper.GetSubspace`.
-
+在app初始化阶段，可以使用`Keeper.Subspace`为其他模块的keeper分配[subspaces](02_subspace.md)，并存储在`Keeper.spaces`中。 然后，这些模块可以通过 `Keeper.GetSubspace` 引用它们的特定参数存储。 
 Example:
 
 ```go

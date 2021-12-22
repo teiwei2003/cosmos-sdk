@@ -1,42 +1,42 @@
-# Messages
+# 消息
 
-In this section we describe the processing of messages for the authz module.
+在本节中，我们将描述 authz 模块的消息处理。
 
-## MsgGrant
+## 消息授权
 
-An authorization grant is created using the `MsgGrant` message.
-If there is already a grant for the `(granter, grantee, Authorization)` triple, then the new grant overwrites the previous one. To update or extend an existing grant, a new grant with the same `(granter, grantee, Authorization)` triple should be created.
+使用“MsgGrant”消息创建授权许可。
+如果已经有对 `(granter, grantee, Authorization)` 三元组的授权，那么新的授权会覆盖之前的授权。要更新或扩展现有授权，应创建具有相同“(授权者、被授权者、授权)”三元组的新授权。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.43.0-beta1/proto/cosmos/authz/v1beta1/tx.proto#L32-L37
 
-The message handling should fail if:
+如果出现以下情况，消息处理应该会失败:
 
-- both granter and grantee have the same address.
-- provided `Expiration` time is less than current unix timestamp.
-- provided `Grant.Authorization` is not implemented.
-- `Authorization.MsgTypeURL()` is not defined in the router (there is no defined handler in the app router to handle that Msg types).
+- 授予者和受赠者的地址相同。
+- 提供的`Expiration` 时间小于当前的 unix 时间戳。
+- 如果没有实现`Grant.Authorization`。
+- `Authorization.MsgTypeURL()` 未在路由器中定义(应用路由器中没有定义的处理程序来处理该消息类型)。
 
-## MsgRevoke
+## 消息撤销
 
-A grant can be removed with the `MsgRevoke` message.
+可以使用 `MsgRevoke` 消息删除授权。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.43.0-beta1/proto/cosmos/authz/v1beta1/tx.proto#L60-L64
 
-The message handling should fail if:
+如果出现以下情况，消息处理应该会失败:
 
-- both granter and grantee have the same address.
-- provided `MsgTypeUrl` is empty.
+- 授予者和受赠者的地址相同。
+- 假设 `MsgTypeUrl` 为空。
 
-NOTE: The `MsgExec` message removes a grant if the grant has expired.
+注意:如果授权已过期，`MsgExec` 消息将删除授权。
 
-## MsgExec
+## 消息执行
 
-When a grantee wants to execute a transaction on behalf of a granter, they must send `MsgExec`.
+当受赠人想要代表受赠人执行交易时，他们必须发送“MsgExec”。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.43.0-beta1/proto/cosmos/authz/v1beta1/tx.proto#L47-L53
 
-The message handling should fail if:
+如果出现以下情况，消息处理应该会失败:
 
-- provided `Authorization` is not implemented.
-- grantee doesn't have permission to run the transaction.
-- if granted authorization is expired.
+- 前提是未实现“授权”。
+- 受让人无权运行交易。
+- 如果授予的授权已过期。 

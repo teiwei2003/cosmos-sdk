@@ -1,94 +1,94 @@
-# Module Simulation
+# モジュールシミュレーション
 
-## Prerequisites
+## 前提条件
 
-* [Cosmos Blockchain Simulator](./../using-the-sdk/simulation.md)
+*[Cosmos Blockchain Simulator](./../using-the-sdk/Simulation.md)
 
-## Synopsis
+## 概要
 
-This document details how to define each module simulation functions to be
-integrated with the application `SimulationManager`.
+このドキュメントでは、各モジュールのシミュレーション機能を定義する方法について詳しく説明します
+アプリケーション「SimulationManager」との統合。
 
-* [Simulation package](#simulation-package)
-    * [Store decoders](#store-decoders)
-    * [Randomized genesis](#randomized-genesis)
-    * [Randomized parameters](#randomized-parameters)
-    * [Random weighted operations](#random-weighted-operations)
-    * [Random proposal contents](#random-proposal-contents)
-* [Registering the module simulation functions](#registering-simulation-functions)
-* [App simulator manager](#app-simulator-manager)
-* [Simulation tests](#simulation-tests)
+*[シミュレーションパッケージ](#simulation-package)
+     *[ストレージデコーダー](#store-decoders)
+     *[ランダムオリジン](#randomized-genesis)
+     *[ランダム化されたパラメーター](#randomized-parameters)
+     *[ランダム加重操作](#random-weighted-operations)
+     *[ランダムプロポーザルコンテンツ](#random-proposal-contents)
+※【モジュールシミュレーション機能の登録】(#registering-simulation-functions)
+*[アプリシミュレーターマネージャー](#app-simulator-manager)
+*[シミュレーションテスト](#simulation-tests)
 
-## Simulation package
+## シミュレーションパッケージ
 
-Every module that implements the Cosmos SDK simulator needs to have a `x/<module>/simulation`
-package which contains the primary functions required by the fuzz tests: store
-decoders, randomized genesis state and parameters, weighted operations and proposal
-contents.
+Cosmos SDKシミュレーターを実装するすべてのモジュールには、 `x/<module>/simulation`が必要です。
+ファジングに必要な主な機能を含むパッケージ:ストレージ
+デコーダー、ランダムな作成状態とパラメーター、重み付けされた操作と提案
+コンテンツ。
 
-### Store decoders
+### ストレージデコーダー 
 
-Registering the store decoders is required for the `AppImportExport`. This allows
-for the key-value pairs from the stores to be decoded (_i.e_ unmarshalled)
-to their corresponding types. In particular, it matches the key to a concrete type
-and then unmarshals the value from the `KVPair` to the type provided.
+`AppImportExport`はストレージデコーダーを登録する必要があります。これにより、
+デコードされるストレージからのキーと値のペア(_i.e_ unmarshalled)
+対応するタイプに。特に、キーを特定のタイプに一致させます
+次に、 `KVPair`の値を指定されたタイプにグループ化解除します。
 
-You can use the example [here](https://github.com/cosmos/cosmos-sdk/blob/v0.42.0/x/distribution/simulation/decoder.go) from the distribution module to implement your store decoders.
+配布モジュール[ここ](https://github.com/cosmos/cosmos-sdk/blob/v0.42.0/x/distribution/simulation/decoder.go)の例を使用して、ストレージデコーダーを実装できます。
 
-### Randomized genesis
+### ランダムオリジン
 
-The simulator tests different scenarios and values for genesis parameters
-in order to fully test the edge cases of specific modules. The `simulator` package from each module must expose a `RandomizedGenState` function to generate the initial random `GenesisState` from a given seed.
+シミュレーターは、さまざまなシナリオと作成パラメーター値をテストします
+特定のモジュールのエッジケースを完全にテストするため。各モジュールの `simulator`パッケージは、指定されたシードから初期のランダムな` GenesisState`を生成するために、 `RandomizedGenState`関数を公開する必要があります。
 
-Once the module genesis parameter are generated randomly (or with the key and
-values defined in a `params` file), they are marshaled to JSON format and added
-to the app genesis JSON to use it on the simulations.
+モジュール作成パラメータがランダムに生成されたら(またはキーを使用して
+`params`ファイルで定義された値)、それらはJSON形式にグループ化されて追加されます
+アプリケーションジェネシスJSONに移動して、シミュレーションで使用します。
 
-You can check an example on how to create the randomized genesis [here](https://github.com/cosmos/cosmos-sdk/blob/v0.42.0/x/staking/simulation/genesis.go).
+ランダムジェネシスを作成する方法の例を[ここ](https://github.com/cosmos/cosmos-sdk/blob/v0.42.0/x/staking/simulation/genesis.go)で表示できます。
 
-### Randomized parameter changes
+### パラメータのランダムな変更
 
-The simulator is able to test parameter changes at random. The simulator package from each module must contain a `RandomizedParams` func that will simulate parameter changes of the module throughout the simulations lifespan.
+シミュレーターは、パラメーターの変更をランダムにテストできます。各モジュールのシミュレーターパッケージには、シミュレーションライフサイクル全体でモジュールのパラメーター変更をシミュレートする「RandomizedParams」関数が含まれている必要があります。
 
-You can see how an example of what is needed to fully test parameter changes [here](https://github.com/cosmos/cosmos-sdk/blob/v0.42.0/x/staking/simulation/params.go)
+パラメータの変更を完全にテストするために必要な例は、[こちら](https://github.com/cosmos/cosmos-sdk/blob/v0.42.0/x/staking/simulation/params.go)で確認できます。
 
-### Random weighted operations
+### ランダム重み付け操作
 
-Operations are one of the crucial parts of the Cosmos SDK simulation. They are the transactions
-(`Msg`) that are simulated with random field values. The sender of the operation
-is also assigned randomly.
+操作は、CosmosSDKシミュレーションの重要な部分の1つです。彼らはお得な情報です
+( `Msg`)ランダムなフィールド値でシミュレートします。アクションの送信者
+また、ランダムに割り当てられます。
 
-Operations on the simulation are simulated using the full [transaction cycle](../core/transactions.md) of a
-`ABCI` application that exposes the `BaseApp`.
+完全な[トランザクションサイクル](../core/transaction.md)を使用して、シミュレーション操作をシミュレートします
+「BaseApp」の「ABCI」アプリケーションを公開します。
 
-Shown below is how weights are set:
+以下に、重みを設定する方法を示します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/staking/simulation/operations.go#L18-L68
 
-As you can see, the weights are predefined in this case. Options exist to override this behavior with different weights. One option is to use `*rand.Rand` to define a random weight for the operation, or you can inject your own predefined weights.
+ご覧のとおり、この場合、重みは事前定義されています。さまざまな重みでこの動作をオーバーライドするオプションがあります。 1つのオプションは、 `* rand.Rand`を使用して操作のランダムな重みを定義するか、独自の事前定義された重みを注入することです。
 
-Here is how one can override the above package `simappparams`.
+上記のパッケージ「simappparams」を上書きする方法は次のとおりです。
 
 +++ https://github.com/cosmos/gaia/blob/master/sims.mk#L9-L22
 
-For the last test a tool called runsim  <!-- # TODO: add link to runsim readme when its created --> is used, this is used to parallelize go test instances, provide info to Github and slack integrations to provide information to your team on how the simulations are running.  
+最後のテストでは、runsim <！-#TODO:作成時にrunsim readmeへのリンクを追加します->を使用します。これは、goテストインスタンスを並列化し、Githubに情報を提供し、統合を緩めてチームに提供します。シミュレーションがどのように機能するかを理解しています。
 
-### Random proposal contents
+### ランダムな提案コンテンツ
 
-Randomized governance proposals are also supported on the Cosmos SDK simulator. Each
-module must define the governance proposal `Content`s that they expose and register
-them to be used on the parameters.
+Cosmos SDKシミュレーターは、ランダムなガバナンス提案もサポートします。各
+モジュールは、公開および登録されたガバナンス提案の「コンテンツ」を定義する必要があります
+それらはパラメータに使用されます。
 
-## Registering simulation functions
+##シミュレーション機能の登録
 
-Now that all the required functions are defined, we need to integrate them into the module pattern within the `module.go`:
+必要なすべての関数が定義されたので、それらを `module.go`のモジュールパターンに統合する必要があります。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.0/x/distribution/module.go
 
-## App Simulator manager
+## アプリケーションシミュレータマネージャー
 
-The following step is setting up the `SimulatorManager` at the app level. This
-is required for the simulation test files on the next step.
+次の手順は、アプリケーションレベルで「SimulatorManager」を設定するためのものです。この
+次のステップは、テストファイルをシミュレートすることです。  
 
 ```go
 type CustomApp struct {
@@ -97,14 +97,14 @@ type CustomApp struct {
 }
 ```
 
-Then at the instantiation of the application, we create the `SimulationManager`
-instance in the same way we create the `ModuleManager` but this time we only pass
-the modules that implement the simulation functions from the `AppModuleSimulation`
-interface described above.
+次に、アプリケーションがインスタンス化されたら、 `SimulationManager`を作成します
+インスタンスは `ModuleManager`を作成した方法と同じですが、今回は渡すだけです
+`AppModuleSimulation`のシミュレーション関数を実装するモジュール
+インターフェースは上記の通りです。  
 
 ```go
 func NewCustomApp(...) {
-  // create the simulation manager and define the order of the modules for deterministic simulations
+ //create the simulation manager and define the order of the modules for deterministic simulations
   app.sm = module.NewSimulationManager(
     auth.NewAppModule(app.accountKeeper),
     bank.NewAppModule(app.bankKeeper, app.accountKeeper),
@@ -116,7 +116,7 @@ func NewCustomApp(...) {
     slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
   )
 
-  // register the store decoders for simulation tests
+ //register the store decoders for simulation tests
   app.sm.RegisterStoreDecoders()
   ...
 }

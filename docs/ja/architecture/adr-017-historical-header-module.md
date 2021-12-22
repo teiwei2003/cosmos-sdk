@@ -1,61 +1,61 @@
-# ADR 17: Historical Header Module
+# ADR 17:ヒストリカルタイトルモジュール
 
-## Changelog
+## 変更ログ
 
-- 26 November 2019: Start of first version
-- 2 December 2019: Final draft of first version
+-2019年11月26日:最初のバージョンが始まります
+-2019年12月2日:初版の最終ドラフト
 
-## Context
+## 環境
 
-In order for the Cosmos SDK to implement the [IBC specification](https://github.com/cosmos/ics), modules within the Cosmos SDK must have the ability to introspect recent consensus states (validator sets & commitment roots) as proofs of these values on other chains must be checked during the handshakes.
+Cosmos SDKが[IBC仕様](https://github.com/cosmos/ics)を実装するには、Cosmos SDKのモジュールが最新のコンセンサス状態(バリデーターセットとコミットメントルート)を次のようにイントロスペクトできる必要があります。ハンドシェイク中にチェックする必要がある証明これらの値は他のチェーンにあります。
 
-## Decision
+## 決定
 
-The application MUST store the most recent `n` headers in a persistent store. At first, this store MAY be the current Merklised store. A non-Merklised store MAY be used later as no proofs are necessary.
+アプリケーションは、最新の `n`ヘッダーを永続ストレージに保存する必要があります。 最初は、このストアは現在のMerklisedストアである可能性があります。 証明が必要ないため、Merklised以外のストレージを将来使用できます。
 
-The application MUST store this information by storing new headers immediately when handling `abci.RequestBeginBlock`:
+アプリケーションは、 `abci.RequestBeginBlock`を処理するときに新しいヘッダーを保存することにより、この情報をすぐに保存する必要があります。 
 
 ```golang
 func BeginBlock(ctx sdk.Context, keeper HistoricalHeaderKeeper, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
   info := HistoricalInfo{
     Header: ctx.BlockHeader(),
-    ValSet: keeper.StakingKeeper.GetAllValidators(ctx), // note that this must be stored in a canonical order
+    ValSet: keeper.StakingKeeper.GetAllValidators(ctx),..note that this must be stored in a canonical order
   }
   keeper.SetHistoricalInfo(ctx, ctx.BlockHeight(), info)
   n := keeper.GetParamRecentHeadersToStore()
   keeper.PruneHistoricalInfo(ctx, ctx.BlockHeight() - n)
-  // continue handling request
+ ..continue handling request
 }
 ```
 
-Alternatively, the application MAY store only the hash of the validator set.
+または、アプリケーションはバリデーターセットのハッシュ値のみを保存できます。
 
-The application MUST make these past `n` committed headers available for querying by Cosmos SDK modules through the `Keeper`'s `GetHistoricalInfo` function. This MAY be implemented in a new module, or it MAY also be integrated into an existing one (likely `x/staking` or `x/ibc`).
+アプリケーションは、これらの過去の `n`送信されたヘッダーを、` Keeper`の `GetHistoricalInfo`関数を介してCosmosSDKモジュールによるクエリに使用できるようにする必要があります。これは、新しいモジュールに実装することも、既存のモジュール(おそらく、 `x .stakeing`または` x .ibc`)に統合することもできます。
 
-`n` MAY be configured as a parameter store parameter, in which case it could be changed by `ParameterChangeProposal`s, although it will take some blocks for the stored information to catch up if `n` is increased.
+`n`はパラメータ保存パラメータとして設定できます。この場合、` ParameterChangeProposal`sで変更できますが、 `n`を追加すると、保存された情報に追いつくためにいくつかのブロックが必要になります。
 
-## Status
+## 状態
 
-Proposed.
+提案。
 
-## Consequences
+## 結果
 
-Implementation of this ADR will require changes to the Cosmos SDK. It will not require changes to Tendermint.
+このADRを実装するには、CosmosSDKを変更する必要があります。 Tendermintを変更する必要はありません。
 
-### Positive
+### ポジティブ
 
-- Easy retrieval of headers & state roots for recent past heights by modules anywhere in the Cosmos SDK.
-- No RPC calls to Tendermint required.
-- No ABCI alterations required.
+-Cosmos SDKの任意の場所にあるモジュールを介して、最近の過去の高さのヘッダーと状態ルートを簡単に取得できます。
+-TendermintにRPC呼び出しを行う必要はありません。
+-ABCIの変更は必要ありません。
 
-### Negative
+### ネガティブ
 
-- Duplicates `n` headers data in Tendermint & the application (additional disk usage) - in the long term, an approach such as [this](https://github.com/tendermint/tendermint/issues/4210) might be preferable.
+-Tendermintとアプリケーションの `n`ヘッダーデータをコピーします(追加のディスク使用量)-長期的には、[this](https://github.com/tendermint/tendermint/issues/4210)のような方法が望ましい場合があります。
 
-### Neutral
+### ニュートラル
 
-(none known)
+(不明)
 
-## References
+## 参照
 
-- [ICS 2: "Consensus state introspection"](https://github.com/cosmos/ibc/tree/master/spec/core/ics-002-client-semantics#consensus-state-introspection)
+-[ICS 2:「コンセンサス状態のイントロスペクション」](https://github.com/cosmos/ibc/tree/master/spec/core/ics-002-client-semantics#consensus-state-introspection) 

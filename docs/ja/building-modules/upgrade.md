@@ -1,53 +1,53 @@
-# Upgrading Modules
+# アップグレードモジュール
 
-[In-Place Store Migrations](../core/upgrade.html) allow your modules to upgrade to new versions that include breaking changes. This document outlines how to build modules to take advantage of this functionality. {synopsis}
+[インプレースストレージ移行](../core/upgrade.html)を使用すると、モジュールを新しいバージョンにアップグレードして、大幅な変更を加えることができます。このドキュメントでは、この機能を利用するためのモジュールを構築する方法の概要を説明します。 {まとめ}
 
-## Prerequisite Readings
+## 読むための前提条件
 
-- [In-Place Store Migration](../core/upgrade.md) {prereq}
+-[インプレースストレージ移行](../core/upgrade.md){前提条件}
 
-## Consensus Version
+## コンセンサスバージョン
 
-Successful upgrades of existing modules require each `AppModule` to implement the function `ConsensusVersion() uint64`.
+既存のモジュールを正常にアップグレードするには、各 `AppModule`が関数` ConsensusVersion()uint64`を実装する必要があります。
 
-- The versions must be hard-coded by the module developer.
-- The initial version **must** be set to 1.
+-バージョンは、モジュール開発者がハードコーディングする必要があります。
+-初期バージョンは** 1に設定する必要があります**。
 
-Consensus versions serve as state-breaking versions of app modules and must be incremented when the module introduces breaking changes.
+コンセンサスバージョンは、アプリケーションモジュールの状態破壊バージョンとして使用され、モジュールが破壊的な変更を導入するときにインクリメントする必要があります。
 
-## Registering Migrations
+## 移行にサインアップ
 
-To register the functionality that takes place during a module upgrade, you must register which migrations you want to take place.
+モジュールのアップグレード中に発生する機能を登録するには、発生する移行を登録する必要があります。
 
-Migration registration takes place in the `Configurator` using the `RegisterMigration` method. The `AppModule` reference to the configurator is in the `RegisterServices` method.
+移行登録は、 `RegisterMigration`メソッドを使用して` Configurator`で実行されます。 configuratorへの「AppModule」参照は「RegisterServices」メソッドにあります。
 
-You can register one or more migrations. If you register more than one migration script, list the migrations in increasing order and ensure there are enough migrations that lead to the desired consensus version. For example, to migrate to version 3 of a module, register separate migrations for version 1 and version 2 as shown in the following example:
+1つ以上の移行を登録できます。複数の移行スクリプトを登録している場合は、移行を昇順でリストし、必要なコンセンサスバージョンを生成するのに十分な移行があることを確認してください。たとえば、モジュールのバージョン3に移行するには、次の例に示すように、バージョン1とバージョン2に別々の移行を登録します。 
 
 ```golang
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-    // --snip--
+   //--snip--
     cfg.RegisterMigration(types.ModuleName, 1, func(ctx sdk.Context) error {
-        // Perform in-place store migrations from ConsensusVersion 1 to 2.
+       //Perform in-place store migrations from ConsensusVersion 1 to 2.
     })
      cfg.RegisterMigration(types.ModuleName, 2, func(ctx sdk.Context) error {
-        // Perform in-place store migrations from ConsensusVersion 2 to 3.
+       //Perform in-place store migrations from ConsensusVersion 2 to 3.
     })
 }
 ```
 
-Since these migrations are functions that need access to a Keeper's store, use a wrapper around the keepers called `Migrator` as shown in this example:
+これらの移行はKeeperストレージへのアクセスを必要とする関数であるため、次の例に示すように、「Migrator」と呼ばれるKeeperラッパーを使用します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/6ac8898fec9bd7ea2c1e5c79e0ed0c3f827beb55/x/bank/keeper/migrations.go#L8-L21
 
-## Writing Migration Scripts
+##移行スクリプトを作成する
 
-To define the functionality that takes place during an upgrade, write a migration script and place the functions in a `migrations/` directory. For example, to write migration scripts for the bank module, place the functions in `x/bank/migrations/`. Use the recommended naming convention for these functions. For example, `v043bank` is the script that migrates the package `x/bank/migrations/v043`:
+アップグレード中に発生する関数を定義するには、移行スクリプトを作成し、これらの関数を `migrations/`ディレクトリに配置します。 たとえば、bankモジュールの移行スクリプトを作成するには、関数を `x/bank/migrations/`に配置します。 これらの関数には、推奨される命名規則を使用してください。 たとえば、 `v043bank`は移行パッケージ` x/bank/migrations/v043`のスクリプトです。
 
 ```golang
-// Migrating bank module from version 1 to 2
+//Migrating bank module from version 1 to 2
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-	return v043bank.MigrateStore(ctx, m.keeper.storeKey) // v043bank is package `x/bank/migrations/v043`.
+	return v043bank.MigrateStore(ctx, m.keeper.storeKey)//v043bank is package `x/bank/migrations/v043`.
 }
 ```
 
-To see example code of changes that were implemented in a migration of balance keys, check out [migrateBalanceKeys](https://github.com/cosmos/cosmos-sdk/blob/36f68eb9e041e20a5bb47e216ac5eb8b91f95471/x/bank/legacy/v043/store.go#L41-L62). For context, this code introduced migrations of the bank store that updated addresses to be prefixed by their length in bytes as outlined in [ADR-028](../architecture/adr-028-public-key-addresses.md).
+バランスキーの移行で実装された変更のサンプルコードを確認するには、[migrateBalanceKeys](https://github.com/cosmos/cosmos-sdk/blob/36f68eb9e041e20a5bb47e216ac5eb8b91f95471/x/bank/legacy/v043/store)を確認してください。 #L41-L62)。 コンテキストとして、このコードは、[ADR-028](../architecture/adr-028-public-key-addresses.md)のように、前にバイト長が付いたアドレスを更新する銀行ストレージの移行を導入します。 

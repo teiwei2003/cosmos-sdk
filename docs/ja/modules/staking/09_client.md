@@ -1,12 +1,12 @@
-# Client
+# 客户
 
-## CLI
+##命令行界面
 
-A user can query and interact with the `staking` module using the CLI.
+用户可以使用 CLI 查询“staking”模块并与之交互。
 
-### Query
+### 询问
 
-The `query` commands allows users to query `staking` state.
+`query` 命令允许用户查询 `staking` 状态。 
 
 ```bash
 simd query staking --help

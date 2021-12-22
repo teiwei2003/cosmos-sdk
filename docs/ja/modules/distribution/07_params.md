@@ -1,6 +1,6 @@
-# Parameters
+# 参数
 
-The distribution module contains the following parameters:
+分发模块包含以下参数: 
 
 | Key                 | Type         | Example                    |
 | ------------------- | ------------ | -------------------------- |

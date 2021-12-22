@@ -1,22 +1,22 @@
-# Client
+# 客户
 
-# Auth
+# 认证
 
-## CLI
+##命令行界面
 
-A user can query and interact with the `auth` module using the CLI.
+用户可以使用 CLI 查询“auth”模块并与之交互。
 
-### Query
+### 询问
 
-The `query` commands allow users to query `auth` state.
+`query` 命令允许用户查询 `auth` 状态。 
 
 ```bash
 simd query auth --help
 ```
 
-#### account
+#### 帐户
 
-The `account` command allow users to query for an account by it's address.
+`account` 命令允许用户通过其地址查询帐户。 
 
 ```bash
 simd query auth account [address] [flags]

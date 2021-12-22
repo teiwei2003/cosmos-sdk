@@ -162,7 +162,7 @@ protobuf 的有效使用，偏离那些只有在有明确
 * 不可变的智能合约模块(即 CosmWasm)_应该_阻止智能合约/持久
 与 `alpha`/`beta` 包交互的脚本
 
-####省略v1后缀
+#### 省略v1后缀
 
 而不是使用 [Buf 推荐的版本后缀](https://buf.build/docs/lint-checkers#package_version_suffix)，
 对于实际上没有第二个版本的包，我们可以省略 `v1`。这

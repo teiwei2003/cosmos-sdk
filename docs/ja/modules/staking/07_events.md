@@ -1,6 +1,6 @@
-# Events
+# 事件
 
-The staking module emits the following events:
+staking 模块发出以下事件: 
 
 ## EndBlocker
 

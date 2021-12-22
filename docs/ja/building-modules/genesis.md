@@ -1,56 +1,56 @@
-# Module Genesis
+# モジュールジェネシス
 
-Modules generally handle a subset of the state and, as such, they need to define the related subset of the genesis file as well as methods to initialize, verify and export it. {synopsis}
+モジュールは通常、状態の​​サブセットを処理するため、ジェネシスファイルの関連するサブセットと、それを初期化、検証、およびエクスポートするためのメソッドを定義する必要があります。 {まとめ}
 
-## Pre-requisite Readings
+## 読むための前提条件
 
-- [Module Manager](./module-manager.md) {prereq}
-- [Keepers](./keeper.md) {prereq}
+-[モジュールマネージャー](。/module-manager.md){前提条件}
+-[キーパー](。/keeper.md){前提条件}
 
-## Type Definition
+## タイプ定義
 
-The subset of the genesis state defined from a given module is generally defined in a `genesis.proto` file ([more info](../core/encoding.md#gogoproto) on how to define protobuf messages). The struct defining the module's subset of the genesis state is usually called `GenesisState` and contains all the module-related values that need to be initialized during the genesis process.
+特定のモジュールから定義されたジェネシス状態のサブセットは、通常、 `genesis.proto`ファイルで定義されます(protobufメッセージの定義方法に関する[詳細情報](../core/encoding.md#gogoproto))。モジュールのジェネシス状態のサブセットを定義する構造は、通常「GenesisState」と呼ばれ、作成プロセス中に初期化する必要があるすべてのモジュール関連の値が含まれています。
 
-See an example of `GenesisState` protobuf message definition from the `auth` module:
+`auth`モジュールからの` GenesisState`protobufメッセージの定義の例を表示します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/a9547b54ffac9729fe1393651126ddfc0d236cff/proto/cosmos/auth/v1beta1/genesis.proto
 
-Next we present the main genesis-related methods that need to be implemented by module developers in order for their module to be used in Cosmos SDK applications.
+次に、モジュールをCosmos SDKアプリケーションで使用できるようにするために、モジュール開発者が実装する必要のある主な作成関連のメソッドを紹介します。
 
 ### `DefaultGenesis`
 
-The `DefaultGenesis()` method is a simple method that calls the constructor function for `GenesisState` with the default value for each parameter. See an example from the `auth` module:
+`DefaultGenesis()`メソッドは、各パラメーターのデフォルト値を使用して `GenesisState`コンストラクターを呼び出す単純なメソッドです。 `auth`モジュールの例を確認してください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/module.go#L48-L52
 
 ### `ValidateGenesis`
 
-The `ValidateGenesis(genesisState GenesisState)` method is called to verify that the provided `genesisState` is correct. It should perform validity checks on each of the parameters listed in `GenesisState`. See an example from the `auth` module:
+`ValidateGenesis(genesisState GenesisState)`メソッドを呼び出して、提供された `genesisState`が正しいことを確認します。 「GenesisState」にリストされている各パラメーターの妥当性チェックを実行する必要があります。 `auth`モジュールの例を確認してください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/types/genesis.go#L57-L70
 
-## Other Genesis Methods
+## その他の作成方法
 
-Other than the methods related directly to `GenesisState`, module developers are expected to implement two other methods as part of the [`AppModuleGenesis` interface](./module-manager.md#appmodulegenesis) (only if the module needs to initialize a subset of state in genesis). These methods are [`InitGenesis`](#initgenesis) and [`ExportGenesis`](#exportgenesis).
+`GenesisState`に直接関連するメソッドに加えて、モジュール開発者は[` AppModuleGenesis`インターフェース](./module-manager.md#appmodulegenesis)の一部として他の2つのメソッドを実装する必要があります(モジュールがジェネシスを初期化する必要がある場合のみ)状態のサブセット)。これらのメソッドは、[`InitGenesis`](#initgenesis)および[` ExportGenesis`](#exportgenesis)です。
 
 ### `InitGenesis`
 
-The `InitGenesis` method is executed during [`InitChain`](../core/baseapp.md#initchain) when the application is first started. Given a `GenesisState`, it initializes the subset of the state managed by the module by using the module's [`keeper`](./keeper.md) setter function on each parameter within the `GenesisState`.
+`InitGenesis`メソッドは、アプリケーションが最初に起動されたときの[` InitChain`](../core/baseapp.md#initchain)中に実行されます。 `GenesisState`を指定すると、` GenesisState`の各パラメーターに対してモジュールの[`keeper`](./keeper.md)セッター関数を使用して、モジュールによって管理される状態のサブセットを初期化します。
 
-The [module manager](./module-manager.md#manager) of the application is responsible for calling the `InitGenesis` method of each of the application's modules in order. This order is set by the application developer via the manager's `SetOrderGenesisMethod`, which is called in the [application's constructor function](../basics/app-anatomy.md#constructor-function).
+アプリケーションの[modulemanager](./module-manager.md#manager)は、アプリケーションの各モジュールの `InitGenesis`メソッドを順番に呼び出す役割を果たします。この順序は、[アプリケーションのコンストラクター](../basics/app-anatomy.md#constructor-function)で呼び出されるマネージャーの `SetOrderGenesisMethod`を介してアプリケーション開発者によって設定されます。
 
-See an example of `InitGenesis` from the `auth` module:
+「auth」モジュールの「InitGenesis」の例を参照してください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/genesis.go#L13-L28
 
 ### `ExportGenesis`
 
-The `ExportGenesis` method is executed whenever an export of the state is made. It takes the latest known version of the subset of the state managed by the module and creates a new `GenesisState` out of it. This is mainly used when the chain needs to be upgraded via a hard fork.
+状態がエクスポートされるたびに、「ExportGenesis」メソッドが実行されます。モジュールによって管理される状態サブセットの最新の既知のバージョンを取得し、そこから新しい「GenesisState」を作成します。これは主に、チェーンをハードフォークでアップグレードする必要がある場合に使用されます。
 
-See an example of `ExportGenesis` from the `auth` module.
+「auth」モジュールの「ExportGenesis」の例を参照してください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/genesis.go#L31-L42
 
-## Next {hide}
+## 次へ{hide}
 
-Learn about [modules interfaces](module-interfaces.md) {hide}
+[module interface](module-interfaces.md){hide}を理解する 

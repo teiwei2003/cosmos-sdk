@@ -1,38 +1,38 @@
-# Governance Proposals
+# 治理提案
 
-In uncommon situations, a highly valued client may become frozen due to uncontrollable
-circumstances. A highly valued client might have hundreds of channels being actively used.
-Some of those channels might have a significant amount of locked tokens used for ICS 20.
+在不常见的情况下，高价值客户可能会因无法控制而被冻结
+情况。一个高价值的客户可能有数百个渠道正在被积极使用。
+其中一些频道可能有大量用于 ICS 20 的锁定令牌。
 
-If the one third of the validator set of the chain the client represents decides to collude,
-they can sign off on two valid but conflicting headers each signed by the other one third
-of the honest validator set. The light client can now be updated with two valid, but conflicting
-headers at the same height. The light client cannot know which header is trustworthy and therefore
-evidence of such misbehaviour is likely to be submitted resulting in a frozen light client.
+如果客户端所代表的链中三分之一的验证者决定串通，
+他们可以签署两个有效但相互冲突的标头，每个标头都由另一个三分之一签名
+诚实的验证者集。轻客户端现在可以更新为两个有效但相互冲突的
+相同高度的标题。轻客户端无法知道哪个头是值得信赖的，因此
+提交此类不当行为的证据很可能会导致冻结轻客户端。
 
-Frozen light clients cannot be updated under any circumstance except via a governance proposal.
-Since a quorum of validators can sign arbitrary state roots which may not be valid executions
-of the state machine, a governance proposal has been added to ease the complexity of unfreezing
-or updating clients which have become "stuck". Without this mechanism, validator sets would need
-to construct a state root to unfreeze the client. Unfreezing clients, re-enables all of the channels
-built upon that client. This may result in recovery of otherwise lost funds.
+除非通过治理提案，否则在任何情况下都不能更新冻结的轻客户端。
+由于法定人数的验证者可以签署可能不是有效执行的任意状态根
+在状态机中，添加了治理提案以减轻解冻的复杂性
+或更新已“卡住”的客户端。如果没有这种机制，验证器集将需要
+构造一个状态根来解冻客户端。解冻客户端，重新启用所有渠道
+建立在那个客户之上。这可能会导致收回其他损失的资金。
 
-Tendermint light clients may become expired if the trusting period has passed since their
-last update. This may occur if relayers stop submitting headers to update the clients.
+如果信任期已过，Tendermint 轻客户端可能会过期
+最后更新。如果中继器停止提交标头以更新客户端，则可能会发生这种情况。
 
-An unplanned upgrade by the counterparty chain may also result in expired clients. If the counterparty
-chain undergoes an unplanned upgrade, there may be no commitment to that upgrade signed by the validator
-set before the chain-id changes. In this situation, the validator set of the last valid update for the
-light client is never expected to produce another valid header since the chain-id has changed, which will
-ultimately lead the on-chain light client to become expired.  
+交易对手链的计划外升级也可能导致客户过期。如果对方
+链经历了计划外的升级，验证者可能不会对该升级做出承诺
+在链 ID 更改之前设置。在这种情况下，最后一个有效更新的验证器集
+轻客户端永远不会产生另一个有效的头，因为链 ID 已经改变，这将
+最终导致链上轻客户端过期。
 
-In the case that a highly valued light client is frozen, expired, or rendered non-updateable, a
-governance proposal may be submitted to update this client, known as the subject client. The
-proposal includes the client identifier for the subject, the client identifier for a substitute
-client, and an initial height to reference the substitute client from. Light client implementations
-may implement custom updating logic, but in most cases, the subject will be updated with information
-from the substitute client, if the proposal passes. The substitute client is used as a "stand in"
-while the subject is on trial. It is best practice to create a substitute client *after* the subject
-has become frozen to avoid the substitute from also becoming frozen. An active substitute client
-allows headers to be submitted during the voting period to prevent accidental expiry once the proposal
-passes.
+如果高价值的轻客户端被冻结、过期或不可更新，
+可以提交治理提案以更新此客户端，称为主题客户端。这
+提议包括主题的客户标识符，替代的客户标识符
+客户端，以及引用替代客户端的初始高度。轻客户端实现
+可以实现自定义更新逻辑，但大多数情况下，主题会更新信息
+如果提案通过，则来自替代客户。替代客户端用作“替身”
+在受审期间。最佳做法是在主题之后*创建替代客户端
+已被冻结以避免替代品也被冻结。一个活跃的替代客户
+允许在投票期间提交标题，以防止提案一旦过期
+通过。 

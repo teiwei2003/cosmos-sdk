@@ -1,66 +1,66 @@
-# ADR 18: Extendable Voting Periods
+# ADR 18:延長可能な投票期間
 
-## Changelog
+## 変更ログ
 
-- 1 January 2020: Start of first version
+-2020年1月1日:最初のバージョンが始まります
 
-## Context
+## 環境
 
-Currently the voting period for all governance proposals is the same.  However, this is suboptimal as all governance proposals do not require the same time period.  For more non-contentious proposals, they can be dealt with more efficently with a faster period, while more contentious or complex proposals may need a longer period for extended discussion/consideration.
+現在、すべてのガバナンス提案の投票期間は同じです。ただし、すべてのガバナンス提案が同じ期間を必要としないため、これは最適ではありません。より物議を醸す提案については、より迅速に、より効果的に処理することができますが、より物議を醸す提案や複雑な提案は、議論/検討に長い時間を必要とする場合があります。
 
-## Decision
+## 決定
 
-We would like to design a mechanism for making the voting period of a governance proposal variable based on the demand of voters.  We would like it to be based on the view of the governance participants, rather than just the proposer of a governance proposal (thus, allowing the proposer to select the voting period length is not sufficient).
+投票者のニーズに応じて、ガバナンス提案の投票サイクルを可変にするメカニズムを設計したいと考えています。ガバナンス提案の提案者だけでなく、ガバナンス参加者の意見に基づいたものにしたいと考えています(したがって、提案者が投票期間の長さを選択できるようにするだけでは不十分です)。
 
-However, we would like to avoid the creation of an entire second voting process to determine the length of the voting period, as it just pushed the problem to determining the length of that first voting period.
+ただし、最初の投票期間の長さを決定するための質問をプッシュするだけなので、投票期間の長さを決定するための完全な2番目の投票プロセスを作成することは避けたいと思います。
 
-Thus, we propose the following mechanism:
+したがって、次のメカニズムを提案します。
 
-### Params
+### パラメーター
 
-- The current gov param `VotingPeriod` is to be replaced by a `MinVotingPeriod` param.  This is the the default voting period that all governance proposal voting periods start with.
-- There is a new gov param called `MaxVotingPeriodExtension`.
+-現在のgovパラメータ `VotingPeriod`は` MinVotingPeriod`パラメータに置き換えられます。これは、すべてのガバナンス提案の投票期間を開始するデフォルトの投票期間です。
+-「MaxVotingPeriodExtension」と呼ばれる新しい政府パラメータがあります。
 
-### Mechanism
+### メカニズム
 
-There is a new `Msg` type called `MsgExtendVotingPeriod`, which can be sent by any staked account during a proposal's voting period.  It allows the sender to unilaterally extend the length of the voting period by `MaxVotingPeriodExtension * sender's share of voting power`.  Every address can only call `MsgExtendVotingPeriod` once per proposal.
+「MsgExtendVotingPeriod」と呼ばれる新しい「Msg」タイプがあります。これは、提案の投票期間中に任意の質権アカウントから送信できます。これにより、送信者は「MaxVotingPeriodExtension *送信者の議決権のシェア」を通じて一方的に投票期間を延長することができます。各アドレスは、プロポーザルごとに1回だけ `MsgExtendVotingPeriod`を呼び出すことができます。
 
-So for example, if the `MaxVotingPeriodExtension` is set to 100 Days, then anyone with 1% of voting power can extend the voting power by 1 day.  If 33% of voting power has sent the message, the voting period will be extended by 33 days.  Thus, if absolutely everyone chooses to extend the voting period, the absolute maximum voting period will be `MinVotingPeriod + MaxVotingPeriodExtension`.
+たとえば、「MaxVotingPeriodExtension」が100日に設定されている場合、議決権の1％を持っている人は誰でも、議決権を1日延長できます。議決権の33％にメッセージが送信された場合、議決権の期間は33日延長されます。したがって、絶対に全員が投票期間を延長することを選択した場合、絶対最大投票期間は `MinVotingPeriod + MaxVotingPeriodExtension`になります。
 
-This system acts as a sort of distributed coordination, where individual stakers choosing to extend or not, allows the system the guage the conentiousness/complexity of the proposal.  It is extremely unlikely that many stakers will choose to extend at the exact same time, it allows stakers to view how long others have already extended thus far, to decide whether or not to extend further.
+このシステムは一種の分散型調整として機能し、さまざまな利害関係者が拡張するかどうかを選択して、システムが提案の継続性/複雑さを測定できるようにします。多くの誓約者が同時に延長することを選択する可能性は非常に低く、これにより、誓約者は、他の人がこれまでに延長した期間を確認して、さらに延長するかどうかを決定できます。
 
-### Dealing with Unbonding/Redelegation
+###バインド解除/再承認を処理する
 
-There is one thing that needs to be addressed.  How to deal with redelegation/unbonding during the voting period.  If a staker of 5% calls `MsgExtendVotingPeriod` and then unbonds, does the voting period then decrease by 5 days again?  This is not good as it can give people a false sense of how long they have to make their decision.  For this reason, we want to design it such that the voting period length can only be extended, not shortened.  To do this, the current extension amount is based on the highest percent that voted extension at any time.  This is best explained by example:
+解決する必要があることが1つあります。投票中の再承認/バインド解除の処理方法。株式保有者の5％が `MsgExtendVotingPeriod`を呼び出してからバインドを解除した場合、投票期間はさらに5日間短縮されますか？これは、決定を下すのにどれくらいの時間がかかるかを人々に誤って考えさせるため、良くありません。このため、投票期間を短縮するのではなく、延長するように設計したいと考えています。このため、現在の延期額は、いつでも延期された投票の最も高い割合に基づいています。これは例によって最もよく説明されます:
 
-1. Let's say 2 stakers of voting power 4% and 3% respectively vote to extend.  The voting period will be extended by 7 days.
-2. Now the staker of 3% decides to unbond before the end of the voting period.  The voting period extension remains 7 days.
-3. Now, let's say another staker of 2% voting power decides to extend voting period.  There is now 6% of active voting power choosing the extend.  The voting power remains 7 days.
-4. If a fourth staker of 10% chooses to extend now, there is a total of 16% of active voting power wishing to extend.  The voting period will be extended to 16 days.
+1. 4％と3％の議決権を持つ2人のスタッカーが延長に投票すると仮定します。投票期間は7日間延長されます。
+2.現在、スタッカーの3％が、投票期間が終了する前にバインドを解除することを決定しています。投票期間はまだ7日間に延長されています。
+3.ここで、2％の議決権を持つ別の利害関係者が、議決権の期間を延長することを決定したとします。現在、拡張機能を選択するためのアクティブな投票権の6％があります。議決権は7日間残ります。
+4. 4番目の利害関係者の10％が延期することを選択した場合、延期を希望するアクティブな議決権の合計は16％になります。投票期間は16日間に延長されます。
 
-### Delegators
+### 主要
 
-Just like votes in the actual voting period, delegators automatically inherit the extension of their validators.  If their validator chooses to extend, their voting power will be used in the validator's extension.  However, the delegator is unable to override their validator and "unextend" as that would contradict the "voting power length can only be ratcheted up" principle described in the previous section.  However, a delegator may choose the extend using their personal voting power, if their validator has not done so.
+実際の投票期間中の投票と同様に、委任者はバリデーターの延長を自動的に継承します。バリデーターが延長を選択した場合、その議決権はバリデーターの延長に使用されます。ただし、これは前のセクションで説明した「投票権の長さを増やすことしかできない」という原則と矛盾するため、委任者はバリデーターを上書きして「延長をキャンセル」することはできません。ただし、バリデーターがそうしなかった場合、委任者は個人の議決権を使用して延長を選択できます。
 
-## Status
+## 状態
 
-Proposed
+提案
 
-## Consequences
+## 結果
 
-### Positive
+### ポジティブ
 
-- More complex/contentious governance proposals will have more time to properly digest and deliberate
+-より複雑で物議を醸すガバナンスの提案には、適切な消化と審議のためのより多くの時間があります
 
-### Negative
+### ネガティブ
 
-- Governance process becomes more complex and requires more understanding to interact with effectively
-- Can no longer predict when a governance proposal will end. Can't assume order in which governance proposals will end.
+-ガバナンスプロセスはより複雑になり、効果的に相互作用するにはより多くの理解が必要になります
+-ガバナンス提案がいつ終了するかを予測することはできなくなりました。ガバナンス提案が終了する順序を想定することは不可能です。
 
-### Neutral
+### ニュートラル
 
-- The minimum voting period can be made shorter
+-最短投票期間を短縮できます
 
-## References
+## 参照
 
-- [Cosmos Forum post where idea first originated](https://forum.cosmos.network/t/proposal-draft-reduce-governance-voting-period-to-7-days/3032/9)
+-[アイデアが最初に生まれたコスモスフォーラムの投稿](https://forum.cosmos.network/t/proposal-draft-reduce-governance-voting-period-to-7-days/3032/9) 
