@@ -1,128 +1,127 @@
-# 命令行界面
+# コマンドラインインターフェイス
 
-本文档描述了命令行界面 (CLI) 如何在高层次上工作，用于 [**应用程序**](../basics/app-anatomy.md)。可以在 [此处](../building-modules/module-interfaces.md#) 找到为 Cosmos SDK [**module**](../building-modules/intro.md) 实现 CLI 的单独文档cli)。 {概要}
+このドキュメントでは、[** application **](../basics/app-anatomy.md)のコマンドラインインターフェイス(CLI)が高レベルでどのように機能するかについて説明します。 Cosmos SDK [** module **](../building-modules/intro.md)のCLIを実装する別のドキュメントCLIは、[here](../building-modules/module-interfacesにあります。 md#))。 {まとめ}
 
-## 命令行界面
+## コマンドラインインターフェイス
 
-### 示例命令
+### コマンドの例
 
-创建 CLI 没有固定的方法，但 Cosmos SDK 模块通常使用 [Cobra 库](https://github.com/spf13/cobra)。使用 Cobra 构建 CLI 需要定义命令、参数和标志。 [**Commands**](#commands) 了解用户希望采取的操作，例如用于创建交易的 `tx` 和用于查询应用程序的 `query`。每个命令还可以有嵌套的子命令，这是命名特定事务类型所必需的。用户还提供**参数**，例如将硬币发送到的帐号，以及 [**Flags**](#flags) 来修改命令的各个方面，例如汽油价格或广播到哪个节点。
+CLIを作成するための固定された方法はありませんが、Cosmos SDKモジュールは通常[Cobraライブラリ](https://github.com/spf13/cobra)を使用します。 Cobraを使用してCLIを構築するには、コマンド、パラメーター、およびフラグを定義する必要があります。 [**コマンド**](#commands)トランザクションを作成するための `tx`やアプリケーションをクエリするための` query`など、ユーザーが実行したいアクションを把握します。各コマンドには、特定のトランザクションタイプに名前を付けるために必要なネストされたサブコマンドを含めることもできます。ユーザーは、コインの送付先のアカウント番号などの**パラメーター**と、ガス価格やノードなどのコマンドのさまざまな側面を変更するための[**フラグ**](#flags)も提供します。にブロードキャストします。
 
-下面是一个用户可能输入的命令示例，该命令与 simapp CLI `simd` 交互以发送一些令牌: 
+以下は、ユーザーが入力できるコマンドの例です。このコマンドは、simappCLIの `simd`と対話して、いくつかのトークンを送信します。
 
 ```bash
-simd tx bank send $MY_VALIDATOR_ADDRESS $RECIPIENT 1000stake --gas auto --gas-prices <gasPrices>
+simd tx bank send $ MY_VALIDATOR_ADDRESS $ RECIPIENT 1000stake --gas auto --gas-prices <gasPrices>
 ```
 
-前四个字符串指定命令:
+最初の4つの文字列は、コマンドを指定します。
 
-- 整个应用程序“simd”的根命令。
-- 子命令`tx`，它包含让用户创建交易的所有命令。
-- 子命令 `bank` 指示将命令路由到哪个模块([`x/bank`](../../x/bank/spec/README.md) 在这种情况下是模块)。
-- 交易类型`send`。
+-アプリケーション「simd」全体のルートコマンド。
+-サブコマンド `tx`。これには、ユーザーがトランザクションを作成できるようにするすべてのコマンドが含まれています。
+-サブコマンド `bank`は、コマンドをルーティングするモジュールを示します([` x/bank`](../../x/bank/spec/README.md)はこの場合のモジュールです)。
+-トランザクションタイプ `send`。
 
-接下来的两个字符串是参数:用户希望发送的“from_address”、收件人的“to_address”以及他们想要发送的“金额”。最后，命令的最后几个字符串是可选标志，用于指示用户愿意支付多少费用(使用用于执行交易的 gas 量和用户提供的 gas 价格计算)。
+次の2つの文字列は、ユーザーが送信する「from_address」、受信者の「to_address」、および送信する「amount」のパラメーターです。最後に、コマンドの最後のいくつかの文字列は、ユーザーが支払う意思がある金額を示すオプションのフラグです(トランザクションの実行に使用されるガスの量とユーザーが提供するガスの価格を使用して計算されます)。
 
-CLI 与 [node](../core/node.md) 交互以处理此命令。接口本身在 main.go 文件中定义。
+CLIは[node](../core/node.md)と対話して、このコマンドを処理します。インターフェイス自体は、main.goファイルで定義されています。
 
-### 构建 CLI
+### CLIを構築する
 
-`main.go` 文件需要有一个 `main()` 函数来创建一个根命令，所有应用程序命令都将作为子命令添加到该根命令中。 root 命令另外处理:
+`main.go`ファイルにはrootコマンドを作成するための` main() `関数が必要であり、すべてのアプリケーションコマンドはサブコマンドとしてrootコマンドに追加されます。ルートコマンドは追加で処理されます。
 
-- 通过读取配置文件(例如 Cosmos SDK 配置文件)来**设置配置**。
-- **向其添加任何标志**，例如`--chain-id`。
-- **通过调用应用程序的`MakeCodec()`函数(在`simapp`中称为`MakeTestEncodingConfig`)来实例化`codec`**。 [`codec`](../core/encoding.md) 用于对应用程序的数据结构进行编码和解码 - 存储只能持久化 `[]byte`，因此开发人员必须为其数据结构定义序列化格式或使用默认值 Protobuf。
-- **为所有可能的用户交互添加子命令**，包括[交易命令](#transaction-commands)和[查询命令](#query-commands)。
+-**構成ファイル(Cosmos SDK構成ファイルなど)を読み取って構成を設定します**。
+-** `--chain-id`などのロゴを追加します**。
+-**アプリケーションの `MakeCodec()`関数( `simapp`では` MakeTestEncodingConfig`と呼ばれます)を呼び出して、 `codec` **をインスタンス化します。 [`codec`](../core/encoding.md)は、アプリケーションのデータ構造をエンコードおよびデコードするために使用されます-ストレージは` [] byte`のみを永続化できるため、開発者はデータ構造のシリアル化を定義する必要がありますフォーマットまたは使用デフォルト値のProtobuf。
+-** [トランザクションコマンド](#transaction-commands)や[query-commands](#query-commands)など、考えられるすべてのユーザーインタラクションのサブコマンドを追加します**。
 
-`main()` 函数最终创建了一个执行器和 [execute](https://godoc.org/github.com/spf13/cobra#Command.Execute) 根命令。请参阅“simapp”应用程序中的“main()”函数示例:
+`main()`関数は、最終的にエグゼキュータと[execute](https://godoc.org/github.com/spf13/cobra#Command.Execute)ルートコマンドを作成します。 「simapp」アプリケーションの「main()」関数の例を参照してください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/simapp/simd/main.go#L12-L24
 
-文档的其余部分将详细说明每个步骤需要实现的内容，并包括来自 `simapp` CLI 文件的较小部分代码。
+ドキュメントの残りの部分では、各ステップで達成する必要があることを詳しく説明し、 `simapp`CLIファイルからのコードの小さな部分を含めます。
 
-## 向 CLI 添加命令
+## CLIにコマンドを追加する
 
-每个应用程序 CLI 首先构造一个根命令，然后通过使用 `rootCmd.AddCommand()` 聚合子命令(通常带有进一步嵌套的子命令)来添加功能。应用程序的大部分独特功能在于其事务和查询命令，分别称为“TxCmd”和“QueryCmd”。
+各アプリケーションCLIは、最初にルートコマンドを作成し、次に `rootCmd.AddCommand()`を使用してサブコマンドを集約することで機能を追加します(通常はさらにネストされたサブコマンドを使用します)。 アプリケーションのユニークな機能のほとんどは、それぞれ「TxCmd」および「QueryCmd」と呼ばれるトランザクションコマンドとクエリコマンドにあります。
 
-### 根命令
+### ルートコマンド
 
-root 命令(称为“rootCmd”)是用户首先在命令行中键入以指示他们希望与哪个应用程序交互的命令。用于调用命令的字符串(“Use”字段)通常是后缀为“-d”的应用程序名称，例如`simd` 或 `gaiad`。 root 命令通常包括以下命令以支持应用程序中的基本功能。
+rootコマンド(「rootCmd」と呼ばれる)は、ユーザーが最初にコマンドラインに入力して、対話するアプリケーションを指定するコマンドです。 コマンドの呼び出しに使用される文字列(「使用」フィールド)は、通常、「simd」や「gaiad」など、接尾辞「-d」が付いたアプリケーション名です。 rootコマンドには通常、アプリケーションの基本機能をサポートするための次のコマンドが含まれています。
 
-- 来自 Cosmos SDK rpc 客户端工具的 **Status** 命令，它打印有关连接的 [`Node`](../core/node.md) 状态的信息。节点的状态包括`NodeInfo`、`SyncInfo`和`ValidatorInfo`。
-- **Keys** [commands](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/client/keys) 来自 Cosmos SDK 客户端工具，其中包括用于使用Cosmos SDK 加密工具中的关键功能，包括添加新密钥并将其保存到密钥环、列出存储在密钥环中的所有公钥以及删除密钥。例如，用户可以输入 `simd keys add <name>` 来添加新密钥并将加密副本保存到密钥环，使用标志 `--recover` 从种子短语或标志`- -multisig` 将多个密钥组合在一起以创建一个多重签名密钥。有关 `add` 键命令的完整详细信息，请参阅代码 [此处](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/client/keys/add.go)。有关使用 `--keyring-backend` 存储密钥凭证的更多详细信息，请查看 [keyring docs](../run-node/keyring.md)。
-- 来自 Cosmos SDK 服务器包的 **Server** 命令。这些命令负责提供启动 ABCI Tendermint 应用程序所需的机制，并提供完全引导应用程序所需的 CLI 框架(基于 [cobra](github.com/spf13/cobra))。该包公开了两个核心函数:`StartCmd` 和 `ExportCmd`，它们分别创建用于启动应用程序和导出状态的命令。单击 [此处](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/server) 了解更多信息。
-- [**交易**](#transaction-commands) 命令。
-- [**查询**](#query-commands) 命令。
+-Cosmos SDKrpcクライアントツールの** Status **コマンド。接続[`Node`](../core/node.md)のステータスに関する情報を出力します。ノードのステータスには、 `NodeInfo`、` SyncInfo`、および `ValidatorInfo`が含まれます。
+-CosmosSDKクライアントツールの**キー** [コマンド](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/client/keys)(Cosmos SDKを使用するための暗号化ツールを含む)のキー機能には、新しいキーの追加とキーリングへの保存、キーリングに保存されているすべての公開キーの一覧表示、およびキーの削除が含まれます。たとえば、ユーザーは `simd keys add <name>`を入力して新しいキーを追加し、暗号化されたコピーをキーリングに保存し、フラグ `--recover`を使用してシードフレーズまたはフラグ`から複数のキーを取得できます。 --- multisig`それらを組み合わせて、マルチ署名キーを作成します。 `add`キーコマンドの詳細については、コード[こちら](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/client/keys/add.go)を参照してください。 `--keyring-backend`を使用してキーの資格情報を保存する方法の詳細については、[keyring docs](../run-node/keyring.md)を参照してください。
+-CosmosSDKサーバーパッケージの** Server **コマンド。これらのコマンドは、ABCI Tendermintアプリケーションを起動するために必要なメカニズムを提供し、アプリケーションを完全に起動するために必要なCLIフレームワーク([cobra](github.com/spf13/cobra)に基づく)を提供する役割を果たします。このパッケージは、2つのコア関数 `StartCmd`と` ExportCmd`を公開します。これらは、それぞれアプリケーションを起動し、状態をエクスポートするためのコマンドを作成します。詳細については、[こちら](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/server)をクリックしてください。
+-[** Transaction **](#transaction-commands)コマンド。
+-[** Query **](#query-commands)コマンド。
 
-接下来是来自“simapp”应用程序的“rootCmd”函数示例。它实例化根命令，添加 [_persistent_ flag](#flags) 和在每次执行之前运行的 `PreRun` 函数，并添加所有必要的子命令。
+次は、「simapp」アプリケーションの「rootCmd」関数の例です。ルートコマンドをインスタンス化し、[_ persistent_ flag](#flags)と各実行の前に実行される `PreRun`関数を追加し、必要なすべてのサブコマンドを追加します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/4eea4cafd3b8b1c2cd493886db524500c9dd745c/simapp/simd/cmd/root.go#L37-L150
 
-`rootCmd` 有一个名为 `initAppConfig()` 的函数，它对于设置应用程序的自定义配置很有用。
-默认情况下，应用程序使用来自 Cosmos SDK 的 Tendermint 应用程序配置模板，可以通过 `initAppConfig()` 覆盖它。
-这是覆盖默认`app.toml`模板的示例代码。
+`rootCmd`には` initAppConfig() `という関数があり、アプリケーションのカスタム構成を設定するのに便利です。
+デフォルトでは、アプリケーションはCosmos SDKのTendermintアプリケーション構成テンプレートを使用します。これは、 `initAppConfig()`でオーバーライドできます。
+これは、デフォルトの `app.toml`テンプレートをオーバーライドするサンプルコードです。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/4eea4cafd3b8b1c2cd493886db524500c9dd745c/simapp/simd/cmd/root.go#L84-L117
 
-`initAppConfig()` 还允许覆盖默认的 Cosmos SDK 的 [服务器配置](https://github.com/cosmos/cosmos-sdk/blob/4eea4cafd3b8b1c2cd493886db524500c9dd745c/server/config/config.go#L199)。一个例子是 `min-gas-prices` 配置，它定义了验证者在处理交易时愿意接受的最低 gas 价格。默认情况下，Cosmos SDK 将此参数设置为 `""`(空字符串)，这会强制所有验证器调整自己的 `app.toml` 并设置一个非空值，否则节点将在启动时停止。这可能不是验证器的最佳 UX，因此链开发人员可以在这个 `initAppConfig()` 函数中为验证器设置一个默认的 `app.toml` 值。
+`initAppConfig()`では、デフォルトのCosmos SDK [サーバー構成](https://github.com/cosmos/cosmos-sdk/blob/4eea4cafd3b8b1c2cd493886db524500c9dd745c/server/config/config.go#L199)をオーバーライドすることもできます。 例として、「min-gas-prices」構成があります。これは、トランザクションを処理するときにバリデーターが受け入れることができる最小ガス価格を定義します。 デフォルトでは、CosmosSDKはこのパラメーターを `" "`(空の文字列)に設定します。これにより、すべてのバリデーターが強制的に `app.toml`を調整し、空でない値を設定します。そうでない場合、ノードは起動時に停止します。 これはバリデーターに最適なUXではない可能性があるため、チェーン開発者はこの `initAppConfig()`関数でバリデーターのデフォルトの `app.toml`値を設定できます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/aa9b055ddb46aacd4737335a92d0b8a82d577341/simapp/simd/cmd/root.go#L101-L116
 
-根级 `status` 和 `keys` 子命令在大多数应用程序中都很常见，并且不与应用程序状态交互。应用程序的大部分功能——用户实际上可以用它_做的事情——是由它的 `tx` 和 `query` 命令启用的。
+ルートレベルの `status`および` keys`サブコマンドは、ほとんどのアプリケーションで一般的であり、アプリケーションのステータスとは相互作用しません。 アプリケーションのほとんどの機能(ユーザーが実際にアプリケーションで実行できること)は、その `tx`および` query`コマンドによって有効になります。
 
-### 交易命令
+### 取引注文
 
-[Transactions](./transactions.md) 是包装 [`Msg`s](../building-modules/messages-and-queries.md#messages) 的对象，它们会触发状态更改。为了能够使用 CLI 界面创建交易，通常会在 `rootCmd` 中添加一个函数 `txCmd`:
+[Transactions](./transactions.md)は、[`Msg`s](../building-modules/messages-and-queries.md#messages)をラップするオブジェクトであり、状態の変更をトリガーします。 CLIインターフェースを使用してトランザクションを作成できるようにするために、通常、関数 `txCmd`が` rootCmd`に追加されます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/simapp/simd/cmd/root.go#L86-L92
 
-这个 `txCmd` 函数为应用程序添加了最终用户可用的所有事务。这通常包括:
+この `txCmd`関数は、エンドユーザーが利用できるすべてのトランザクションをアプリケーションに追加します。 これには通常、次のものが含まれます。
 
-- **签名命令**来自 [`auth`](../../x/auth/spec/README.md) 模块，用于在交易中签署消息。要启用多重签名，请添加 `auth` 模块的 `MultiSign` 命令。由于每笔交易都需要某种签名才能有效，因此每个应用程序都需要签名命令。
-- **来自 Cosmos SDK 客户端工具的广播命令**，用于广播交易。
-- **所有[模块事务命令](../building-modules/module-interfaces.md#transaction-commands)** 应用程序依赖，通过使用[基本模块管理器](../building- modules/module-manager.md#basic-manager) `AddTxCommands()` 函数。
+-**署名コマンド**は[`auth`](../../x/auth/spec/README.md)モジュールから取得され、トランザクションでメッセージに署名するために使用されます。 マルチ署名を有効にするには、 `auth`モジュールの` MultiSign`コマンドを追加します。 すべてのトランザクションが有効であるためにはある種の署名が必要であるため、すべてのアプリケーションには署名コマンドが必要です。
+-**Cosmos SDKクライアントツールからのブロードキャストコマンド**、トランザクションのブロードキャストに使用されます。
+-**すべての[モジュールトランザクションコマンド](../building-modules/module-interfaces.md#transaction-commands)** [Basic Module Manager](../building- modules/module -managerを使用したアプリケーションの依存関係.md#basic-manager) `AddTxCommands()`関数。
 
-这是一个从“simapp”应用程序聚合这些子命令的“txCmd”示例:
+これは、「simapp」アプリケーションからこれらのサブコマンドを集約する「txCmd」の例です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/simapp/simd/cmd/root.go#L123-L149
 
-### 查询命令
+### クエリコマンド
 
-[**Queries**](../building-modules/messages-and-queries.md#queries) 是允许用户检索有关应用程序状态信息的对象。为了能够使用 CLI 界面创建交易，通常会在 `rootCmd` 中添加一个函数 `txCmd`:
+[**Queries**](../building-modules/messages-and-queries.md#queries)は、ユーザーがアプリケーションの状態に関する情報を取得できるようにするオブジェクトです。 CLIインターフェースを使用してトランザクションを作成できるようにするために、通常、関数 `txCmd`が` rootCmd`に追加されます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/simapp/simd/cmd/root.go#L86-L92
 
-这个 `queryCmd` 函数为应用程序添加了最终用户可用的所有查询。这通常包括:
+この `queryCmd`関数は、エンドユーザーが利用できるすべてのクエリをアプリケーションに追加します。 これには通常、次のものが含まれます。
 
-- **QueryTx** 和/或其他交易查询命令]来自`auth`模块，允许用户通过输入其哈希值、标签列表或区块高度来搜索交易。这些查询允许用户查看交易是否已包含在区块中。
-- 来自 `auth` 模块的 **Account 命令**，显示给定地址的帐户的状态(例如帐户余额)。
-- **Validator command** 来自 Cosmos SDK rpc 客户端工具，显示给定高度的验证器集。
-- 来自 Cosmos SDK rpc 客户端工具的 **Block 命令**，显示给定高度的块数据。
-- **所有[模块查询命令](../building-modules/module-interfaces.md#query-commands)** 应用程序依赖，使用[基本模块管理器](../building- modules/module-manager.md#basic-manager) `AddQueryCommands()` 函数。 
+-**QueryTx**および/またはその他のトランザクションクエリコマンド]は `auth`モジュールから取得され、ユーザーはハッシュ値、タグリスト、またはブロックの高さを入力してトランザクションを検索できます。 これらのクエリにより、ユーザーはトランザクションがブロックに含まれているかどうかを確認できます。
+-`auth`モジュールからの**アカウントコマンド**。特定のアドレスのアカウントのステータス(アカウントの残高など)を表示します。
+-**バリデーターコマンド**は、指定された高さのバリデーターセットを表示するCosmos SDKrpcクライアントツールから取得されます。
+-Cosmos SDK rpcクライアントツールの**ブロックコマンド**を使用して、特定の高さのブロックデータを表示します。
+-**すべての[モジュールクエリコマンド](../building-modules/module-interfaces.md#query-commands)**アプリケーションの依存関係、[Basic Module Manager](../building-modules/module-managerを使用してください。 md#basic-manager) `AddQueryCommands()`関数。
 
-这是一个从“simapp”应用程序聚合子命令的“queryCmd”示例:
-
+これは、「simapp」アプリケーションからのサブコマンドを集約する「queryCmd」の例です。
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/simapp/simd/cmd/root.go#L99-L121
 
-## 标志
+## サイン
 
-标志用于修改命令；开发人员可以使用 CLI 将它们包含在 `flags.go` 文件中。用户可以显式地将它们包含在命令中或通过在其 [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml) 中预先配置它们。通常预先配置的标志包括用户希望与之交互的区块链的“--node”和“--chain-id”。
+フラグはコマンドを変更するために使用されます。開発者はCLIを使用して、コマンドを `flags.go`ファイルに含めることができます。ユーザーは、コマンドに明示的に含めるか、[`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml)で事前に構成することができます。通常、事前設定されたフラグには、ユーザーが操作したいブロックチェーンの「--node」と「--chain-id」が含まれます。
 
-添加到命令的 _persistent_ 标志(与 _local_ 标志相对)超越其所有子命令:子命令将继承这些标志的配置值。此外，所有标志在添加到命令时都有默认值；有些关闭选项，但其他是用户需要覆盖以创建有效命令的空值。标志可以显式标记为 _required_ 以便在用户不提供值时自动抛出错误，但以不同方式处理意外丢失标志也是可以接受的。
+コマンドに追加された_persistent_フラグ(_local_フラグではなく)は、そのすべてのサブコマンドをオーバーライドします。サブコマンドは、これらのフラグの構成値を継承します。さらに、すべてのフラグには、コマンドに追加されたときにデフォルト値があります。一部はオフオプションですが、その他は空の値であり、ユーザーが有効なコマンドを作成するためにオーバーライドする必要があります。フラグを明示的に_required_としてマークして、ユーザーが値を指定しない場合にエラーを自動的にスローすることができますが、誤って欠落しているフラグを別の方法で処理することもできます。
 
-标志直接添加到命令中(通常在定义模块命令的 [模块的 CLI 文件](../building-modules/module-interfaces.md#flags) 中)并且除了 `rootCmd` 持久标志之外没有任何标志必须添加在应用程序级别添加。通常为“--chain-id”(应用程序所属区块链的唯一标识符)添加一个 _persistent_ 标志到 root 命令。添加这个标志可以在`main()`函数中完成。添加此标志是有意义的，因为链 ID 不应在此应用程序 CLI 中跨命令更改。以下是来自“simapp”应用程序的示例:
+フラグはコマンドに直接追加され(通常、モジュールコマンドを定義する[module CLIファイル](../building-modules/module-interfaces.md#flags)にあります)、 `rootCmd以外のフラグは必要ありません。 `永続フラグ追加はアプリケーションレベルで追加されます。通常、「-chain-id」(アプリケーションが属するブロックチェーンの一意の識別子)は、rootコマンドに_persistent_フラグを追加します。このフラグの追加は、 `main()`関数で行うことができます。このアプリケーションCLIのコマンド間でチェーンIDを変更してはならないため、このフラグを追加することは理にかなっています。以下は、「simapp」アプリケーションの例です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/simapp/simd/cmd/root.go#L118-L119
 
-## 环境变量
+## 環境変数
 
-每个标志都绑定到它各自命名的环境变量。然后环境变量的名称由两部分组成 - 大写的“basename”后跟标志的标志名称。 `-` 必须替换为 `_`。例如，基本名称为“GAIA”的应用程序的标志“--home”绑定到“GAIA_HOME”。它允许减少为常规操作键入的标志数量。例如，而不是: 
+各フラグは、独自の名前付き環境変数にバインドされています。 その場合、環境変数の名前は2つの部分で構成されます。大文字の「basename」の後にロゴのロゴ名が続きます。 `-`は` _`に置き換える必要があります。 たとえば、ベース名が「GAIA」であるアプリケーションのフラグ「--home」は「GAIA_HOME」にバインドされます。 これにより、通常の操作で入力されるフラグの数を減らすことができます。 たとえば、次の代わりに:
 
 ```sh
-gaia --home=./ --node=<node address> --chain-id="testchain-1" --keyring-backend=test tx ... --from=<key name>
+gaia --home=./--node=<node address> --chain-id="testchain-1" --keyring-backend=test tx ... --from=<key name>
 ```
 
-这会更方便: 
+これはより便利になります:
 
 ```sh
 # define env variables in .env, .envrc etc
@@ -135,18 +134,18 @@ GAIA_KEYRING_BACKEND="test"
 gaia tx ... --from=<key name>
 ```
 
-## 配置
+## 構成
 
-应用程序的根命令使用 `PersistentPreRun()` cobra 命令属性来执行命令至关重要，因此所有子命令都可以访问服务器和客户端上下文。这些上下文最初被设置为它们的默认值，并且可能在它们各自的“PersistentPreRun()”函数中被修改，范围限定为命令。请注意，`client.Context` 通常预先填充有“默认”值，这些值可能对所有命令在必要时继承和覆盖很有用。
+アプリケーションのルートコマンドは、 `PersistentPreRun()` cobraコマンド属性を使用してコマンドを実行することが重要です。これにより、すべてのサブコマンドがサーバーとクライアントのコンテキストにアクセスできるようになります。 これらのコンテキストは、最初はデフォルト値に設定されており、それぞれの「PersistentPreRun()」関数で変更できますが、スコープはコマンドに限定されます。 `client.Context`には通常、「デフォルト」の値が事前に入力されていることに注意してください。これは、必要に応じてすべてのコマンドを継承およびオーバーライドする場合に役立ちます。
 
-下面是一个来自 `simapp` 的 `PersistentPreRun()` 函数的例子:
+`simapp`の` PersistentPreRun() `関数の例を次に示します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/simapp/simd/cmd/root.go#L54-L60
 
-`SetCmdClientContextHandler` 调用通过 `ReadPersistentCommandFlags` 读取持久标志，它创建一个 `client.Context` 并在根命令的 `Context` 上设置它。
+`SetCmdClientContextHandler`呼び出しは、` ReadPersistentCommandFlags`を介して永続性フラグを読み取り、 `client.Context`を作成して、ルートコマンドの` Context`に設定します。
 
-`InterceptConfigsPreRunHandler` 调用创建了一个 viper 文字、默认的 `server.Context` 和一个记录器，并将其设置在根命令的 `Context` 上。 `server.Context` 将通过内部 `interceptConfigs` 调用修改并保存到磁盘，该调用根据提供的主路径读取或创建 Tendermint 配置。此外，`interceptConfigs` 还读取并加载应用程序配置 `app.toml`，并将其绑定到 `server.Context` viper 文字。这是至关重要的，因此应用程序不仅可以访问 CLI 标志，还可以访问此文件提供的应用程序配置值。
+`InterceptConfigsPreRunHandler`呼び出しは、バイパーテキスト、デフォルトの` server.Context`、およびレコーダーを作成し、ルートコマンドの `Context`に設定します。 `server.Context`は変更され、内部の` interceptConfigs`呼び出しを介してディスクに保存されます。この呼び出しは、提供されたメインパスに従ってTendermint構成を読み取りまたは作成します。 さらに、 `interceptConfigs`は、アプリケーション構成` app.toml`を読み取ってロードし、それを `server.Context`viperテキストにバインドします。 これは重要であるため、アプリケーションはCLIフラグだけでなく、このファイルによって提供されるアプリケーション構成値にもアクセスできます。
 
-## 下一个 {hide}
+## 次へ{非表示}
 
-了解 [事件](./events.md) {hide} 
+[events](./events.md){hide}を理解する

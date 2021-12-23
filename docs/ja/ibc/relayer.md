@@ -1,43 +1,43 @@
-# 中继器
+# リピータ
 
-## 先决条件阅读
+## 前提条件の読書
 
-- [IBC 概览](./overview.md) {prereq}
-- [事件](https://github.com/cosmos/cosmos-sdk/blob/master/docs/core/events.md) {prereq}
+- [IBCの概要](./overview.md) {prereq}
+- [イベント](https://github.com/cosmos/cosmos-sdk/blob/master/docs/core/events.md) {prereq}
 
-## 事件
+## イベント
 
-为基础应用程序处理的每个事务发出事件以指示执行
-一些客户可能想要了解的逻辑。这在中继 IBC 数据包时非常有用。
-任何使用 IBC 的消息都会为执行中定义的相应 TAO 逻辑发出事件
-[IBC 事件规范](https://github.com/cosmos/ibc-go/blob/main/modules/core/spec/06_events.md)。
+基盤となるアプリケーションによって処理されたトランザクションごとにイベントを発行して、実行を示します
+一部のお客様は、ロジックを理解したいと思うかもしれません。 これは、IBCパケットを中継するときに非常に役立ちます。
+IBCを使用するメッセージは、実行で定義された対応するTAOロジックのイベントを発行します。
+[IBCイベント仕様]（https://github.com/cosmos/ibc-go/blob/main/modules/core/spec/06_events.md）。
 
-在 Cosmos SDK 中，可以假设每条消息都有一个类型为“message”的事件，
-属性键`action`，以及表示发送消息类型的属性值
-(`channel_open_init` 将是`MsgChannelOpenInit` 的属性值)。如果中继器查询
-对于事务事件，它可以使用此事件类型/属性键对拆分消息事件。
+Cosmos SDKでは、すべてのメッセージに「メッセージ」タイプのイベントがあると見なすことができます。
+属性キー `action`、および送信されたメッセージのタイプを示す属性値
+（ `channel_open_init`は` MsgChannelOpenInit`の属性値になります）。 リピーターがクエリを実行する場合
+トランザクションイベントの場合、このイベントタイプとプロパティキーのペアを使用して、メッセージイベントを分割できます。
 
-带有属性键“module”的事件类型“message”可能会针对单个事件多次发出
-由于应用程序回调而产生的消息。可以假设执行的任何 TAO 逻辑都会导致
-具有属性值“ibc_<submodulename>”的模块事件发射(02-client 发射“ibc_client”)。
+属性キー「モジュール」を持つイベントタイプ「メッセージ」は、単一のイベントに対して複数回発行される場合があります
+アプリケーションのコールバックが原因で生成されたメッセージ。 実行されたTAOロジックは、次の結果になると想定できます。
+属性値が「ibc_ <submodulename>」のモジュールイベントが送信されます（02-clientは「ibc_client」を送信します）。
 
-### 订阅 Tendermint
+### テンダーミントを購読する
 
-通过 [Tendermint 的 Websocket](https://docs.tendermint.com/master/rpc/) 调用 Tendermint RPC 方法 `Subscribe` 将使用以下方法返回事件
-Tendermint 对它们的内部表示。而不是像他们一样接收事件列表
-发出后，Tendermint 将返回类型 `map[string][]string`，它映射了
-从 `<event_type>.<attribute_key>` 到 `attribute_value`。这会导致事件的提取
-订购是非平凡的，但仍然可能。
+[TendermintのWebsocket]（https://docs.tendermint.com/master/rpc/）を介してTendermintRPCメソッド `Subscribe`を呼び出すと、次のメソッドを使用してイベントが返されます。
+それらのテンダーミントの内部表現。 彼らのようにイベントのリストを受け取る代わりに
+送信後、Tendermintはタイプ `map [string] [] string`を返します。
+`<event_type>。<attribute_key>`から `attribute_value`へ。 これは、イベントの抽出につながります
+注文は簡単ではありませんが、それでも可能です。
 
-中继者应该使用 `message.action` 键来提取交易中的消息数量
-以及发送的 IBC 交易类型。对于字符串数组中的每个 IBC 交易
-`message.action`，应该从其他事件字段中提取必要的信息。如果
-`send_packet` 出现在 `message.action` 值的索引 2 处，中继器将需要使用
-键“send_packet.packet_sequence”的索引 2 处的值。应该对每个人重复这个过程
-中继数据包所需的一条信息。
+中継者は `message.action`キーを使用して、トランザクション内のメッセージの数を抽出する必要があります
+そして、送信されたIBCトランザクションのタイプ。 文字列配列内のIBCトランザクションごと
+`message.action`、必要な情報は他のイベントフィールドから抽出する必要があります。 もしも
+`send_packet`は` message.action`値のインデックス2に表示され、リピーターは使用する必要があります
+キー「send_packet.packet_sequence」のインデックス2の値。 このプロセスはすべての人に繰り返す必要があります
+データパケットを中継するために必要な情報。
 
-## 示例实现
+## 実装例
 
 - [Golang Relayer](https://github.com/iqlusioninc/relayer)
-- [爱马仕](https://github.com/informalsystems/ibc-rs/tree/master/relayer)
+- [Hermes](https://github.com/informalsystems/ibc-rs/tree/master/relayer)
 - [Typescript Relayer](https://github.com/confio/ts-relayer) 

@@ -1,10 +1,10 @@
-# 介绍
+# 導入する
 
-本介绍提供了 Cosmos SDK 的快速入门。
+この紹介では、CosmosSDKのクイックスタートを提供します。
 
-1. [概述](./overview.md)
-2. [特定应用区块链](./why-app-specific.md)
-3. [Cosmos SDK 应用架构](./sdk-app-architecture.md)
-4. [Cosmos SDK 设计概述](./sdk-design.md)
+1. [概要](./overview.md)
+2. [アプリケーション固有のブロックチェーン](./why-app-specific.md)
+3. [Cosmos SDKアプリケーションアーキテクチャ](./sdk-app-architecture.md)
+4. [Cosmos SDKデザインの概要](./sdk-design.md)
 
-阅读介绍材料后，请前往 [basics](../basics/README.md) 了解更多信息。 
+紹介資料を読んだ後、詳細については[basics](../basics/README.md)にアクセスしてください。

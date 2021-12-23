@@ -128,6 +128,6 @@ global-labels = [
 | `store_iavl_commit`             | Duration of an IAVL `Store#Commit` call                                                   | ms              | summary |
 | `store_iavl_query`              | Duration of an IAVL `Store#Query` call                                                    | ms              | summary |
 
-## Next {hide}
+## 下一个 {hide}
 
 Learn about the [object-capability](./ocap.md) model {hide}

@@ -50,7 +50,7 @@ childCtx = parentCtx.WithBlockHeader(header)
 [Golang Context Package](https://golang.org/pkg/context) 文档指导开发者
 显式传递上下文 `ctx` 作为进程的第一个参数。
 
-##存储分支
+## 存储分支
 
 `Context` 包含一个 `MultiStore`，它允许使用 `CacheMultiStore` 进行分支和缓存功能
 (`CacheMultiStore` 中的查询被缓存以避免将来的往返)。

@@ -39,5 +39,5 @@ Tendermint 对它们的内部表示。而不是像他们一样接收事件列表
 ## 示例实现
 
 - [Golang Relayer](https://github.com/iqlusioninc/relayer)
-- [爱马仕](https://github.com/informalsystems/ibc-rs/tree/master/relayer)
+- [Hermes](https://github.com/informalsystems/ibc-rs/tree/master/relayer)
 - [Typescript Relayer](https://github.com/confio/ts-relayer) 

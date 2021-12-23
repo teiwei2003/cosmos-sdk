@@ -44,14 +44,14 @@ Cosmos SDK 旨在通过成为
 例如，以下代码片段违反了对象功能
 原则:
 
-```Go
-输入 AppAccount 结构 {...}
-帐户 := &AppAccount{
-    地址:pub.Address(),
-    硬币:sdk.Coins{sdk.NewInt64Coin("ATM", 100)},
+```go
+type AppAccount struct {...}
+account := &AppAccount{
+    Address: pub.Address(),
+    Coins: sdk.Coins{sdk.NewInt64Coin("ATM", 100)},
 }
-sumValue := externalModule.ComputeSumValue(账户)
-``
+sumValue := externalModule.ComputeSumValue(account)
+```
 
 `ComputeSumValue` 方法隐含了一个纯函数，但隐含的
 接受指针值的能力是修改该值的能力

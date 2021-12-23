@@ -1,40 +1,40 @@
-# 定制
+# カスタムメイド
 
-了解如何配置您的应用程序以使用 IBC 并将数据包发送到其他链。 {概要}
+IBCを使用し、他のチェーンにパケットを送信するようにアプリケーションを構成する方法を学びます。 {まとめ}
 
-本文档可作为想要编写自己的 Inter-blockchain 的开发人员的指南
-自定义 [用例] 的通信协议 (IBC) 应用程序 (https://github.com/cosmos/ics/blob/master/ibc/4_IBC_USECASES.md)。
+このドキュメントは、独自のブロック間チェーンを作成したい開発者向けのガイドとして使用できます。
+[ユースケース](https://github.com/cosmos/ics/blob/master/ibc/4_IBC_USECASES.md)の通信プロトコル(IBC)アプリケーションをカスタマイズします。
 
-由于IBC协议的模块化设计，IBC
-应用程序开发人员不需要关心客户端的底层细节，
-连接和证明验证。然而，对较低级别的简要说明
-给出堆栈以便应用程序开发人员可以对 IBC 有一个高级别的理解
-协议。然后文档详细介绍了与应用程序最相关的抽象层
-开发人员(通道和端口)，并描述如何定义自己的自定义数据包，以及
-`IBCModule` 回调。
+IBCプロトコルのモジュラー設計により、IBC
+アプリケーション開発者は、クライアントの低レベルの詳細を気にする必要はありません。
+接続と認証の検証。ただし、下位レベルの簡単な説明
+アプリケーション開発者がIBCを高レベルで理解できるように、スタックを提供します
+プロトコル。次に、ドキュメントは、アプリケーションに最も関連する抽象化レイヤーについて詳しく説明します
+開発者(チャネルとポート)、および独自のカスタムデータパッケージを定義する方法を説明し、
+`IBCModule`コールバック。
 
-要让您的模块通过 IBC 进行交互，您必须:绑定到端口，定义您自己的数据包数据和确认结构以及如何对它们进行编码/解码，并实现
-`IBCModule` 接口。以下是如何编写 IBC 应用程序的更详细说明
-模块正确。
+モジュールがIBCを介して対話できるようにするには、ポートにバインドし、独自のパケットデータと確認構造、およびそれらをエンコード/デコードする方法を定義し、実装する必要があります。
+`IBCModule`インターフェース。 IBCアプリケーションの作成方法の詳細については次のとおりです。
+モジュールは正しいです。
 
-## 先决条件阅读
+## 前提条件の読書
 
-- [IBC 概览](./overview.md)) {prereq}
-- [IBC 默认集成](./integration.md) {prereq}
+- [IBC 概要](./overview.md)) {prereq}
+- [IBC デフォルトの統合](./integration.md) {prereq}
 
-##创建自定义IBC应用程序模块
+## カスタムIBCアプリケーションモジュールを作成する
 
-### 实现`IBCModule` 接口和回调
+### `IBCModule`インターフェースとコールバックを実装する
 
-Cosmos SDK 期望所有 IBC 模块都实现 [`IBCModule`
-接口](https://github.com/cosmos/ibc-go/tree/main/modules/core/05-port/types/module.go)。这
-接口包含 IBC 期望模块实现的所有回调。本节将介绍
-在通道握手执行期间调用的回调。
+Cosmos SDKは、すべてのIBCモジュールが[`IBCModule`を実装することを期待しています
+インターフェース](https://github.com/cosmos/ibc-go/tree/main/modules/core/05-port/types/module.go)。 この
+インターフェイスには、IBCがモジュールに実装することを期待するすべてのコールバックが含まれています。 このセクションでは紹介します
+チャネルハンドシェイクの実行中にコールバックが呼び出されました。
 
-以下是模块预期实现的通道握手回调: 
+以下は、モジュールによって実装されることが期待されるチャネルハンドシェイクコールバックです。 
 
 ```go
-// Called by IBC Handler on MsgOpenInit
+//Called by IBC Handler on MsgOpenInit
 func (k Keeper) OnChanOpenInit(ctx sdk.Context,
     order channeltypes.Order,
     connectionHops []string,
@@ -44,21 +44,21 @@ func (k Keeper) OnChanOpenInit(ctx sdk.Context,
     counterparty channeltypes.Counterparty,
     version string,
 ) error {
-    // OpenInit must claim the channelCapability that IBC passes into the callback
+   //OpenInit must claim the channelCapability that IBC passes into the callback
     if err := k.ClaimCapability(ctx, chanCap, host.ChannelCapabilityPath(portID, channelID)); err != nil {
 			return err
 	}
 
-    // ... do custom initialization logic
+   //... do custom initialization logic
 
-    // Use above arguments to determine if we want to abort handshake
-    // Examples: Abort if order == UNORDERED,
-    // Abort if version is unsupported
+   //Use above arguments to determine if we want to abort handshake
+   //Examples: Abort if order == UNORDERED,
+   //Abort if version is unsupported
     err := checkArguments(args)
     return err
 }
 
-// Called by IBC Handler on MsgOpenTry
+//Called by IBC Handler on MsgOpenTry
 OnChanOpenTry(
     ctx sdk.Context,
     order channeltypes.Order,
@@ -70,47 +70,47 @@ OnChanOpenTry(
     version,
     counterpartyVersion string,
 ) error {
-    // Module may have already claimed capability in OnChanOpenInit in the case of crossing hellos
-    // (ie chainA and chainB both call ChanOpenInit before one of them calls ChanOpenTry)
-    // If the module can already authenticate the capability then the module already owns it so we don't need to claim
-    // Otherwise, module does not have channel capability and we must claim it from IBC
+   //Module may have already claimed capability in OnChanOpenInit in the case of crossing hellos
+   //(ie chainA and chainB both call ChanOpenInit before one of them calls ChanOpenTry)
+   //If the module can already authenticate the capability then the module already owns it so we don't need to claim
+   //Otherwise, module does not have channel capability and we must claim it from IBC
     if !k.AuthenticateCapability(ctx, chanCap, host.ChannelCapabilityPath(portID, channelID)) {
-        // Only claim channel capability passed back by IBC module if we do not already own it
+       //Only claim channel capability passed back by IBC module if we do not already own it
         if err := k.scopedKeeper.ClaimCapability(ctx, chanCap, host.ChannelCapabilityPath(portID, channelID)); err != nil {
             return err
         }
     }
 
-    // ... do custom initialization logic
+   //... do custom initialization logic
 
-    // Use above arguments to determine if we want to abort handshake
+   //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
 
-// Called by IBC Handler on MsgOpenAck
+//Called by IBC Handler on MsgOpenAck
 OnChanOpenAck(
     ctx sdk.Context,
     portID,
     channelID string,
     counterpartyVersion string,
 ) error {
-    // ... do custom initialization logic
+   //... do custom initialization logic
 
-    // Use above arguments to determine if we want to abort handshake
+   //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
 
-// Called by IBC Handler on MsgOpenConfirm
+//Called by IBC Handler on MsgOpenConfirm
 OnChanOpenConfirm(
     ctx sdk.Context,
     portID,
     channelID string,
 ) error {
-    // ... do custom initialization logic
+   //... do custom initialization logic
 
-    // Use above arguments to determine if we want to abort handshake
+   //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
@@ -121,201 +121,201 @@ closing handshake. Closing a channel is a 2-step handshake, the initiating chain
 `ChanCloseInit` and the finalizing chain calls `ChanCloseConfirm`.
 
 ```go
-// Called by IBC Handler on MsgCloseInit
+//Called by IBC Handler on MsgCloseInit
 OnChanCloseInit(
     ctx sdk.Context,
     portID,
     channelID string,
 ) error {
-    // ... do custom finalization logic
+   //... do custom finalization logic
 
-    // Use above arguments to determine if we want to abort handshake
+   //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
 
-// Called by IBC Handler on MsgCloseConfirm
+//Called by IBC Handler on MsgCloseConfirm
 OnChanCloseConfirm(
     ctx sdk.Context,
     portID,
     channelID string,
 ) error {
-    // ... do custom finalization logic
+   //... do custom finalization logic
 
-    // Use above arguments to determine if we want to abort handshake
+   //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
 ```
 
-#### 通道握手版本协商
+#### チャネルハンドシェイクバージョンネゴシエーション
 
-应用程序模块应验证在通道握手过程中使用的版本控制。
+アプリケーションモジュールは、チャネルハンドシェイク中に使用されたバージョン管理を検証する必要があります。
 
-* `ChanOpenInit` 回调应该验证 `MsgChanOpenInit.Version` 是否有效
-* `ChanOpenTry` 回调应该验证 `MsgChanOpenTry.Version` 是有效的，并且 `MsgChanOpenTry.CounterpartyVersion` 是有效的。
-* `ChanOpenAck` 回调应该验证 `MsgChanOpenAck.CounterpartyVersion` 是否有效并受支持。
+* `ChanOpenInit`コールバックは、` MsgChanOpenInit.Version`が有効かどうかを確認する必要があります
+* `ChanOpenTry`コールバックは、` MsgChanOpenTry.Version`が有効であり、 `MsgChanOpenTry.CounterpartyVersion`が有効であることを確認する必要があります。
+* `ChanOpenAck`コールバックは、` MsgChanOpenAck.CounterpartyVersion`が有効でサポートされていることを確認する必要があります。
 
-版本必须是字符串，但可以实现任何版本控制结构。如果您的应用程序计划
-有线性版本，然后推荐语义版本控制。如果您的应用程序计划发布
-主要版本之间的各种功能，然后建议使用相同的版本控制方案
-作为IBC。此版本控制方案指定了版本标识符和兼容的功能集
-那个标识符。有效的版本选择包括选择兼容的版本标识符
-您的应用程序对该版本支持的功能子集。该结构用于此
-方案可以在“03-connection/types”中找到。
+バージョンは文字列である必要がありますが、任意のバージョン管理構造を実装できます。 アプリケーションが計画している場合
+線形バージョンがあり、セマンティックバージョン管理が推奨されます。 アプリケーションのリリースが予定されている場合
+メジャーバージョン間でさまざまな機能がある場合は、同じバージョン管理スキームを使用することをお勧めします
+IBCとして。 このバージョン管理スキームは、バージョン識別子と互換性のある機能セットを指定します
+その識別子。 有効なバージョンの選択には、互換性のあるバージョン識別子の選択が含まれます
+アプリケーションがこのバージョンでサポートする機能のサブセット。 この構造はこれに使用されます
+解決策は「03-connection/types」にあります。
 
-由于版本类型是字符串，应用程序可以做简单的版本验证
-通过字符串匹配，或者他们可以使用已经实现的版本控制系统并通过原型
-根据需要将编码版本编码到每个握手调用中。
+バージョンタイプは文字列であるため、アプリケーションは簡単なバージョン検証を行うことができます
+文字列照合を介して、またはすでに実装されているバージョン管理システムを使用してプロトタイプを渡すことができます
+必要に応じて、エンコードバージョンを各ハンドシェイク呼び出しにエンコードします。
 
-ICS20 目前使用单个支持的版本实现基本字符串匹配。
+ICS20は現在、サポートされている単一のバージョンを使用して、基本的な文字列照合を実装しています。
 
-### 绑定端口
+### バインディングポート
 
-目前，端口必须在应用程序初始化时绑定。模块可以绑定到 `InitGenesis` 中的端口
-像这样: 
+現在、アプリケーションの初期化時にポートをバインドする必要があります。 モジュールは `InitGenesis`のポートにバインドできます
+このような:
 
 ```go
 func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, state types.GenesisState) {
-    // ... other initialization logic
+   //... other initialization logic
 
-    // Only try to bind to port if it is not already bound, since we may already own
-    // port capability from capability InitGenesis
+   //Only try to bind to port if it is not already bound, since we may already own
+   //port capability from capability InitGenesis
     if !isBound(ctx, state.PortID) {
-        // module binds to desired ports on InitChain
-        // and claims returned capabilities
+       //module binds to desired ports on InitChain
+       //and claims returned capabilities
         cap1 := keeper.IBCPortKeeper.BindPort(ctx, port1)
         cap2 := keeper.IBCPortKeeper.BindPort(ctx, port2)
         cap3 := keeper.IBCPortKeeper.BindPort(ctx, port3)
 
-        // NOTE: The module's scoped capability keeper must be private
+       //NOTE: The module's scoped capability keeper must be private
         keeper.scopedKeeper.ClaimCapability(cap1)
         keeper.scopedKeeper.ClaimCapability(cap2)
         keeper.scopedKeeper.ClaimCapability(cap3)
     }
 
-    // ... more initialization logic
+   //... more initialization logic
 }
 ```
 
-### 自定义数据包
+### カスタムデータパッケージ
 
-通过通道连接的模块必须就它们通过通道发送的应用程序数据达成一致。
-通道，以及他们将如何编码/解码它。 IBC 未指定此过程，因为它已启动
-到每个应用模块来决定如何执行这个协议。 然而，对于大多数
-应用程序这将在通道握手期间作为版本协商发生。 虽然更多
-可以在通道开启握手内部实现复杂的版本协商，一个非常
-[ibc-transfer 模块](https://github.com/cosmos/ibc-go/tree/main/modules/apps/transfer/module.go) 中实现了简单的版本协商。
+チャネルを介して接続されたモジュールは、チャネルを介して送信するアプリケーションデータに同意する必要があります。
+チャネル、およびそれらがどのようにそれをエンコード/デコードするか。 IBCは、このプロセスが開始されたため、このプロセスを指定しませんでした
+各アプリケーションモジュールに移動して、このプロトコルの実装方法を決定します。 ただし、ほとんどの場合
+アプリケーションこれは、チャネルハンドシェイク中のバージョンネゴシエーションとして発生します。 もっと
+複雑なバージョンネゴシエーションは、チャネルオープニングハンドシェイク内で実現できます。
+シンプルなバージョンネゴシエーションは[ibc-transfermodule](https://github.com/cosmos/ibc-go/tree/main/modules/apps/transfer/module.go)に実装されています。
 
-因此，模块必须定义它的自定义数据包数据结构，以及定义良好的方法
-将其编码和解码为`[]byte`。 
+したがって、モジュールは、カスタムデータパケットデータ構造と、明確に定義されたメソッドを定義する必要があります
+`[] byte`としてエンコードおよびデコードします。 
 
 ```go
-// Custom packet data defined in application module
+//Custom packet data defined in application module
 type CustomPacketData struct {
-    // Custom fields ...
+   //Custom fields ...
 }
 
 EncodePacketData(packetData CustomPacketData) []byte {
-    // encode packetData to bytes
+   //encode packetData to bytes
 }
 
 DecodePacketData(encoded []byte) (CustomPacketData) {
-    // decode from bytes to packet data
+   //decode from bytes to packet data
 }
 ```
 
-然后，模块必须在通过 IBC 发送数据包数据之前对其进行编码。 
+次に、モジュールはIBCを介して送信する前にパケットデータをエンコードする必要があります。 
 
 ```go
-// Sending custom application packet data
+//Sending custom application packet data
 data := EncodePacketData(customPacketData)
 packet.Data = data
 IBCChannelKeeper.SendPacket(ctx, packet)
 ```
 
-接收数据包的模块必须将“PacketData”解码为它期望的结构，以便它可以
-采取行动。 
+パケットを受信するモジュールは、「PacketData」を期待する構造にデコードして、次のことができるようにする必要があります。
+行動を起こす。 
 
 ```go
-// Receiving custom application packet data (in OnRecvPacket)
+//Receiving custom application packet data (in OnRecvPacket)
 packetData := DecodePacketData(packet.Data)
-// handle received custom packet data
+//handle received custom packet data
 ```
 
-#### 数据包流处理
+#### パケットフロー処理
 
-正如 IBC 期望模块实现通道握手回调一样，IBC 也期望模块
-实现回调以处理通过通道的数据包流。
+IBCがモジュールがチャネルハンドシェイクコールバックを実装することを期待しているように、IBCもモジュールを期待しています
+チャネルを介したパケットのフローを処理するためのコールバックを実装します。
 
-一旦模块 A 和模块 B 相互连接，中继器就可以开始中继数据包和
-在频道上来回确认。
+モジュールAとモジュールBが相互に接続されると、リピーターはデータパケットの中継を開始できます。
+チャネルで前後に確認します。
 
-![IBC数据包流程图](https://media.githubusercontent.com/media/cosmos/ics/master/spec/ics-004-channel-and-packet-semantics/packet-state-machine.png)
+![IBCデータパケットのフローチャート](https://media.githubusercontent.com/media/cosmos/ics/master/spec/ics-004-channel-and-packet-semantics/packet-state-machine.png)
 
-简而言之，一个成功的数据包流的工作原理如下:
+つまり、成功したパケットフローは次のように機能します。
 
-1.模块A通过IBC模块发送数据包
-2.数据包被模块B接收
-3. 如果模块 B 写入数据包的确认，则模块 A 将处理
-   确认
-4.如果在超时前没有成功接收到数据包，则模块A处理
-   数据包超时。
+1. モジュールAは、IBCモジュールを介してデータパケットを送信します
+2. データパケットはモジュールBによって受信されます
+3. モジュールBがデータパケットの確認応答を書き込む場合、モジュールAは処理します
+    確認
+4. タイムアウト前にデータパケットが正常に受信されなかった場合、モジュールAは処理します
+    パケットがタイムアウトしました。
 
-##### 发送数据包
+##### データパケットを送信する
 
-模块不通过回调发送数据包，因为模块发起发送的动作
-数据包发送到 IBC 模块，而不是将消息发送到 IBC 的数据包流的其他部分
-模块必须通过使用回调触发端口绑定模块的执行。因此，要发送一个
-一个模块只需要在“IBCChannelKeeper”上调用“SendPacket”。 
+モジュールは送信アクションを開始するため、モジュールはコールバックを介してデータパケットを送信しません
+パケットは、IBCのパケットフローの他の部分にメッセージを送信する代わりに、IBCモジュールに送信されます。
+モジュールは、コールバックを使用してポートバインディングモジュールの実行をトリガーする必要があります。 したがって、送信するには
+モジュールは、「IBCChannelKeeper」で「SendPacket」を呼び出すだけで済みます。 
 
 ```go
-// retrieve the dynamic capability for this channel
+//retrieve the dynamic capability for this channel
 channelCap := scopedKeeper.GetCapability(ctx, channelCapName)
-// Sending custom application packet data
+//Sending custom application packet data
 data := EncodePacketData(customPacketData)
 packet.Data = data
-// Send packet to IBC, authenticating with channelCap
+//Send packet to IBC, authenticating with channelCap
 IBCChannelKeeper.SendPacket(ctx, channelCap, packet)
 ```
 
 ::: 警告
-为了防止模块在它们不拥有的通道上发送数据包，IBC 期望
-模块为数据包的源通道传递正确的通道能力。
+モジュールが所有していないチャネルでパケットを送信しないようにするために、IBCは
+このモジュールは、データパケットの送信元チャネルに適切なチャネル機能を提供します。
 :::
 
-##### 接收数据包
+##### パケットを受信する
 
-为了处理接收数据包，模块必须实现`OnRecvPacket` 回调。 这得到
-在 IBC 证明数据包有效并正确处理后，由 IBC 模块调用
-守门员。 因此，`OnRecvPacket` 回调只需要关心使适当的状态
-更改给定的数据包数据而不必担心数据包是否有效。
+受信したパケットを処理するには、モジュールは `OnRecvPacket`コールバックを実装する必要があります。 これは
+IBCがデータパケットが有効で正しく処理されていることを証明した後、IBCモジュールによって呼び出されます。
+ゴールキーパー。 したがって、 `OnRecvPacket`コールバックは、適切な状態にすることだけを気にする必要があります
+パケットが有効かどうかを気にせずに、特定のパケットのデータを変更します。
 
-模块可以将确认作为字节字符串返回并将其返回给 IBC 处理程序。
-IBC 处理程序然后将提交该数据包的确认，以便中继器可以中继
-确认返回发送器模块。
+モジュールは確認をバイト文字列として返し、IBCハンドラーに返すことができます。
+次に、IBCハンドラーはパケットの確認応答を送信して、リピーターが中継できるようにします。
+確認はトランスミッタモジュールに返されます。
 
 ```go
 OnRecvPacket(
     ctx sdk.Context,
     packet channeltypes.Packet,
 ) (res *sdk.Result, ack []byte, abort error) {
-    // Decode the packet data
+   //Decode the packet data
     packetData := DecodePacketData(packet.Data)
 
-    // do application state changes based on packet data
-    // and return result, acknowledgement and abortErr
-    // Note: abortErr is only not nil if we need to abort the entire receive packet, and allow a replay of the receive.
-    // If the application state change failed but we do not want to replay the packet,
-    // simply encode this failure with relevant information in ack and return nil error
+   //do application state changes based on packet data
+   //and return result, acknowledgement and abortErr
+   //Note: abortErr is only not nil if we need to abort the entire receive packet, and allow a replay of the receive.
+   //If the application state change failed but we do not want to replay the packet,
+   //simply encode this failure with relevant information in ack and return nil error
     res, ack, abortErr := processPacket(ctx, packet, packetData)
 
-    // if we need to abort the entire receive packet, return error
+   //if we need to abort the entire receive packet, return error
     if abortErr != nil {
         return nil, nil, abortErr
     }
 
-    // Encode the ack since IBC expects acknowledgement bytes
+   //Encode the ack since IBC expects acknowledgement bytes
     ackBytes := EncodeAcknowledgement(ack)
 
     return res, ackBytes, nil
@@ -323,51 +323,51 @@ OnRecvPacket(
 ```
 
 ::: 警告
-如果我们想要整个接收包执行，`OnRecvPacket` 应该 **only** 返回一个错误
-(包括 IBC 处理)要恢复。这将允许在这种情况下重放数据包
-中继中的一些错误导致数据包处理失败。
+受信したパケット全体を実行したい場合、 `OnRecvPacket`は**のみ**エラーを返す必要があります
+(IBC処理を含む)復元されます。 これにより、この状況でパケットを再生できるようになります
+リレーのエラーにより、パケット処理が失敗しました。
 
-如果在处理数据包数据时发生了一些应用级错误，在大多数情况下，我们会
-不希望数据包处理恢复。相反，我们可能希望将此失败编码为
-确认并完成对数据包的处理。这将确保数据包无法重放，
-并且还将允许发送方模块在收到消息时潜在地补救这种情况
-承认。这种技术的一个例子是在 `ibc-transfer` 模块的
+パケットデータの処理中にアプリケーションレベルのエラーが発生した場合、ほとんどの場合、
+パケット処理を再開したくない。 代わりに、この失敗を次のようにエンコードすることをお勧めします
+データパケットの処理を確認して完了します。 これにより、パケットを再生できなくなります。
+また、メッセージが受信されたときに、送信者モジュールがこの状況を潜在的に修正できるようにします
+認める。 この手法の例は、 `ibc-transfer`モジュールにあります
 [`OnRecvPacket`](https://github.com/cosmos/ibc-go/tree/main/modules/apps/transfer/module.go)。
 :::
 
-### 致谢
+### Acknowledgements
 
-在同步数据包处理的情况下，模块可以在接收和处理数据包时提交确认。
-如果在接收到数据包后的某个时间点处理数据包(异步执行)，则确认
-将在应用程序处理数据包后写入，这可能是在数据包接收之后。
+同期パケット処理の場合、モジュールはパケットの受信と処理時に確認応答をコミットする場合があります。
+パケットが受信された後のある時点でパケットが処理される場合(非同期実行)、確認応答
+パケットがアプリケーションによって処理されると書き込まれます。これは、パケットの受信後の可能性があります。
 
-注意:大多数区块链模块都希望使用同步执行模型，在该模型中模块处理和写入确认
-对于从 IBC 模块接收到的数据包。
+注:ほとんどのブロックチェーンモジュールは、モジュールが確認応答を処理して書き込む同期実行モデルを使用する必要があります
+IBCモジュールからパケットを受信するとすぐにパケットの場合。
 
-然后可以将此确认转发回原始发送者链，后者可以采取行动
-取决于确认的内容。
+その後、この確認応答を元の送信者チェーンに中継して、アクションを実行できます。
+謝辞の内容によって異なります。
 
-正如分组数据对 IBC 是不透明的，确认同样是不透明的。模块必须通过和
-接收带有 IBC 模块的确认作为字节字符串。
+パケットデータがIBCに対して不透明であったように、確認応答も同様に不透明です。モジュールは合格する必要があり、
+IBCモジュールで確認応答をバイト文字列として受信します。
 
-因此，模块必须就如何编码/解码确认达成一致。创建一个的过程
-确认结构连同它的编码和解码，非常类似于分组数据
-上面的例子。 [ICS 04](https://github.com/cosmos/ics/tree/master/spec/ics-004-channel-and-packet-semantics#acknowledgement-envelope)
-指定推荐的确认格式。此确认类型可以从
-[频道类型](https://github.com/cosmos/ibc-go/tree/main/modules/core/04-channel/types)。
+したがって、モジュールは確認応答をエンコード/デコードする方法について合意する必要があります。を作成するプロセス
+確認応答構造体とそのエンコードおよびデコードは、パケットデータと非常によく似ています。
+上記の例。 [ICS 04](https://github.com/cosmos/ics/tree/master/spec/ics-004-channel-and-packet-semantics#acknowledgement-envelope)
+確認応答の推奨形式を指定します。この確認応答タイプは、からインポートできます。
+[チャネルタイプ](https://github.com/cosmos/ibc-go/tree/main/modules/core/04-channel/types)。
 
-虽然模块可以选择任意确认结构，但 IBC [此处](https://github.com/cosmos/ibc-go/blob/main/proto/ibc/core/channel/v1/channel.原型):
+モジュールは任意の確認応答構造体を選択できますが、デフォルトの確認応答タイプはIBC [ここ](https://github.com/cosmos/ibc-go/blob/main/proto/ibc/core/channel/v1/channel)によって提供されます。プロト):
 
 ```proto
-// Acknowledgement is the recommended acknowledgement format to be used by
-// app-specific protocols.
-// NOTE: The field numbers 21 and 22 were explicitly chosen to avoid accidental
-// conflicts with other protobuf message formats used for acknowledgements.
-// The first byte of any message with this format will be the non-ASCII values
-// `0xaa` (result) or `0xb2` (error). Implemented as defined by ICS:
-// https://github.com/cosmos/ics/tree/master/spec/ics-004-channel-and-packet-semantics#acknowledgement-envelope
+//Acknowledgement is the recommended acknowledgement format to be used by
+//app-specific protocols.
+//NOTE: The field numbers 21 and 22 were explicitly chosen to avoid accidental
+//conflicts with other protobuf message formats used for acknowledgements.
+//The first byte of any message with this format will be the non-ASCII values
+//`0xaa` (result) or `0xb2` (error). Implemented as defined by ICS:
+//https://github.com/cosmos/ics/tree/master/spec/ics-004-channel-and-packet-semantics#acknowledgement-envelope
 message Acknowledgement {
-  // response contains either a result or an error and must be non-empty
+ //response contains either a result or an error and must be non-empty
   oneof response {
     bytes  result = 21;
     string error  = 22;
@@ -375,17 +375,17 @@ message Acknowledgement {
 }
 ```
 
-#### 确认数据包
+#### パケットの確認
 
-在模块写入确认后，中继器可以将确认中继回发送器模块。 发送模块可以
-然后使用`OnAcknowledgementPacket`回调处理确认。 的内容
-确认完全取决于通道上的模块(就像分组数据一样)； 然而，它
-可能经常包含有关数据包是否被成功处理的信息
-如果数据包处理失败，一些额外的数据可能对补救有用。
+モジュールが確認を書き込んだ後、リピーターは確認をトランスミッタモジュールに中継して戻すことができます。 送信モジュールは
+次に、 `OnAcknowledgementPacket`コールバックを使用して確認を処理します。 コンテンツ
+確認応答は、チャネル上のモジュールに完全に依存します(パケットデータと同様)。ただし、
+多くの場合、パケットが正常に処理されたかどうかに関する情報が含まれている可能性があります
+パケット処理が失敗した場合、いくつかの追加データが修復に役立つ可能性があります。
 
-由于模块负责就分组数据的编码/解码标准达成一致，并且
-确认，IBC 会将确认作为 `[]byte` 传递给这个回调。 回调
-负责解码确认并处理它。 
+モジュールは、パケットデータのエンコード/デコード標準について合意に達する責任があるため、
+確認、IBCは確認を `[] byte`としてこのコールバックに渡します。 折り返し電話
+確認のデコードと処理を担当します。 
 
 ```go
 OnAcknowledgementPacket(
@@ -393,72 +393,72 @@ OnAcknowledgementPacket(
     packet channeltypes.Packet,
     acknowledgement []byte,
 ) (*sdk.Result, error) {
-    // Decode acknowledgement
+   //Decode acknowledgement
     ack := DecodeAcknowledgement(acknowledgement)
 
-    // process ack
+   //process ack
     res, err := processAck(ack)
     return res, err
 }
 ```
 
-#### 超时数据包
+#### タイムアウトパケット
 
-如果在成功接收数据包之前达到数据包的超时时间或
-对方通道端在数据包被成功接收之前关闭，然后接收
-链无法再处理它。 因此，发送链必须使用
-`OnTimeoutPacket` 来处理这种情况。 IBC 模块将再次验证超时是否为
-确实有效，所以我们的模块只需要实现一次做什么的状态机逻辑
-超时时间已到，无法再接收数据包。
+パケットが正常に受信される前にパケットタイムアウト期間に達した場合、または
+チャネルのもう一方の端は、データパケットが正常に受信される前に閉じられ、その後受信されます
+チェーンはそれを処理できなくなります。 したがって、送信チェーンは使用する必要があります
+この状況を処理するための `OnTimeoutPacket`。 IBCモジュールは、タイムアウトが
+それは確かに効果的であるため、私たちのモジュールは、一度行うことのステートマシンロジックを実装するだけで済みます
+タイムアウト期間が終了し、データパケットを受信できなくなりました。
 
 ```go
 OnTimeoutPacket(
     ctx sdk.Context,
     packet channeltypes.Packet,
 ) (*sdk.Result, error) {
-    // do custom timeout logic
+   //do custom timeout logic
 }
 ```
 
 ### Routing
 
-如上所述，模块必须实现 IBC 模块接口(其中包含通道
-握手回调和数据包处理回调)。 这个接口的具体实现
-必须使用模块名称注册为 IBC `Router` 上的路由。 
+上記のように、モジュールはIBCモジュールインターフェイス(チャネルを含む)を実装する必要があります
+ハンドシェイクコールバックとパケット処理コールバック)。 このインターフェースの具体的な実現
+モジュール名は、IBC`Router`にルートとして登録するために使用する必要があります。
 
 ```go
-// app.go
+//app.go
 func NewApp(...args) *App {
-// ...
+//...
 
-// Create static IBC router, add module routes, then set and seal it
+//Create static IBC router, add module routes, then set and seal it
 ibcRouter := port.NewRouter()
 
 ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
-// Note: moduleCallbacks must implement IBCModule interface
+//Note: moduleCallbacks must implement IBCModule interface
 ibcRouter.AddRoute(moduleName, moduleCallbacks)
 
-// Setting Router will finalize all routes by sealing router
-// No more routes can be added
+//Setting Router will finalize all routes by sealing router
+//No more routes can be added
 app.IBCKeeper.SetRouter(ibcRouter)
 ```
 
-## 工作示例
+## 実例
 
-有关 IBC 应用程序的实际工作示例，您可以查看“ibc-transfer”模块
-它实现了上面讨论的所有内容。
+IBCアプリケーションの実際の動作例については、「ibc-transfer」モジュールを確認できます。
+上記のすべてを実装します。
 
-以下是要查看的模块的有用部分:
+モジュールの便利な部分は次のとおりです。
 
-[绑定转移
-端口](https://github.com/cosmos/ibc-go/blob/main/modules/apps/transfer/types/genesis.go)
+[バインディング転送
+ポート)(https://github.com/cosmos/ibc-go/blob/main/modules/apps/transfer/types/genesis.go)
 
-[发送转账
-数据包](https://github.com/cosmos/ibc-go/blob/main/modules/apps/transfer/keeper/relay.go)
+[転送を送信
+データパッケージ](https://github.com/cosmos/ibc-go/blob/main/modules/apps/transfer/keeper/relay.go)
 
-[实施IBC
-回调](https://github.com/cosmos/ibc-go/blob/main/modules/apps/transfer/module.go)
+[IBCを実装する
+コールバック](https://github.com/cosmos/ibc-go/blob/main/modules/apps/transfer/module.go)
 
-## 下一个 {hide}
+## 次へ{非表示}
 
-了解 [构建模块](https://github.com/cosmos/cosmos-sdk/blob/master/docs/building-modules/intro.md) {hide} 
+[モジュールの構築](https://github.com/cosmos/cosmos-sdk/blob/master/docs/building-modules/intro.md)を理解する{非表示}

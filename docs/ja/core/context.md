@@ -1,32 +1,32 @@
-# 语境
+# 環境
 
-`context` 是一种数据结构，旨在从一个函数传递到另一个函数，它携带有关应用程序当前状态的信息。它提供了对分支存储(整个状态的安全分支)以及有用的对象和信息的访问，如“gasMeter”、“块高度”、“共识参数”等。 {概要}
+`context`は、ある関数から別の関数に渡されるように設計されたデータ構造であり、アプリケーションの現在の状態に関する情報を伝達します。 ブランチストレージ(状態全体の安全なブランチ)へのアクセスと、「gasMeter」、「ブロックの高さ」、「コンセンサスパラメータ」などの有用なオブジェクトと情報へのアクセスを提供します。 {まとめ}
 
-## 先决条件阅读
+## 前提条件の読書
 
-- [Cosmos SDK 应用剖析](../basics/app-anatomy.md) {prereq}
-- [交易的生命周期](../basics/tx-lifecycle.md) {prereq}
+- [CosmosSDKアプリケーションの構造](../basics/app-anatomy.md) {prereq}
+- [トランザクションのライフサイクル](../basics/tx-lifecycle.md) {prereq}
 
-## 上下文定义
+## コンテキスト定義
 
-Cosmos SDK `Context` 是一个自定义数据结构，它包含 Go 的 stdlib [`context`](https://golang.org/pkg/context) 作为其基础，并且在其定义中具有许多特定于宇宙 SDK。 `Context` 是事务处理不可或缺的一部分，因为它允许模块轻松访问 [`multistore`](./store.md#multistore) 中各自的 [store](./store.md#base-layer-kvstores) ) 并检索交易上下文，例如区块头和燃气表。
+Cosmos SDK `Context`は、Goのstdlib [` context`](https://golang.org/pkg/context)をベースとして含むカスタムデータ構造であり、その定義には多くのユニバース固有のSDKが含まれています。 `Context`は、モジュールがそれぞれの[store](./store.md#base-layer-kvstores in [` multistore`](./store.md#multistore))に簡単にアクセスできるようにするため、トランザクション処理の不可欠な部分です。 )そして、ブロックヘッダーやガスメーターなどのトランザクションコンテキストを取得します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/types/context.go#L16-L39
 
-- **Context:** 基本类型是 Go [Context](https://golang.org/pkg/context)，在 [Go Context Package](#go-context-package) 部分进一步解释以下。
-- **Multistore:** 每个应用程序的 `BaseApp` 都包含一个 [`CommitMultiStore`](./store.md#multistore)，它在创建 `Context` 时提供。调用 `KVStore()` 和 `TransientStore()` 方法允许模块使用它们唯一的 `StoreKey` 获取它们各自的 [`KVStore`](./store.md#base-layer-kvstores)。
-- **ABCI Header:** [header](https://tendermint.com/docs/spec/abci/abci.html#header) 是一种 ABCI 类型。它携带有关区块链状态的重要信息，例如当前区块的区块高度和提议者。
-- **Chain ID:** 区块所属区块链的唯一标识号。
-- **交易字节数:** 正在使用上下文处理的交易的 `[]byte` 表示。每笔交易都由 Cosmos SDK 的各个部分和共识引擎(例如 Tendermint)在其整个 [生命周期](../basics/tx-lifecycle.md) 中处理，其中一些对交易类型没有任何了解。因此，事务使用某种[编码格式](./encoding.md)，例如[Amino](./encoding.md)，被编组为通用的“[]byte”类型。
-- **Logger:** 来自 Tendermint 库的 `logger`。了解有关日志的更多信息 [此处](https://tendermint.com/docs/tendermint-core/how-to-read-logs.html#how-to-read-logs)。模块调用此方法来创建自己独特的特定于模块的记录器。
-- **VoteInfo:** ABCI 类型列表 [`VoteInfo`](https://tendermint.com/docs/spec/abci/abci.html#voteinfo)，其中包括验证器的名称和布尔值表明他们是否已经签署了区块。
-- **Gas Meters:** 具体来说，一个 [`gasMeter`](../basics/gas-fees.md#main-gas-meter) 用于当前正在使用上下文处理的交易和一个 [`blockGasMeter`](../basics/gas-fees.md#block-gas-meter) 用于它所属的整个块。用户指定他们希望为执行交易支付多少费用；这些燃气表跟踪到目前为止在交易或区块中使用了多少 [gas](../basics/gas-fees.md)。如果燃气表用完，则执行停止。
-- **CheckTx 模式:** 一个布尔值，指示交易应在“CheckTx”还是“DeliverTx”模式下处理。
-- **Min Gas Price:** 节点为了在其区块中包含交易而愿意接受的最低 [gas](../basics/gas-fees.md) 价格。此价格是由每个节点单独配置的本地值，因此**不应在导致状态转换的序列中使用的任何函数中使用**。
-- **Consensus Params:** ABCI 类型 [Consensus Parameters](https://tendermint.com/docs/spec/abci/apps.html#consensus-parameters)，指定区块链的某些限制，例如最大值一个块的气体。
-- **事件管理器:** 事件管理器允许任何有权访问 `Context` 的调用者发出 [`Events`](./events.md)。模块可以定义特定于模块的
-  `Events` 通过定义各种 `Types` 和 `Attributes` 或使用在 `types/` 中找到的通用定义。客户可以订阅或查询这些“事件”。这些“事件”在整个“DeliverTx”、“BeginBlock”和“EndBlock”中收集，并返回给 Tendermint 进行索引。例如: 
-
+-**コンテキスト:**基本的なタイプはGo [Context](https://golang.org/pkg/context)です。さらに、[Go Context Package](#go-context-package)セクションで次のことを説明します。
+-**マルチストア:**各アプリケーションの `BaseApp`には、`コンテキスト `の作成時に提供される[` CommitMultiStore`](./store.md#multistore)が含まれています。 `KVStore()`および `TransientStore()`メソッドを呼び出すと、モジュールは独自の `StoreKey`を使用して、それぞれの[` KVStore`](./store.md#base-layer-kvstores)を取得できます。
+-**ABCIヘッダー:** [ヘッダー](https://tendermint.com/docs/spec/abci/abci.html#header)はABCIタイプです。現在のブロックの高さや提案者など、ブロックチェーンの状態に関する重要な情報が含まれています。
+-**チェーンID:**ブロックが属するブロックチェーンの一意の識別番号。
+-**Transaction Bytes:**コンテキストを使用して処理されているトランザクションの `[] byte`表現。各トランザクションは、Cosmos SDKのさまざまな部分とコンセンサスエンジン(Tendermintなど)によって[ライフサイクル](../basics/tx-lifecycle.md)全体で処理され、トランザクションの種類に関する知識がないものもあります。したがって、トランザクションは、ユニバーサル「[] byte」タイプにグループ化された[Amino](./encoding.md)などの特定の[encoding format](./encoding.md)を使用します。
+-**ロガー:** Tendermintライブラリの `logger`。ログの詳細については、[こちら](https://tendermint.com/docs/tendermint-core/how-to-read-logs.html#how-to-read-logs)をご覧ください。モジュールはこのメソッドを呼び出して、独自のモジュール固有のロガーを作成します。
+-**VoteInfo:** ABCIタイプリスト[`VoteInfo`](https://tendermint.com/docs/spec/abci/abci.html#voteinfo)には、バリデーターの名前と、それらがブロックに署名されています。
+-**ガスメーター:**具体的には、[`gasMeter`](../basics/gas-fees.md#main-gas-meter)は、コンテキストと[` blockGasMeterを使用して現在処理されているトランザクションに使用されます`](../basics/gas-fees.md#block-gas-meter)は、それが属するブロック全体に使用されます。ユーザーは、トランザクションの実行に支払う金額を指定します。これらのガスメーターは、これまでにトランザクションまたはブロックで使用された[gas](../basics/gas-fees.md)の量を追跡します。ガスメーターがなくなると、実行が停止します。
+-**CheckTxモード:**トランザクションを「CheckTx」モードと「DeliverTx」モードのどちらで処理するかを示すブール値。
+-**最小ガス価格:**ノードがそのブロックにトランザクションを含めるために受け入れることをいとわない最低の[gas](../basics/gas-fees.md)価格。この価格は、各ノードによって個別に構成されたローカル値であるため、**状態遷移を引き起こすシーケンスで使用される関数では使用しないでください**。
+-**コンセンサスパラメータ:** ABCIタイプ[コンセンサスパラメータ](https://tendermint.com/docs/spec/abci/apps.html#consensus-parameters)。これは、最大値など、ブロックチェーンの特定の制限を指定します。値ガスのブロック。
+-**イベントマネージャー:**イベントマネージャーを使用すると、 `Context`にアクセスできるすべての呼び出し元が[` Events`](./events.md)を発行できます。モジュールはモジュール固有を定義できます
+  `Events`は、さまざまな` Types`と `Attributes`を定義するか、` types/`にある共通の定義を使用します。顧客は、これらの「イベント」をサブスクライブまたはクエリできます。これらの「イベント」は、「DeliverTx」、「BeginBlock」、および「EndBlock」全体で収集され、インデックス作成のためにTendermintに返されます。例えば:
+  
 ```go
 ctx.EventManager().EmitEvent(sdk.NewEvent(
     sdk.EventTypeMessage,
@@ -34,41 +34,41 @@ ctx.EventManager().EmitEvent(sdk.NewEvent(
 )
 ```
 
-## 去上下文包
+## コンテキストパッケージに移動
 
-[Golang Context Package](https://golang.org/pkg/context) 中定义了一个基本的`Context`。 一个`上下文`
-是一种不可变的数据结构，它在 API 和进程之间承载请求范围的数据。 上下文
-还旨在启用并发并在 goroutines 中使用。
+基本的な `Context`は、[Golang Context Package](https://golang.org/pkg/context)で定義されています。 `コンテキスト`
+これは、APIとプロセスの間で要求されたデータを運ぶ不変のデータ構造です。 環境
+また、並行性を有効にし、ゴルーチンで使用できるように設計されています。
 
-上下文旨在**不可变**； 他们永远不应该被编辑。 相反，约定是
-使用“With”函数从其父级创建子上下文。 例如: 
+コンテキストは**不変**であることが意図されており、編集しないでください。 代わりに、コンベンションは
+「With」関数を使用して、親から子コンテキストを作成します。 例えば: 
 
 ```go
 childCtx = parentCtx.WithBlockHeader(header)
 ```
 
-[Golang Context Package](https://golang.org/pkg/context) 文档指导开发者
-显式传递上下文 `ctx` 作为进程的第一个参数。
+[Golangコンテキストパッケージ](https://golang.org/pkg/context)ドキュメントガイド開発者
+プロセスの最初のパラメータとしてコンテキスト `ctx`を明示的に渡します。
 
-##存储分支
+## ストレージブランチ
 
-`Context` 包含一个 `MultiStore`，它允许使用 `CacheMultiStore` 进行分支和缓存功能
-(`CacheMultiStore` 中的查询被缓存以避免将来的往返)。
-每个“KVStore”都分支在一个安全且隔离的临时存储中。进程可以自由地将更改写入
-`CacheMultiStore`。如果状态转换序列没有问题地执行，存储分支可以
-提交到序列末尾的底层存储，或者在出现某些情况时忽略它们
-出错。 Context 的使用模式如下:
+`Context`には` MultiStore`が含まれており、 `CacheMultiStore`を使用して関数を分岐およびキャッシュできます。
+( `CacheMultiStore`のクエリは、将来のラウンドトリップを回避するためにキャッシュされます)。
+各「KVStore」は、安全で隔離された一時的なストアに分岐します。プロセスは自由に変更を書き込むことができます
+`CacheMultiStore`。状態遷移シーケンスが問題なく実行された場合、ストレージブランチは次のようになります。
+シーケンスの最後に基になるストレージに送信するか、特定の状況が発生したときにそれらを無視します
+何かがうまくいかなかった。 Contextの使用パターンは次のとおりです。
 
-1. 一个进程从它的父进程接收一个上下文`ctx`，它提供了需要的信息
-   执行过程。
-2. `ctx.ms` 是一个**分支存储**，即[multistore](./store.md#multistore) 的一个分支，以便进程在执行时可以对状态进行更改，不改变原来的`ctx.ms`。这对于保护底层 multistore 很有用，以防在执行过程中的某个时刻需要恢复更改。
-3. 进程在执行时可能会从 `ctx` 读取和写入。它可能会调用一个子进程并通过
-   `ctx` 根据需要添加到它。
-4. 当子进程返回时，它检查结果是成功还是失败。如果失败，什么都没有
-   需要完成 - 分支 `ctx` 被简单地丢弃。如果成功，所做的更改
-   `CacheMultiStore` 可以通过 `Write()` 提交给原始的 `ctx.ms`。
+1. プロセスは、必要な情報を提供する親プロセスからコンテキスト `ctx`を受け取ります
+   実装プロセス。
+2. `ctx.ms`は**ブランチストア**、つまり[multistore](./store.md＃multistore)のブランチであるため、プロセスは元の`を変更せずに実行中に状態を変更できます。 ctx.ms`。これは、実行中のある時点で変更を復元する必要がある場合に、基盤となるマルチストアを保護するのに役立ちます。
+3. プロセスは、実行中に `ctx`から読み取りおよび書き込みを行う場合があります。子プロセスを呼び出してパスする場合があります
+   必要に応じて `ctx`が追加されます。
+4. 子プロセスが戻ると、結果が成功か失敗かをチェックします。それが失敗した場合、何もありません
+   実行する必要があります-ブランチ `ctx`は単に破棄されます。成功した場合、行われた変更
+   `CacheMultiStore`は、` Write() `を介して元の` ctx.ms`に送信できます。
 
-例如，这里是 [`runTx`](./baseapp.md#runtx-and-runmsgs) 函数的一个片段
+たとえば、関数[`runTx`](./baseapp.md＃runtx-and-runmsgs)のスニペットを次に示します。
 [`baseapp`](./baseapp.md): 
 
 ```go
@@ -85,16 +85,16 @@ if result.IsOK() {
 }
 ```
 
-这是过程:
+これがプロセスです:
 
-1. 在对事务中的消息调用 `runMsgs` 之前，它使用 `app.cacheTxContext()`
-    分支和缓存上下文和多存储。
-2. `runMsgCtx` - 带有分支存储的上下文，在 `runMsgs` 中用于返回结果。
-3.如果进程运行在[`checkTxMode`](./baseapp.md#checktx)，则不需要写
-    更改 - 结果立即返回。
-4.如果进程在[`deliverTxMode`](./baseapp.md#delivertx)下运行，结果显示
-    成功运行所有消息后，分支多存储被写回原始。
+1. トランザクション内のメッセージで `runMsgs`を呼び出す前に、` app.cacheTxContext() `を使用します
+     ブランチとキャッシュのコンテキストと複数のストレージ。
+2. `runMsgCtx`-ブランチストレージのコンテキスト。`runMsgs`で結果を返すために使用されます。
+3. プロセスが[`checkTxMode`](./baseapp.md＃checktx)で実行されている場合は、次のように記述する必要はありません。
+     変更-結果はすぐに返されます。
+4. プロセスが[`deliverTxMode`](./baseapp.md＃delivertx)で実行されている場合、結果が表示されます
+     すべてのメッセージが正常に実行された後、ブランチマルチストアは元のメッセージに書き戻されます。
 
-## 下一个 {hide}
+## 次へ{非表示}
 
-了解 [节点客户端](./node.md) {hide} 
+[ノードクライアント](./node.md)を理解する{非表示}

@@ -1,14 +1,14 @@
-#存储
+# ストレージ
 
-存储是保存应用程序状态的数据结构。 {概要}
+ストレージは、アプリケーションの状態を保存するデータ構造です。 {まとめ}
 
-### 先决条件阅读
+### 前提条件の読書
 
 - [Cosmos SDK 应用剖析](../basics/app-anatomy.md) {prereq}
 
-## Cosmos SDK存储介绍
+## CosmosSDKストレージの紹介
 
-Cosmos SDK 附带了大量存储来持久化应用程序的状态。 默认情况下，Cosmos SDK 应用程序的主存储是一个“multistore”，即存储的存储。 开发人员可以根据他们的应用程序需求将任意数量的键值存储添加到多存储中。 multistore 的存在是为了支持 Cosmos SDK 的模块化，因为它允许每个模块声明和管理自己的状态子集。 多存储中的键值存储只能通过特定的能力`key`访问，该能力通常保存在声明存储的模块的[`keeper`](../building-modules/keeper.md)中。 
+Cosmos SDKには、アプリケーションの状態を維持するための多くのストレージが付属しています。 デフォルトでは、Cosmos SDKアプリケーションのメインストレージは「マルチストア」、つまりストレージストレージです。 開発者は、アプリケーションの要件に応じて、任意の数のKey-Valueストアをマルチストアに追加できます。 マルチストアは、Cosmos SDKのモジュール性をサポートするために存在します。これは、各モジュールが独自の状態のサブセットを宣言および管理できるようにするためです。 マルチストアのKey-Valueストアには、特定の機能 `key`を介してのみアクセスできます。これは通常、モジュールの[` keeper`](../building-modules/keeper.md)に格納されています。ストレージが宣言されています。 
 
 ```
 +-----------------------------------------------------+
@@ -50,204 +50,204 @@ Cosmos SDK 附带了大量存储来持久化应用程序的状态。 默认情�
                    Application's State
 ```
 
-###存储界面
+### ストレージインターフェイス
 
-在其核心，Cosmos SDK `store` 是一个对象，它包含一个 `CacheWrapper` 并具有一个 `GetStoreType()` 方法:
+コアとなるCosmosSDKストアは、CacheWrapperを含み、GetStoreType()メソッドを持つオブジェクトです。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L15-L18
 
-`GetStoreType` 是一个返回存储类型的简单方法，而一个 `CacheWrapper` 是一个简单的接口，它通过 `Write` 方法实现存储读取缓存和写入分支:
+`GetStoreType`はストレージタイプを返す単純なメソッドであり、` CacheWrapper`は単純なインターフェイスであり、 `Write`メソッドを介してストレージの読み取りキャッシュと書き込みブランチを実装します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L240-L264
 
-分支和缓存在 Cosmos SDK 中无处不在，并且需要在每种存储类型上实现。一个存储分支创建一个隔离的、临时的存储分支，可以在不影响主要底层存储的情况下传递和更新。这用于触发临时状态转换，如果发生错误，可以稍后恢复。在 [context](./context.md#Store-branching) 中阅读更多相关信息
+分岐とキャッシュはCosmosSDKに遍在しており、各ストレージタイプに実装する必要があります。 ストレージブランチは、基盤となるメインストレージに影響を与えることなく転送および更新できる、分離された一時ストレージブランチを作成します。 これは、一時的な状態遷移をトリガーするために使用されます。エラーが発生した場合は、後で復元できます。 詳細については、[context](./context.md＃Store-branching)をご覧ください。
 
-### 提交存储
+### ストレージを送信する
 
-提交存储是一种能够提交对底层树或数据库所做更改的存储。 Cosmos SDK 通过使用 `Committer` 扩展基本存储接口来区分简单存储和提交存储:
+コミットストレージは、基になるツリーまたはデータベースに加えられた変更をコミットできるストレージです。 Cosmos SDKは、 `Committer`を使用して基本的なストレージインターフェイスを拡張することにより、シンプルなストレージと送信ストレージを区別します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L29-L33
 
-`Committer` 是一个接口，它定义了将更改持久化到磁盘的方法:
+`Committer`は、ディスクへの変更を永続化するメソッドを定義するインターフェイスです。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L20-L27
 
-`CommitID` 是状态树的确定性提交。它的哈希值返回到底层的共识引擎并存储在块头中。请注意，提交存储接口有多种用途，其中之一是确保不是每个对象都可以提交存储。作为 Cosmos SDK 的 [object-capabilities 模型](./ocap.md) 的一部分，只有 `baseapp` 应该具有提交存储的能力。例如，这就是为什么模块通常用来访问存储的 `ctx.KVStore()` 方法返回一个 `KVStore` 而不是 `CommitKVStore` 的原因。
+`CommitID`は、状態ツリーの決定論的コミットです。そのハッシュ値は、基になるコンセンサスエンジンに返され、ブロックヘッダーに格納されます。送信ストレージインターフェイスには多くの用途があることに注意してください。その1つは、すべてのオブジェクトをストレージに送信できるわけではないことを確認することです。 Cosmos SDKの[object-capabilitiesモデル](./ocap.md)の一部として、 `baseapp`のみがストレージを送信できる必要があります。たとえば、モジュールがストレージへのアクセスに通常使用する `ctx.KVStore()`メソッドが、 `CommitKVStore`ではなく` KVStore`を返すのはこのためです。
 
-Cosmos SDK 提供了多种存储类型，最常用的是 [`CommitMultiStore`](#multistore)、[`KVStore`](#kvstore) 和 [`GasKv` store](#gaskv-store)。 [其他类型的存储](#other-stores) 包括`Transient` 和`TraceKV` 存储。
+Cosmos SDKはさまざまなストレージタイプを提供しますが、最も一般的に使用されるのは[`CommitMultiStore`](＃multistore)、[` KVStore`](＃kvstore)、[`GasKv`ストア](＃gaskv-store)です。 [Other-stores](＃other-stores)には、 `Transient`ストアと` TraceKV`ストアが含まれます。
 
-## 多存储
+## 複数のストレージ
 
-### 多存储接口
+### マルチストレージインターフェース
 
-每个 Cosmos SDK 应用程序都在其根部拥有一个多存储以保持其状态。 multistore 是一个遵循 `Multistore` 接口的 `KVStores` 存储:
+すべてのCosmosSDKアプリケーションには、その状態を維持するためにルートにマルチストアがあります。 multistoreは、 `Multistore`インターフェースに続く` KVStores`ストアです。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L104-L133
 
-如果启用了跟踪，那么分支 multistore 将首先将所有底层的 `KVStore` 包装在 [`TraceKv.Store`](#tracekv-store) 中。
+トレースが有効になっている場合、ブランチマルチストアは最初に[`TraceKv.Store`](＃tracekv-store)内の基礎となるすべての` KVStore`をラップします。
 
 ### CommitMultiStore
 
-Cosmos SDK 中使用的`Multistore` 的主要类型是`CommitMultiStore`，它是`Multistore` 接口的扩展:
+CosmosSDKで使用される `Multistore`の主なタイプは、` Multistore`インターフェースの拡張である `CommitMultiStore`です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L141-L184
 
-至于具体实现，[`rootMulti.Store`] 是 `CommitMultiStore` 接口的首选实现。
+具体的な実装としては、[`rootMulti.Store`]が` CommitMultiStore`インターフェースの推奨実装です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/rootmulti/store.go#L43-L61
 
-`rootMulti.Store` 是一个围绕 `db` 构建的基础层多存储，其上可以安装多个 `KVStores`，并且是 [`baseapp`](./baseapp.md) 中使用的默认多存储存储.
+`rootMulti.Store`は` db`を中心に構築されたベースレイヤーマルチストレージであり、その上に複数の `KVStores`をインストールでき、[` baseapp`](./baseapp.md)で使用されるデフォルトのマルチストレージです。 。
 
 ### CacheMultiStore 
 
-每当 `rootMulti.Store` 需要分支时，一个 [`cachemulti.Store`](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/store/cachemulti/store.go) 是用过的。
+`rootMulti.Store`が分岐する必要があるときはいつでも、[` cachemulti.Store`](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/store/cachemulti/store.go)が使用されます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/cachemulti/store.go#L17-L28
 
-`cachemulti.Store` 在其构造函数中分支所有子存储(为每个子存储创建一个虚拟存储)并将它们保存在 `Store.stores` 中。此外缓存所有读取查询。 `Store.GetKVStore()` 从`Store.stores` 返回存储，并且`Store.Write()` 在所有子存储上递归调用`CacheWrap.Write()`。
+`cachemulti.Store`は、コンストラクター内のすべてのサブストアを分岐し(サブストアごとに仮想ストアを作成します)、それらを` Store.stores`に保存します。 さらに、すべての読み取りクエリがキャッシュされます。 `Store.GetKVStore()`は `Store.stores`からストアを返し、` Store.Write() `はすべての子ストアで` CacheWrap.Write() `を再帰的に呼び出します。
 
-## 基础层 KVStores
+## 基本レイヤーKVStores
 
-### `KVStore` 和 `CommitKVStore` 接口
+### `KVStore`および` CommitKVStore`インターフェース
 
-`KVStore` 是一个简单的键值存储，用于存储和检索数据。 `CommitKVStore` 是一个也实现了 `Committer` 的 `KVStore`。默认情况下，安装在`baseapp` 的主`CommitMultiStore` 中的存储是`CommitKVStore`。 `KVStore` 接口主要用于限制模块访问提交者。
+`KVStore`は、データを保存および取得するための単純なKey-Valueストアです。 `CommitKVStore`は` Committer`も実装する `KVStore`です。デフォルトでは、 `baseapp`のメインの` CommitMultiStore`にインストールされているストアは `CommitKVStore`です。 `KVStore`インターフェースは、主にサブミッターへのモジュールアクセスを制限するために使用されます。
 
-模块使用单个“KVStore”来管理全局状态的子集。 `KVStores` 可以被持有特定键的对象访问。这个`key` 应该只暴露给定义存储的模块的 [`keeper`](../building-modules/keeper.md)。
+モジュールは、単一の「KVStore」を使用して、グローバル状態のサブセットを管理します。 `KVStores`には、特定のキーを保持しているオブジェクトからアクセスできます。この `key`は、ストレージを定義するモジュールの[` keeper`](../building-modules/keeper.md)にのみ公開する必要があります。
 
-`CommitKVStore`s 由它们各自的 `key` 代理声明，并安装在应用程序的 [multistore](#multistore) 上的[主应用程序文件](../basics/app-anatomy.md#core-application-file )。在同一个文件中，`key` 也被传递给负责管理 store 的模块的 `keeper`。
+`CommitKVStore`は、それぞれの` key`エージェントによって宣言され、アプリケーションの[multistore](＃multistore)ファイルの[メインアプリケーションファイル](../basics/app-anatomy.md＃core-application)にインストールされます。 )。同じファイルで、`key`はストアの管理を担当するモジュールの`keeper`にも渡されます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L189-L219
 
-除了传统的`Get` 和`Set` 方法，`KVStore` 必须提供一个`Iterator(start, end)` 方法，该方法返回一个`Iterator` 对象。它用于迭代一系列键，通常是共享公共前缀的键。以下是银行模块 keeper 的示例，用于迭代所有帐户余额:
+従来の `Get`メソッドと` Set`メソッドに加えて、 `KVStore`は` Iterator`オブジェクトを返す `Iterator(start、end)`メソッドを提供する必要があります。これは、一連のキー(通常は共通のプレフィックスを共有するキー)を反復処理するために使用されます。以下は、すべての口座残高を反復処理するために使用される銀行モジュールキーパーの例です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/x/bank/keeper/view.go#L115-L134
 
-### `IAVL`存储
+### `IAVL`ストレージ
 
-`baseapp` 中使用的 `KVStore` 和 `CommitKVStore` 的默认实现是 `iavl.Store`。
+`baseapp`で使用される` KVStore`と `CommitKVStore`のデフォルトの実装は` iavl.Store`です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/iavl/store.go#L37-L40
 
-`iavl`存储基于 [IAVL 树](https://github.com/tendermint/iavl)，这是一种自平衡二叉树，可保证:
+`iavl`ストレージは[IAVLツリー](https://github.com/tendermint/iavl)に基づいています。これは、以下を保証する自己平衡二分木です。
 
-- `Get` 和 `Set` 操作的复杂度为 O(log n)，其中 n 是树中元素的数量。
-- 迭代有效地返回范围内的排序元素。
-- 每个树版本都是不可变的，即使在提交后也可以检索(取决于修剪设置)。
+-`Get`および `Set`操作の複雑さはO(log n)です。ここで、nはツリー内の要素の数です。
+-反復は、範囲内の並べ替えられた要素を効果的に返します。
+-各ツリーバージョンは不変であり、送信後も取得できます(プルーニング設定によって異なります)。
 
-关于 IAVL 树的文档位于 [此处](https://github.com/cosmos/iavl/blob/v0.15.0-rc5/docs/overview.md)。
+IAVLツリーのドキュメントは[ここ](https://github.com/cosmos/iavl/blob/v0.15.0-rc5/docs/overview.md)にあります。
 
-### `DbAdapter` 存储
+### `DbAdapter`ストレージ
 
-`dbadapter.Store` 是 `dbm.DB` 的适配器，使其实现 `KVStore` 接口。
+`dbadapter.Store`は` dbm.DB`のアダプタであり、これにより `KVStore`インターフェースを実装できます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/dbadapter/store.go#L13-L16
 
-`dbadapter.Store` 嵌入了 `dbm.DB`，这意味着大部分 `KVStore` 接口功能都已实现。其他功能(主要是杂项)是手动实现的。此存储主要用于 [Transient Stores](#transient-stores)
+`dbadapter.Store`には` dbm.DB`が埋め込まれています。これは、 `KVStore`のほとんどのインターフェース機能が実装されていることを意味します。 その他の機能(主にその他)は手動で実装されます。 このストアは主に[一時的なストア](＃transient-stores)に使用されます
 
-### `瞬态`存储
+### `一時的な`ストレージ
 
-`Transient.Store` 是一个基础层 `KVStore`，它在块的末尾被自动丢弃。
+`Transient.Store`はベースレイヤーの` KVStore`であり、ブロックの最後で自動的に破棄されます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/transient/store.go#L13-L16
 
-`Transient.Store` 是一个带有 `dbm.NewMemDB()` 的 `dbadapter.Store`。所有`KVStore` 方法都被重用。当调用`Store.Commit()` 时，会分配一个新的`dbadapter.Store`，丢弃之前的引用并使其垃圾回收。
+`Transient.Store`は` dbm.NewMemDB() `を持つ` dbadapter.Store`です。 すべての `KVStore`メソッドが再利用されます。 `Store.Commit()`を呼び出すと、新しい `dbadapter.Store`が割り当てられ、以前の参照が破棄され、ガベージコレクションが行われます。
 
-这种类型的存储对于保留仅与每个块相关的信息很有用。一个例子是存储参数更改(即，如果块中的参数发生更改，则将 bool 设置为“true”)。
+このタイプのストレージは、各ブロックにのみ関連する情報を保持するのに役立ちます。 例として、パラメーターの変更を保存します(つまり、ブロック内のパラメーターが変更された場合は、boolを「true」に設定します)。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/x/params/types/subspace.go#L20-L30
 
-瞬态存储通常通过 [`context`](./context.md) 通过 `TransientStore()` 方法访问:
+一時ストレージは通常、[`context`](./context.md)を介して` TransientStore() `メソッドを介してアクセスされます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/types/context.go#L232-L235
 
-## KVStore 包装器
+## KVStoreラッパー
 
 ### CacheKVStore
 
-`cachekv.Store` 是一个包装器 `KVStore`，它在底层 `KVStore` 上提供缓冲写入/缓存读取功能。
+`cachekv.Store`はラッパー` KVStore`であり、基礎となる `KVStore`にバッファ書き込み/キャッシュ読み取り関数を提供します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/cachekv/store.go#L27-L34
 
-每当需要分支 IAVL 存储以创建隔离存储时(通常当我们需要改变可能会在以后恢复的状态时)，就会使用这种类型。
+このタイプは、IAVLストレージを分岐して分離ストレージを作成する必要がある場合(通常、将来復元される可能性のある状態を変更する必要がある場合)に使用されます。
 
-#### `获取`
+#### `入手`
 
-`Store.Get()` 首先检查 `Store.cache` 是否具有与键相关联的值。如果该值存在，则函数返回它。如果没有，该函数调用`Store.parent.Get()`，将结果缓存在`Store.cache`中，并返回它。 
+`Store.Get()`は、最初に `Store.cache`にキーに関連付けられた値があるかどうかをチェックします。 値が存在する場合、関数はその値を返します。 そうでない場合、関数は `Store.parent.Get()`を呼び出し、結果を `Store.cache`にキャッシュして、それを返します。
 
-#### `设置`
+#### `設定`
 
-`Store.Set()` 将键值对设置为 `Store.cache`。 `cValue` 具有字段dirty bool，指示缓存值是否与底层值不同。当`Store.Set()`缓存一个新对时，`cValue.dirty`被设置为`true`，所以当`Store.Write()`被调用时，它可以被写入底层存储。
+`Store.Set()`は、キーと値のペアを `Store.cache`に設定します。 `cValue`には、キャッシュされた値が基になる値と異なるかどうかを示すダーティブール値のフィールドがあります。 `Store.Set()`が新しいペアをキャッシュするとき、 `cValue.dirty`は` true`に設定されるので、 `Store.Write()`が呼び出されると、基礎となるストレージに書き込むことができます。
 
-#### `迭代器`
+#### `イテレータ`
 
-`Store.Iterator()` 必须遍历缓存项和原始项。在`Store.iterator()` 中，为每个迭代器生成两个迭代器，并合并。 `memIterator` 本质上是 `KVPairs` 的一部分，用于缓存项。 `mergeIterator` 是两个迭代器的组合，遍历是在两个迭代器上有序进行的。
+`Store.Iterator()`は、キャッシュアイテムと元のアイテムをトラバースする必要があります。 `Store.iterator()`では、イテレータごとに2つのイテレータが生成され、マージされます。 `memIterator`は本質的に` KVPairs`の一部であり、アイテムをキャッシュするために使用されます。 `mergeIterator`は2つのイテレータの組み合わせであり、トラバーサルは2つのイテレータに対して整然と実行されます。
 
-### `GasKv`存储
+### `GasKv`ストレージ
 
-Cosmos SDK 应用程序使用 [`gas`](../basics/gas-fees.md) 来跟踪资源使用情况并防止垃圾邮件。 [`GasKv.Store`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/gaskv/store.go) 是一个 `KVStore` 包装器，可以自动消耗每个 Gas读取或写入存储的时间。它是在 Cosmos SDK 应用程序中跟踪存储使用情况的首选解决方案。
+Cosmos SDKアプリケーションは、[`gas`](../basics/gas-fees.md)を使用して、リソースの使用状況を追跡し、スパムを防止します。 [`GasKv.Store`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/gaskv/store.go)は、毎回自動的に消費できる` KVStore`ラッパーです。各ガスがストレージに対して読み取りまたは書き込みを行います。これは、CosmosSDKアプリケーションでストレージの使用状況を追跡するための推奨ソリューションです。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/gaskv/store.go#L13-L19
 
-当父`KVStore`的方法被调用时，`GasKv.Store`会根据`Store.gasConfig`自动消耗适量的gas:
+親の `KVStore`メソッドが呼び出されると、` GasKv.Store`は `Store.gasConfig`に従って適切な量のガスを自動的に消費します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/gas.go#L153-L162
 
-默认情况下，所有 `KVStores` 在检索时都包含在 `GasKv.Stores` 中。这是在 [`context`](./context.md) 的 `KVStore()` 方法中完成的:
+デフォルトでは、すべての `KVStores`は取得時に` GasKv.Stores`に含まれます。これは、[`context`](./context.md)の` KVStore() `メソッドで行われます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/types/context.go#L227-L230
 
-在这种情况下，使用默认气体配置:
+この場合、デフォルトのガス構成を使用します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/gas.go#L164-L175
 
-### `TraceKv`存储
+### `TraceKv`ストレージ
 
-`tracekv.Store` 是一个包装器 `KVStore`，它在底层 `KVStore` 上提供操作跟踪功能。如果在父“MultiStore”上启用跟踪，Cosmos SDK 会自动在所有“KVStore”上应用它。
+`tracekv.Store`はラッパー` KVStore`であり、基礎となる `KVStore`で操作追跡機能を提供します。 親の「MultiStore」でトラッキングが有効になっている場合、CosmosSDKはそれをすべての「KVStore」に自動的に適用します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/tracekv/store.go#L20-L43
 
-当每个 `KVStore` 方法被调用时，`tracekv.Store` 会自动将 `traceOperation` 记录到 `Store.writer`。 `traceOperation.Metadata` 填充为 `Store.context` 当它不为零时。 `TraceContext` 是一个 `map[string]interface{}`。
+各 `KVStore`メソッドが呼び出されると、` tracekv.Store`は自動的に `traceOperation`を` Store.writer`に記録します。 `traceOperation.Metadata`は、ゼロでない場合は` Store.context`で埋められます。 `TraceContext`は` map [string] interface {} `です。
 
-### `Prefix` 存储
+### `プレフィックス`ストレージ
 
-`prefix.Store` 是一个包装器 `KVStore`，它在底层的 `KVStore` 上提供自动键前缀功能。
+`prefix.Store`はラッパー` KVStore`であり、基礎となる `KVStore`に自動キープレフィックス機能を提供します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/prefix/store.go#L15-L21
 
-当调用`Store.{Get, Set}()` 时，存储将调用转发给其父级，键以`Store.prefix` 为前缀。
+`Store。{Get、Set}()`を呼び出すと、ストアはその呼び出しを親に転送し、キーのプレフィックスは `Store.prefix`になります。
 
-当调用`Store.Iterator()` 时，它不会简单地给`Store.prefix` 加上前缀，因为它不能按预期工作。在这种情况下，即使某些元素不是以前缀开头，也会遍历它们。
+`Store.Iterator()`を呼び出す場合、期待どおりに機能しないため、単に `Store.prefix`のプレフィックスを付けることはありません。 この場合、一部の要素がプレフィックスで始まらない場合でも、それらはトラバースされます。
 
-### `ListenKv`存储
+### `ListenKv`ストレージ
 
-`listenkv.Store` 是一个包装器 `KVStore`，它提供了对底层 `KVStore` 的状态监听功能。
-它由 Cosmos SDK 自动应用于任何在状态流配置期间指定了“StoreKey”的“KVStore”。
-有关状态流配置的其他信息可以在 [store/streaming/README.md](../../store/streaming/README.md) 中找到。
+`listenkv.Store`はラッパー` KVStore`であり、基盤となる `KVStore`のステータス監視機能を提供します。
+これは、Cosmos SDKによって、状態フローの構成中に「StoreKey」が指定されているすべての「KVStore」に自動的に適用されます。
+状態ストリームの構成に関する追加情報は、[store/streaming/README.md](../../store/streaming/README.md)にあります。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.44.1/store/listenkv/store.go#L11-L18
 
-当调用`KVStore.Set` 或`KVStore.Delete` 方法时，`listenkv.Store` 会自动将操作写入到`Store.listeners` 集合中。
+`KVStore.Set`または` KVStore.Delete`メソッドを呼び出すと、 `listenkv.Store`は自動的に操作を` Store.listeners`コレクションに書き込みます。
 
-## 新存储包 (`store/v2`)
+## 新しいストレージパッケージ( `store/v2`)
 
-SDK 正在过渡到使用此处列出的类型作为状态存储的默认接口。在撰写本文时，这些无法在应用程序中使用，并且与 `CommitMultiStore` 和相关类型不直接兼容。
+SDKは、状態ストレージのデフォルトのインターフェイスとしてここにリストされているタイプを使用するように移行しています。 執筆時点では、これらはアプリケーションで使用できず、CommitMultiStoreおよび関連するタイプと直接互換性がありません。。
 
-### `BasicKVStore` 接口
+### `BasicKVStore`インターフェース
 
-仅提供基本 CRUD 功能(`Get`、`Set`、`Has` 和 `Delete` 方法)的接口，没有迭代或缓存。这用于部分公开较大存储的组件，例如`flat.Store`。
+基本的なCRUD関数( `Get`、` Set`、 `Has`、` Delete`メソッド)のインターフェースのみを提供し、反復やキャッシュは行いません。 これは、 `flat.Store`などのより大きなストレージコンポーネントを部分的に公開するために使用されます。
 
-### 平铺
+### タイル張り
 
-`flat.Store` 是新的默认持久化存储，它在内部解耦了状态存储和承诺方案的关注点。值直接存储在后备键值数据库(“存储”存储桶)中，而值的哈希映射到能够生成加密承诺的单独存储(“状态承诺”存储桶，使用 `smt.存储`)。
+`flat.Store`は、新しいデフォルトの永続ストレージであり、状態ストレージとコミットメントスキームの懸念を内部的に切り離します。 値はバッキングキー値データベース(「ストレージ」バケット)に直接格納され、値のハッシュは暗号化プロミスを生成できる別のストレージにマップされます(「状態プロミス」バケット、 `smt.storage`を使用) 。
 
-这可以选择性地构建为对每个存储桶使用不同的后端数据库。
+これは、オプションで、バケットごとに異なるバックエンドデータベースを使用するように構築できます。
 
-<!-- TODO: 添加链接 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.44.0/store/v2/flat/store.go -->
+<!-- TODO: リンクを追加する +++ https://github.com/cosmos/cosmos-sdk/blob/v0.44.0/store/v2/flat/store.go -->
 
-### SMT存储
+### SMTストレージ
 
-一个 `BasicKVStore`，用于部分公开底层存储的功能(例如，允许访问 `flat.Store` 中的承诺存储)。
+基盤となるストレージの機能を部分的に公開するために使用される `BasicKVStore`(たとえば、` flat.Store`の約束されたストアへのアクセスを許可する)。
 
-## 下一个 {hide}
+## 次へ{非表示}
 
-了解 [encoding](./encoding.md) {hide} 
+[encoding](./encoding.md){hide}を理解する
