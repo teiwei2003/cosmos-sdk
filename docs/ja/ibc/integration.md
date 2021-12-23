@@ -1,99 +1,99 @@
-# 一体化
+# 統合
 
-了解如何将 IBC 集成到您的应用程序并将数据包发送到其他链。 {概要}
+IBCをアプリケーションに統合し、他のチェーンにパケットを送信する方法を学びます。 {まとめ}
 
-本文档概述了集成和配置 [IBC
-模块](https://github.com/cosmos/ibc-go/tree/main/modules/core) 到您的 Cosmos SDK 应用程序和
-将可替代的代币转移发送到其他链。
+このドキュメントでは、統合と構成の概要を説明します[IBC
+モジュール](https://github.com/cosmos/ibc-go/tree/main/modules/core)をCosmosSDKアプリケーションに追加します
+代替可能なトークン転送を他のチェーンに送信します。
 
-## 集成IBC模块
+## 統合IBCモジュール
 
-将 IBC 模块集成到基于 Cosmos SDK 的应用程序非常简单。一般的变化可以概括为以下步骤:
+IBCモジュールをCosmosSDKに基づくアプリケーションに統合するのは非常に簡単です。 一般的な変更は、次の手順として要約できます。
 
-- 将所需模块添加到`module.BasicManager`
-- 为`App` 类型的新模块定义额外的`Keeper` 字段
-- 添加模块的`StoreKeys`并初始化它们的`Keepers`
-- 为 `ibc` 和 `evidence` 模块设置相应的路由器和路由
-- 将模块添加到模块`Manager`
-- 将模块添加到`Begin/EndBlockers` 和`InitGenesis`
-- 更新模块“SimulationManager”以启用模拟
+- 必要なモジュールを `module.BasicManager`に追加します
+- タイプ `App`の新しいモジュール用に追加の` Keeper`フィールドを定義します
+- モジュールの `StoreKeys`を追加し、それらの` Keepers`を初期化します
+- `ibc`および `evidence`モジュールに対応するルーターとルートを設定します
+- モジュールをモジュール `Manager`に追加します
+- モジュールを `Begin/EndBlockers`と` InitGenesis`に追加します
+- モジュール「SimulationManager」を更新してシミュレーションを有効にします
 
-### 模块`BasicManager` 和`ModuleAccount` 权限
+### モジュール `BasicManager`および` ModuleAccount`権限
 
-第一步是将以下模块添加到`BasicManager`:`x/capability`、`x/ibc`、
-`x/evidence` 和 `x/ibc-transfer`。之后，我们需要授予`Minter`和`Burner`权限
-`ibc-transfer``ModuleAccount` 用于铸造和销毁中继代币。 
+最初のステップは、次のモジュールを `BasicManager`に追加することです。`x/capability`、` x/ibc`、
+`x/evidence`と` x/ibc-transfer`。 その後、 `Minter`と` Burner`の権限を付与する必要があります
+`ibc-transfer``ModuleAccount`は、リレートークンを作成および破棄するために使用されます。 
 
 ```go
-// app.go
+//app.go
 var (
 
   ModuleBasics = module.NewBasicManager(
-    // ...
+   //...
     capability.AppModuleBasic{},
     ibc.AppModuleBasic{},
     evidence.AppModuleBasic{},
-    transfer.AppModuleBasic{}, // i.e ibc-transfer module
+    transfer.AppModuleBasic{},//i.e ibc-transfer module
   )
 
-  // module account permissions
+ //module account permissions
   maccPerms = map[string][]string{
-    // other module accounts permissions
-    // ...
+   //other module accounts permissions
+   //...
     ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 )
 ```
 
-### 应用领域
+### アプリケーションエリア
 
-然后，我们需要按如下方式注册`Keepers`: 
+次に、次のように `Keepers`を登録する必要があります。
 
 ```go
-// app.go
+//app.go
 type App struct {
-  // baseapp, keys and subspaces definitions
+ //baseapp, keys and subspaces definitions
 
-  // other keepers
-  // ...
-  IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-  EvidenceKeeper   evidencekeeper.Keeper // required to set up the client misbehaviour route
-  TransferKeeper   ibctransferkeeper.Keeper // for cross-chain fungible token transfers
+ //other keepers
+ //...
+  IBCKeeper        *ibckeeper.Keeper//IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+  EvidenceKeeper   evidencekeeper.Keeper//required to set up the client misbehaviour route
+  TransferKeeper   ibctransferkeeper.Keeper//for cross-chain fungible token transfers
 
-  // make scoped keepers public for test purposes
+ //make scoped keepers public for test purposes
   ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
   ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-  /// ...
-  /// module and simulation manager definitions
+ ///...
+ ///module and simulation manager definitions
 }
 ```
 
 ### Configure the `Keepers`
 
-在初始化期间，除了初始化 IBC `Keepers`(对于 `x/ibc`，以及
-`x/ibc-transfer` 模块)，我们需要通过能力模块授予特定的能力
-`ScopedKeepers` 以便我们可以验证每个 IBC 的对象能力权限
-渠道。 
+初期化中、IBC `Keepers`(` x/ibc`の場合、および
+`x/ibc-transfer`モジュール)、能力モジュールを介して特定の能力を付与する必要があります
+各IBCのオブジェクト機能のアクセス許可を確認できるようにするための `ScopedKeepers`
+チャネル。 
 
 ```go
 func NewApp(...args) *App {
-  // define codecs and baseapp
+ //define codecs and baseapp
 
-  // add capability keeper and ScopeToModule for ibc module
+ //add capability keeper and ScopeToModule for ibc module
   app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 
-  // grant capabilities for the ibc and ibc-transfer modules
+ //grant capabilities for the ibc and ibc-transfer modules
   scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
   scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 
-  // ... other modules keepers
+ //... other modules keepers
 
-  // Create IBC Keeper
+ //Create IBC Keeper
   app.IBCKeeper = ibckeeper.NewKeeper(
   appCodec, keys[ibchost.StoreKey], app.StakingKeeper, scopedIBCKeeper,
   )
 
-  // Create Transfer Keepers
+ //Create Transfer Keepers
   app.TransferKeeper = ibctransferkeeper.NewKeeper(
     appCodec, keys[ibctransfertypes.StoreKey],
     app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
@@ -101,148 +101,148 @@ func NewApp(...args) *App {
   )
   transferModule := transfer.NewAppModule(app.TransferKeeper)
 
-  // Create evidence Keeper for to register the IBC light client misbehaviour evidence route
+ //Create evidence Keeper for to register the IBC light client misbehaviour evidence route
   evidenceKeeper := evidencekeeper.NewKeeper(
     appCodec, keys[evidencetypes.StoreKey], &app.StakingKeeper, app.SlashingKeeper,
   )
 
-  // .. continues
+ //.. continues
 }
 ```
 
-### 注册`路由器`
+### `ルーター`を登録する
 
-IBC 需要知道哪个模块绑定到哪个端口，以便它可以将数据包路由到
-适当的模块并调用适当的回调。端口到模块名称的映射由
-IBC 的港口“Keeper”。但是，模块名称到相关回调的映射已经完成
-由港口
-[`Router`](https://github.com/cosmos/ibc-go/blob/main/modules/core/05-port/types/router.go) 在
-IBC 模块。
+IBCは、パケットをにルーティングできるように、どのモジュールがどのポートにバインドされているかを知る必要があります。
+適切なモジュールを作成し、適切なコールバックを呼び出します。ポートのモジュール名へのマッピングは、次のように決定されます。
+IBCのポート「Keeper」。ただし、関連するコールバックへのモジュール名のマッピングは完了しています
+港で
+[`ルーター`](https://github.com/cosmos/ibc-go/blob/main/modules/core/05-port/types/router.go)
+IBCモジュール。
 
-添加模块路由允许 IBC 处理程序在处理一个
-通道握手或数据包。
+モジュールルーティングを追加すると、IBCハンドラーが
+チャネルハンドシェイクまたはデータパケット。
 
-所需的第二个“路由器”是证据模块路由器。这个路由器处理一般
-证据提交并将业务逻辑路由到每个注册的证据处理程序。在这种情况下
-IBC的，需要提交[轻客户端的证据
-不当行为](https://github.com/cosmos/ics/tree/master/spec/ics-002-client-semantics#misbehaviour)
-为了冻结客户端并防止发送/接收更多数据包。
+必要な2番目の「ルーター」は証拠モジュールルーターです。このルーターは平凡なものを処理します
+証拠の提出とビジネスロジックは、登録された各証拠処理プログラムにルーティングされます。このような状況下で
+IBC、提出する必要がある[ライトクライアントの証拠
+不正行為](https://github.com/cosmos/ics/tree/master/spec/ics-002-client-semantics#misbehaviour)
+クライアントをフリーズし、それ以上のパケットの送受信を防ぐため。
 
-目前，`Router` 是静态的，因此必须在应用程序初始化时对其进行初始化和正确设置。
-一旦设置了`Router`，就不能添加新的路由。 
+現在、 `Router`は静的であるため、アプリケーションの初期化時に初期化して正しく設定する必要があります。
+`Router`が設定されると、新しいルートを追加することはできません。 
 
 ```go
-// app.go
+//app.go
 func NewApp(...args) *App {
-  // .. continuation from above
+ //.. continuation from above
 
-  // Create static IBC router, add ibc-tranfer module route, then set and seal it
+ //Create static IBC router, add ibc-tranfer module route, then set and seal it
   ibcRouter := port.NewRouter()
   ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
-  // Setting Router will finalize all routes by sealing router
-  // No more routes can be added
+ //Setting Router will finalize all routes by sealing router
+ //No more routes can be added
   app.IBCKeeper.SetRouter(ibcRouter)
 
-  // create static Evidence routers
+ //create static Evidence routers
 
   evidenceRouter := evidencetypes.NewRouter().
-    // add IBC ClientMisbehaviour evidence handler
+   //add IBC ClientMisbehaviour evidence handler
     AddRoute(ibcclient.RouterKey, ibcclient.HandlerClientMisbehaviour(app.IBCKeeper.ClientKeeper))
 
-  // Setting Router will finalize all routes by sealing router
-  // No more routes can be added
+ //Setting Router will finalize all routes by sealing router
+ //No more routes can be added
   evidenceKeeper.SetRouter(evidenceRouter)
 
-  // set the evidence keeper from the section above
+ //set the evidence keeper from the section above
   app.EvidenceKeeper = *evidenceKeeper
 
-  // .. continues
+ //.. continues
 ```
 
 ### Module Managers
 
-为了使用 IBC，我们需要将新模块添加到模块 `Manager` 和 `SimulationManager`，以防您的应用程序支持 [simulations](./../building-modules/simulator.md)。 
+IBCを使用するには、アプリケーションが[simulations](./../building-modules/simulator.md)をサポートしている場合に備えて、モジュール `Manager`と` SimulationManager`に新しいモジュールを追加する必要があります。 
 
 ```go
-// app.go
+//app.go
 func NewApp(...args) *App {
-  // .. continuation from above
+ //.. continuation from above
 
   app.mm = module.NewManager(
-    // other modules
-    // ...
+   //other modules
+   //...
     capability.NewAppModule(appCodec, *app.CapabilityKeeper),
     evidence.NewAppModule(app.EvidenceKeeper),
     ibc.NewAppModule(app.IBCKeeper),
     transferModule,
   )
 
-  // ...
+ //...
 
   app.sm = module.NewSimulationManager(
-    // other modules
-    // ...
+   //other modules
+   //...
     capability.NewAppModule(appCodec, *app.CapabilityKeeper),
     evidence.NewAppModule(app.EvidenceKeeper),
     ibc.NewAppModule(app.IBCKeeper),
     transferModule,
   )
 
-  // .. continues
+ //.. continues
 ```
 
-### 应用 ABCI 订购
+### ABCI注文を適用する
 
-IBC 的一项新增功能是存储在 staking 模块中的“HistoricalEntries”概念。
-每个条目都包含此链的“Header”和“ValidatorSet”的历史信息，这些信息被存储
-在“BeginBlock”调用期间的每个高度。 需要历史信息来反省
-过去在任何给定高度的历史信息，以便在此期间验证轻客户端“ConsensusState”
-连接握手。
+IBCの新機能は、ステーキングモジュールに格納されている「HistoricalEntries」の概念です。
+各エントリには、このチェーンの「Header」と「ValidatorSet」の履歴情報が含まれています。これらは保存されています。
+「BeginBlock」呼び出し中の各高さ。 反映するために履歴情報が必要
+この期間中のライトクライアント「ConsensusState」を検証するための過去の任意の高さでの履歴情報
+接続ハンドシェイク。
 
-IBC 模块还具有
-[`BeginBlock`](https://github.com/cosmos/ibc-go/blob/main/modules/core/02-client/abci.go) 逻辑为
-好。 这是可选的，因为只有在您的应用程序使用 [localhost
-客户端](https://github.com/cosmos/ibc/tree/master/spec/client/ics-009-loopback-client) 连接两个
-来自同一链的不同模块。
+IBCモジュールには
+[`BeginBlock`](https://github.com/cosmos/ibc-go/blob/main/modules/core/02-client/abci.go)ロジックは
+良い。 [localhostのみを使用できるため、これはオプションです。
+クライアント](https://github.com/cosmos/ibc/tree/master/spec/client/ics-009-loopback-client)2つ接続します
+同じチェーンからの異なるモジュール。
 
-::: 小费
-如果您的应用程序将使用
-本地主机(_aka_ 环回)客户端。
+::: ヒント
+アプリケーションが使用する場合
+ローカルホスト(_aka_ループバック)クライアント。
 ::: 
 
 ```go
-// app.go
+//app.go
 func NewApp(...args) *App {
-  // .. continuation from above
+ //.. continuation from above
 
-  // add evidence, staking and ibc modules to BeginBlockers
+ //add evidence, staking and ibc modules to BeginBlockers
   app.mm.SetOrderBeginBlockers(
-    // other modules ...
+   //other modules ...
     evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
   )
 
-  // ...
+ //...
 
-  // NOTE: Capability module must occur first so that it can initialize any capabilities
-  // so that other modules that want to create or claim capabilities afterwards in InitChain
-  // can do so safely.
+ //NOTE: Capability module must occur first so that it can initialize any capabilities
+ //so that other modules that want to create or claim capabilities afterwards in InitChain
+ //can do so safely.
   app.mm.SetOrderInitGenesis(
     capabilitytypes.ModuleName,
-    // other modules ...
+   //other modules ...
     ibchost.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
   )
 
-  // .. continues
+ //.. continues
 ```
 
 ::: 警告
-**重要**:功能模块**必须**在`SetOrderInitGenesis`中首先声明
+**重要**：汎用モジュール**は `SetOrderInitGenesis`で最初に宣言する必要があります
 :::
 
-而已！ 您现在已经连接了 IBC 模块，现在可以发送可替代的代币
-不同的链。 如果您想更广泛地了解更改，请查看 Cosmos SDK 的
+それでおしまい！ これで、IBCモジュールが配線され、代替可能なトークンを送信できるようになりました。
+異なるチェーン。 変更の全体像を知りたい場合は、CosmosSDKを調べてください。
 [`SimApp`](https://github.com/cosmos/ibc-go/blob/main/testing/simapp/app.go)。
 
-## 下一个 {hide}
+## 次へ{非表示}
 
-了解如何为您的应用程序创建 [自定义 IBC 模块](./custom.md) {hide} 
+アプリケーション用の[カスタムIBCモジュール](./custom.md){hide}を作成する方法を学ぶ

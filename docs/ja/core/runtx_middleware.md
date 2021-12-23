@@ -1,37 +1,37 @@
-# RunTx 恢复中间件
+# RunTxリカバリミドルウェア
 
-`BaseApp.runTx()` 函数处理在事务执行过程中可能发生的 Golang 恐慌，例如，keeper 面临无效状态并出现恐慌。
-根据恐慌类型使用不同的处理程序，例如默认的一个打印错误日志消息。
-恢复中间件用于为 Cosmos SDK 应用程序开发人员添加自定义紧急恢复。
+`BaseApp.runTx()`関数は、トランザクションの実行中に発生する可能性のあるGolangパニックを処理します。たとえば、キーパーは無効な状態に直面してパニックになります。
+パニックのタイプに応じて、エラーログメッセージを出力するデフォルトのハンドラーなど、さまざまなハンドラーが使用されます。
+リカバリミドルウェアは、CosmosSDKアプリケーション開発者向けのカスタム緊急リカバリを追加するために使用されます。
 
-更多上下文可以在相应的 [ADR-022](../architecture/adr-022-custom-panic-handling.md) 中找到。
+より多くのコンテキストは、対応する[ADR-022](../ architecture / adr-022-custom-panic-handling.md)にあります。
 
-可以在 [recovery.go](../../baseapp/recovery.go) 文件中找到实现。
+実装は[recovery.go](../../ baseapp / recovery.go)ファイルにあります。
 
-## 界面 
+## インターフェース 
 
 ```go
 type RecoveryHandler func(recoveryObj interface{}) error
 ```
 
-`recoveryObj` 是 `buildin` Golang 包中 `recover()` 函数的返回值。
+`recoveryObj`は、` buildin`Golangパッケージの `recover()`関数の戻り値です。
 
 **合同:**
 
-- 如果 `recoveryObj` 没有被处理并且应该传递给下一个恢复中间件，RecoveryHandler 返回 `nil`；
-- 如果处理了 `recoveryObj`，RecoveryHandler 返回一个非零的 `error`；
+-`recoveryObj`が処理されず、次のリカバリミドルウェアに渡す必要がある場合、RecoveryHandlerは `nil`を返します。
+-`recoveryObj`が処理されると、RecoveryHandlerはゼロ以外の `error`を返します。
 
-##自定义RecoveryHandler注册
+## カスタムRecoveryHandler登録
 
 `BaseApp.AddRunTxRecoveryHandler(handlers ...RecoveryHandler)`
 
-BaseApp 方法将恢复中间件添加到默认恢复链中。
+BaseAppメソッドは、リカバリミドルウェアをデフォルトのリカバリチェーンに追加します。
 
-## 例子
+## 例
 
-假设我们想要在发生某些特定错误时发出“共识失败”链状态。
+特定のエラーが発生したときに「コンセンサス障害」チェーン状態を発行するとします。
 
-我们有一个恐慌的模块管理员: 
+パニック状態のモジュール管理者がいます: 
 
 ```go
 func (k FooKeeper) Do(obj interface{}) {
@@ -43,7 +43,7 @@ func (k FooKeeper) Do(obj interface{}) {
 }
 ```
 
-默认情况下，恐慌会被恢复，错误信息将被打印到日志中。 要覆盖该行为，我们应该注册一个自定义 RecoveryHandler: 
+デフォルトでは、パニックは回復し、エラーメッセージがログに出力されます。 この動作をオーバーライドするには、カスタムRecoveryHandlerを登録する必要があります。
 
 ```go
 // Cosmos SDK application constructor
@@ -64,6 +64,6 @@ baseApp := baseapp.NewBaseApp(...)
 baseApp.AddRunTxRecoveryHandler(customHandler)
 ```
 
-## 下一个 {hide}
+## 次へ{非表示}
 
-了解 [IBC](./../ibc/README.md) 协议 {hide} 
+[IBC](./../ ibc / README.md)プロトコルを理解する{非表示}

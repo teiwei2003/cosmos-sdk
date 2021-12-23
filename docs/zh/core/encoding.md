@@ -233,10 +233,10 @@ func (p *Profile) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 // proto/cosmos/evidence/v1beta1/tx.proto
 
 message MsgSubmitEvidence {
-  字符串提交者 = 1;
-  google.protobuf.Any evidence = 2 [(cosmos_proto.accepts_interface) = "Evidence"];
+  string              submitter = 1;
+  google.protobuf.Any evidence  = 2 [(cosmos_proto.accepts_interface) = "Evidence"];
 }
-``
+```
 
 Cosmos SDK `codec.Codec` 接口提供支持方法 `MarshalInterface` 和 `UnmarshalInterface` 以轻松将状态编码为 `Any`。
 
@@ -246,11 +246,11 @@ Cosmos SDK `codec.Codec` 接口提供支持方法 `MarshalInterface` 和 `Unmars
 
 此外，应该在反序列化中引入一个 `UnpackInterfaces` 阶段，以便在需要它们之前解压接口。直接或通过其成员之一包含 protobuf `Any` 的 Protobuf 类型应该实现 `UnpackInterfacesMessage` 接口:
 
-```Go
-类型 UnpackInterfacesMessage 接口 {
-  UnpackInterfaces(InterfaceUnpacker) 错误
+```go
+type UnpackInterfacesMessage interface {
+  UnpackInterfaces(InterfaceUnpacker) error
 }
-``
+```
 
 ## 下一个 {hide}
 
