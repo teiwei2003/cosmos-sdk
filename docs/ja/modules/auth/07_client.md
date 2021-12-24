@@ -1,22 +1,22 @@
-# 客户
+# お客様
 
-# 认证
+# 認証
 
-##命令行界面
+## コマンドラインインターフェイス
 
-用户可以使用 CLI 查询“auth”模块并与之交互。
+ユーザーはCLIを使用して、「auth」モジュールを照会および操作できます。
 
-### 询问
+### query
 
-`query` 命令允许用户查询 `auth` 状态。 
+`query`コマンドを使用すると、ユーザーは` auth`のステータスを照会できます。
 
 ```bash
 simd query auth --help
 ```
 
-#### 帐户
+#### account
 
-`account` 命令允许用户通过其地址查询帐户。 
+`account`コマンドを使用すると、ユーザーは自分のアドレスでアカウントを照会できます。 
 
 ```bash
 simd query auth account [address] [flags]
@@ -42,7 +42,7 @@ sequence: "1"
 
 #### accounts
 
-The `accounts` command allow users to query all the available accounts.
+`accounts`コマンドを使用すると、ユーザーは使用可能なすべてのアカウントを照会できます。
 
 ```bash
 simd query auth accounts [flags]
@@ -141,19 +141,19 @@ pagination:
 
 #### params
 
-The `params` command allow users to query the current auth parameters.
+`params`コマンドを使用すると、ユーザーは現在の認証パラメータを照会できます。
 
 ```bash
 simd query auth params [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query auth params
 ```
 
-Example Output:
+出力例:
 
 ```bash
 max_memo_characters: "256"
@@ -165,17 +165,17 @@ tx_size_cost_per_byte: "10"
 
 ## gRPC
 
-A user can query the `auth` module using gRPC endpoints.
+ユーザーは、gRPCエンドポイントを使用して `auth`モジュールをクエリできます。
 
-### Account
+### account
 
-The `account` endpoint allow users to query for an account by it's address.
+`account`エンドポイントを使用すると、ユーザーはそのアドレスでアカウントを照会できます。
 
 ```bash
 cosmos.auth.v1beta1.Query/Account
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -184,7 +184,7 @@ grpcurl -plaintext \
     cosmos.auth.v1beta1.Query/Account
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -200,7 +200,7 @@ Example Output:
 }
 ```
 
-### Accounts
+### accounts
 
 The `accounts` endpoint allow users to query all the available accounts.
 
@@ -208,7 +208,7 @@ The `accounts` endpoint allow users to query all the available accounts.
 cosmos.auth.v1beta1.Query/Accounts
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -216,7 +216,7 @@ grpcurl -plaintext \
     cosmos.auth.v1beta1.Query/Accounts
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -316,15 +316,15 @@ Example Output:
 }
 ```
 
-### Params
+### params
 
-The `params` endpoint allow users to query the current auth parameters.
+`params`エンドポイントを使用すると、ユーザーは現在の認証パラメータを照会できます。
 
 ```bash
 cosmos.auth.v1beta1.Query/Params
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -332,7 +332,7 @@ grpcurl -plaintext \
     cosmos.auth.v1beta1.Query/Params
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -346,29 +346,29 @@ Example Output:
 }
 ```
 
-## REST
+## 休み
 
-A user can query the `auth` module using REST endpoints.
+ユーザーは、RESTエンドポイントを使用して `auth`モジュールにクエリを実行できます。
 
-### Account
+### account
 
-The `account` endpoint allow users to query for an account by it's address.
+`account`エンドポイントを使用すると、ユーザーはそのアドレスでアカウントを照会できます。
 
 ```bash
 /cosmos/auth/v1beta1/account?address={address}
 ```
 
-### Accounts
+### accounts
 
-The `accounts` endpoint allow users to query all the available accounts.
+`accounts`エンドポイントを使用すると、ユーザーは使用可能なすべてのアカウントを照会できます。
 
 ```bash
 /cosmos/auth/v1beta1/accounts
 ```
 
-### Params
+### params
 
-The `params` endpoint allow users to query the current auth parameters.
+`params`エンドポイントを使用すると、ユーザーは現在の認証パラメータを照会できます。
 
 ```bash
 /cosmos/auth/v1beta1/params
@@ -378,11 +378,11 @@ The `params` endpoint allow users to query the current auth parameters.
 
 ## CLI
 
-A user can query and interact with the `vesting` module using the CLI.
+ユーザーは、CLIを使用して `vesting`モジュールを照会および操作できます。
 
 ### Transactions
 
-The `tx` commands allow users to interact with the `vesting` module.
+`tx`コマンドを使用すると、ユーザーは` vesting`モジュールを操作できます。
 
 ```bash
 simd tx vesting --help
@@ -390,7 +390,7 @@ simd tx vesting --help
 
 #### create-periodic-vesting-account
 
-The `create-periodic-vesting-account` command creates a new vesting account funded with an allocation of tokens, where a sequence of coins and period length in seconds. Periods are sequential, in that the duration of of a period only starts at the end of the previous period. The duration of the first period starts upon account creation.
+`create-periodic-vesting-account`コマンドは、トークンの割り当てで資金を供給される新しい権利確定アカウントを作成します。ここで、コインのシーケンスと期間の長さは秒単位です。 期間は連続しており、期間の期間は前の期間の終わりにのみ開始されます。 最初の期間の期間は、アカウントの作成時に始まります。
 
 ```bash
 simd tx vesting create-periodic-vesting-account [to_address] [periods_json_file] [flags]
@@ -404,7 +404,7 @@ simd tx vesting create-periodic-vesting-account cosmos1.. periods.json
 
 #### create-vesting-account
 
-The `create-vesting-account` command creates a new vesting account funded with an allocation of tokens. The account can either be a delayed or continuous vesting account, which is determined by the '--delayed' flag. All vesting accouts created will have their start time set by the committed block's time. The end_time must be provided as a UNIX epoch timestamp.
+`create-vesting-account`コマンドは、トークンの割り当てで資金提供される新しい権利確定アカウントを作成します。 アカウントは、「-delayed」フラグによって決定される遅延または継続的な権利確定アカウントのいずれかです。 作成されたすべての権利確定アカウントには、コミットされたブロックの時間によって設定された開始時間があります。 end_timeは、UNIXエポックタイムスタンプとして指定する必要があります。
 
 ```bash
 simd tx vesting create-vesting-account [to_address] [amount] [end_time] [flags]

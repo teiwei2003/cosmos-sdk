@@ -1,30 +1,30 @@
-# 守门员
+# Keepers
 
-bank 模块提供了这些导出的 keeper 接口，可以
-传递给读取或更新帐户余额的其他模块。模块
-应该使用提供它们的功能的最少许可的接口
-要求。
+bankモジュールは、これらのエクスポートされたkeeperインターフェイスを提供します。
+アカウントの残高を読み取ったり更新したりする他のモジュールに渡します。 モジュール
+それらの機能を提供する最も許可されていないインターフェースを使用する必要があります
+必須。
 
-最佳实践要求仔细审查“银行”模块代码，以确保
-权限以您期望的方式受到限制。
+ベストプラクティスでは、「バンク」モジュールコードを注意深く確認して、
+権限は、期待する方法で制限されます。
 
-## 屏蔽地址
+## ブロックリストアドレス
 
-`x/bank` 模块接受被视为阻止列表的地址映射
-通过“MsgSend”等方式直接明确地接收资金，
-`MsgMultiSend` 和直接 API 调用，如 `SendCoinsFromModuleToAccount`。
+`x / bank`モジュールは、ブロックされたリストと見なされるアドレスマッピングを受け入れます
+「MsgSend」などの方法で直接かつ明示的に資金を受け取ります。
+`MsgMultiSend`および` SendCoinsFromModuleToAccount`などの直接API呼び出し。
 
-通常，这些地址是模块帐户。如果这些地址收到资金
-在状态机的预期规则之外，不变量很可能是
-损坏并可能导致网络停止。
+通常、これらのアドレスはモジュールアカウントです。 これらの住所が資金を受け取った場合
+ステートマシンの予想されるルールの外では、不変条件は
+損傷し、ネットワークが停止する可能性があります。
 
-通过为“x/bank”模块提供一组被屏蔽的地址，如果用户或客户试图直接或间接地将资金发送到被屏蔽的账户，例如，通过使用 [IBC](http: //docs.cosmos.network/master/ibc/)。
+ユーザーまたは顧客がブロックされたアカウントに直接または間接的に資金を送金しようとした場合、たとえば[IBC]（http：//docs.cosmos）を使用して、「x/bank」モジュールにブロックされたアドレスのセットを提供する。 network/master/ibc/）。
 
-## 常见类型
+## 一般的なタイプ
 
-### 输入
+### 入力
 
-多方转移的输入 
+マルチパーティ転送入力
 
 ```protobuf
 // Input models transaction input.
@@ -36,7 +36,7 @@ message Input {
 
 ### Output
 
-An output of a multiparty transfer.
+マルチパーティ転送の出力。
 
 ```protobuf
 // Output models transaction outputs.
@@ -48,7 +48,7 @@ message Output {
 
 ## BaseKeeper
 
-Base keeper 提供完全权限访问:能够任意修改任何帐户的余额并铸造或燃烧硬币。 
+Base keeper はフルアクセスを提供します：あなたは任意のアカウントの残高を変更し、自由にコインをミントまたは燃やすことができます。
 
 ```go
 // Keeper defines a module interface that facilitates the transfer of coins
@@ -83,8 +83,8 @@ type Keeper interface {
 
 ## SendKeeper
 
-发送保管员提供对帐户余额的访问以及在之间转移硬币的能力
-帐户。 发送管理员不会改变总供应量(铸造或燃烧硬币)。 
+SendKeeperは、口座残高へのアクセスと、間でコインを転送する機能を提供します
+アカウント。 送信マネージャーは、総供給量（コインの鋳造または燃焼）を変更しません。
 
 ```go
 // SendKeeper defines a module interface that facilitates the transfer of coins
@@ -107,7 +107,7 @@ type SendKeeper interface {
 
 ## ViewKeeper
 
-视图管理器提供对帐户余额的只读访问。 视图保持器没有平衡更改功能。 所有余额查找都是“O(1)”。 
+ViewKeeperは、アカウント残高への読み取り専用アクセスを提供します。 ビューホルダーにはバランス変更機能はありません。 すべてのバランスルックアップは「O（1）」です。
 
 ```go
 // ViewKeeper defines a module interface that facilitates read only access to

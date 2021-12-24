@@ -1,12 +1,12 @@
-# 客户
+# お客様
 
-##命令行界面
+## コマンドラインインターフェイス
 
-用户可以使用 CLI 查询“bank”模块并与之交互。
+ユーザーはCLIを使用して、「bank」モジュールを照会および操作できます。
 
-### 询问
+### query
 
-`query` 命令允许用户查询 `bank` 状态。 
+`query`コマンドを使用すると、ユーザーは` bank`のステータスを照会できます。
 
 ```
 simd query bank --help
@@ -14,18 +14,18 @@ simd query bank --help
 
 #### balances
 
-`balances` 命令允许用户按地址查询账户余额。 
+`balances`コマンドを使用すると、ユーザーは住所で口座残高を照会できます。
 ```
 simd query bank balances [address] [flags]
 ```
 
-Example:
+例:
 
 ```
 simd query bank balances cosmos1..
 ```
 
-Example Output:
+出力例:
 
 ```
 balances:
@@ -38,19 +38,19 @@ pagination:
 
 #### denom-metadata
 
-`denom-metadata` 命令允许用户查询硬币面额的元数据。 用户可以使用 `--denom` 标志查询单个面额的元数据，或者没有它的所有面额。 
+`denom-metadata`コマンドを使用すると、ユーザーは硬貨の種類のメタデータを照会できます。 ユーザーは `--denom`フラグを使用して、単一の宗派のメタデータ、またはそれがないすべての宗派のメタデータを照会できます。
 
 ```
 simd query bank denom-metadata [flags]
 ```
 
-Example:
+例:
 
 ```
 simd query bank denom-metadata --denom stake
 ```
 
-Example Output:
+出力例:
 
 ```
 metadata:
@@ -67,19 +67,19 @@ metadata:
 
 #### total
 
-`total` 命令允许用户查询硬币的总供应量。 用户可以使用 `--denom` 标志或没有它的所有硬币查询单个硬币的总供应量。 
+`total`コマンドを使用すると、ユーザーはコインの総供給量を照会できます。 ユーザーは、 `--denom`フラグまたはそれなしのすべてのコインを使用して、単一のコインの総供給量を照会できます。
 
 ```
 simd query bank total [flags]
 ```
 
-Example:
+例:
 
 ```
 simd query bank total --denom stake
 ```
 
-Example Output:
+出力例:
 
 ```
 amount: "10000000000"
@@ -88,7 +88,7 @@ denom: stake
 
 ### Transactions
 
-The `tx` commands allow users to interact with the `bank` module.
+`tx`コマンドを使用すると、ユーザーは` bank`モジュールを操作できます。
 
 ```
 simd tx bank --help
@@ -96,13 +96,13 @@ simd tx bank --help
 
 #### send
 
-The `send` command allows users to send funds from one account to another.
+`send`コマンドを使用すると、ユーザーはあるアカウントから別のアカウントに資金を送ることができます。
 
 ```
 simd tx bank send [from_key_or_address] [to_address] [amount] [flags]
 ```
 
-Example:
+例:
 
 ```
 simd tx bank send cosmos1.. cosmos1.. 100stake
@@ -110,17 +110,17 @@ simd tx bank send cosmos1.. cosmos1.. 100stake
 
 ## gRPC
 
-A user can query the `bank` module using gRPC endpoints.
+ユーザーは、gRPCエンドポイントを使用して `bank`モジュールにクエリを実行できます。
 
 ### Balance
 
-The `Balance` endpoint allows users to query account balance by address for a given denomination.
+`Balance`エンドポイントを使用すると、ユーザーは特定の金種の住所ごとに口座残高を照会できます。
 
 ```
 cosmos.bank.v1beta1.Query/Balance
 ```
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -129,7 +129,7 @@ grpcurl -plaintext \
     cosmos.bank.v1beta1.Query/Balance
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -142,13 +142,13 @@ Example Output:
 
 ### AllBalances
 
-The `AllBalances` endpoint allows users to query account balance by address for all denominations.
+`AllBalances`エンドポイントを使用すると、ユーザーはすべての金種の住所ごとに口座残高を照会できます。
 
 ```
 cosmos.bank.v1beta1.Query/AllBalances
 ```
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -157,7 +157,7 @@ grpcurl -plaintext \
     cosmos.bank.v1beta1.Query/AllBalances
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -175,13 +175,13 @@ Example Output:
 
 ### DenomMetadata
 
-The `DenomMetadata` endpoint allows users to query metadata for a single coin denomination.
+`DenomMetadata`エンドポイントを使用すると、ユーザーは単一の硬貨のメタデータを照会できます。
 
 ```
 cosmos.bank.v1beta1.Query/DenomMetadata
 ```
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -190,7 +190,7 @@ grpcurl -plaintext \
     cosmos.bank.v1beta1.Query/DenomMetadata
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -214,13 +214,13 @@ Example Output:
 
 ### DenomsMetadata
 
-The `DenomsMetadata` endpoint allows users to query metadata for all coin denominations.
+`DenomsMetadata`エンドポイントを使用すると、ユーザーはすべての硬貨のメタデータを照会できます。
 
 ```
 cosmos.bank.v1beta1.Query/DenomsMetadata
 ```
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -228,7 +228,7 @@ grpcurl -plaintext \
     cosmos.bank.v1beta1.Query/DenomsMetadata
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -257,13 +257,13 @@ Example Output:
 
 ### DenomOwners
 
-The `DenomOwners` endpoint allows users to query metadata for a single coin denomination.
+`DenomOwners`エンドポイントを使用すると、ユーザーは単一の硬貨のメタデータを照会できます。
 
 ```
 cosmos.bank.v1beta1.Query/DenomOwners
 ```
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -272,7 +272,7 @@ grpcurl -plaintext \
     cosmos.bank.v1beta1.Query/DenomOwners
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -300,13 +300,13 @@ Example Output:
 
 ### TotalSupply
 
-The `TotalSupply` endpoint allows users to query the total supply of all coins.
+`TotalSupply`エンドポイントを使用すると、ユーザーはすべてのコインの総供給量を照会できます。
 
 ```
 cosmos.bank.v1beta1.Query/TotalSupply
 ```
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -314,7 +314,7 @@ grpcurl -plaintext \
     cosmos.bank.v1beta1.Query/TotalSupply
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -332,13 +332,13 @@ Example Output:
 
 ### SupplyOf
 
-The `SupplyOf` endpoint allows users to query the total supply of a single coin.
+`Supply Of`エンドポイントを使用すると、ユーザーは1枚のコインの総供給量を照会できます。
 
 ```
 cosmos.bank.v1beta1.Query/SupplyOf
 ```
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -347,7 +347,7 @@ grpcurl -plaintext \
     cosmos.bank.v1beta1.Query/SupplyOf
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -360,13 +360,13 @@ Example Output:
 
 ### Params
 
-The `Params` endpoint allows users to query the parameters of the `bank` module.
+`Params`エンドポイントを使用すると、ユーザーは` bank`モジュールのパラメーターを照会できます。
 
 ```
 cosmos.bank.v1beta1.Query/Params
 ```
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -374,7 +374,7 @@ grpcurl -plaintext \
     cosmos.bank.v1beta1.Query/Params
 ```
 
-Example Output:
+出力例:
 
 ```
 {

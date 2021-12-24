@@ -2,7 +2,7 @@
 
 本文档提供了从 v0.42 到 v0.44 的链式升级指南以及使用“simapp”的升级过程示例。 {概要}
 
-::: 小费
+::: 提示
 在升级到 v0.44 之前，您必须升级到 Stargate v0.42。如果您还没有这样做，请参阅[链升级指南到 v0.42](/v0.42/migrations/chain-upgrade-guide-040.html)。请注意，v0.43 发布后不久就停产了，所有链应直接从 v0.42 升级到 v0.44。
 :::
 
@@ -30,7 +30,7 @@ Cosmos SDK 的 IBC 模块已移至 v0.42 及更高版本的[自己的存储库](
 
 我们建议验证器使用 [Cosmovisor](../run-node/cosmovisor.html)，这是一个用于运行应用程序二进制文件的进程管理器。出于安全原因，我们建议验证器构建自己的升级二进制文件，而不是启用自动下载选项。如果必要的安全保证到位(即，可下载升级二进制文件的升级建议中提供的 URL 包括正确的校验和)，验证者仍然可以选择使用自动下载选项。
 
-::: 小费
+::: 提示
 如果验证者想要启用自动下载选项，并且他们当前正在使用 Cosmos SDK `v0.42` 运行应用程序，他们将需要使用 Cosmovisor [`v0.1`](https://github.com/ cosmos/cosmos-sdk/releases/tag/cosmovisor%2Fv0.1.0)。如果启用了自动下载选项，更高版本的 Cosmovisor 不支持 Cosmos SDK `v0.42` 或更早版本。 
 :::
 
@@ -44,7 +44,7 @@ Cosmos SDK 的 IBC 模块已移至 v0.42 及更高版本的[自己的存储库](
 
 以下示例将使用“simapp”作为我们的区块链应用程序来完成升级过程。我们将把 `simapp` 从 v0.42 升级到 v0.44。我们将自己构建升级二进制文件并启用自动重启选项。
 
-::: 小费
+::: 提示
 在下面的例子中，我们从 `v0.42` 开始一个新链。此版本的二进制文件将是创世二进制文件。对于第一次在现有链上使用 Cosmovisor 的验证者，要么将链当前版本的二进制文件用作创世二进制文件(即起始二进制文件)，要么验证器应更新“当前”符号链接以指向升级目录。有关详细信息，请参阅 [Cosmovisor](../run-node/cosmovisor.html)。
 :::
 
@@ -118,7 +118,7 @@ Create a new key for the validator, then add a genesis account and transaction:
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v0.1.0
 ```
 
-::: 小费
+::: 提示
 如果你使用的是 go `v1.15` 或更早版本，你需要把 `cosmos-sdk` 目录改出，运行 `go get` 而不是 `go install`，然后再改回 `cosmos-sdk ` 存储库。
 :::
 

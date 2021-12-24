@@ -1,20 +1,20 @@
-# REST 端点迁移
+# RESTエンドポイントの移行
 
-迁移到 gRPC-Gateway REST 端点。旧版 REST 端点在 v0.40 中被标记为已弃用，并将在 v0.45 中删除。 {概要}
+gRPC-GatewayRESTエンドポイントに移行します。 従来のRESTエンドポイントはv0.40で非推奨としてマークされ、v0.45で削除されます。 {まとめ}
 
 ::: 警告
-由于安全漏洞，在 v0.44 中提前删除了两个旧版 REST 端点(`POST /txs` 和 `POST /txs/encode`)。
+セキュリティの脆弱性のため、v0.44では2つの古いRESTエンドポイント( `POST /txs`と` POST /txs /encode`)が事前に削除されました。
 :::
 
-## 传统 REST 端点
+## 従来のRESTエンドポイント
 
-Cosmos SDK 版本 v0.39 和更早版本使用名为“gorilla/mux”的包注册了 REST 端点。这些 REST 端点在 v0.40 中被标记为已弃用，此后被称为旧版 REST 端点。传统 REST 端点将在 v0.45 中正式删除。
+Cosmos SDKバージョンv0.39以前では、「gorilla/mux」という名前のパッケージを使用してRESTエンドポイントが登録されています。 これらのRESTエンドポイントは、v0.40で非推奨としてマークされ、それ以降、レガシーRESTエンドポイントと呼ばれています。 従来のRESTエンドポイントはv0.45で正式に削除されます。
 
-## gRPC 网关 REST 端点
+## gRPCゲートウェイRESTエンドポイント
 
-随着 v0.40 中的 Protocol Buffers 迁移，Cosmos SDK 已被设置为利用大量 gRPC 工具和解决方案。 v0.40 引入了使用 [grpc-gateway](https://grpc-ecosystem.github.io/grpc) 从 [gRPC `Query` 服务](../building-modules/query-services.md) 生成的新 REST 端点-网关/)。这些新的 REST 端点称为 gRPC-Gateway REST 端点。
+v0.40でのProtocolBuffersの移行により、Cosmos SDKは、多数のgRPCツールとソリューションを利用するように設定されました。 v0.40では、[gRPC `Query` service](../building-modules/query-services.md)から生成された[grpc-gateway](https://grpc-ecosystem.github.io/grpc)の使用が導入されました新しいRESTエンドポイント-ゲートウェイ/)。 これらの新しいRESTエンドポイントは、gRPC-GatewayRESTエンドポイントと呼ばれます。
 
-## 迁移到新的 REST 端点 
+## 新しいRESTエンドポイントに移行します
 
 | Legacy REST Endpoint                                                            | Description                                                         | New gRPC-gateway REST Endpoint                                                                        |
 | ------------------------------------------------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
@@ -76,6 +76,6 @@ Cosmos SDK 版本 v0.39 和更早版本使用名为“gorilla/mux”的包注册
 | `GET /upgrade/current`                                                          | Get the current plan                                                | `GET /cosmos/upgrade/v1beta1/current_plan`                                                            |
 | `GET /upgrade/applied_plan/{name}`                                              | Get a previously applied plan                                       | `GET /cosmos/upgrade/v1beta1/applied/{name}`                                                          |
 
-## 迁移到 gRPC
+## gRPCに移行する
 
-Cosmos SDK 并没有像上面描述的那样访问 REST 端点，而是公开了一个 gRPC 服务器。 任何客户端都可以使用 gRPC 而不是 REST 与节点进行交互。 可以在 [此处](../core/grpc_rest.md) 中找到与节点通信的不同方式的概述，可以在 [此处](../run-node /txs.md#programmatically-with-go)。
+Cosmos SDKは、上記のようにRESTエンドポイントにアクセスしませんが、gRPCサーバーを公開します。 すべてのクライアントは、RESTの代わりにgRPCを使用してノードと対話できます。 ノードと通信するためのさまざまな方法の概要は、[ここ](../core/grpc_rest.md)にあり、[ここ](../run-node/txs.md#programmatically)にあります。 -with-go)。

@@ -1,12 +1,12 @@
-# 客户
+# お客様
 
-##命令行界面
+## コマンドラインインターフェイス
 
-用户可以使用 CLI 查询“分发”模块并与之交互。
+ユーザーはCLIを使用して、「配布」モジュールを照会および操作できます。
 
-### 询问
+### query
 
-`query` 命令允许用户查询 `distribution` 状态。 
+`query`コマンドを使用すると、ユーザーは` distribution`のステータスを照会できます。
 
 ```
 simd query distribution --help
@@ -14,19 +14,19 @@ simd query distribution --help
 
 #### commission
 
-The `commission` command allows users to query validator commission rewards by address.
+`commission`コマンドを使用すると、ユーザーはアドレスごとにバリデーターのコミッション報酬を照会できます。
 
 ```
 simd query distribution commission [address] [flags]
 ```
 
-Example:
+例:
 
 ```
 simd query distribution commission cosmosvaloper1..
 ```
 
-Example Output:
+出力例:
 
 ```
 commission:
@@ -36,19 +36,19 @@ commission:
 
 #### community-pool
 
-The `community-pool` command allows users to query all coin balances within the community pool.
+`community-pool`コマンドを使用すると、ユーザーはコミュニティプール内のすべてのコイン残高を照会できます。
 
 ```
 simd query distribution community-pool [flags]
 ```
 
-Example:
+例:
 
 ```
 simd query distribution community-pool
 ```
 
-Example Output:
+出力例:
 
 ```
 pool:
@@ -58,19 +58,19 @@ pool:
 
 #### params
 
-The `params` command allows users to query the parameters of the `distribution` module.
+`params`コマンドを使用すると、ユーザーは` distribution`モジュールのパラメーターを照会できます。
 
 ```
 simd query distribution params [flags]
 ```
 
-Example:
+例:
 
 ```
 simd query distribution params
 ```
 
-Example Output:
+出力例:
 
 ```
 base_proposer_reward: "0.010000000000000000"
@@ -81,19 +81,19 @@ withdraw_addr_enabled: true
 
 #### rewards
 
-The `rewards` command allows users to query delegator rewards. Users can optionally include the validator address to query rewards earned from a specific validator.
+`rewards`コマンドを使用すると、ユーザーは委任者の報酬を照会できます。 ユーザーは、オプションでバリデーターアドレスを含めて、特定のバリデーターから獲得した報酬を照会できます。
 
 ```
 simd query distribution rewards [delegator-addr] [validator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```
 simd query distribution rewards cosmos1..
 ```
 
-Example Output:
+出力例:
 
 ```
 rewards:
@@ -108,19 +108,19 @@ total:
 
 #### slashes
 
-The `slashes` command allows users to query all slashes for a given block range.
+`slashes`コマンドを使用すると、ユーザーは特定のブロック範囲のすべてのスラッシュを照会できます。
 
 ```
 simd query distribution slashes [validator] [start-height] [end-height] [flags]
 ```
 
-Example:
+例:
 
 ```
 simd query distribution slashes cosmosvaloper1.. 1 1000
 ```
 
-Example Output:
+出力例:
 
 ```
 pagination:
@@ -133,19 +133,19 @@ slashes:
 
 #### validator-outstanding-rewards
 
-The `validator-outstanding-rewards` command allows users to query all outstanding (un-withdrawn) rewards for a validator and all their delegations.
+`validator-outstanding-rewards`コマンドを使用すると、ユーザーは、バリデーターとそのすべての委任について、すべての未処理の（取り消されていない）報酬を照会できます。
 
 ```
 simd query distribution validator-outstanding-rewards [validator] [flags]
 ```
 
-Example:
+例:
 
 ```
 simd query distribution validator-outstanding-rewards cosmosvaloper1..
 ```
 
-Example Output:
+出力例:
 
 ```
 rewards:
@@ -155,7 +155,7 @@ rewards:
 
 ### Transactions
 
-The `tx` commands allow users to interact with the `distribution` module.
+`tx`コマンドを使用すると、ユーザーは` distribution`モジュールを操作できます。
 
 ```
 simd tx distribution --help
@@ -163,13 +163,13 @@ simd tx distribution --help
 
 #### fund-community-pool
 
-The `fund-community-pool` command allows users to send funds to the community pool.
+`fund-community-pool`コマンドを使用すると、ユーザーはコミュニティプールに資金を送ることができます。
 
 ```
 simd tx distribution fund-community-pool [amount] [flags]
 ```
 
-Example:
+例:
 
 ```
 simd tx distribution fund-community-pool 100stake --from cosmos1..
@@ -177,13 +177,13 @@ simd tx distribution fund-community-pool 100stake --from cosmos1..
 
 #### set-withdraw-addr
 
-The `set-withdraw-addr` command allows users to set the withdraw address for rewards associated with a delegator address.
+`set-withdraw-addr`コマンドを使用すると、ユーザーは委任者アドレスに関連付けられた報酬の撤回アドレスを設定できます。
 
 ```
 simd tx distribution set-withdraw-addr [withdraw-addr] [flags]
 ```
 
-Example:
+例:
 
 ```
 simd tx distribution set-withdraw-addr cosmos1.. --from cosmos1..
@@ -191,13 +191,13 @@ simd tx distribution set-withdraw-addr cosmos1.. --from cosmos1..
 
 #### withdraw-all-rewards
 
-The `withdraw-all-rewards` command allows users to withdraw all rewards for a delegator.
+`withdraw-all-rewards`コマンドを使用すると、ユーザーは委任者のすべての報酬を引き出すことができます。
 
 ```
 simd tx distribution withdraw-all-rewards [flags]
 ```
 
-Example:
+例:
 
 ```
 simd tx distribution withdraw-all-rewards --from cosmos1..
@@ -205,14 +205,14 @@ simd tx distribution withdraw-all-rewards --from cosmos1..
 
 #### withdraw-rewards
 
-The `withdraw-rewards` command allows users to withdraw all rewards from a given delegation address,
-and optionally withdraw validator commission if the delegation address given is a validator operator and the user proves the `--commision` flag.
+`withdraw-rewards`コマンドを使用すると、ユーザーは特定の委任アドレスからすべての報酬を引き出すことができます。
+また、指定された委任アドレスがバリデーターオペレーターであり、ユーザーが `--commision`フラグを証明した場合は、オプションでバリデーターコミッションを撤回します。
 
 ```
 simd tx distribution withdraw-rewards [validator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```
 simd tx distribution withdraw-rewards cosmosvaloper1.. --from cosmos1.. --commision
@@ -220,13 +220,13 @@ simd tx distribution withdraw-rewards cosmosvaloper1.. --from cosmos1.. --commis
 
 ## gRPC
 
-A user can query the `distribution` module using gRPC endpoints.
+ユーザーは、gRPCエンドポイントを使用して `distribution`モジュールにクエリを実行できます。
 
 ### Params
 
-The `Params` endpoint allows users to query parameters of the `distribution` module.
+`Params`エンドポイントを使用すると、ユーザーは` distribution`モジュールのパラメーターを照会できます。
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -234,7 +234,7 @@ grpcurl -plaintext \
     cosmos.distribution.v1beta1.Query/Params
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -249,9 +249,9 @@ Example Output:
 
 ### ValidatorOutstandingRewards
 
-The `ValidatorOutstandingRewards` endpoint allows users to query rewards of a validator address.
+`ValidatorOutstandingRewards`エンドポイントを使用すると、ユーザーはバリデーターアドレスの報酬を照会できます。
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -260,7 +260,7 @@ grpcurl -plaintext \
     cosmos.distribution.v1beta1.Query/ValidatorOutstandingRewards
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -277,9 +277,9 @@ Example Output:
 
 ### ValidatorCommission
 
-`commission` 命令允许用户按地址查询验证人佣金奖励。 
+`commission`コマンドを使用すると、ユーザーはアドレスで検証者のコミッション報酬を照会できます。 
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -288,7 +288,7 @@ grpcurl -plaintext \
     cosmos.distribution.v1beta1.Query/ValidatorCommission
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -305,9 +305,9 @@ Example Output:
 
 ### ValidatorSlashes
 
-`ValidatorSlashes` 端点允许用户查询验证器的斜线事件。 
+`ValidatorSlashes`エンドポイントを使用すると、ユーザーはバリデーターのスラッシュイベントを照会できます。 
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -316,7 +316,7 @@ grpcurl -plaintext \
     cosmos.distribution.v1beta1.Query/ValidatorSlashes
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -334,9 +334,9 @@ Example Output:
 
 ### DelegationRewards
 
-“DelegationRewards”端点允许用户查询委托产生的总奖励。 
+`DelegationRewards`エンドポイントを使用すると、ユーザーは委任によって生成された報酬の合計を照会できます。 
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -345,7 +345,7 @@ grpcurl -plaintext \
     cosmos.distribution.v1beta1.Query/DelegationRewards
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -360,9 +360,9 @@ Example Output:
 
 ### DelegationTotalRewards
 
-`DelegationTotalRewards` 端点允许用户查询每个验证器累积的总奖励。 
+`DelegationTotalRewards`エンドポイントを使用すると、ユーザーは各バリデーターによって蓄積された報酬の合計を照会できます。。 
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -371,7 +371,7 @@ grpcurl -plaintext \
     cosmos.distribution.v1beta1.Query/DelegationTotalRewards
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -397,9 +397,9 @@ Example Output:
 
 ### DelegatorValidators
 
-`DelegatorValidators` 端点允许用户查询给定委托人的所有验证器。
+`DelegatorValidators`エンドポイントを使用すると、ユーザーは特定のプリンシパルのすべてのバリデーターにクエリを実行できます。
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -408,7 +408,7 @@ grpcurl -plaintext \
     cosmos.distribution.v1beta1.Query/DelegatorValidators
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -420,9 +420,9 @@ Example Output:
 
 ### DelegatorWithdrawAddress
 
-`DelegatorWithdrawAddress` 端点允许用户查询委托人的提现地址。 
+`DelegatorWithdrawAddress`エンドポイントを使用すると、ユーザーはプリンシパルの引き出しアドレスを照会できます。 
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -431,7 +431,7 @@ grpcurl -plaintext \
     cosmos.distribution.v1beta1.Query/DelegatorWithdrawAddress
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -441,9 +441,9 @@ Example Output:
 
 ### CommunityPool
 
-The `CommunityPool` endpoint allows users to query the community pool coins.
+`CommunityPool`エンドポイントを使用すると、ユーザーはコミュニティプールコインを照会できます。
 
-Example:
+例:
 
 ```
 grpcurl -plaintext \
@@ -451,7 +451,7 @@ grpcurl -plaintext \
     cosmos.distribution.v1beta1.Query/CommunityPool
 ```
 
-Example Output:
+出力例:
 
 ```
 {
