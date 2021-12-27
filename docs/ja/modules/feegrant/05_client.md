@@ -1,12 +1,12 @@
-# 客户
+# クライアント
 
-##命令行界面
+## CLI
 
-用户可以使用 CLI 查询“feegrant”模块并与之交互。
+ユーザーは、CLIを使用して `feegrant`モジュールを照会および操作できます。
 
-### 询问
+### query
 
-`query` 命令允许用户查询 `feegrant` 状态。 
+`query`コマンドを使用すると、ユーザーは` feegrant`状態を照会できます。
 
 ```
 simd query feegrant --help
@@ -14,19 +14,19 @@ simd query feegrant --help
 
 #### grant
 
-The `grant` command allows users to query a grant for a given granter-grantee pair.
+`grant`コマンドを使用すると、ユーザーは特定の付与者と付与者のペアの付与を照会できます。
 
 ```
 simd query feegrant grant [granter] [grantee] [flags]
 ```
 
-Example:
+例：
 
 ```
 simd query feegrant grant cosmos1.. cosmos1..
 ```
 
-Example Output:
+出力例：
 
 ```
 allowance:
@@ -41,19 +41,19 @@ granter: cosmos1..
 
 #### grants
 
-`grants` 命令允许用户查询给定受让人的所有授权。 
+`grants`コマンドを使用すると、ユーザーは特定の担当者のすべての承認を照会できます。
 
 ```
 simd query feegrant grants [grantee] [flags]
 ```
 
-Example:
+例：
 
 ```
 simd query feegrant grants cosmos1..
 ```
 
-Example Output:
+出力例：
 
 ```
 allowances:
@@ -72,7 +72,7 @@ pagination:
 
 ### Transactions
 
-`tx` 命令允许用户与 `feegrant` 模块交互。
+`tx`コマンドを使用すると、ユーザーは` feegrant`モジュールを操作できます。
 
 ```
 simd tx feegrant --help
@@ -80,7 +80,7 @@ simd tx feegrant --help
 
 #### grant
 
-`grant` 命令允许用户向另一个帐户授予费用津贴。 费用津贴可以具有到期日期、总支出限额和/或定期支出限额。 
+`grant`コマンドを使用すると、ユーザーは別のアカウントに手数料を付与できます。 手数料手当には、有効期限、合計支出制限、および/または定期的な支出制限を含めることができます。 
 
 ```
 simd tx feegrant grant [granter] [grantee] [flags]
@@ -100,13 +100,13 @@ simd tx feegrant grant cosmos1.. cosmos1.. --period 3600 --period-limit 10stake
 
 #### revoke
 
-`revoke` 命令允许用户撤销授予的费用津贴。
+`revoke`コマンドを使用すると、ユーザーは付与された手数料を取り消すことができます。
 
 ```
 simd tx feegrant revoke [granter] [grantee] [flags]
 ```
 
-Example:
+例：
 
 ```
 simd tx feegrant revoke cosmos1.. cosmos1..
@@ -114,17 +114,17 @@ simd tx feegrant revoke cosmos1.. cosmos1..
 
 ## gRPC
 
-用户可以使用 gRPC 端点查询 `feegrant` 模块。
+ユーザーは、gRPCエンドポイントを使用して `feegrant`モジュールをクエリできます。
 
 ### Allowance
 
-`Allowance` 端点允许用户查询授予的费用津贴。 
+`Allowance`エンドポイントを使用すると、ユーザーは付与された料金の手当を照会できます。 
 
 ```
 cosmos.feegrant.v1beta1.Query/Allowance
 ```
 
-Example:
+例：
 
 ```
 grpcurl -plaintext \
@@ -133,7 +133,7 @@ grpcurl -plaintext \
     cosmos.feegrant.v1beta1.Query/Allowance
 ```
 
-Example Output:
+出力例：
 
 ```
 {
@@ -147,13 +147,13 @@ Example Output:
 
 ### Allowances
 
-The `Allowances` endpoint allows users to query all granted fee allowances for a given grantee.
+`Allowances`エンドポイントを使用すると、ユーザーは、特定の被付与者に対して付与されたすべての手数料の許容値を照会できます。
 
 ```
 cosmos.feegrant.v1beta1.Query/Allowances
 ```
 
-Example:
+例：
 
 ```
 grpcurl -plaintext \
@@ -162,7 +162,7 @@ grpcurl -plaintext \
     cosmos.feegrant.v1beta1.Query/Allowances
 ```
 
-Example Output:
+出力例：
 
 ```
 {

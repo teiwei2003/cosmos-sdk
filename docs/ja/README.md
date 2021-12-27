@@ -43,39 +43,39 @@ footer:
 aside: false
 -->
 
-# Cosmos SDK 文档
+# CosmosSDKドキュメント
 
-## 开始
+## はじめに
 
-- **[Cosmos SDK Intro](./intro/overview.md)**:Cosmos SDK 的高级概述。
-- **[Starport](https://docs.starport.network/)**:Cosmos SDK 的开发人员友好界面，用于在主权和安全的区块链上搭建、启动和维护任何加密应用程序。
-- **[SDK 教程](https://tutorials.cosmos.network/)**:展示如何从头开始构建基于 Cosmos SDK 的区块链的教程，并解释了该过程中的基本 Cosmos SDK 原理。
+- **[Cosmos SDK Intro](./intro/overview.md)**:CosmosSDKの概要。
+- **[Starport](https://docs.starport.network/)**:Cosmos SDKの開発者向けのインターフェイスは、暗号化されたアプリケーションをソブリンで安全なブロックチェーン上で構築、起動、および保守するために使用されます。
+- **[SDK Tutorials](https://tutorials.cosmos.network/)**:Cosmos SDKに基づいてブロックチェーンを最初から構築する方法を示し、その過程でCosmosSDKの基本原則を説明するチュートリアル。
 
-## 参考文档
+## 参考資料
 
-- **[Basics](./basics/)**:Cosmos SDK 的基本概念，包括应用的标准剖析、交易生命周期和账户管理。
-- **[Core](./core/)**:Cosmos SDK 的核心概念，包括`baseapp`、`store` 或`server`。
-- **[Building Modules](./building-modules/)**:模块开发人员的重要概念，如`message`、`keeper`和`querier`。
-- **[IBC](./ibc/)**:IBC 协议集成和概念。
-- **[运行节点、API、CLI](./run-node/)**:如何使用 CLI 和 API 运行节点并与节点交互。
-- **[Migrations](./migrations/)**:更新到新版本 Cosmos SDK 的迁移指南。
+- **[Basics](./basics/)**:アプリケーション標準分析、トランザクションライフサイクル、アカウント管理など、CosmosSDKの基本概念。
+- **[Core](./core/)**:`baseapp`、` store`、または `server`を含むCosmosSDKのコアコンセプト。
+- **[Building Modules](./building-modules/)**:`message`、` keeper`、 `querier`などのモジュール開発者にとって重要な概念。
+- **[IBC](./ibc/)**:IBCプロトコルの統合と概念。
+- **[运行节点、API、CLI](./run-node/)**:ノードを実行し、CLIとAPIを使用してノードと対話する方法。
+- **[Migrations](./migrations/)**:CosmosSDKの新しいバージョンに更新するための移行ガイド。
 
-## 其他资源
+## その他のリソース
 
-- **[模块目录](../x/)**:Cosmos SDK 模块实现及其各自的文档。
-- **[Specifications](./spec/)**:Cosmos SDK 的模块和其他部分的规范。
-- **[Cosmos SDK API 参考](https://godoc.org/github.com/cosmos/cosmos-sdk)**:Cosmos SDK 的 Godocs。
-- **[REST 和 RPC 端点](https://cosmos.network/rpc/)**:与`gaia` 全节点交互的端点列表。
-- **[Rosetta API](./run-node/rosetta.md)**:Rosetta API 集成。
+- **[Module Directory](../x/)**:CosmosSDKモジュールの実装とそれぞれのドキュメント。
+- **[Specifications](./spec/)**:CosmosSDKのモジュールおよびその他の部分の仕様。
+- **[Cosmos SDK API 参照](https://godoc.org/github.com/cosmos/cosmos-sdk)**:CosmosSDKのGodocs。
+- **[RESTとRPCエンドポイント](https://cosmos.network/rpc/)**:`gaia`フルノードと対話するエンドポイントのリスト。
+- **[Rosetta API](./run-node/rosetta.md)**:RosettaAPI統合。
 
-## Cosmos Hub
+## コスモスハブ
 
-Cosmos Hub (`gaia`) 文档已移至 [github.com/cosmos/gaia](https://github.com/cosmos/gaia/tree/master/docs)。
+Cosmos Hub（ `gaia`）のドキュメントは[github.com/cosmos/gaia]（https://github.com/cosmos/gaia/tree/master/docs）に移動しました。
 
-## 开发语言
+## 言語
 
-Cosmos SDK 是用 [Golang](https://golang.org/) 编写的，尽管该框架可以用其他语言类似地实现。联系我们以获取有关为另一种语言的实施提供资金的信息。
+Cosmos SDKは[Golang]（https://golang.org/）で記述されていますが、フレームワークは他の言語でも同様に実装できます。 別の言語での実装への資金提供については、お問い合わせください。
 
-## 贡献
+## 貢献する
 
-有关构建过程的详细信息和进行更改时的注意事项，请参阅 [DOCS_README.md](https://github.com/cosmos/cosmos-sdk/blob/master/docs/DOCS_README.md)。 
+ビルドプロセスの詳細と変更を行う際の考慮事項については、[DOCS_README.md]（https://github.com/cosmos/cosmos-sdk/blob/master/docs/DOCS_README.md）を参照してください。

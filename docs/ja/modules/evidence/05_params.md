@@ -1,3 +1,3 @@
-# Parameters
+# パラメーター
 
-The evidence module does not contain any parameters.
+エビデンスモジュールにはパラメータが含まれていません。

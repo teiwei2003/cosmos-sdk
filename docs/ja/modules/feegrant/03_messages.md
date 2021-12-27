@@ -1,13 +1,13 @@
-# 消息
+# メッセージ
 
-## 消息/GrantAllowance
+## メッセージ/グラントアローワンス
 
-将使用 `MsgGrantAllowance` 消息创建费用补贴。
+手数料手当の助成金は、 `MsgGrantAllowance`メッセージで作成されます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/691032b8be0f7539ec99f8882caecefc51f33d1f/proto/cosmos/feegrant/v1beta1/tx.proto#L22-L33
 
-## 消息/撤销Allowance
+## Msg / RevokeAllowance
 
-可以使用 `MsgRevokeAllowance` 消息删除允许的授予费用津贴。
+許可された付与料の手当は、 `MsgRevokeAllowance`メッセージで削除できます。
 
-+++ https://github.com/cosmos/cosmos-sdk/blob/691032b8be0f7539ec99f8882caecefc51f33d1f/proto/cosmos/feegrant/v1beta1/tx.proto#L38-L45 
++++ https://github.com/cosmos/cosmos-sdk/blob/691032b8be0f7539ec99f8882caecefc51f33d1f/proto/cosmos/feegrant/v1beta1/tx.proto#L38-L45

@@ -1,12 +1,12 @@
-# 客户
+# クライアント
 
-##命令行界面
+## CLI
 
-用户可以使用 CLI 查询“证据”模块并与之交互。
+ユーザーは、CLIを使用して `evidence`モジュールを照会および操作できます。
 
-### 询问
+### Query
 
-`query` 命令允许用户查询 `evidence` 状态。 
+`query`コマンドを使用すると、ユーザーは`evidence`状態を照会できます。 
 
 ```bash
 simd query evidence --help
@@ -14,7 +14,7 @@ simd query evidence --help
 
 ### evidence
 
-`evidence` 命令允许用户通过哈希列出所有证据或证据。 
+`evidence`コマンドを使用すると、ユーザーはすべての証拠または証拠をハッシュで一覧表示できます。 
 
 Usage:
 
@@ -22,15 +22,15 @@ Usage:
 simd query evidence [flags]
 ```
 
-To query evidence by hash
+ハッシュで証拠を照会するには
 
-Example:
+例:
 
 ```bash
 simd query evidence "DF0C23E8634E480F84B9D5674A7CDC9816466DEC28A3358F73260F68D28D7660"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 evidence:
@@ -40,15 +40,15 @@ evidence:
   time: "2021-10-20T16:08:38.194017624Z"
 ```
 
-To get all evidence
+すべての証拠を入手するには
 
-Example:
+例:
 
 ```bash
 simd query evidence
 ```
 
-Example Output:
+出力例:
 
 ```bash
 evidence:
@@ -61,25 +61,25 @@ pagination:
   total: "1"
 ```
 
-## REST
+ ## 休み
 
-A user can query the `evidence` module using REST endpoints.
+ユーザーは、RESTエンドポイントを使用して`evidence`モジュールを照会できます。
 
-### Evidence
+### 証拠
 
-Get evidence by hash
+ハッシュで証拠を取得する
 
 ```bash
 /cosmos/evidence/v1beta1/evidence/{evidence_hash}
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET "http://localhost:1317/cosmos/evidence/v1beta1/evidence/DF0C23E8634E480F84B9D5674A7CDC9816466DEC28A3358F73260F68D28D7660"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -92,21 +92,21 @@ Example Output:
 }
 ```
 
-### All evidence
+### すべての証拠
 
-Get all evidence
+すべての証拠を入手する
 
 ```bash
 /cosmos/evidence/v1beta1/evidence
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET "http://localhost:1317/cosmos/evidence/v1beta1/evidence"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -126,23 +126,22 @@ Example Output:
 
 ## gRPC
 
-A user can query the `evidence` module using gRPC endpoints.
+ユーザーは、gRPCエンドポイントを使用して `evidence`モジュールをクエリできます。
 
-### Evidence
+### 証拠
 
-Get evidence by hash
-
+ハッシュで証拠を取得する
 ```bash
 cosmos.evidence.v1beta1.Query/Evidence
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext -d '{"evidence_hash":"DF0C23E8634E480F84B9D5674A7CDC9816466DEC28A3358F73260F68D28D7660"}' localhost:9090 cosmos.evidence.v1beta1.Query/Evidence
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -155,21 +154,21 @@ Example Output:
 }
 ```
 
-### All evidence
+### すべての証拠
 
-Get all evidence
+すべての証拠を入手する
 
 ```bash
 cosmos.evidence.v1beta1.Query/AllEvidence
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext localhost:9090 cosmos.evidence.v1beta1.Query/AllEvidence
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {

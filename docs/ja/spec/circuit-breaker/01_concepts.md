@@ -1,16 +1,16 @@
-# Concepts
+# コンセプト
 
-The intention of the circuit breaker is to have a contingency plan for a
-running network which maintains network liveness. This can be achieved through
-selectively "pausing" functionality of specific modules on a running network.
-The circuit breaker is intended to be enabled through either:
+サーキットブレーカの目的は、緊急時対応計画を立てることです。
+ネットワークの活性を維持する実行中のネットワーク。 これは、
+実行中のネットワーク上の特定のモジュールの機能を選択的に「一時停止」します。
+回路ブレーカーは、次のいずれかの方法で有効にすることを目的としています。
 
-- governance
-- for emergencies a special subset of accounts selected by the state machine
-- a transaction which proves the expected behaviour is broken
+- ガバナンス
+- 緊急事態の場合、ステートマシンによって選択されたアカウントの特別なサブセット
+- 期待される動作が壊れていることを証明するトランザクション
 
-## Pause state
+## 一時停止状態
 
-The basic pause state of any module simply disables all message routes to
-that module. Beyond that, it may be a appropriate for different modules to
-process begin-block/end-block in an altered "safe" way.
+モジュールの基本的な一時停止状態は、へのすべてのメッセージルートを無効にするだけです。
+そのモジュール。 それを超えて、それは異なるモジュールがするのに適切かもしれません
+変更された「安全な」方法でbegin-block/end-blockを処理します。

@@ -1,7 +1,7 @@
-# 状态
+# 状態
 
-目前，`x/evidence` 模块只存储有效提交的 `Evidence` 状态。
-证据状态也存储和导出在 `x/evidence` 模块的 `GenesisState` 中。
+現在、 `x/evidence`モジュールは有効な送信済み`Evidence`のみを状態で保存します。
+エビデンス状態は、 `x/evidence`モジュールの`GenesisState`にも保存およびエクスポートされます。
 
 ```protobuf
 // GenesisState defines the evidence module's genesis state.
@@ -12,4 +12,4 @@ message GenesisState {
 
 ```
 
-所有“证据”都通过前缀“KVStore”使用前缀“0x00”(“KeyPrefixEvidence”)检索和存储。 
+すべての `Evidence`は、プレフィックス`0x00`（`KeyPrefixEvidence`）を使用してプレフィックス`KVStore`を介して取得および保存されます。

@@ -1,62 +1,62 @@
-# Specification of Specifications
+# 仕様の仕様
 
-This file intends to outline the common structure for specifications within
-this directory.
+このファイルは、内の仕様の一般的な構造を概説することを目的としています。
+このディレクトリ。
 
-## Tense
+## 時制
 
-For consistency, specs should be written in passive present tense.
+一貫性を保つために、仕様は受動的な現在形で記述する必要があります。
 
-## Pseudo-Code
+## 擬似コード
 
-Generally, pseudo-code should be minimized throughout the spec. Often, simple
-bulleted-lists which describe a function's operations are sufficient and should
-be considered preferable. In certain instances, due to the complex nature of
-the functionality being described pseudo-code may the most suitable form of
-specification. In these cases use of pseudo-code is permissible, but should be
-presented in a concise manner, ideally restricted to only the complex
-element as a part of a larger description.
+一般に、擬似コードは仕様全体で最小化する必要があります。多くの場合、単純です
+関数の操作を説明する箇条書きリストで十分であり、
+望ましいと考えられます。場合によっては、
+擬似コードで説明されている機能は、次の最も適切な形式である可能性があります。
+仕様。このような場合、擬似コードの使用は許可されますが、
+簡潔な方法で提示され、理想的には複合体のみに制限されます
+より大きな説明の一部としての要素。
 
-## Common Layout
+## 一般的なレイアウト
 
-The following generalized file structure should be used to breakdown
-specifications for modules. With the exception of README.md, `XX` at the
-beginning of the file name should be replaced with a number to indicate
-document flow (ex. read `01_state.md` before `02_state_transitions.md`). The
-following list is nonbinding and all files are optional.
+次の一般化されたファイル構造を使用して分類する必要があります
+モジュールの仕様。 README.mdを除いて、
+ファイル名の先頭は、示すために数字に置き換える必要があります
+ドキュメントフロー(例： `02_state_transitions.md`の前に` 01_state.md`を読み取ります)。 The
+次のリストは拘束力がなく、すべてのファイルはオプションです。
 
-- `README.md` - overview of the module
-- `XX_concepts.md` - describe specialized concepts and definitions used throughout the spec
-- `XX_state.md` - specify and describe structures expected to marshalled into the store, and their keys
-- `XX_state_transitions.md` - standard state transition operations triggered by hooks, messages, etc.
-- `XX_messages.md` - specify message structure(s) and expected state machine behaviour(s)
-- `XX_begin_block.md` - specify any begin-block operations
-- `XX_end_block.md` - specify any end-block operations
-- `XX_hooks.md` - describe available hooks to be called by/from this module
-- `XX_events.md` - list and describe event tags used
-- `XX_client.md` - list and describe CLI commands and gRPC and REST endpoints
-- `XX_params.md` - list all module parameters, their types (in JSON) and examples
-- `XX_future_improvements.md` - describe future improvements of this module
-- `XX_tests.md` - acceptance tests
-- `XX_appendix.md` - supplementary details referenced elsewhere within the spec
+- `README.md` - モジュールの概要
+- `XX_concepts.md` - 仕様全体で使用される特殊な概念と定義を説明する
+- `XX_state.md` - ストアにマーシャリングされると予想される構造とそのキーを指定して説明します
+- `XX_state_transitions.md` - フック、メッセージなどによってトリガーされる標準の状態遷移操作。
+- `XX_messages.md` - メッセージ構造と予想されるステートマシンの動作を指定します
+- `XX_begin_block.md` - ブロック開始操作を指定します
+- `XX_end_block.md` - エンドブロック操作を指定します
+- `XX_hooks.md` - このモジュールによって/から呼び出される利用可能なフックを記述します
+- `XX_events.md` - 使用されるイベントタグを一覧表示して説明する
+- `XX_client.md` - CLIコマンドとgRPCおよびRESTエンドポイントのリストと説明
+- `XX_params.md` - すべてのモジュールパラメーター、それらのタイプ(JSON）および例を一覧表示します
+- `XX_future_improvements.md` - このモジュールの将来の改善について説明する
+- `XX_tests.md` - 受け入れテスト
+- `XX_appendix.md` - 仕様内の他の場所で参照されている補足の詳細
 
-### Notation for key-value mapping
+### Key-Valueマッピングの表記
 
-Within `state.md` the following notation `->` should be used to describe key to
-value mapping:
+`state.md`内では、次の表記`-> `を使用してキーを記述します。
+バリューマッピング：
 
 ```
 key -> value
 ```
 
-to represent byte concatenation the `|` may be used. In addition, encoding
-type may be specified, for example:
+バイト連結を表すために、 `|`を使用できます。 さらに、エンコーディング
+タイプを指定できます。次に例を示します。
 
 ```
 0x00 | addressBytes | address2Bytes -> amino(value_object)
 ```
 
-Additionally, index mappings may be specified by mapping to the `nil` value, for example:
+さらに、インデックスマッピングは、次のように `nil`値にマッピングすることで指定できます。
 
 ```
 0x01 | address2Bytes | addressBytes -> nil
