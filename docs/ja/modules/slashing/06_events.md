@@ -1,6 +1,7 @@
-# 事件
+# イベント
 
-slashing 模块发出以下事件: 
+スラッシュモジュールは、次のイベントを発行します。 
+
 ## MsgServer
 
 ### MsgUnjail
@@ -32,7 +33,7 @@ slashing 模块发出以下事件:
 
 ### Slash
 
-+ same as `"slash"` event from `HandleValidatorSignature`, but without the `jailed` attribute.
++ `HandleValidatorSignature`の` "slash"`イベントと同じですが、`jailed`属性はありません
 
 ### Jail
 

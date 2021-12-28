@@ -1,56 +1,56 @@
-# 链升级指南到 v0.44
+# v0.44へのチェーンアップグレードガイド
 
-本文档提供了从 v0.42 到 v0.44 的链式升级指南以及使用“simapp”的升级过程示例。 {概要}
+このドキュメントは、v0.42からv0.44へのチェーンアップグレードガイドと、「simapp」を使用したアップグレードプロセスの例を提供します。 {まとめ}
 
-::: 小费
-在升级到 v0.44 之前，您必须升级到 Stargate v0.42。如果您还没有这样做，请参阅[链升级指南到 v0.42](/v0.42/migrations/chain-upgrade-guide-040.html)。请注意，v0.43 发布后不久就停产了，所有链应直接从 v0.42 升级到 v0.44。
+::: ヒント
+v0.44にアップグレードする前に、Stargatev0.42にアップグレードする必要があります。 まだ行っていない場合は、[v0.42へのチェーンアップグレードガイド](/v0.42/migrations/chain-upgrade-guide-040.html)を参照してください。 v0.43はリリース直後に廃止され、すべてのチェーンをv0.42からv0.44に直接アップグレードする必要があることに注意してください。
 :::
 
-## 先决条件阅读
+## 前提条件の読書
 
-- [升级模块](../building-modules/upgrade.html) {prereq}
-- [就地存储迁移](../core/upgrade.html) {prereq}
+- [アップグレードモジュール](../building-modules/upgrade.html) {prereq}
+- [インプレースストレージ移行](../core/upgrade.html) {prereq}
 - [Cosmovisor](../run-node/cosmovisor.html) {prereq}
 
-Cosmos SDK v0.44 引入了一种处理链升级的新方法，不再需要将状态导出到 JSON，进行必要的更改，然后使用修改后的 JSON 作为新的创世文件创建新链。
+Cosmos SDK v0.44では、チェーンのアップグレードを処理するための新しい方法が導入されています。状態をJSONにエクスポートし、必要な変更を加えてから、変更したJSONを新しいジェネシスファイルとして使用して新しいチェーンを作成する必要がなくなりました。
 
-Cosmos SDK 的 IBC 模块已移至 v0.42 及更高版本的[自己的存储库](https://github.com/cosmos/ibc-go)。如果您正在使用 IBC，请确保还通过 [IBC 迁移文档](https://github.com/cosmos/ibc-go/blob/main/docs/migrations/ibc-migration-043.md)。
+Cosmos SDKのIBCモジュールは、v0.42以降の[独自のリポジトリ](https://github.com/cosmos/ibc-go)に移動されました。 IBCを使用している場合は、[IBC移行ドキュメント](https://github.com/cosmos/ibc-go/blob/main/docs/migrations/ibc-migration-043.md)も必ず渡してください。
 
-升级二进制文件将读取现有数据库并执行就地存储迁移，而不是启动新链。这种处理链升级的新方法可以与 [Cosmovisor](../run-node/cosmovisor.html) 一起使用，使升级过程无缝。
+アップグレードバイナリは、新しいチェーンを開始する代わりに、既存のデータベースを読み取り、インプレースストレージ移行を実行します。 チェーンのアップグレードを処理するこの新しい方法は、[Cosmovisor](../run-node/cosmovisor.html)で使用して、アップグレードプロセスをシームレスにすることができます。
 
-## 就地存储迁移
+## インプレースストレージ移行
 
-我们建议使用 [In-Place Store Migrations](../core/upgrade.html) 将您的链从 v0.42 升级到 v0.44。第一步是确保您的所有模块都遵循 [模块升级指南](../building-modules/upgrade.html)。第二步是向`app.go`添加一个[升级处理程序](../core/upgrade.html#running-migrations)。
+[In-Place Store Migrations](../core/upgrade.html)を使用して、チェーンをv0.42からv0.44にアップグレードすることをお勧めします。 最初のステップは、すべてのモジュールが[モジュールアップグレードガイド](../building-modules/upgrade.html)に従っていることを確認することです。 2番目のステップは、[アップグレードハンドラー](../core/upgrade.html＃running-migrations)を `app.go`に追加することです。
 
-在本文档中，我们将首次提供一个示例，说明链升级模块版本的升级处理程序的样子。需要注意的是，每个模块的初始共识版本必须设置为“1”而不是“0”，否则升级处理程序将重新初始化每个模块。
+このドキュメントでは、チェーンアップグレードモジュールバージョンのアップグレードハンドラーがどのように見えるかを示すために、初めて例を提供します。 各モジュールの初期コンセンサスバージョンは、「0」ではなく「1」に設定する必要があることに注意してください。設定しないと、アップグレードハンドラが各モジュールを再初期化します。
 
-除了迁移现有模块之外，升级处理程序还为新模块执行存储升级。在下面的示例中，我们将为 v0.44 中提供的两个新模块添加存储迁移:`x/authz` 和 `x/feegrant`。
+アップグレードハンドラーは、既存のモジュールの移行に加えて、新しいモジュールのストレージアップグレードも実行します。 以下の例では、v0.44で提供される2つの新しいモジュール `x/authz`と` x/feegrant`にストレージの移行を追加します。
 
-## 使用 Cosmovisor
+## Cosmovisorを使用する
 
-我们建议验证器使用 [Cosmovisor](../run-node/cosmovisor.html)，这是一个用于运行应用程序二进制文件的进程管理器。出于安全原因，我们建议验证器构建自己的升级二进制文件，而不是启用自动下载选项。如果必要的安全保证到位(即，可下载升级二进制文件的升级建议中提供的 URL 包括正确的校验和)，验证者仍然可以选择使用自动下载选项。
+バリデーターは、アプリケーションのバイナリファイルを実行するためのプロセスマネージャーである[Cosmovisor](../run-node/cosmovisor.html)を使用することをお勧めします。 セキュリティ上の理由から、自動ダウンロードオプションを有効にするのではなく、バリデーターが独自のアップグレードバイナリを構築することをお勧めします。 必要なセキュリティ保証が設定されている場合(つまり、ダウンロード可能なアップグレードバイナリのアップグレード推奨で提供されるURLに正しいチェックサムが含まれている場合)、検証者は自動ダウンロードオプションの使用を選択できます。
 
-::: 小费
-如果验证者想要启用自动下载选项，并且他们当前正在使用 Cosmos SDK `v0.42` 运行应用程序，他们将需要使用 Cosmovisor [`v0.1`](https://github.com/ cosmos/cosmos-sdk/releases/tag/cosmovisor%2Fv0.1.0)。如果启用了自动下载选项，更高版本的 Cosmovisor 不支持 Cosmos SDK `v0.42` 或更早版本。 
+::: ヒント
+バリデーターが自動ダウンロードオプションを有効にし、現在Cosmos SDK `v0.42`を使用してアプリケーションを実行している場合は、Cosmovisor [` v0.1`](https://github.com)を使用する必要があります。/cosmos/cosmos-sdk/releases/tag/cosmovisor%2Fv0.1.0)。 自動ダウンロードオプションが有効になっている場合、Cosmovisorの新しいバージョンはCosmos SDK`v0.42`以前のバージョンをサポートしません。 
 :::
 
-验证者可以使用自动重启选项来防止升级过程中出现不必要的停机。一旦链在建议的升级高度停止，自动重启选项将使用升级二进制文件自动重启链。使用自动重启选项，验证者可以提前准备升级二进制文件，然后在升级时放松。
+検証者は、自動再起動オプションを使用して、アップグレードプロセス中の不要なダウンタイムを防ぐことができます。 チェーンが推奨されるアップグレードの高さで停止すると、自動再起動オプションは、アップグレードバイナリファイルを使用してチェーンを自動的に再起動します。 自動再起動オプションを使用すると、ベリファイアはアップグレードバイナリファイルを事前に準備し、アップグレード中にリラックスできます。
 
-## 迁移 app.toml
+## app.tomlを移行します
 
-随着对 `v0.44` 的更新，新的服务器配置选项已添加到 `app.toml`。更新包括 Rosetta 和 gRPC Web 的新配置部分以及状态同步的新配置选项。查看最新版本的默认 [`app.toml`](https://github.com/cosmos/cosmos-sdk/blob/release/v0.44.x/server/config/toml.go) 文件`v0.44` 了解更多信息。
+`v0.44`のアップデートにより、新しいサーバー構成オプションが` app.toml`に追加されました。 このアップデートには、RosettaおよびgRPC Webの新しい構成セクションと、状態同期の新しい構成オプションが含まれています。 デフォルトの[`app.toml`](https://github.com/cosmos/cosmos-sdk/blob/release/v0.44.x/server/config/toml.go)ファイル` v0の最新バージョンを表示する.44`詳細。
 
-## 示例:Simapp 升级
+## 例：Simappのアップグレード
 
 以下示例将使用“simapp”作为我们的区块链应用程序来完成升级过程。我们将把 `simapp` 从 v0.42 升级到 v0.44。我们将自己构建升级二进制文件并启用自动重启选项。
 
-::: 小费
-在下面的例子中，我们从 `v0.42` 开始一个新链。此版本的二进制文件将是创世二进制文件。对于第一次在现有链上使用 Cosmovisor 的验证者，要么将链当前版本的二进制文件用作创世二进制文件(即起始二进制文件)，要么验证器应更新“当前”符号链接以指向升级目录。有关详细信息，请参阅 [Cosmovisor](../run-node/cosmovisor.html)。
+::: ヒント
+以下の例では、 `v0.42`から新しいチェーンを開始します。 このバージョンのバイナリファイルは、ジェネシスバイナリファイルになります。 既存のチェーンでCosmovisorを初めて使用する検証者は、チェーンの現在のバージョンのバイナリファイルをジェネシスバイナリファイル(つまり、開始バイナリファイル)として使用するか、検証者が「現在の」シンボリックリンクを更新する必要があります。アップグレードコンテンツをポイントします。 詳しくは、[Cosmovisor](../run-node/cosmovisor.html)をご覧ください。
 :::
 
-### 初始设置
+### デフォルト設定
 
-从 `cosmos-sdk` 存储库中，查看最新的 `v0.42.x` 版本: 
+`cosmos-sdk`リポジトリから、最新の` v0.42.x`バージョンを確認します。
 
 ```
 git checkout release/v0.42.x
@@ -108,9 +108,9 @@ Create a new key for the validator, then add a genesis account and transaction:
 ./build/simd collect-gentxs
 ```
 
-现在我们的节点已经初始化，我们准备开始一个新的 `simapp` 链，让我们设置 `cosmovisor` 和 genesis 二进制文件。
+ノードが初期化されたので、新しい `simapp`チェーンを開始する準備ができました。次に、` cosmovisor`とジェネシスバイナリを設定しましょう。
 
-### Cosmovisor 设置
+### コスモバイザー設定
 
 安装 `cosmovisor` 二进制文件: 
 
@@ -118,11 +118,11 @@ Create a new key for the validator, then add a genesis account and transaction:
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v0.1.0
 ```
 
-::: 小费
-如果你使用的是 go `v1.15` 或更早版本，你需要把 `cosmos-sdk` 目录改出，运行 `go get` 而不是 `go install`，然后再改回 `cosmos-sdk ` 存储库。
+::: ヒント
+go `v1.15`以前を使用している場合は、` cosmos-sdk`ディレクトリを変更し、 `goinstall`の代わりに` go get`を実行してから、 `cosmos-sdk`ストレージライブラリに戻す必要があります。
 :::
 
-设置所需的环境变量: 
+必要な環境変数を設定します。
 
 ```
 export DAEMON_NAME=simd
@@ -135,14 +135,14 @@ Set the optional environment variable to trigger an automatic restart:
 export DAEMON_RESTART_AFTER_UPGRADE=true
 ```
 
-为 genesis 二进制文件创建文件夹并复制 `v0.42.x` 二进制文件:
+ジェネシスバイナリファイル用のフォルダを作成し、 `v0.42.x`バイナリファイルをコピーします。
 
 ```
 mkdir -p $DAEMON_HOME/cosmovisor/genesis/bin
 cp ./build/simd $DAEMON_HOME/cosmovisor/genesis/bin
 ```
 
-现在已经安装了 `cosmovisor` 并添加了 genesis 二进制文件，让我们将升级处理程序添加到 `simapp/app.go` 并准备升级二进制文件。
+`cosmovisor`がインストールされ、ジェネシスバイナリファイルが追加されたので、アップグレードハンドラーを` simapp/app.go`に追加して、バイナリファイルをアップグレードする準備をしましょう。
 
 ### Chain Upgrade
 
@@ -160,13 +160,13 @@ Add the following to `simapp/app.go` inside `NewSimApp` and after `app.UpgradeKe
 	app.registerUpgradeHandlers()
 ```
 
-将以下内容添加到 `NewSimApp` 之后的 `simapp/app.go`(要了解有关升级处理程序的更多信息，请参阅 [In-Place Store Migrations](../core/upgrade.html)): 
+`NewSimApp`の後に` simapp/app.go`に以下を追加します(アップグレードハンドラーの詳細については、[In-Place Store Migrations](../core/upgrade.html)を参照してください)。
 
 ```go
 func (app *SimApp) registerUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler("v0.44", func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
-		// 1st-time running in-store migrations, using 1 as fromVersion to
-		// avoid running InitGenesis.
+		//1st-time running in-store migrations, using 1 as fromVersion to
+		//avoid running InitGenesis.
 		fromVM := map[string]uint64{
 			"auth":         1,
 			"bank":         1,
@@ -199,7 +199,7 @@ func (app *SimApp) registerUpgradeHandlers() {
 			Added: []string{"authz", "feegrant"},
 		}
 
-		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		//configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
 }
@@ -217,14 +217,14 @@ Build the `simd` binary for `v0.44.x` (the upgrade binary):
 make build
 ```
 
-为升级二进制文件创建文件夹并复制 `v0.44.x` 二进制文件: 
+アップグレードバイナリファイル用のフォルダを作成し、 `v0.44.x`バイナリファイルをコピーします。 
 
 ```
 mkdir -p $DAEMON_HOME/cosmovisor/upgrades/v0.44/bin
 cp ./build/simd $DAEMON_HOME/cosmovisor/upgrades/v0.44/bin
 ```
 
-现在我们已经添加了升级处理程序并准备了升级二进制文件，我们准备启动 `cosmovisor` 并模拟升级建议过程。
+アップグレードハンドラーを追加し、アップグレードバイナリを準備したので、 `cosmovisor`を起動して、アップグレード提案プロセスをシミュレートする準備が整いました。
 ### Upgrade Proposal
 
 Start the node using `cosmovisor`:
@@ -233,7 +233,7 @@ Start the node using `cosmovisor`:
 cosmovisor start
 ```
 
-打开一个新的终端窗口并提交升级建议以及存款和投票(这些命令必须在 20 秒内运行): 
+新しいターミナルウィンドウを開き、アップグレードの提案とデポジットと投票を送信します(これらのコマンドは20秒以内に実行する必要があります)。
 
 ```
 ./build/simd tx gov submit-proposal software-upgrade v0.44 --title upgrade --description upgrade --upgrade-height 20 --from validator --yes
@@ -241,4 +241,4 @@ cosmovisor start
 ./build/simd tx gov vote 1 yes --from validator --yes
 ```
 
-确认链在高度 20 自动升级。 
+チェーンが高さ20で自動的にアップグレードされることを確認します。 

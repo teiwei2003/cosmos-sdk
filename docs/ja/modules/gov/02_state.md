@@ -1,25 +1,14 @@
-# 状态
+# 状態
 
 ## 提案
 
-`Proposal` 对象用于统计投票并通常跟踪提案的状态。
-它们包含治理模块将尝试的任意 `sdk.Msg` 数组
-如果提案通过，则解决然后执行。 “提案”由一个标识
-唯一 id 并包含一系列时间戳:`submit_time`、`deposit_end_time`、
-`voting_start_time`, `voting_end_time` 跟踪提案的生命周期
+`Proposal`オブジェクトは、投票を集計し、一般的に提案の状態を追跡するために使用されます。
+これらには、ガバナンスモジュールが解決を試み、提案が通過した場合に実行しようとする任意の `sdk.Msg`の配列が含まれています。 `プロポーザル`は一意のIDで識別され、一連のタイムスタンプが含まれます： `submit_time`、` deposit_end_time`、 `voting_start_time`、` voting_end_time`プロポーザルのライフサイクルを追跡します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/4a129832eb16f37a89e97652a669f0cdc9196ca9/proto/cosmos/gov/v1beta2/gov.proto#L42-L52
 
-一个提案通常需要的不仅仅是一组消息来解释它的
-目的但需要一些更大的理由并为感兴趣的参与者提供一种手段
-讨论和辩论该提案。在大多数情况下，鼓励有一个链下
-支持链上治理过程的系统。为了适应这种情况，一个
-提案包含一个特殊的“元数据”字段，一个字节数组，可用于
-为提案添加上下文。 `metadata` 字段允许自定义使用网络，但是，
-预计该字段包含 URL 或使用系统的某种形式的 CID，例如
-[IPFS](https://docs.ipfs.io/concepts/content-addressing/)。为了支持的情况
-跨网络的互操作性，SDK 建议“元数据”代表
-以下`JSON`模板: 
+提案は通常、その目的を説明するための一連のメッセージ以上のものを必要としますが、より大きな正当化が必要であり、関心のある参加者が提案について話し合い、議論するための手段を可能にします。 ほとんどの場合、オンチェーンガバナンスプロセスをサポートするオフチェーンシステムを使用することをお勧めします。 これに対応するために、プロポーザルには、プロポーザルにコンテキストを追加するために使用できるバイトの配列である特別な「メタデータ」フィールドが含まれています。 `metadata`フィールドはネットワークのカスタム使用を許可しますが、フィールドには[IPFS]（https://docs.ipfs.io/concepts/content-などのシステムを使用するURLまたは何らかの形式のCIDが含まれていることが期待されます。 アドレッシング/）。
+ネットワーク間の相互運用性のケースをサポートするために、SDKは `metadata`が次の` JSON`テンプレートを表すことを推奨しています。
 
 ```json
 {
@@ -30,30 +19,23 @@
 }
 ```
 
-这使得客户端更容易支持多个网络。
+これにより、クライアントが複数のネットワークをサポートするのがはるかに簡単になります。
 
-### 编写一个使用治理的模块
+### ガバナンスを使用するモジュールの作成
 
-链或您可能想要的单个模块的许多方面
-使用治理来执行例如更改各种参数。这很简单
-去做。首先，写出你的消息类型和 `MsgServer` 实现。添加一个
-`authority` 字段给 keeper ，它将在构造函数中填充
-治理模块帐户:`govKeeper.GetGovernanceAccount().GetAddress()`。那么对于
-`msg_server.go` 中的方法，对签名者发送的消息执行检查
-匹配“权威”。这将阻止任何用户执行该消息。
+チェーン、またはさまざまなパラメーターの変更など、ガバナンスを使用して実行する必要がある個々のモジュールには、多くの側面があります。 これは非常に簡単です。 まず、メッセージタイプと `MsgServer`の実装を書き出します。 コンストラクターに入力されるキーパーに `authority`フィールドを追加します。
+ガバナンスモジュールアカウント： `govKeeper.GetGovernanceAccount().GetAddress()`。
+次に、 `msg_server.go`のメソッドについて、署名者が`authority`と一致するというメッセージのチェックを実行します。 これにより、ユーザーはそのメッセージを実行できなくなります。
 
-## 参数和基本类型
+## パラメータと基本タイプ
 
-`Parameters` 定义了运行投票的规则。只能有
-是任何给定时间的一个活动参数集。如果治理想要改变一个
-参数集，用于修改值或添加/删除参数字段，一个新的
-必须创建参数集并且前一个被渲染为非活动状态。
+`Parameters`は、投票が実行されるルールを定義します。できるのは任意の時点で1つのアクティブなパラメータセットである。ガバナンスが変更したい場合、値を変更するか、パラメータフィールドを追加/削除するためのパラメータセット、新しいパラメータセットを作成し、前のパラメータセットを非アクティブにする必要があります。
 
-### 存款参数
+### DepositParams
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/gov.proto#L127-L145
 
-### 投票参数
+### VotingParams
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/gov.proto#L147-L156
 
@@ -61,9 +43,9 @@
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/gov.proto#L158-L183
 
-参数存储在全局`GlobalParams` KVStore 中。
+パラメータはグローバルな`GlobalParams`KVStoreに保存されます。
 
-此外，我们还介绍了一些基本类型: 
+さらに、いくつかの基本的なタイプを紹介します。 
 
 ```go
 type Vote byte
@@ -95,13 +77,13 @@ const (
 )
 ```
 
-## Deposit
+## 保証金
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/gov.proto#L43-L53
 
 ## ValidatorGovInfo
 
-This type is used in a temp map when tallying
+このタイプは、集計時に一時マップで使用されます
 
 ```go
   type ValidatorGovInfo struct {
@@ -110,36 +92,24 @@ This type is used in a temp map when tallying
   }
 ```
 
-## 存储
+##　ストア
 
-_Stores 是 multi-store 中的 KVStores。找存储的关键是第一
-列表中的参数_`
+_Storesは、マルチストア内のKVStoresです。 ストアを見つけるための鍵は、list_`の最初のパラメーターです。1つのKVStore `Governance`を使用して、2つのマッピングを保存します。
 
-我们将使用一个 KVStore `Governance` 来存储两个映射:
+- `proposalID | 'proposal'`から `Proposal`へのマッピング。
+- `proposalID | 'addresses' | address`から `Vote`へのマッピング。 このマッピングにより、 `proposalID：addresses`で範囲クエリを実行することにより、提案に投票したすべてのアドレスとその投票をクエリできます。擬似コードの目的で、ストアでの読み取りまたは書き込みに使用する2つの関数を次に示します。
 
-- 从 `proposalID|'proposal'` 到 `Proposal` 的映射。
-- 从 `proposalID|'addresses'|address` 到 `Vote` 的映射。这种映射允许
-  我们查询所有对该提案进行投票的地址以及他们的投票
-  对 `proposalID:addresses` 进行范围查询。
+- ` load（StoreKey、Key） `：マルチストアのキー` StoreKey`にあるストアのキー `Key`に保存されているアイテムを取得します
+- `store（StoreKey、Key、value） `：マルチストアのキー` StoreKey`にあるストアのキー `Key`に値` Value`を書き込みます
 
-出于伪代码的目的，以下是我们将用于在存储中读取或写入的两个函数:
+## 提案処理キュー
 
-- `load(StoreKey, Key)`:检索存储在多存储中键`StoreKey`的存储中存储在键`Key`中的项目
-- `store(StoreKey, Key, value)`:在多存储中的键`StoreKey`中找到的存储中的键`Key`中写入值`Value`
+**ストア：**
 
-## 提案处理队列
+- `ProposalProcessingQueue`： `MinDeposit`に到達したプロポーザルのすべての` ProposalIDs`を含むキュー `queue [proposalID]`。 各 `EndBlock`の間に、投票期間の終わりに達したすべての提案が処理されます。
+完成した提案を処理するために、アプリケーションは投票を集計し、各バリデーターの投票を計算し、バリデーターセット内のすべてのバリデーターが投票したかどうかを確認します。 提案が受理された場合、保証金は返金されます。 最後に、プロポーザルコンテンツ `Handler`が実行されます。
 
-**存储:**
-
-- `ProposalProcessingQueue`:一个队列 `queue[proposalID]` 包含所有
-  达到“MinDeposit”的提案的“ProposalIDs”。在每个“EndBlock”期间，
-  所有已到投票期结束的提案都将被处理。
-  为了处理完成的提案，应用程序会统计投票数，计算
-  每个验证者的投票，并检查验证者集中的每个验证者是否有
-  投票。如果提案被接受，押金将被退还。最后，提案
-  内容 `Handler` 被执行。
-
-以及“ProposalProcessingQueue”的伪代码: 
+そして、 `ProposalProcessingQueue`の擬似コード：
 
 ```go
   in EndBlock do

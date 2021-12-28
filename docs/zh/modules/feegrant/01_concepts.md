@@ -61,7 +61,7 @@
 
 ```Go
 ./simd tx gov submit-proposal --title="Test Proposal" --description="My Awesome Proposal" --type="Text" --from validator-key --fee-granter=cosmos1xh44hxt7spr67hqaa7nyx5gnutrz5fraw6grxn --chain-id =testnet --fees="10stake"
-``
+```
 
 ## 授予的费用减免
 

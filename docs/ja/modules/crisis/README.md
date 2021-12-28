@@ -1,19 +1,19 @@
-# `危机`
+# `crisis`
 
-## 概述
+## 概要
 
-危机模块在一个区块链的情况下停止区块链
-不变量被破坏。 不变量可以在应用程序中注册
-应用程序初始化过程。
+ブロックチェーンの場合、crisisモジュールはブロックチェーンを停止します
+不変条件は破棄されます. 不変条件はアプリケーションに登録できます
+アプリケーションの初期化プロセス.
 
-## 内容
+## コンテンツ
 
-1. **[状态](01_state.md)**
-     - [ConstantFee](01_state.md#constantfee)
-2. **[消息](02_messages.md)**
-     - [MsgVerifyInvariant](02_messages.md#msgverifyinvariant)
-3. **[事件](03_events.md)**
-     - [处理程序](03_events.md#handlers)
-4. **[参数](04_params.md)**
-5. **[客户端](05_client.md)**
-     - [CLI](05_client.md#cli) 
+1. **[State](01_state.md)**
+      - [ConstantFee](01_state.md＃constantfee)
+2. **[メッセージ](02_messages.md)**
+      - [MsgVerifyInvariant](02_messages.md＃msgverifyinvariant)
+3. **[イベント](03_events.md)**
+      - [ハンドラー](03_events.md＃handlers)
+4. **[パラメータ](04_params.md)**
+5. **[クライアント](05_client.md)**
+      - [CLI](05_client.md＃cli)

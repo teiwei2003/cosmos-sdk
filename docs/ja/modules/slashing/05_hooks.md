@@ -1,21 +1,20 @@
-# 钩子
+# フック
 
-本节包含对模块`hooks` 的描述。 挂钩是在引发事件时自动执行的操作。
+このセクションには、モジュールの「フック」の説明が含まれています。 フックは、イベントが発生したときに自動的に実行される操作です。
 
-## 放样钩子
+## Staking hooks
 
-slashing 模块实现了 `x/staking` 中定义的 `StakingHooks`，并用作验证者信息的记录保存。 在应用程序初始化期间，这些钩子应该在 staking 模块结构中注册。
+スラッシュモジュールは、`x/staking`で定義され`StakingHooks`を実装し、バリデーター情報の記録保持として使用されます。 アプリの初期化中に、これらのフックをステーキングモジュール構造体に登録する必要があります。
 
-以下挂钩会影响 slashing 状态:
+次のフックは、スラッシュ状態に影響を与えます。
 
-+ `AfterValidatorBonded` 创建一个 `ValidatorSigningInfo` 实例，如下一节所述。
-+ `AfterValidatorCreated` 存储验证者的共识密钥。
-+ `AfterValidatorRemoved` 删除验证者的共识密钥。
++ `AfterValidatorBonded`は、次のセクションで説明するように、` ValidatorSigningInfo`インスタンスを作成します。
++ `AfterValidatorCreated`は、バリデーターのコンセンサスキーを格納します。
++ `AfterValidatorRemoved`は、バリデーターのコンセンサスキーを削除します。
 
-## 验证者绑定
+## バリデーター結合
 
-在成功首次绑定新验证器后，我们为
-现在绑定的验证器，当前块的“StartHeight”。 
+新しいバリデーターの最初の結合が成功すると、結合されたバリデーターの新しい`ValidatorSigningInfo`構造を作成します。これは、現在のブロックの`StartHeight`です。 
 
 ```
 onValidatorBonded(address sdk.ValAddress)

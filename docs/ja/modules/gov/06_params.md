@@ -1,6 +1,6 @@
-# 参数
+# パラメーター
 
-治理模块包含以下参数: 
+ガバナンスモジュールには、次のパラメータが含まれています。
 
 | Key           | Type   | Example                                                                                            |
 |---------------|--------|----------------------------------------------------------------------------------------------------|
@@ -19,6 +19,4 @@
 | threshold          | string (dec)     | "0.500000000000000000"                  |
 | veto               | string (dec)     | "0.334000000000000000"                  |
 
-__NOTE__: The governance module contains parameters that are objects unlike other
-modules. If only a subset of parameters are desired to be changed, only they need
-to be included and not the entire parameter object structure.
+__注意__：ガバナンスモジュールには、他のモジュールとは異なり、オブジェクトであるパラメータが含まれています。 パラメータのサブセットのみを変更する必要がある場合は、パラメータオブジェクト構造全体ではなく、パラメータのみを含める必要があります。

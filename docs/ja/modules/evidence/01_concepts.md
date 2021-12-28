@@ -1,12 +1,12 @@
 # 概念
 
-## 证据
+## 証拠
 
-提交给“x/evidence”模块的任何具体类型的证据都必须满足
-“证据”合同概述如下。 并非所有具体类型的证据都能满足
-本合同以同样的方式和某些数据可能与某些完全无关
-证据类型。 一个额外的“ValidatorEvidence”，它扩展了“Evidence”，
-还创建了一个合同，用于针对恶意验证者的证据。 
+`x/evidence`モジュールに提出される具体的な種類の証拠は、次の条件を満たす必要があります。
+以下に概説する「証拠」契約。 すべての具体的な種類の証拠が満たされるわけではありません
+この契約は同じように、一部のデータは特定のデータとはまったく無関係である可能性があります
+証拠の種類。`Evidence`を拡張する追加`ValidatorEvidence`、
+悪意のあるバリデーターに対する証拠の契約を定義するためにも作成されました。
 
 ```go
 // Evidence defines the contract which concrete evidence types of misbehavior
@@ -40,13 +40,13 @@ type ValidatorEvidence interface {
 }
 ```
 
-## 注册和处理
+## 登録と処理
 
-`x/evidence` 模块必须首先知道它所期望的所有类型的证据
-处理。 这是通过在 `Evidence` 中注册 `Route` 方法来完成的
-与所谓的“路由器”(定义如下)签订合同。 `Router` 接受
-`Evidence` 并尝试为 `Evidence` 找到相应的 `Handler`
-通过`Route`方法。 
+`x/evidence`モジュールは、最初に、期待するすべてのタイプの証拠を知る必要があります
+対処する。 これは、`Route`メソッドを`Evidence`に登録することによって行われます。
+いわゆる「ルーター」（以下に定義）と契約を結びます。`ルーター`は受け入れる
+`Evidence`そして`Evidence`に対応する`Handler`を見つけようとします
+`Route`メソッドを介して。
 
 ```go
 type Router interface {
@@ -58,12 +58,12 @@ type Router interface {
 }
 ```
 
-`Handler`(定义如下)负责执行整个
-处理“证据”的业务逻辑。 这通常包括验证
-证据，通过“ValidateBasic”进行无状态检查和通过任何方式进行的有状态检查
-提供给 `Handler` 的 Keepers。 此外，`Handler` 还可以执行
-诸如削减和监禁验证者之类的功能。 处理所有“证据”
-由`Handler` 应该被持久化。 
+`Handler`（以下に定義）は、
+`証拠`を処理するためのビジネスロジック。 これには通常、検証が含まれます
+証拠、`ValidateBasic`によるステートレスチェックと任意のステートフルチェックの両方
+`ハンドラー`に提供されるキーパー。 さらに、`ハンドラー`も実行する可能性があります
+バリデーターのスラッシュやジェイルなどの機能。 処理されたすべての`証拠`
+`ハンドラー`によって永続化する必要があります。 
 
 ```go
 // Handler defines an agnostic Evidence handler. The handler is responsible

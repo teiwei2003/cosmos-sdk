@@ -1,8 +1,8 @@
-# 消息
+# メッセージ
 
 ## MsgSubmitEvidence
 
-证据是通过“MsgSubmitEvidence”消息提交的: 
+証拠は、「MsgSubmitEvidence」メッセージを介して送信されます。
 
 ```protobuf
 // MsgSubmitEvidence represents a message that supports submitting arbitrary
@@ -13,12 +13,12 @@ message MsgSubmitEvidence {
 }
 ```
 
-注意，一个 `MsgSubmitEvidence` 消息的 `Evidence` 必须有一个对应的
-`Handler` 注册到 `x/evidence` 模块的 `Router` 以便处理
-并正确路由。
+`MsgSubmitEvidence`メッセージの`Evidence`には対応するものが必要であることに注意してください
+処理するために `x / evidence`モジュールの`Router`に登録された `Handler`
+正しくルーティングされます。
 
-鉴于 `Evidence` 注册到相应的 `Handler`，它被处理
-如下: 
+`Evidence`が対応する`Handler`に登録されている場合、それは処理されます
+次のように：
 
 ```go
 func SubmitEvidence(ctx Context, evidence Evidence) error {
@@ -46,6 +46,6 @@ func SubmitEvidence(ctx Context, evidence Evidence) error {
 }
 ```
 
-首先，必须不存在完全相同的有效提交“证据”
-类型。 其次，`Evidence` 被路由到`Handler` 并执行。 最后，
-如果在处理“证据”时没有错误，则会发出一个事件并将其持久化以保持状态。 
+まず、まったく同じの有効な提出された`Evidence`がすでに存在していてはなりません
+タイプ。 次に、`Evidence`は`Handler`にルーティングされ、実行されます。 ついに、
+`Evidence`の処理にエラーがない場合、イベントが発行され、状態に保持されます。 

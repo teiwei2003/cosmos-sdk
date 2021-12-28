@@ -1,36 +1,36 @@
-# 前处理程序
+# 前処理プログラム
 
-`x/auth` 模块目前没有自己的事务处理程序，但确实公开了特殊的 `AnteHandler`，用于对事务执行基本的有效性检查，以便它可以被抛出内存池。
-根据 [ADR 010](https://github.com/cosmos/cosmos-sdk/blob/v0.43.0-alpha1/docs/架构/adr-010-modular-antehandler.md)。
+現在、 `x / auth`モジュールには独自のトランザクションハンドラーがありませんが、特別な` AntiHandler`を公開して、トランザクションの基本的な有効性チェックを実行し、メモリプールからスローできるようにします。
+[ADR 010](https://github.com/cosmos/cosmos-sdk/blob/v0.43.0-alpha1/docs/architecture/adr-010-modular-antehandler.md)によると。
 
-请注意，在 `CheckTx` 和 `DeliverTx` 上都调用了 `AnteHandler`，因为 Tendermint 提议者目前能够将失败的 `CheckTx` 包含在他们提议的区块交易中。
+Tendermintの提案者は現在、提案されたブロックトランザクションに失敗した `CheckTx`を含めることができるため、` AnteHandler`は `CheckTx`と` DeliverTx`の両方で呼び出されることに注意してください。
 
-## 装饰器
+## デコレータ
 
-auth 模块提供了 `AnteDecorator`s，它们按以下顺序递归地链接到单个 `AnteHandler` 中:
+authモジュールは `AnteDecorator`を提供します。これは、次の順序で単一の` AnteHandler`に再帰的にリンクされます。
 
-- `SetUpContextDecorator`:在 `Context` 中设置 `GasMeter`，并用 defer 子句包装下一个 `AnteHandler`，以从 `AnteHandler` 链中的任何下游 `OutOfGas` 恐慌中恢复，并返回有关所提供气体的信息的错误和使用的气体。
+-`SetUpContextDecorator`： `Context`に` GasMeter`を設定し、次の `AntiHandler`をdefer句でラップして、` AnteHandler`チェーンのダウンストリーム `OutOfGas`パニックから回復し、供給されたガス情報エラーに関する情報を返します。使用ガス。
 
-- `RejectExtensionOptionsDecorator`:拒绝所有可以选择包含在 protobuf 事务中的扩展选项。
+-`RejectExtensionOptionsDecorator`：protobufトランザクションにオプションで含めることができるすべての拡張オプションを拒否します。
 
-- `MempoolFeeDecorator`:在`CheckTx`期间检查`tx`费用是否高于本地内存池`minFee`参数。
+-`MempoolFeeDecorator`： `CheckTx`中に` tx`料金がローカルメモリプールの `minFee`パラメータよりも高いかどうかを確認します。
 
-- `ValidateBasicDecorator`:调用`tx.ValidateBasic` 并返回任何非零错误。
+-`ValidateBasicDecorator`： `tx.ValidateBasic`を呼び出し、ゼロ以外のエラーを返します。
 
-- `TxTimeoutHeightDecorator`:检查`tx` 高度超时。
+-`TxTimeoutHeightDecorator`：タイムアウトの `tx`の高さを確認します。
 
-- `ValidateMemoDecorator`:使用应用程序参数验证 `tx` 备忘录并返回任何非零错误。
+-`ValidateMemoDecorator`：アプリケーションパラメータを使用して `tx`メモを検証し、ゼロ以外のエラーを返します。
 
-- `ConsumeGasTxSizeDecorator`:根据应用程序参数消耗与`tx` 大小成比例的gas。
+-`ConsumeGasTxSizeDecorator`：アプリケーションパラメータに従って `tx`のサイズに比例したガスを消費します。
 
-- `DeductFeeDecorator`:从 `tx` 的第一个签名者中扣除 `FeeAmount`。如果启用了 `x/feegrant` 模块并设置了费用授予者，它会从费用授予者帐户中扣除费用。
+-`DeductFeeDecorator`： `tx`の最初の署名者から` FeeAmount`を差し引きます。 `x / feegrant`モジュールが有効になっていて、料金付与者が設定されている場合、料金付与者アカウントから料金が差し引かれます。
 
-- `SetPubKeyDecorator`:从`tx` 的签名者设置公钥，该签名者还没有在状态机和当前上下文中保存其相应的公钥。
+-`SetPubKeyDecorator`：対応する公開鍵をステートマシンと現在のコンテキストに保存していない `tx`の署名者からの公開鍵を設定します。
 
-- `ValidateSigCountDecorator`:根据应用参数验证 `tx` 中的签名数量。
+-`ValidateSigCountDecorator`：アプリケーションパラメータに基づいて `tx`の署名の数を検証します。
 
-- `SigGasConsumeDecorator`:为每个签名消耗参数定义的气体量。这需要在上下文中为所有签名者设置公钥作为“SetPubKeyDecorator”的一部分。
+-`SigGasConsumeDecorator`：各シグニチャの消費パラメータによって定義されたガスの量。これには、コンテキスト内のすべての署名者の「SetPubKeyDecorator」の一部として公開鍵を設定する必要があります。
 
-- `SigVerificationDecorator`:验证所有签名是否有效。这需要在上下文中为所有签名者设置公钥作为“SetPubKeyDecorator”的一部分。
+-`SigVerificationDecorator`：すべての署名が有効であることを確認します。これには、コンテキスト内のすべての署名者の「SetPubKeyDecorator」の一部として公開鍵を設定する必要があります。
 
-- `IncrementSequenceDecorator`:为每个签名者增加账户序列以防止重放攻击。 
+-`IncrementSequenceDecorator`：リプレイ攻撃を防ぐために、各署名者のアカウントシーケンスを追加します。

@@ -1,11 +1,10 @@
-# 消息
+# メッセージ
 
-在本节中，我们描述了 `slashing` 模块的消息处理。
+このセクションでは、`slashing`モジュールのメッセージの処理について説明します。
 
-## 出狱
+## Unjail
 
-如果验证器因停机而自动解除绑定并希望重新上线&
-可能重新加入绑定集，它必须发送`MsgUnjail`:
+ダウンタイムのためにバリデーターが自動的に結合解除され、オンラインに戻って結合されたセットに再度参加したい場合は、 `MsgUnjail`を送信する必要があります。
 
 ```protobuf
 // MsgUnjail is an sdk.Msg used for unjailing a jailed validator, thus returning
@@ -16,7 +15,7 @@ message MsgUnjail {
 }
 ```
 
-下面是 `MsgSrv/Unjail` RPC 的伪代码: 
+以下は、`MsgSrv/Unjail`RPCの擬似コードです。
 
 ```
 unjail(tx MsgUnjail)
@@ -42,6 +41,5 @@ unjail(tx MsgUnjail)
     return
 ```
 
-如果验证者有足够的股份进入顶部`n = MaximumBondedValidators`，它将自动重新绑定，
-并且所有仍然委托给验证者的委托人将被重新绑定并开始再次收集
-规定和奖励。 
+バリデーターが上位の `n = MaximumBondedValidators`に入るのに十分なステークを持っている場合、バリデーターは自動的に再結合されます。
+そして、バリデーターにまだ委任されているすべての委任者は再結合され、再び引当金と報酬の収集を開始します。

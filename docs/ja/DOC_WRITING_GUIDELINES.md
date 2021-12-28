@@ -1,15 +1,15 @@
-# Documentation Writing Guidelines
+# ドキュメント作成ガイドライン
 
-## Best Practices
+## ベストプラクティス
 
-+ Check the spelling and grammar, even if you have to copy and paste from an external source.
-+ Use simple sentences. Easy-to-read sentences mean the reader can quickly use the guidance you share.
-+ Try to express your thoughts in a concise and clean way.
-+ Don't abuse `code` format when writing in plain English.
-+ Follow Google developer documentation [style guide](https://developers.google.com/style).
-+ Check the meaning of words in Microsoft's [A-Z word list and term collections](https://docs.microsoft.com/en-us/style-guide/a-z-word-list-term-collections/term-collections/accessibility-terms) (use the search input!).
-+ RFC keywords should be used in technical documents (uppercase) and we recommend to use them in user documentation (lowercase). The RFC keywords are: "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL. They are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
++ 外部ソースからコピーして貼り付ける必要がある場合でも、スペルと文法を確認してください。
++ 簡単な文章を使用します。読みやすい文章は、読者があなたが共有するガイダンスをすばやく使用できることを意味します。
++ あなたの考えを簡潔でクリーンな方法で表現するようにしてください。
++ 平易な英語で書くときは、 `code`形式を乱用しないでください。
++ Google開発者向けドキュメント[スタイルガイド](https://developers.google.com/style)に従ってください。
++ Microsoftの[AZ単語リストと用語コレクション](https://docs.microsoft.com/en-us/style-guide/az-word-list-term-collections/term-collections/accessibility)で単語の意味を確認します-用語)(検索入力を使用してください！)。
++ RFCキーワードは、技術文書(大文字)で使用する必要があり、ユーザー文書(小文字)で使用することをお勧めします。 RFCキーワードは、「MUST」、「MUST NOT」、「REQUIRED」、「SHALL」、「SHALL NOT」、「SHOULD」、「SHOULD NOT」、「RECOMMENDED」、「MAY」、および「OPTIONAL」です。 [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119)で説明されているように解釈されます。
 
-## Technical Writing Course
+## テクニカルライティングコース
 
-Google provides a free [course](https://developers.google.com/tech-writing/overview) for technical writing.
+Googleは、テクニカルライティングのための無料の[コース](https://developers.google.com/tech-writing/overview)を提供しています。

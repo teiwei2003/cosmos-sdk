@@ -3,7 +3,7 @@ parent:
   order: false
 -->
 
-# Using the Cosmos SDK
+# CosmosSDKの使用
 
 - [Modules](../../x/README.md)
 - [Simulation](../core/simulation.md)

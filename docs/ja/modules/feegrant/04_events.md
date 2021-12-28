@@ -1,6 +1,7 @@
-# 事件
+# イベント
 
-Feegrant 模块发出以下事件: 
+Feegrantモジュールは、次のイベントを発行します。
+
 # Msg Server
 
 ### MsgGrantAllowance

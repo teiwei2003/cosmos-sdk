@@ -1,27 +1,24 @@
-# 消息
+# メッセージ
 
-## 提案提交
+## 提案の提出
 
-任何帐户都可以通过“MsgSubmitProposal”提交提案
-交易。
+提案は、`MsgSubmitProposal`トランザクションを介して任意のアカウントで送信できます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/tx.proto#L24-L39
 
-`MsgSubmitProposal` 消息的 `Content` 必须有一个合适的路由器
-在治理模块中设置。
+`MsgSubmitProposal`メッセージの`Content`には、ガバナンスモジュールに適切なルーターが設定されている必要があります。
 
-**状态修改:**
+**状態の変更:**
 
-- 生成新的`proposalID`
-- 创建新的“提案”
-- 初始化`Proposal`的属性
-- 通过`InitialDeposit`减少发件人的余额
-- 如果达到`MinDeposit`:
-     - 在`ProposalProcessingQueue`中推送`proposalID`
-- 将 `InitialDeposit` 从 `Proposer` 转移到治理 `ModuleAccount`
+- 新しい `proposalID`を生成します
+- 新しい `プロポーザル`を作成します
+- `Proposal`の属性を初期化します
+- `InitialDeposit`によって送信者の残高を減らします
+- `MinDeposit`に達した場合：
+     - `ProposalProcessingQueue`で `proposalID`をプッシュします
+- `InitialDeposit`を `Proposer`からガバナンス` ModuleAccount`に転送します
 
-一个 `MsgSubmitProposal` 事务可以按照以下方式处理
-伪代码。 
+`MsgSubmitProposal`トランザクションは、次の擬似コードに従って処理できます。
 
 ```go
 // PSEUDOCODE //
@@ -65,25 +62,23 @@ upon receiving txGovSubmitProposal from sender do
   return proposalID
 ```
 
-## 订金
+## 保証金
 
-提交提案后，如果
-`Proposal.TotalDeposit < ActiveParam.MinDeposit`，Atom 持有者可以发送
-`MsgDeposit` 交易以增加提案的存款。
+プロポーザルが送信されると、`Proposal.TotalDeposit <ActiveParam.MinDeposit`の場合、Atomホルダーは` MsgDeposit`トランザクションを送信して、プロポーザルのデポジットを増やすことができます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/tx.proto#L61-L72
 
-**状态修改:**
+**状態の変更：**
 
-- 通过`存款`减少发件人的余额
-- 在`proposal.Deposits`中添加发件人的`deposit`
-- 通过发送者的`deposit`增加`proposal.TotalDeposit`
-- 如果达到`MinDeposit`:
-     - 在`ProposalProcessingQueueEnd`中推送`proposalID`
-- 将`Deposit`从`proposer`转移到治理`ModuleAccount`
+- `預金 `によって送信者の残高を減らします
+- `proposal.Deposits`に送信者の `deposit`を追加します
+- 送信者の `deposit`によって` proposal.TotalDeposit`を増やします
+- `MinDeposit`に達した場合：
+     - `ProposalProcessingQueueEnd`で `proposalID`をプッシュします
+- `Deposit`を `proposer`からガバナンス` ModuleAccount`に転送します
 
-`MsgDeposit` 交易必须经过多次检查才能有效。
-以下伪代码概述了这些检查。 
+`MsgDeposit`トランザクションが有効になるには、いくつかのチェックを行う必要があります。
+これらのチェックは、次の擬似コードで概説されています。 
 
 ```go
 // PSEUDOCODE //
@@ -133,20 +128,18 @@ upon receiving txGovDeposit from sender do
 
 ## Vote
 
-一旦达到`ActiveParam.MinDeposit`，投票期开始。 从那里，
-绑定的 Atom 持有者能够发送“MsgVote”交易来投下他们的
-对该提案进行投票。 
+`ActiveParam.MinDeposit`に達すると、投票期間が始まります。 そこから、結合されたAtom保有者は、「MsgVote」トランザクションを送信して、提案に投票することができます。。 
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/gov/v1beta1/tx.proto#L46-L56
 
-**状态修改:**
+**状態の変更：**
 
-- 记录发件人的“投票”
+- 送信者の「投票」を記録する
 
-_注意:此消息的 Gas 成本必须考虑到 EndBlocker 中未来的投票统计_
+_注：このメッセージのガスコストは、EndBlockerでの投票の将来の集計を考慮に入れる必要があります_
 
-接下来是“MsgVote”交易方式的伪代码概述
-处理: 
+次は、`MsgVote`トランザクションの方法の擬似コードの概要です。
+処理：
 
 ```go
   // PSEUDOCODE //

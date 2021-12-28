@@ -1,7 +1,8 @@
-# 守门员
+# キーパー
 
-在app初始化阶段，可以使用`Keeper.Subspace`为其他模块的keeper分配[subspaces](02_subspace.md)，并存储在`Keeper.spaces`中。 然后，这些模块可以通过 `Keeper.GetSubspace` 引用它们的特定参数存储。 
-Example:
+アプリの初期化段階では、[subspaces](02_subspace.md)を `Keeper.Subspace`を使用して他のモジュールのキーパーに割り当てることができ、`Keeper.spaces`に保存されます。 次に、これらのモジュールは、`Keeper.GetSubspace`を介して特定のパラメータストアへの参照を持つことができます。 
+
+例:
 
 ```go
 type ExampleKeeper struct {

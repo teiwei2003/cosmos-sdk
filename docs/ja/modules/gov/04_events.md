@@ -1,6 +1,6 @@
-# 事件
+# イベント
 
-治理模块发出以下事件: 
+ガバナンスモジュールは、次のイベントを発行します。
 
 ## EndBlocker
 
@@ -58,4 +58,4 @@
 | message              | action              | deposit         |
 | message              | sender              | {senderAddress} |
 
-- [0] Event only emitted if the voting period starts during the submission.
+- [0]送信中に投票期間が開始された場合にのみ発行されるイベント。

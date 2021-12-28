@@ -1,3 +1,3 @@
-# 事件
+# イベント
 
-authz 模块发出在 [Protobuf 参考](../../../core/proto-docs.md#cosmos/authz/v1beta1/event.proto) 中定义的 proto 事件。
+authzモジュールは、[Protobuf Reference](../../../core/proto-docs.md＃cosmos/authz/v1beta1/event.proto)で定義されているprotoイベントを発行します。

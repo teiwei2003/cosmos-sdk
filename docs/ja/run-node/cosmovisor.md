@@ -1,45 +1,44 @@
 # cosmovisor
 
-`cosmovisor` 是 Cosmos SDK 应用程序二进制文件的小型进程管理器，用于监控传入链升级提议的治理模块。如果看到一个提案获得批准，`cosmovisor` 可以自动下载新的二进制文件，停止当前的二进制文件，从旧的二进制文件切换到新的二进制文件，最后用新的二进制文件重新启动节点。
+`cosmovisor`は、Cosmos SDKアプリケーションバイナリの小さなプロセスマネージャーであり、着信チェーンアップグレードの提案についてガバナンスモジュールを監視します。 承認されたプロポーザルを検出すると、`cosmovisor`は自動的に新しいバイナリをダウンロードし、現在のバイナリを停止し、古いバイナリから新しいバイナリに切り替え、最後に新しいバイナリでノードを再起動します。
 
-#### 设计
+#### 設計
 
-Cosmovisor 旨在用作“Cosmos SDK”应用程序的包装器:
+Cosmovisorは、`CosmosSDK`アプリのラッパーとして使用するように設計されています。
 
-* 它将参数传递给关联的应用程序(由`DAEMON_NAME` 环境变量配置)。
-  运行 `cosmovisor run arg1 arg2 ....` 将运行 `app arg1 arg2 ...`；
-* 如果需要，它将通过重新启动和升级来管理应用程序；
-* 它是使用环境变量配置的，而不是位置参数。
+* 関連するアプリ(`DAEMON_NAME`環境変数で構成)に引数を渡します。`cosmovisor run arg1 arg2 ....`を実行すると、`app arg1 arg2 ...`が実行されます。
+* 必要に応じて再起動してアップグレードすることでアプリを管理します。
+* 位置引数ではなく、環境変数を使用して構成されます。
 
-*注意:如果应用程序的新版本未设置为运行就地存储迁移，则需要在使用新二进制文件重新启动 `cosmovisor` 之前手动运行迁移。因此，我们建议应用程序采用就地存储迁移。*
+*注:アプリケーションの新しいバージョンがインプレースストア移行を実行するように設定されていない場合は、新しいバイナリで`cosmovisor`を再起動する前に、移行を手動で実行する必要があります。 このため、アプリケーションでインプレースストア移行を採用することをお勧めします。*
 
-*注意:如果验证者想要启用自动下载选项([我们不推荐](#auto-download))，并且他们当前正在使用 Cosmos SDK `v0.42` 运行应用程序，他们将需要使用 Cosmovisor [`v0.1`](https://github.com/cosmos/cosmos-sdk/releases/tag/cosmovisor%2Fv0.1.0)。如果启用了自动下载选项，更高版本的 Cosmovisor 不支持 Cosmos SDK `v0.44.3` 或更早版本。*
+*注:バリデーターが自動ダウンロードオプション([お勧めしません](＃auto-download))を有効にし、現在Cosmos SDK`v0.42`を使用してアプリケーションを実行している場合は、 Cosmovisor [`v0.1`](https://github.com/cosmos/cosmos-sdk/releases/tag/cosmovisor%2Fv0.1.0)を使用するには。 自動ダウンロードオプションが有効になっている場合、Cosmovisorの新しいバージョンはCosmos SDK`v0.44.3`以前をサポートしていません。*
 
 ## 贡献
 
-Cosmovisor 是 Cosmos SDK monorepo 的一部分，但它是一个单独的模块，有自己的发布时间表。
+CosmovisorはCosmosSDKモノレポの一部ですが、独自のリリーススケジュールを持つ別個のモジュールです。
 
-发布分支具有以下格式`release/cosmovisor/vA.B.x`，其中 A 和 B 是一个数字(例如`release/cosmovisor/v0.1.x`)。使用以下格式标记版本:`cosmovisor/vA.B.C`。
+リリースブランチの形式は`release/cosmovisor/vA.B.x`です。ここで、AとBは数字です(例:`release/cosmovisor/v0.1.x`)。 リリースには、`cosmovisor/vA.B.C`の形式を使用してタグが付けられます。
 
-## 设置
+## 設定
 
-### 安装
+### インストール
 
-要安装最新版本的 `cosmovisor`，请运行以下命令: 
+最新バージョンの`cosmovisor`をインストールするには、次のコマンドを実行します。
 
 ```
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@latest
 ```
 
-要安装以前的版本，您可以指定版本。 重要提示:使用 Cosmos-SDK v0.44.3 或更早版本(例如 v0.44.2)并希望使用自动下载功能的链必须使用 Cosmovisor v0.1.0 
+以前のバージョンをインストールするには、バージョンを指定できます。重要:Cosmos-SDK v0.44.3以前(v0.44.2など)を使用し、自動ダウンロード機能を使用するチェーンは、Cosmovisorv0.1.0を使用する必要があります
 
 ```
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v0.1.0
 ```
 
-使用 Cosmovisor v1.0.0 时可以确认 cosmovisor 的版本，但使用 `v0.1.0` 则无法这样做。 
+Cosmovisor v1.0.0を使用している場合は、cosmovisorのバージョンを確認できますが、`v0.1.0`では確認できません。
 
-您还可以通过拉取 cosmos-sdk 存储库并切换到正确的版本并按如下方式构建来从源代码安装: 
+cosmos-sdkリポジトリをプルし、正しいバージョンに切り替えて次のようにビルドすることにより、ソースからインストールすることもできます。 
 
 ```
 git clone git@github.com:cosmos/cosmos-sdk
@@ -49,39 +48,39 @@ cd cosmovisor
 make
 ```
 
-这将在您的当前目录中构建 cosmovisor。 之后，您可能希望将其放入机器的 PATH 中，如下所示: 
+これにより、現在のディレクトリにcosmovisorが構築されます。 その後、次のようにマシンのPATHに配置することができます。
 
 ```
 cp cosmovisor ~/go/bin/cosmovisor
 ```
 
-*注意:如果您使用的是 go `v1.15` 或更早版本，则需要使用 `go get`，并且您可能希望在项目目录外运行该命令。*
+*注:go`v1.15`以前を使用している場合は、`go get`を使用する必要があり、プロジェクトディレクトリの外部でコマンドを実行することをお勧めします。*
 
-### 命令行参数和环境变量
+### コマンドライン引数と環境変数
 
-传递给 `cosmovisor` 的第一个参数是 `cosmovisor` 要采取的操作。选项是:
+`cosmovisor`に渡される最初の引数は、`cosmovisor`が実行するアクションです。 オプションは次のとおりです。
 
-* `help`、`--help` 或 `-h` - 输出 `cosmovisor` 帮助信息并检查你的 `cosmovisor` 配置。
-* `run` - 使用提供的其余参数运行配置的二进制文件。
-* `version` 或 `--version` - 输出 `cosmovisor` 版本并使用 `version` 参数运行二进制文件。
+*`help`、`--help`、または`-h`-`cosmovisor`ヘルプ情報を出力し、`cosmovisor`構成を確認します。
+*`run`-提供された残りの引数を使用して、構成されたバイナリを実行します。
+*`version`、または`--version`-`cosmovisor`バージョンを出力し、`version`引数を指定してバイナリを実行します。
 
-传递给“cosmovisor run”的所有参数都将传递给应用程序二进制文件(作为子进程)。 `cosmovisor` 将返回子进程的 `/dev/stdout` 和 `/dev/stderr` 作为它自己的。出于这个原因，`cosmovisor run` 不能接受除应用程序二进制文件可用的命令行参数之外的任何命令行参数。
+`cosmovisor run`に渡されるすべての引数は、(サブプロセスとして)アプリケーションバイナリに渡されます。`cosmovisor`は、サブプロセスの`/dev/stdout`と`/dev/stderr`を独自のものとして返します。 このため、`cosmovisor run`は、アプリケーションバイナリで使用可能なコマンドライン引数以外のコマンドライン引数を受け入れることができません。
 
-*注意:不推荐使用没有动作参数之一的`cosmovisor`。为了向后兼容，如果第一个参数不是动作参数，则假定为 `run`。但是，此回退可能会在未来版本中删除，因此建议您始终提供 `run`。
+*注:アクション引数の1つを指定せずに`cosmovisor`を使用することは非推奨です。 後方互換性のために、最初の引数がアクション引数でない場合、`run`が想定されます。 ただし、このフォールバックは将来のバージョンで削除される可能性があるため、常に`run`を指定することをお勧めします。*
 
-`cosmovisor` 从环境变量中读取其配置:
+`cosmovisor`は、環境変数から構成を読み取ります。
 
-* `DAEMON_HOME` 是保存 `cosmovisor/` 目录的位置，该目录包含创世二进制文件、升级二进制文件以及与每个二进制文件相关的任何其他辅助文件(例如 `$HOME/.gaiad`、`$HOME/. regend`、`$HOME/.simd` 等)。
-* `DAEMON_NAME` 是二进制文件本身的名称(例如`gaiad`、`regend`、`simd` 等)。
-* `DAEMON_ALLOW_DOWNLOAD_BINARIES`(*可选*)，如果设置为`true`，将启用新二进制文件的自动下载(出于安全原因，这适用于完整节点而不是验证器)。默认情况下，`cosmovisor` 不会自动下载新的二进制文件。
-* `DAEMON_RESTART_AFTER_UPGRADE`(*可选*，默认值 = `true`)，如果为 `true`，则在成功升级后使用相同的命令行参数和标志(但使用新的二进制文件)重新启动子进程。否则 (`false`)，`cosmovisor` 在升级后停止运行，需要系统管理员手动重启。注意restart 是升级后才会出现的，不会在出现错误后自动重启子进程。
-* `DAEMON_POLL_INTERVAL` 是轮询升级计划文件的间隔长度。该值可以是数字(以毫秒为单位)或持续时间(例如“1s”)。默认值:300 毫秒。
-* `UNSAFE_SKIP_BACKUP`(默认为`false`)，如果设置为`true`，直接升级而不执行备份。否则(`false`，默认)在尝试升级之前备份数据。默认值 false 很有用，建议在发生故障和备份需要回滚时使用。我们建议使用默认备份选项`UNSAFE_SKIP_BACKUP=false`。
-* `DAEMON_PREUPGRADE_MAX_RETRIES`(默认为 `0`)。退出状态为“31”后，应用程序中调用“pre-upgrade”的最大次数。达到最大重试次数后，cosmovisor 升级失败。
+*`DAEMON_HOME`は、ジェネシスバイナリ、アップグレードバイナリ、および各バイナリに関連付けられた追加の補助ファイル(`$ HOME/.gaiad`、`$ HOME/など)を含む`cosmovisor/`ディレクトリが保持される場所です。 regend`、`$ HOME/.simd`など)。
+*`DAEMON_NAME`は、バイナリ自体の名前です(たとえば、`gaiad`、`regend`、`simd`など)。
+*`DAEMON_ALLOW_DOWNLOAD_BINARIES`(*オプション*)を`true`に設定すると、新しいバイナリの自動ダウンロードが有効になります(セキュリティ上の理由から、これはバリデーターではなくフルノードを対象としています)。デフォルトでは、`cosmovisor`は新しいバイナリを自動ダウンロードしません。
+*`DAEMON_RESTART_AFTER_UPGRADE`(*オプション*、デフォルト=`true`)、`true`の場合、アップグレードが成功した後、同じコマンドライン引数とフラグを使用して(ただし新しいバイナリを使用して)サブプロセスを再起動します。それ以外の場合(`false`)、`cosmovisor`はアップグレード後に実行を停止し、システム管理者が手動で再起動する必要があります。再起動はアップグレード後にのみ行われ、エラーが発生した後にサブプロセスを自動再起動しないことに注意してください。
+*`DAEMON_POLL_INTERVAL`は、アップグレード計画ファイルをポーリングするための間隔の長さです。値は、数値(ミリ秒単位)または期間(「1s」など)のいずれかです。デフォルト:300ミリ秒。
+*`UNSAFE_SKIP_BACKUP`(デフォルトは`false`)は、`true`に設定されている場合、バックアップを実行せずに直接アップグレードします。それ以外の場合(`false`、デフォルト)は、アップグレードを試行する前にデータをバックアップします。デフォルト値のfalseは、障害が発生した場合やバックアップをロールバックする必要がある場合に役立ち、推奨されます。デフォルトのバックアップオプション`UNSAFE_SKIP_BACKUP = false`を使用することをお勧めします。
+*`DAEMON_PREUPGRADE_MAX_RETRIES`(デフォルトは`0`)。終了ステータスが`31`になった後、アプリケーションで`pre-upgrade`を呼び出す最大回数。最大再試行回数の後、cosmovisorはアップグレードに失敗します。
 
-### 文件夹布局
+### フォルダレイアウト
 
-`$DAEMON_HOME/cosmovisor` 应该完全属于 `cosmovisor` 及其控制的子进程。文件夹内容组织如下: 
+`$ DAEMON_HOME/cosmovisor`は、完全に`cosmovisor`とそれによって制御されるサブプロセスに属することが期待されます。 フォルダの内容は次のように構成されています。
 
 ```
 .
@@ -96,9 +95,9 @@ cp cosmovisor ~/go/bin/cosmovisor
         └── upgrade-info.json
 ```
 
-`cosmovisor/` 目录为应用程序的每个版本(即 `genesis` 或 `upgrades/<name>`)包含一个子目录。在每个子目录中是应用程序二进制文件(即`bin/$DAEMON_NAME`)和与每个二进制文件关联的任何其他辅助文件。 `current` 是指向当前活动目录(即 `genesis` 或 `upgrades/<name>`)的符号链接。 `upgrades/<name>` 中的 `name` 变量是升级模块计划中指定的升级的 URI 编码名称。
+`cosmovisor/`ディレクトリには、アプリケーションの各バージョンのサブディレクトリが含まれます(つまり、`genesis`または`upgrades/<name>`)。 各サブディレクトリ内には、アプリケーションバイナリ(つまり、`bin/$ DAEMON_NAME`)と、各バイナリに関連付けられた追加の補助ファイルがあります。`current`は、現在アクティブなディレクトリ(つまり、`genesis`または`upgrades/<name>`)へのシンボリックリンクです。`upgrades/<name>`の`name`変数は、アップグレードモジュールプランで指定されているアップグレードのURIエンコードされた名前です。
 
-请注意`$DAEMON_HOME/cosmovisor` 只存储*应用程序二进制文件*。 `cosmovisor` 二进制文件本身可以存储在任何典型的位置(例如 `/usr/local/bin`)。应用程序将继续将其数据存储在默认数据目录(例如`$HOME/.gaiad`)或使用`--home` 标志指定的数据目录中。 `$DAEMON_HOME` 独立于数据目录，可以设置为任何位置。如果您将 `$DAEMON_HOME` 设置为与数据目录相同的目录，您将得到如下配置: 
+`$ DAEMON_HOME/cosmovisor`は*アプリケーションバイナリ*のみを保存することに注意してください。`cosmovisor`バイナリ自体は、任意の一般的な場所(たとえば、`/usr/local/bin`)に格納できます。 アプリケーションは引き続き、デフォルトのデータディレクトリ(例:`$ HOME/.gaiad`)または`--home`フラグで指定されたデータディレクトリにデータを保存します。`$ DAEMON_HOME`はデータディレクトリから独立しており、任意の場所に設定できます。`$ DAEMON_HOME`をデータディレクトリと同じディレクトリに設定すると、次のような構成になります。
 
 ```
 .gaiad
@@ -107,46 +106,46 @@ cp cosmovisor ~/go/bin/cosmovisor
 └── cosmovisor
 ```
 
-## 用法
+## 使用法
 
-系统管理员负责:
+システム管理者の責任は次のとおりです。
 
-- 安装 `cosmovisor` 二进制文件
-- 配置主机的初始化系统(例如`systemd`、`launchd`等)
-- 适当设置环境变量
-- 手动安装 `genesis` 文件夹
-- 手动安装 `upgrades/<name>` 文件夹
+-`cosmovisor`バイナリのインストール
+-ホストのinitシステムの構成(例:`systemd`、`launchd`など)
+-環境変数を適切に設定する
+-`genesis`フォルダを手動でインストールする
+-`upgrades/<name>`フォルダを手動でインストールします
 
-`cosmovisor` 会在第一次启动时将 `current` 链接设置为指向 `genesis`(即不存在 `current` 链接时)，然后在正确的时间点处理切换二进制文件，以便系统管理员可以提前几天准备并在升级时放松。
+`cosmovisor`は、最初の開始時(つまり、`current`リンクが存在しない場合)に`current`リンクが`genesis`を指すように設定し、システム管理者が数日前に準備できるように、正しい時点でバイナリの切り替えを処理します。 アップグレード時にリラックスしてください。
 
-为了支持可下载的二进制文件，需要打包每个升级二进制文件的 tarball 并通过规范 URL 提供。此外，包含 genesis 二进制文件和所有可用升级二进制文件的 tarball 可以打包并提供，以便可以轻松下载从一开始就同步全节点所需的所有必要二进制文件。
+ダウンロード可能なバイナリをサポートするには、アップグレードバイナリごとにtarballをパッケージ化して、正規URLから利用できるようにする必要があります。 さらに、ジェネシスバイナリと利用可能なすべてのアップグレードバイナリを含むtarballをパッケージ化して利用できるようにすることで、最初からフルノードを同期するために必要なすべてのバイナリを簡単にダウンロードできます。
 
-`DAEMON` 特定的代码和操作(例如，tendermint 配置、应用程序数据库、同步块等)都按预期工作。应用程序二进制文件的指令(例如命令行标志和环境变量)也按预期工作。
+`DAEMON`固有のコードと操作(例:tendermint構成、アプリケーションデータベース、同期ブロックなど)はすべて期待どおりに機能します。 コマンドラインフラグや環境変数などのアプリケーションバイナリのディレクティブも期待どおりに機能します。
 
-### 检测升级
+### アップグレードの検出
 
-`cosmovisor` 正在轮询 `$DAEMON_HOME/data/upgrade-info.json` 文件以获取新的升级说明。当检测到升级并且区块链达到升级高度时，该文件由“BeginBlocker”中的 x/upgrade 模块创建。
-应用以下启发式方法来检测升级:
+`cosmovisor`は`$ DAEMON_HOME/data/upgrade-info.json`ファイルをポーリングして新しいアップグレード手順を探します。 ファイルは、アップグレードが検出され、ブロックチェーンがアップグレードの高さに達したときに、`BeginBlocker`のx/upgradeモジュールによって作成されます。
+次のヒューリスティックは、アップグレードを検出するために適用されます。
 
-+ 启动时，`cosmovisor` 不太了解当前正在运行的升级，除了`current/bin/` 二进制文件。它尝试读取“current/update-info.json”文件以获取有关当前升级名称的信息。
-+ 如果`cosmovisor/current/upgrade-info.json` 和`data/upgrade-info.json` 都不存在，那么`cosmovisor` 将等待`data/upgrade-info.json` 文件触发升级。
-+ 如果`cosmovisor/current/upgrade-info.json` 不存在但`data/upgrade-info.json` 存在，那么`cosmovisor` 假设`data/upgrade-info.json` 中的任何内容都是有效的升级请求。在这种情况下，`cosmovisor` 会立即尝试根据 `data/upgrade-info.json` 中的 `name` 属性进行升级。
-+ 否则，`cosmovisor` 会等待 `upgrade-info.json` 中的更改。一旦文件中记录了新的升级名称，`cosmovisor` 将触发升级机制。
++ 起動時、`cosmovisor`は、`current/bin/`であるバイナリを除いて、現在実行中のアップグレードについてあまり知りません。`current/update-info.json`ファイルを読み取って、現在のアップグレード名に関する情報を取得しようとします。
++`cosmovisor/current/upgrade-info.json`も`data/upgrade-info.json`も存在しない場合、`cosmovisor`は`data/upgrade-info.json`ファイルがアップグレードをトリガーするのを待ちます。
++`cosmovisor/current/upgrade-info.json`が存在しないが、`data/upgrade-info.json`が存在する場合、`cosmovisor`は`data/upgrade-info.json`にあるものはすべて有効であると見なします アップグレードリクエスト。 この場合、`cosmovisor`は`data/upgrade-info.json`の`name`属性に従ってすぐにアップグレードを試みます。
++ それ以外の場合、`cosmovisor`は`upgrade-info.json`の変更を待ちます。 新しいアップグレード名がファイルに記録されるとすぐに、`cosmovisor`はアップグレードメカニズムをトリガーします。
 
-当升级机制被触发时，`cosmovisor` 将:
+アップグレードメカニズムがトリガーされると、`cosmovisor`は次のようになります。
 
-1. 如果启用了`DAEMON_ALLOW_DOWNLOAD_BINARIES`，首先将新的二进制文件自动下载到`cosmovisor/<name>/bin`(其中`<name>` 是`upgrade-info.json:name` 属性)；
-2.更新`current`符号链接指向新目录，并将`data/upgrade-info.json`保存到`cosmovisor/current/upgrade-info.json`。
+1.`DAEMON_ALLOW_DOWNLOAD_BINARIES`が有効になっている場合は、新しいバイナリを`cosmovisor/<name>/bin`に自動ダウンロードすることから始めます(ここで、`<name>`は`upgrade-info.json:name`属性です)。
+2.`current`シンボリックリンクを更新して新しいディレクトリをポイントし、`data/upgrade-info.json`を`cosmovisor/current/upgrade-info.json`に保存します。
 
-### 自动下载
+### 自動ダウンロード
 
-通常，`cosmovisor` 要求系统管理员在升级之前将所有相关的二进制文件放在磁盘上。然而，对于不需要这种控制并想要自动设置的人(也许他们正在同步一个非验证全节点并且想要做很少的维护)，还有另一种选择。
+通常、`cosmovisor`では、アップグレードを実行する前に、システム管理者が関連するすべてのバイナリをディスクに配置する必要があります。 ただし、そのような制御を必要とせず、自動セットアップが必要な場合(おそらく、検証されていないフルノードを同期していて、メンテナンスをほとんど行わない場合)、別のオプションがあります。
 
-**注意:我们不建议使用自动下载**，因为它不会提前验证二进制文件是否可用。如果下载二进制文件有任何问题，cosmovisor 将停止并且不会重新启动应用程序(这可能导致链停止)。 
+**注:バイナリが使用可能かどうかを事前に確認しないため、自動ダウンロード**の使用はお勧めしません。 バイナリのダウンロードに問題がある場合、cosmovisorは停止し、アプリを再起動しません(チェーンの停止につながる可能性があります)。
 
-如果 `DAEMON_ALLOW_DOWNLOAD_BINARIES` 设置为 `true`，并且在触发升级时找不到本地二进制文件，`cosmovisor` 将尝试根据 `data` 中的 `info` 属性中的说明下载并安装二进制文件本身 /upgrade-info.json` 文件。 这些文件由 x/upgrade 模块构建，并包含来自升级“计划”对象的数据。 `Plan` 有一个信息字段，它应该具有以下两种有效格式之一来指定下载:
+`DAEMON_ALLOW_DOWNLOAD_BINARIES`が`true`に設定されていて、アップグレードがトリガーされたときにローカルバイナリが見つからない場合、`cosmovisor`は`dataの`info`属性の指示に基づいてバイナリ自体をダウンロードしてインストールしようとします/upgrade-info.json`ファイル。 ファイルはx/upgradeモジュールによって構築され、アップグレード`Plan`オブジェクトからのデータが含まれています。`Plan`には、ダウンロードを指定するために次の2つの有効な形式のいずれかを持つことが期待される情報フィールドがあります。
 
-1. 将 os/architecture -> 二进制 URI 映射存储在升级计划信息字段中作为“二进制”键下的 JSON。 例如: 
+1. os/architecture->バイナリURIマップをアップグレードプラン情報フィールドの`" binaries "`キーの下にJSONとして保存します。 例えば:
 
 ```json
 {
@@ -156,7 +155,7 @@ cp cosmovisor ~/go/bin/cosmovisor
 }
 ```
 
-您可以一次包含多个二进制文件，以确保多个环境将收到正确的二进制文件: 
+一度に複数のバイナリを含めて、複数の環境が正しいバイナリを受け取るようにすることができます。
 
 ```json
 {
@@ -168,7 +167,7 @@ cp cosmovisor ~/go/bin/cosmovisor
 }
 ```
 
-将此作为提案提交时，请确保没有空格。 使用“gaiad”的示例命令可能如下所示: 
+これを提案として提出するときは、スペースがないことを確認してください。`gaiad`を使用したコマンドの例は次のようになります。
 
 ```
 > gaiad tx gov submit-proposal software-upgrade Vega \
@@ -185,49 +184,49 @@ cp cosmovisor ~/go/bin/cosmovisor
 --yes
 ```
 
-2. 以上述格式存储包含所有信息的文件的链接(例如，如果您想指定大量二进制文件、更改日志信息等，而无需填充区块链)。 例如: 
+2. 上記の形式のすべての情報を含むファイルへのリンクを保存します(たとえば、ブロックチェーンをいっぱいにせずに多くのバイナリ、変更ログ情報などを指定する場合)。 例えば:
 
 ```
 https://example.com/testnet-1001-info.json?checksum=sha256:deaaa99fda9407c4dbe1d04bd49bab0cc3c1dd76fa392cd55a9425be074af01e
 ```
 
-当 `cosmovisor` 被触发下载新的二进制文件时，`cosmovisor` 会解析 `"binaries"` 字段，使用 [go-getter](https://github.com/hashicorp/go-getter) 下载新的二进制文件 ，并将新的二进制文件解压到 `upgrades/<name>` 文件夹中，这样它就可以像手动安装一样运行。
+`cosmovisor`がトリガーされて新しいバイナリがダウンロードされると、`cosmovisor`は`" binarys "`フィールドを解析し、[go-getter](https://github.com/hashicorp/go-getter)を使用して新しいバイナリをダウンロードします。 、新しいバイナリを`upgrades/<name>`フォルダに解凍して、手動でインストールしたかのように実行できるようにします。
 
-请注意，为了让此机制提供强大的安全保证，所有 URL 都应包含 SHA 256/512 校验和。 这确保不会运行虚假的二进制文件，即使有人入侵服务器或劫持 DNS。 `go-getter` 将始终确保下载的文件与提供的校验和匹配。 `go-getter` 还将处理将档案解压到目录中(在这种情况下，下载链接应该指向 `bin` 目录中所有数据的 `zip` 文件)。
+このメカニズムで強力なセキュリティ保証を提供するには、すべてのURLにSHA256/512チェックサムを含める必要があることに注意してください。 これにより、誰かがサーバーをハッキングしたりDNSを乗っ取ったりした場合でも、誤ったバイナリが実行されないことが保証されます。`go-getter`は、ダウンロードされたファイルが提供されている場合、チェックサムと一致することを常に確認します。`go-getter`は、ディレクトリへのアーカイブの解凍も処理します(この場合、ダウンロードリンクは`bin`ディレクトリ内のすべてのデータの`zip`ファイルを指している必要があります)。。
 
-要在 linux 上正确创建 sha256 校验和，您可以使用 `sha256sum` 实用程序。 例如: 
+Linuxでsha256チェックサムを適切に作成するには、`sha256sum`ユーティリティを使用できます。 例えば: 
 
 ```
 sha256sum ./testdata/repo/zip_directory/autod.zip
 ```
 
-结果将类似于以下内容:`29139e1381b8177aec909fab9a75d11381cab5adf7d3af0c05ff1c9c117743a7`。
+結果は次のようになります。`29139e1381b8177aec909fab9a75d11381cab5adf7d3af0c05ff1c9c117743a7`。
 
-如果您希望使用更长的散列，您也可以使用 `sha512sum`，或者如果您希望使用损坏的散列，您也可以使用 `md5sum`。 无论您选择哪种方式，请确保在 URL 的校验和参数中正确设置哈希算法。
+より長いハッシュを使用したい場合は`sha512sum`を使用し、壊れたハッシュを使用したい場合は`md5sum`を使用することもできます。 どちらを選択する場合でも、URLのチェックサム引数でハッシュアルゴリズムを適切に設定してください。
 
-## 示例:SimApp 升级
+## 例:SimAppのアップグレード
 
-以下说明使用 Cosmos SDK 源代码附带的模拟应用程序 (`simapp`) 演示了 `cosmovisor`。 以下命令将从 `cosmos-sdk` 存储库中运行。
+次の手順は、Cosmos SDKのソースコードに付属のシミュレーションアプリケーション(`simapp`)を使用した`cosmovisor`のデモンストレーションを提供します。 次のコマンドは、`cosmos-sdk`リポジトリ内から実行されます。
 
-首先，查看最新的 `v0.42` 版本: 
+まず、最新の`v0.42`リリースを確認してください。
 
 ```
 git checkout v0.42.7
 ```
 
-Compile the `simd` binary:
+`simd`バイナリをコンパイルします。
 
 ```
 make build
 ```
 
-Reset `~/.simapp` (never do this in a production environment):
+`〜/.simapp`をリセットします(実稼働環境では絶対に行わないでください)。
 
 ```
 ./build/simd unsafe-reset-all
 ```
 
-Configure the `simd` binary for testing:
+テスト用に`simd`バイナリを設定します。
 
 ```
 ./build/simd config chain-id test
@@ -235,7 +234,7 @@ Configure the `simd` binary for testing:
 ./build/simd config broadcast-mode block
 ```
 
-Initialize the node and overwrite any previous genesis file (never do this in a production environment):
+ノードを初期化し、以前のジェネシスファイルを上書きします(本番環境では絶対に行わないでください)。
 
 <!-- TODO: init does not read chain-id from config -->
 
@@ -243,13 +242,13 @@ Initialize the node and overwrite any previous genesis file (never do this in a 
 ./build/simd init test --chain-id test --overwrite
 ```
 
-Set the minimum gas price to `0stake` in `~/.simapp/config/app.toml`:
+`〜/.simapp/config/app.toml`で最低ガス価格を`0stake`に設定します。
 
 ```
 minimum-gas-prices = "0stake"
 ```
 
-Create a new key for the validator, then add a genesis account and transaction:
+バリデーターの新しいキーを作成してから、ジェネシスアカウントとトランザクションを追加します。
 
 <!-- TODO: add-genesis-account does not read keyring-backend from config -->
 <!-- TODO: gentx does not read chain-id from config -->
@@ -261,43 +260,43 @@ Create a new key for the validator, then add a genesis account and transaction:
 ./build/simd collect-gentxs
 ```
 
-Set the required environment variables:
+必要な環境変数を設定します。
 
 ```
 export DAEMON_NAME=simd
 export DAEMON_HOME=$HOME/.simapp
 ```
 
-Set the optional environment variable to trigger an automatic restart:
+オプションの環境変数を設定して、自動再起動をトリガーします。
 
 ```
 export DAEMON_RESTART_AFTER_UPGRADE=true
 ```
 
-Create the folder for the genesis binary and copy the `simd` binary:
+ジェネシスバイナリ用のフォルダを作成し、`simd`バイナリをコピーします。
 
 ```
 mkdir -p $DAEMON_HOME/cosmovisor/genesis/bin
 cp ./build/simd $DAEMON_HOME/cosmovisor/genesis/bin
 ```
 
-For the sake of this demonstration, amend `voting_period` in `genesis.json` to a reduced time of 20 seconds (`20s`):
+このデモンストレーションのために、`genesis.json`の`voting_period`を20秒(`20s`)の短縮された時間に修正します。
 
 ```
 cat <<< $(jq '.app_state.gov.voting_params.voting_period = "20s"' $HOME/.simapp/config/genesis.json) > $HOME/.simapp/config/genesis.json
 ```
 
-Next, we will hardcode a modification in `simapp` to simulate a code change. In `simapp/app.go`, find the line containing the `UpgradeKeeper` initialization. It should look like the following:
+次に、コードの変更をシミュレートするために、`simapp`で変更をハードコーディングします。`simapp/app.go`で、`UpgradeKeeper`初期化を含む行を見つけます。 次のようになります。
 
 ```go
 app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath)
 ```
 
-After that line, add the following:
+その行の後に、以下を追加します。
 
 ```go
 app.UpgradeKeeper.SetUpgradeHandler("test1", func(ctx sdk.Context, plan upgradetypes.Plan) {
-	// Add some coins to a random account
+	//Add some coins to a random account
 	addr, err := sdk.AccAddressFromBech32("cosmos18cgkqduwuh253twzmhedesw3l7v3fm37sppt58")
 	if err != nil {
 		panic(err)
@@ -309,26 +308,26 @@ app.UpgradeKeeper.SetUpgradeHandler("test1", func(ctx sdk.Context, plan upgradet
 })
 ```
 
-Now recompile the `simd` binary with the added upgrade handler:
+次に、アップグレードハンドラーを追加して`simd`バイナリを再コンパイルします。
 
 ```
 make build
 ```
 
-Create the folder for the upgrade binary and copy the `simd` binary:
+アップグレードバイナリ用のフォルダを作成し、`simd`バイナリをコピーします。
 
 ```
 mkdir -p $DAEMON_HOME/cosmovisor/upgrades/test1/bin
 cp ./build/simd $DAEMON_HOME/cosmovisor/upgrades/test1/bin
 ```
 
-Start `cosmosvisor`:
+`cosmosvisor`を開始します。
 
 ```
 cosmovisor run start
 ```
 
-Open a new terminal window and submit an upgrade proposal along with a deposit and a vote (these commands must be run within 20 seconds of each other):
+新しいターミナルウィンドウを開き、デポジットと投票とともにアップグレード提案を送信します(これらのコマンドは互いに20秒以内に実行する必要があります)。
 
 ```
 ./build/simd tx gov submit-proposal software-upgrade test1 --title upgrade --description upgrade --upgrade-height 20 --from validator --yes
@@ -336,4 +335,4 @@ Open a new terminal window and submit an upgrade proposal along with a deposit a
 ./build/simd tx gov vote 1 yes --from validator --yes
 ```
 
-The upgrade will occur automatically at height 20.
+アップグレードは高さ20で自動的に行われます。

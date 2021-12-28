@@ -1,21 +1,21 @@
-# Bech32 on Cosmos
+# コスモスのBech32
 
-The Cosmos network prefers to use the Bech32 address format wherever users must handle binary data. Bech32 encoding provides robust integrity checks on data and the human readable part (HRP) provides contextual hints that can assist UI developers with providing informative error messages.
+Cosmosネットワークは、ユーザーがバイナリデータを処理する必要がある場合は常にBech32アドレス形式を使用することを好みます。 Bech32エンコーディングは、データの堅牢な整合性チェックを提供し、人間が読める部分(HRP)は、UI開発者が有益なエラーメッセージを提供するのに役立つコンテキストヒントを提供します。
 
-In the Cosmos network, keys and addresses may refer to a number of different roles in the network like accounts, validators etc.
+Cosmosネットワークでは、キーとアドレスは、アカウント、バリデーターなど、ネットワーク内のさまざまな役割を参照する場合があります。
 
-## HRP table
+## HRPテーブル
 
-| HRP              | Definition                            |
+| HRP |定義|
 | ---------------- | ------------------------------------- |
-| cosmos           | Cosmos Account Address                |
-| cosmosvalcons    | Cosmos Validator Consensus Address    |
-| cosmosvaloper    | Cosmos Validator Operator Address     |
+|コスモス|コスモスアカウントアドレス|
+|コスモスバルコン| CosmosValidatorコンセンサスアドレス|
+|コスモスバロパー| CosmosValidatorオペレーターアドレス|
 
-## Encoding
+## エンコーディング
 
-While all user facing interfaces to Cosmos software should exposed Bech32 interfaces, many internal interfaces encode binary value in hex or base64 encoded form.
+Cosmosソフトウェアへのすべてのユーザー向けインターフェイスはBech32インターフェイスを公開する必要がありますが、多くの内部インターフェイスはバイナリ値を16進数またはbase64でエンコードされた形式でエンコードします。
 
-To covert between other binary representation of addresses and keys, it is important to first apply the Amino encoding process before Bech32 encoding.
+アドレスとキーの他のバイナリ表現を隠すには、Bech32エンコーディングの前に最初にAminoエンコーディングプロセスを適用することが重要です。
 
-A complete implementation of the Amino serialization format is unnecessary in most cases. Simply prepending bytes from this [table](https://github.com/tendermint/spec/blob/master/spec/blockchain/encoding.md#public-key-cryptography) to the byte string payload before Bech32 encoding will sufficient for compatible representation.
+ほとんどの場合、Aminoシリアル化形式の完全な実装は不要です。 Bech32エンコーディングで十分になる前に、この[テーブル](https://github.com/tendermint/spec/blob/master/spec/blockchain/encoding.md#public-key-cryptography)からバイト文字列ペイロードにバイトを追加するだけです。互換性のある表現。

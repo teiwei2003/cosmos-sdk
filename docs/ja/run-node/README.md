@@ -1,11 +1,11 @@
-# 运行节点、API 和 CLI
+# ノード、API、CLIの実行
 
-此脚本包含有关如何运行节点并与之交互的文档。
+このスクリプトには、ノードを実行して操作する方法に関するドキュメントが含まれています。
 
-1. [设置钥匙圈](./keyring.md)
-2. [运行节点](./run-node.md)
-3. [与节点交互](./interact-node.md)
-4. [生成、签署和广播交易](./txs.md)
-5. [Cosmos 升级管理器](./cosmovisor.md)
-6. [Rosetta API](./rosetta.md)
-7. [运行测试网](./run-testnet.md) 
+1. [キーリングの設定](./keyring.md)
+2. [ノードの実行](./run-node.md)
+3. [ノードとの相互作用](./interact-node.md)
+4. [トランザクションの生成、署名、およびブロードキャスト](./txs.md)
+5. [コスモスアップグレードマネージャー](./cosmovisor.md)
+6. [APIロゼット](./rosetta.md)
+7. [テストネットの実行](./run-testnet.md) 

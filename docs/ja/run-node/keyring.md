@@ -1,49 +1,39 @@
-# 设置钥匙圈
+# キーリングの設定
 
-本文档描述了如何为 [**application**](../basics/app-anatomy.md) 配置和使用密钥环及其各种后端。 {概要}
+このドキュメントでは、[**アプリケーション**](../basics/app-anatomy.md)のキーリングとそのさまざまなバックエンドを構成して使用する方法について説明します。 {synopsis}
 
-密钥环保存用于与节点交互的私有/公共密钥对。例如，在运行区块链节点之前需要设置验证器密钥，以便正确签署区块。私钥可以存储在不同的位置，称为“后端”，例如文件或操作系统自己的密钥存储。
+キーリングは、ノードとの対話に使用される秘密/公開キーペアを保持します。 たとえば、ブロックチェーンノードを実行する前に検証キーを設定して、ブロックに正しく署名できるようにする必要があります。 秘密鍵は、ファイルやオペレーティングシステム自体の鍵ストレージなど、「バックエンド」と呼ばれるさまざまな場所に保存できます。
 
-## 密钥环的可用后端
+## キーリングに使用可能なバックエンド
 
-从 v0.38.0 版本开始，Cosmos SDK 附带了一个新的密钥环实现
-它提供了一组以安全方式管理加密密钥的命令。这
-新的密钥环支持多个存储后端，其中一些可能无法在
-所有操作系统。
+v0.38.0リリース以降、CosmosSDKには新しいキーリングの実装が付属しています
+これは、暗号化キーを安全な方法で管理するための一連のコマンドを提供します。 ザ
+新しいキーリングは複数のストレージバックエンドをサポートしますが、その一部はで利用できない場合があります
+すべてのオペレーティングシステム。
 
-### `os` 后端
+### `os`バックエンド
 
-`os` 后端依赖于操作系统特定的默认值来处理密钥存储
-安全地。通常，操作系统的凭证子系统处理密码提示，
-私钥存储，以及根据用户密码策略的用户会话。这里
-是最流行的操作系统及其各自的密码管理器的列表:
+`os`バックエンドは、キーストレージを処理するためにオペレーティングシステム固有のデフォルトに依存しています安全に。通常、オペレーティングシステムのクレデンシャルサブシステムは、パスワードプロンプトを処理します。
+秘密鍵の保管、およびユーザーのパスワードポリシーに従ったユーザーセッション。 ここ最も人気のあるオペレーティングシステムとそれぞれのパスワードマネージャーのリストです。
 
-- macOS(自 Mac OS 8.6 起):[钥匙串](https://support.apple.com/en-gb/guide/keychain-access/welcome/mac)
-- Windows:[凭据管理 API](https://docs.microsoft.com/en-us/windows/win32/secauthn/credentials-management)
+- macOS (since Mac OS 8.6): [Keychain](https://support.apple.com/en-gb/guide/keychain-access/welcome/mac)
+- Windows: [Credentials Management API](https://docs.microsoft.com/en-us/windows/win32/secauthn/credentials-management)
 - GNU/Linux:
     - [libsecret](https://gitlab.gnome.org/GNOME/libsecret)
     - [kwallet](https://api.kde.org/frameworks/kwallet/html/index.html)
 
-使用 GNOME 作为默认桌面环境的 GNU/Linux 发行版通常带有
-[海马](https://wiki.gnome.org/Apps/Seahorse)。基于 KDE 的发行版的用户是
-通常随 [KDE 钱包管理器](https://userbase.kde.org/KDE_Wallet_Manager) 提供。
-虽然前者实际上是一个 `libsecret` 方便的前端，后者是一个 `kwallet`
-客户。
+デフォルトのデスクトップ環境としてGNOMEを使用するGNU/Linuxディストリビューションには、通常、[Seahorse](https://wiki.gnome.org/Apps/Seahorse)が付属しています。 KDEベースのディストリビューションのユーザーには、通常、[KDE Wallet Manager](https://userbase.kde.org/KDE_Wallet_Manager)が提供されます。
+前者は実際には「libsecret」の便利なフロントエンドですが、後者は「kwallet」クライアントです。
 
-`os` 是默认选项，因为操作系统的默认凭据管理器是
-旨在满足用户最常见的需求，并为他们提供舒适的
-在不影响安全性的情况下体验。
+オペレーティングシステムのデフォルトのクレデンシャルマネージャーは、ユーザーの最も一般的なニーズを満たし、セキュリティを損なうことなく快適なエクスペリエンスを提供するように設計されているため、`os`がデフォルトのオプションです。
 
-推荐用于无头环境的后端是 `file` 和 `pass`。
+ヘッドレス環境で推奨されるバックエンドは、`file`と`pass`です。
 
-### `file` 后端
+### `file`バックエンド
 
-`file` 后端更类似于之前使用的 keybase 实现
-v0.38.1。它将加密的密钥环存储在应用程序的配置目录中。这
-keyring 每次访问都会请求密码，可能会出现多次
-次在单个命令中导致重复的密码提示。如果使用 bash 脚本
-要使用 `file` 选项执行命令，您可能需要使用以下格式
-对于多个提示: 
+`file`バックエンドは、v0.38.1より前に使用されていたキーベースの実装によく似ています。 暗号化されたキーリングをアプリの構成ディレクトリに保存します。
+このキーリングは、アクセスされるたびにパスワードを要求します。これは、1つのコマンドで複数回発生し、パスワードプロンプトが繰り返される場合があります。
+bashスクリプトを使用して`file`オプションを使用してコマンドを実行する場合は、複数のプロンプトに次の形式を使用することをお勧めします。 
 
 ```sh
 # assuming that KEYPASSWD is set in the environment
@@ -56,65 +46,59 @@ $ echo $KEYPASSWD | gaiacli keys show me                          # single promp
 The first time you add a key to an empty keyring, you will be prompted to type the password twice.
 :::
 
-### `pass` 后端
+### `pass`バックエンド
 
-`pass` 后端使用 [pass](https://www.passwordstore.org/) 实用程序来管理磁盘
-密钥的敏感数据和元数据的加密。 密钥存储在“gpg”加密文件中
-在特定于应用程序的目录中。 `pass` 可用于最流行的 UNIX
-操作系统以及 GNU/Linux 发行版。 请参阅其手册页了解
-有关如何下载和安装它的信息。
+`pass`バックエンドは、[pass](https://www.passwordstore.org/)ユーティリティを使用して、キーの機密データとメタデータのディスク上の暗号化を管理します。
+キーは、アプリ固有のディレクトリ内の`gpg`暗号化ファイル内に保存されます。
+`pass`は、最も一般的なUNIXオペレーティングシステムとGNU/Linuxディストリビューションで使用できます。
+ダウンロードとインストールの方法については、マニュアルページを参照してください。
 
-::: 小费
-**pass** 使用 [GnuPG](https://gnupg.org/) 进行加密。 `gpg` 自动调用 `gpg-agent`
-守护进程在执行时处理 GnuPG 凭据的缓存。 请参考`gpg-agent`
-有关如何配置缓存参数(例如凭据 TTL 和
-密码过期。
+::: ヒント
+**pass**は、暗号化に[GnuPG](https://gnupg.org/)を使用します。`gpg`は、実行時に`gpg-agent`デーモンを自動的に呼び出します。このデーモンは、GnuPGクレデンシャルのキャッシュを処理します。
+クレデンシャルTTLやクレデンシャルなどのキャッシュパラメータを設定する方法の詳細については、`gpg-agent`のマニュアルページを参照してください。
+パスフレーズの有効期限。
 :::
 
-密码存储必须在第一次使用之前设置: 
+パスワードストアは、最初に使用する前に設定する必要があります。 
 
 ```sh
 pass init <GPG_KEY_ID>
 ```
 
-将 `<GPG_KEY_ID>` 替换为您的 GPG 密钥 ID。您可以使用您的个人 GPG 密钥或替代密钥
-您可能希望专门用于加密密码存储。
+`<GPG_KEY_ID>`をGPGキーIDに置き換えます。 個人のGPGキーまたは代替を使用できます。パスワードストアを暗号化するために特に使用する場合があります。
 
-### `kwallet` 后端
+### `kwallet`バックエンド
 
-`kwallet` 后端使用 `KDE Wallet Manager`，它默认安装在
-将 KDE 作为默认桌面环境提供的 GNU/Linux 发行版。请参阅
-[KWallet 手册](https://docs.kde.org/stable5/en/kdeutils/kwallet5/index.html) 了解更多
-信息。
+`kwallet`バックエンドは`KDE Wallet Manager`を使用します。これは、KDEをデフォルトのデスクトップ環境として出荷するGNU/Linuxディストリビューションにデフォルトでインストールされます。
+詳細については、[KWalletハンドブック(https://docs.kde.org/stable5/en/kdeutils/kwallet5/index.html)を参照してください。
 
-### `test` 后端
+### `test`バックエンド
 
-`test` 后端是 `file` 后端的无密码变体。存储密钥
-磁盘上未加密。
+`test`バックエンドは、`file`バックエンドのパスワードなしのバリエーションです。 キーは暗号化されずにディスクに保存されます。
 
-**仅用于测试目的。不建议在生产环境中使用 `test` 后端**。
+**テスト目的でのみ提供されます。`test`バックエンドを本番環境で使用することはお勧めしません**。
 
-### `memory` 后端
+### `メモリ`バックエンド
 
-`memory` 后端将密钥存储在内存中。程序退出后，这些键会立即被删除。
+`memory`バックエンドはキーをメモリに保存します。 プログラムが終了すると、キーはすぐに削除されます。
 
-**仅用于测试目的。不建议在生产环境中使用 `memory` 后端**。
+**テスト目的でのみ提供されます。`memory`バックエンドを本番環境で使用することはお勧めしません**。
 
-## 将密钥添加到密钥环
+## キーリングにキーを追加する
 
 ::: 警告
-确保您可以构建自己的二进制文件，并在代码段中将“simd”替换为您的二进制文件的名称。
+独自のバイナリを作成できることを確認し、スニペットで`simd`をバイナリの名前に置き換えてください。
 :::
 
-使用 Cosmos SDK 开发的应用程序带有 `keys` 子命令。出于本教程的目的，我们将运行 `simd` CLI，这是一个使用 Cosmos SDK 构建的应用程序，用于测试和教育目的。更多信息请参见[`simapp`](https://github.com/cosmos/cosmos-sdk/tree/v0.40.0-rc3/simapp)。
+Cosmos SDKを使用して開発されたアプリケーションには、`keys`サブコマンドが付属しています。 このチュートリアルでは、テストと教育の目的でCosmosSDKを使用して構築されたアプリケーションである`simd`CLIを実行しています。 詳細については、[`simapp`](https://github.com/cosmos/cosmos-sdk/tree/v0.40.0-rc3/simapp)を参照してください。
 
-您可以使用 `simd keys` 获取有关 keys 命令的帮助，使用 `simd keys [command] --help` 获取有关特定子命令的更多信息。
+キーコマンドのヘルプには`simd keys`を使用し、特定のサブコマンドの詳細については`simd keys [command]-help`を使用できます。
 
-::: 小费
-您还可以使用 `simd completion` 命令启用自动完成功能。例如，在 bash 会话开始时，运行 `. <(simd completion)`，并且所有 `simd` 子命令都将自动完成。
+::: ヒント
+`simdcompletion`コマンドでオートコンプリートを有効にすることもできます。 たとえば、bashセッションの開始時に、`を実行します。 <(simd complete)`、およびすべての`simd`サブコマンドは自動補完されます。
 :::
 
-要在密钥环中创建新密钥，请运行带有 `<key_name>` 参数的 `add` 子命令。出于本教程的目的，我们将仅使用 `test` 后端，并调用我们的新密钥 `my_validator`。此键将在下一节中使用。 
+キーリングに新しいキーを作成するには、`<key_name>`引数を指定して`add`サブコマンドを実行します。 このチュートリアルでは、`test`バックエンドのみを使用し、新しいキー`my_validator`を呼び出します。 このキーは次のセクションで使用されます。
 
 ```bash
 $ simd keys add my_validator --keyring-backend test
@@ -123,10 +107,10 @@ $ simd keys add my_validator --keyring-backend test
 MY_VALIDATOR_ADDRESS=$(simd keys show my_validator -a --keyring-backend test)
 ```
 
-此命令生成一个新的 24 字助记词，将其持久化到相关后端，并输出有关密钥对的信息。 如果此密钥对将用于保存有价值的令牌，请务必在安全的地方写下助记词！
+このコマンドは、新しい24ワードのニーモニックフレーズを生成し、それを関連するバックエンドに保持し、キーペアに関する情報を出力します。 このキーペアを使用して価値のあるトークンを保持する場合は、ニーモニックフレーズを安全な場所に書き留めてください。
 
-默认情况下，密钥环会生成一个“secp256k1”密钥对。 密钥环还支持“ed25519”密钥，可以通过传递“--algo ed25519”标志来创建。 一个密钥环当然可以同时保存两种类型的密钥，Cosmos SDK 的 `x/auth` 模块(特别是它的 [AnteHandlers](../core/baseapp.md#antehandler))本身就支持这两种公钥算法。
+デフォルトでは、キーリングは`secp256k1`キーペアを生成します。 キーリングは`ed25519`キーもサポートします。これは、`--algoed25519`フラグを渡すことで作成できます。 もちろん、キーリングは両方のタイプのキーを同時に保持でき、CosmosSDKの`x/auth`モジュール(特に[AnteHandlers](../core/baseapp.md＃antehandler))は、これら2つの公開鍵アルゴリズムをネイティブにサポートします。
 
-## 下一个 {hide}
+## 次へ{非表示}
 
-阅读有关 [运行节点](./run-node.md) {hide} 
+[ノードの実行](./run-node.md){hide}について読む

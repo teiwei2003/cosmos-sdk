@@ -1,21 +1,21 @@
-# Specifications
+#  仕様
 
-This directory contains specifications for the modules of the Cosmos SDK as well as Interchain Standards (ICS) and other specifications.
+このディレクトリには、Cosmos SDKのモジュールの仕様、Interchain Standards(ICS)およびその他の仕様が含まれています。
 
-Cosmos SDK applications hold this state in a Merkle store. Updates to
-the store may be made during transactions and at the beginning and end of every
-block.
+Cosmos SDKアプリケーションは、この状態をMerkleストアに保持します。 の更新
+ストアは、トランザクション中、およびすべての開始時と終了時に作成される場合があります
+ブロック。
 
-## Cosmos SDK specifications
+## CosmosSDKの仕様
 
-- [Store](./store) - The core Merkle store that holds the state.
-- [Bech32](./addresses/bech32.md) - Address format for Cosmos SDK applications.
+- [Store](./store)-状態を保持するコアMerkleストア。
+- [Bech32](./addresss/bech32.md)-CosmosSDKアプリケーションのアドレス形式。
 
-## Modules specifications
+## モジュールの仕様
 
-Go the [module directory](../../x/README.md)
+[モジュールディレクトリ](../../x/README.md)に移動します
 
-## Tendermint
+## テンダーミント
 
-For details on the underlying blockchain and p2p protocols, see
-the [Tendermint specification](https://github.com/tendermint/spec/tree/master/spec).
+基盤となるブロックチェーンおよびp2pプロトコルの詳細については、を参照してください。
+[Tendermint仕様](https://github.com/tendermint/spec/tree/master/spec)。

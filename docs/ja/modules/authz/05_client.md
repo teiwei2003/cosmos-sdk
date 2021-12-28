@@ -1,10 +1,10 @@
-# 客户
+# お客様
 
-##命令行界面
+## コマンドラインインターフェイス
 
-用户可以使用 CLI 查询“authz”模块并与之交互。
+ユーザーはCLIを使用して、「authz」モジュールを照会および操作できます。
 
-### 询问
+### query
 
 `query` 命令允许用户查询 `authz` 状态。 
 
@@ -14,19 +14,19 @@ simd query authz --help
 
 #### grants
 
-`grants` 命令允许用户查询授权者-被授权者对的授权。 如果设置了消息类型 URL，则它只为该消息类型选择授权。 
+`grants`コマンドを使用すると、ユーザーは承認者の承認を受けた人の承認を照会できます。 メッセージタイプのURLが設定されている場合、そのメッセージタイプの認証のみが選択されます。
 
 ```bash
 simd query authz grants [granter-addr] [grantee-addr] [msg-type-url]? [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query authz grants cosmos1.. cosmos1.. /cosmos.bank.v1beta1.MsgSend
 ```
 
-Example Output:
+出力例:
 
 ```bash
 grants:
@@ -41,7 +41,7 @@ pagination: null
 
 ### Transactions
 
-The `tx` commands allow users to interact with the `authz` module.
+`tx`コマンドを使用すると、ユーザーは` authz`モジュールを操作できます。
 
 ```bash
 simd tx authz --help
@@ -49,13 +49,13 @@ simd tx authz --help
 
 #### exec
 
-The `exec` command allows a grantee to execute a transaction on behalf of granter.
+`exec`コマンドを使用すると、被付与者は、付与者に代わってトランザクションを実行できます。
 
 ```bash
   simd tx authz exec [tx-json-file] --from [grantee] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx authz exec tx.json --from=cosmos1..
@@ -63,13 +63,13 @@ simd tx authz exec tx.json --from=cosmos1..
 
 #### grant
 
-The `grant` command allows a granter to grant an authorization to a grantee.
+`grant`コマンドを使用すると、付与者は被付与者に許可を与えることができます。
 
 ```bash
 simd tx authz grant <grantee> <authorization_type="send"|"generic"|"delegate"|"unbond"|"redelegate"> --from <granter> [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx authz grant cosmos1.. send --spend-limit=100stake --from=cosmos1..
@@ -77,13 +77,13 @@ simd tx authz grant cosmos1.. send --spend-limit=100stake --from=cosmos1..
 
 #### revoke
 
-The `revoke` command allows a granter to revoke an authorization from a grantee.
+`revoke`コマンドを使用すると、付与者は被付与者からの承認を取り消すことができます。
 
 ```bash
 simd tx authz revoke [grantee] [msg-type-url] --from=[granter] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx authz revoke cosmos1.. /cosmos.bank.v1beta1.MsgSend --from=cosmos1..
@@ -91,17 +91,17 @@ simd tx authz revoke cosmos1.. /cosmos.bank.v1beta1.MsgSend --from=cosmos1..
 
 ## gRPC
 
-A user can query the `authz` module using gRPC endpoints.
+ユーザーは、gRPCエンドポイントを使用して `authz`モジュールをクエリできます。
 
 ### Grants
 
-The `Grants` endpoint allows users to query grants for a granter-grantee pair. If the message type URL is set, it selects grants only for that message type.
+`Grants`エンドポイントを使用すると、ユーザーは、助成者と助成金のペアの助成金を照会できます。 メッセージタイプのURLが設定されている場合、そのメッセージタイプに対してのみ許可が選択されます。
 
 ```bash
 cosmos.authz.v1beta1.Query/Grants
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -110,7 +110,7 @@ grpcurl -plaintext \
     cosmos.authz.v1beta1.Query/Grants
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -131,21 +131,21 @@ Example Output:
 }
 ```
 
-## REST
+## 休み
 
-A user can query the `authz` module using REST endpoints.
+ユーザーは、RESTエンドポイントを使用して `authz`モジュールを照会できます。
 
 ```bash
 /cosmos/authz/v1beta1/grants
 ```
 
-Example:
+例:
 
 ```bash
 curl "localhost:1317/cosmos/authz/v1beta1/grants?granter=cosmos1..&grantee=cosmos1..&msg_type_url=/cosmos.bank.v1beta1.MsgSend"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {

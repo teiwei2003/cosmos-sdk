@@ -1,25 +1,16 @@
-# 开始块
+# スターティングブロック
 
-## 活性跟踪
+## 活力追跡
 
-在每个块的开始，我们更新每个块的“ValidatorSigningInfo”
-验证器并检查它们是否超过了活跃度阈值
-滑动窗口。这个滑动窗口由`SignedBlocksWindow`和
-此窗口中的索引由验证器中的“IndexOffset”决定
-`验证器签名信息`。对于处理的每个块，“IndexOffset”递增
-无论验证者是否签名。指标确定后，
-`MissedBlocksBitArray` 和 `MissedBlocksCounter` 相应更新。
+各ブロックの開始時に、各バリデーターの `ValidatorSigningInfo`を更新し、スライディングウィンドウ上でそれらが活性しきい値を下回ったかどうかを確認します。
+このスライディングウィンドウは、 `SignedBlocksWindow`と
+このウィンドウのインデックスは、バリデーターの `ValidatorSigningInfo`にある` IndexOffset`によって決定されます。 処理されたブロックごとに、バリデーターが署名したかどうかに関係なく、 `IndexOffset`がインクリメントされます。 インデックスが決定されると、それに応じて `MissedBlocksBitArray`と` MissedBlocksCounter`が更新されます。
 
-最后，为了确定验证器是否低于活跃度阈值，
-我们获取丢失的最大块数，`maxMissed`，即
-`SignedBlocksWindow - (MinSignedPerWindow * SignedBlocksWindow)` 和最小值
-我们可以确定活跃度的高度，`minHeight`。如果当前块是
-大于 `minHeight` 并且验证器的 `MissedBlocksCounter` 大于
-`maxMissed`，他们将被 `SlashFractionDowntime` 削减，将被监禁
-对于`DowntimeJailDuration`，并重置以下值:
-`MissedBlocksBitArray`、`MissedBlocksCounter` 和 `IndexOffset`。
+最後に、バリデーターが活性しきい値を下回ったかどうかを判断するために、欠落したブロックの最大数 `maxMissed`をフェッチします。これは` SignedBlocksWindow-（MinSignedPerWindow * SignedBlocksWindow） `であり、活性を判断できる最小の高さです。 `minHeight`。 現在のブロックが `minHeight`より大きく、バリデーターの` MissedBlocksCounter`がより大きい場合
+`maxMissed`は、` SlashFractionDowntime`によってスラッシュされ、 `DowntimeJailDuration`のために投獄され、次の値がリセットされます。
+`MissedBlocksBitArray`、` MissedBlocksCounter`、および `IndexOffset`。
 
-**注意**:活性斜线**不会**导致墓碑。 
+**注**：活気のあるスラッシュは、墓を踏みにじることにはなりません。 
 
 ```go
 height := block.Height

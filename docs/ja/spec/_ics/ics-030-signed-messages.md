@@ -1,69 +1,69 @@
-# ICS 030: Cosmos Signed Messages
+# ICS 030：コスモス署名メッセージ
 
->TODO: Replace with valid ICS number and possibly move to new location.
+> TODO：有効なICS番号に置き換えて、新しい場所に移動する可能性があります。
 
-* [Changelog](#changelog)
-* [Abstract](#abstract)
-* [Preliminary](#preliminary)
-* [Specification](#specification)
-* [Future Adaptations](#future-adaptations)
-* [API](#api)
-* [References](#references)
+* [変更ログ](＃changelog)
+* [要約](＃abstract)
+* [暫定版](＃preliminary)
+* [仕様](＃specification)
+* [将来の適応](＃future-adaptations)
+* [API](＃api)
+* [参照](＃references)
 
-## Status
+## 状態
 
-Proposed.
+提案。
 
-## Changelog
+## 変更ログ
 
-## Abstract
+## 概要
 
-Having the ability to sign messages off-chain has proven to be a fundamental aspect
-of nearly any blockchain. The notion of signing messages off-chain has many
-added benefits such as saving on computational costs and reducing transaction
-throughput and overhead. Within the context of the Cosmos, some of the major
-applications of signing such data includes, but is not limited to, providing a
-cryptographic secure and verifiable means of proving validator identity and
-possibly associating it with some other framework or organization. In addition,
-having the ability to sign Cosmos messages with a Ledger or similar HSM device.
+オフチェーンでメッセージに署名する機能を持つことは、基本的な側面であることが証明されています
+ほぼすべてのブロックチェーンの。 オフチェーンでメッセージに署名するという概念には多くの
+計算コストの節約やトランザクションの削減などの追加のメリット
+スループットとオーバーヘッド。 コスモスの文脈の中で、主要なもののいくつか
+このようなデータに署名するアプリケーションには、以下が含まれますが、これに限定されません。
+検証者の身元を証明する暗号化された安全で検証可能な手段と
+おそらくそれを他のフレームワークや組織と関連付けることです。 加えて、
+元帳または同様のHSMデバイスを使用してCosmosメッセージに署名する機能を備えています。
 
-A standardized protocol for hashing, signing, and verifying messages that can be
-implemented by the Cosmos SDK and other third-party organizations is needed. Such a
-standardized protocol subscribes to the following:
+メッセージをハッシュ、署名、および検証するための標準化されたプロトコル
+CosmosSDKおよびその他のサードパーティ組織による実装が必要です。 そのような
+標準化されたプロトコルは、以下をサブスクライブします。
 
-* Contains a specification of human-readable and machine-verifiable typed structured data
-* Contains a framework for deterministic and injective encoding of structured data
-* Utilizes cryptographic secure hashing and signing algorithms
-* A framework for supporting extensions and domain separation
-* Is invulnerable to chosen ciphertext attacks
-* Has protection against potentially signing transactions a user did not intend to
+* 人間が読み取れる、機械で検証できる型付き構造化データの仕様が含まれています
+* 構造化データの決定論的かつ単射エンコーディングのためのフレームワークが含まれています
+* 暗号化されたセキュアハッシュおよび署名アルゴリズムを利用します
+* 拡張機能とドメイン分離をサポートするためのフレームワーク
+* 選択暗号文攻撃に対して無防備です
+* ユーザーが意図していなかった潜在的に署名するトランザクションに対する保護があります
 
-This specification is only concerned with the rationale and the standardized
-implementation of Cosmos signed messages. It does **not** concern itself with the
-concept of replay attacks as that will be left up to the higher-level application
-implementation. If you view signed messages in the means of authorizing some
-action or data, then such an application would have to either treat this as
-idempotent or have mechanisms in place to reject known signed messages.
+この仕様は、理論的根拠と標準化されたものにのみ関係しています。
+Cosmos署名付きメッセージの実装。 それは**関係ありません**
+リプレイ攻撃の概念は、上位レベルのアプリケーションに委ねられます
+実装。 一部を承認する手段で署名されたメッセージを表示する場合
+アクションまたはデータの場合、そのようなアプリケーションはこれを次のように扱う必要があります
+べき等であるか、既知の署名付きメッセージを拒否するメカニズムがあります。
 
-## Preliminary
+## 予備
 
-The Cosmos message signing protocol will be parameterized with a cryptographic
-secure hashing algorithm `SHA-256` and a signing algorithm `S` that contains
-the operations `sign` and `verify` which provide a digital signature over a set
-of bytes and verification of a signature respectively.
+Cosmosメッセージ署名プロトコルは暗号化されてパラメータ化されます
+セキュアハッシュアルゴリズム `SHA-256`と署名アルゴリズム` S`を含む
+セットにデジタル署名を提供する操作 `sign`と` verify`
+それぞれバイト数と署名の検証。
 
-Note, our goal here is not to provide context and reasoning about why necessarily
-these algorithms were chosen apart from the fact they are the defacto algorithms
-used in Tendermint and the Cosmos SDK and that they satisfy our needs for such
-cryptographic algorithms such as having resistance to collision and second
-pre-image attacks, as well as being [deterministic](https://en.wikipedia.org/wiki/Hash_function#Determinism) and [uniform](https://en.wikipedia.org/wiki/Hash_function#Uniformity).
+ここでの私たちの目標は、必ずしも理由についてのコンテキストと推論を提供することではないことに注意してください
+これらのアルゴリズムは、事実上のアルゴリズムであるという事実とは別に選択されました
+TendermintとCosmosSDKで使用されており、そのようなニーズを満たしていること
+衝突耐性や秒耐性などの暗号化アルゴリズム
+原像攻撃、および[決定論的](https://en.wikipedia.org/wiki/Hash_function#Determinism)および[均一](https://en.wikipedia.org/wiki/Hash_function#Uniformity) 
 
-## Specification
+## 仕様
 
-Tendermint has a well established protocol for signing messages using a canonical
-JSON representation as defined [here](https://github.com/tendermint/tendermint/blob/master/types/canonical.go).
+Tendermintには、正規のメッセージを使用してメッセージに署名するための確立されたプロトコルがあります
+定義されているJSON表現[ここ](https://github.com/tendermint/tendermint/blob/master/types/canonical.go)。
 
-An example of such a canonical JSON structure is Tendermint's vote structure:
+このような正規のJSON構造の例は、Tendermintの投票構造です。
 
 ```go
 type CanonicalJSONVote struct {
@@ -77,22 +77,22 @@ type CanonicalJSONVote struct {
 }
 ```
 
-With such canonical JSON structures, the specification requires that they include
-meta fields: `@chain_id` and `@type`. These meta fields are reserved and must be
-included. They are both of type `string`. In addition, fields must be ordered
-in lexicographically ascending order.
+このような正規のJSON構造では、仕様に次のものが含まれている必要があります
+メタフィールド： `@ chain_id`と` @ type`。これらのメタフィールドは予約されており、
+含まれています。どちらも `string`型です。さらに、フィールドは順序付けする必要があります
+辞書式順序で昇順。
 
-For the purposes of signing Cosmos messages, the `@chain_id` field must correspond
-to the Cosmos chain identifier. The user-agent should **refuse** signing if the
-`@chain_id` field does not match the currently active chain! The `@type` field
-must equal the constant `"message"`. The `@type` field corresponds to the type of
-structure the user will be signing in an application. For now, a user is only
-allowed to sign bytes of valid ASCII text ([see here](https://github.com/tendermint/tendermint/blob/master/libs/common/string.go#L61-L74)).
-However, this will change and evolve to support additional application-specific
-structures that are human-readable and machine-verifiable ([see Future Adaptations](#futureadaptations)).
+Cosmosメッセージに署名するには、 `@ chain_id`フィールドが対応している必要があります
+コスモスチェーン識別子に。ユーザーエージェントは、次の場合に署名を**拒否**する必要があります
+`@ chain_id`フィールドが現在アクティブなチェーンと一致しません！ `@ type`フィールド
+定数 `" message "`と等しくなければなりません。 `@ type`フィールドは次のタイプに対応します
+ユーザーがアプリケーションにサインインする構造。今のところ、ユーザーは
+有効なASCIIテキストのバイトに署名できます([ここを参照](https://github.com/tendermint/tendermint/blob/master/libs/common/string.go#L61-L74))。
+ただし、これは変更され、追加のアプリケーション固有をサポートするように進化します
+人間が読み取れ、機械が検証できる構造([Future Adaptations](＃futureadaptations)を参照)。
 
-Thus, we can have a canonical JSON structure for signing Cosmos messages using
-the [JSON schema](http://json-schema.org/) specification as such:
+したがって、を使用してCosmosメッセージに署名するための正規のJSON構造を持つことができます
+[JSONスキーマ](http://json-schema.org/)仕様自体：
 
 ```json
 {
@@ -138,45 +138,45 @@ e.g.
 }
 ```
 
-## Future Adaptations
+## 将来の適応
 
-As applications can vary greatly in domain, it will be vital to support both
-domain separation and human-readable and machine-verifiable structures.
+アプリケーションはドメインによって大きく異なる可能性があるため、両方をサポートすることが不可欠です。
+ドメインの分離と、人間が読み取れる機械で検証可能な構造。
 
-Domain separation will allow for application developers to prevent collisions of
-otherwise identical structures. It should be designed to be unique per application
-use and should directly be used in the signature encoding itself.
+ドメインの分離により、アプリケーション開発者はの衝突を防ぐことができます
+それ以外は同一の構造。 アプリケーションごとに一意になるように設計する必要があります
+を使用し、署名エンコーディング自体で直接使用する必要があります。
 
-Human-readable and machine-verifiable structures will allow end users to sign
-more complex structures, apart from just string messages, and still be able to
-know exactly what they are signing (opposed to signing a bunch of arbitrary bytes).
+人間が読み取れ、機械で検証できる構造により、エンドユーザーは署名できます
+文字列メッセージだけでなく、より複雑な構造でありながら、
+彼らが何に署名しているのかを正確に知っている(任意のバイトの束に署名するのではなく)。
 
-Thus, in the future, the Cosmos signing message specification will be expected
-to expand upon it's canonical JSON structure to include such functionality.
+したがって、将来的には、コスモス署名メッセージの仕様が期待されます
+そのような機能を含めるために、正規のJSON構造を拡張します。
 
 ## API
 
-Application developers and designers should formalize a standard set of APIs that
-adhere to the following specification:
+アプリケーション開発者と設計者は、次のようなAPIの標準セットを形式化する必要があります。
+次の仕様を順守してください。
 
 -----
 
-### **cosmosSignBytes**
+### ** cosmosSignBytes **
 
-Params:
+パラメータ：
 
-* `data`: the Cosmos signed message canonical JSON structure
-* `address`: the Bech32 Cosmos account address to sign data with
+* `data`：Cosmos署名付きメッセージの正規JSON構造
+* `address`：データに署名するためのBech32Cosmosアカウントアドレス
 
-Returns:
+戻り値：
 
-* `signature`: the Cosmos signature derived using signing algorithm `S`
+* `signature`：署名アルゴリズム` S`を使用して導出されたCosmos署名
 
 -----
 
-### Examples
+### 例
 
-Using the `secp256k1` as the DSA, `S`:
+`secp256k1`をDSAとして使用すると、` S`：
 
 ```javascript
 data = {
@@ -189,4 +189,4 @@ cosmosSignBytes(data, "cosmos1pvsch6cddahhrn5e8ekw0us50dpnugwnlfngt3")
 > "0x7fc4a495473045022100dec81a9820df0102381cdbf7e8b0f1e2cb64c58e0ecda1324543742e0388e41a02200df37905a6505c1b56a404e23b7473d2c0bc5bcda96771d2dda59df6ed2b98f8"
 ```
 
-## References
+## 参照

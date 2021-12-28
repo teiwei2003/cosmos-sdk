@@ -1,14 +1,11 @@
-# 状态
+# 状態
 
-## 签名信息(活力)
+## 署名情報(活性度)
 
-每个区块都包含一组验证者对前一个区块的预提交，
-称为 Tendermint 提供的“LastCommitInfo”。 `LastCommitInfo` 是有效的，所以
-只要它包含来自总投票权的 +2/3 的预提交。
+すべてのブロックには、Tendermintによって提供される`LastCommitInfo`として知られる、前のブロックのバリデーターによる一連の事前コミットが含まれています。`LastCommitInfo`は、総投票権の+2/3からの事前コミットが含まれている限り有効です。
 
-提议者被激励在 Tendermint 的“LastCommitInfo”中包含来自所有验证者的预提交
-通过收取与投票之间的差异成比例的额外费用
-`LastCommitInfo` 和 +2/3 中包含的权力(参见 [费用分配](x/distribution/spec/03_begin_block.md))。 
+提案者は、追加料金を受け取ることにより、Tendermint`LastCommitInfo`にすべてのバリデーターからの事前コミットを含めるように奨励されています
+`LastCommitInfo`に含まれる投票権と+2/3の差に比例します([料金配分(x/distribution/spec/03_begin_block.md)を参照)。
 
 ```
 type LastCommitInfo struct {
@@ -17,31 +14,23 @@ type LastCommitInfo struct {
 }
 ```
 
-验证器因某些原因未能包含在“LastCommitInfo”中而受到惩罚
-通过被自动监禁、可能被削减和解除绑定来减少块的数量。
+バリデーターは、自動的に投獄され、スラッシュされる可能性があり、結合が解除されることにより、いくつかのブロックの`LastCommitInfo`に含まれなかった場合にペナルティが課せられます。。
 
-有关验证器活跃度活动的信息通过“ValidatorSigningInfo”进行跟踪。
-它在存储中的索引如下:
+バリデーターの活性活動に関する情報は、`ValidatorSigningInfo`を通じて追跡されます。
+次のようにストアでインデックスが作成されます。
 
-- ValidatorSigningInfo: `0x01 | ConsAddrLen (1 字节) | ConsAddress -> ProtocolBuffer(ValSigningInfo)`
-- MissedBlocksBitArray:`0x02 | ConsAddrLen (1 字节) |约束地址 | LittleEndianUint64(signArrayIndex) -> VarInt(didMiss)`(varint 是一种数字编码格式)
+- ValidatorSigningInfo:`0x01 | ConsAddrLen (1 字节) | ConsAddress -> ProtocolBuffer(ValSigningInfo)`
+- MissedBlocksBitArray:`0x02 | ConsAddrLen (1 字节) |约束地址 | LittleEndianUint64(signArrayIndex) -> VarInt(didMiss)`(varintは数値エンコード形式です)
 
-第一个映射允许我们轻松查找最近的签名信息
-验证者基于验证者的共识地址。
+最初のマッピングにより、バリデーターのコンセンサスアドレスに基づいて、バリデーターの最近の署名情報を簡単に検索できます。
 
-第二个映射(`MissedBlocksBitArray`)作用
-作为一个大小为“SignedBlocksWindow”的位数组，它告诉我们验证器是否错过了
-位数组中给定索引的块。给出位数组中的索引
-作为小端 uint64。
-结果是一个 `varint` 取为 `0` 或 `1`，其中 `0` 表示
-验证器没有错过(确实签名)相应的块，并且`1`表示
-他们错过了街区(没有签名)。
+2番目のマッピング(`MissedBlocksBitArray`)は、サイズが` SignedBlocksWindow`のビット配列として機能し、バリデーターがビット配列内の特定のインデックスのブロックを見逃したかどうかを通知します。 ビット配列のインデックスは、リトルエンディアンのuint64として指定されます。
+結果は、`0`または` 1`をとる`varint`です。ここで、` 0`は
+バリデーターは対応するブロックを見逃しませんでした(署名しました)。`1`はブロックを見逃した(署名しなかった)ことを示します。
 
-请注意，“MissedBlocksBitArray”并未预先明确初始化。钥匙
-当我们通过第一个“SignedBlocksWindow”块进行新的
-绑定验证器。 `SignedBlocksWindow` 参数定义了大小
-(块数)用于跟踪验证器活跃度的滑动窗口。
+`MissedBlocksBitArray`は事前に明示的に初期化されていないことに注意してください。
+新しく結合されたバリデーターの最初の`SignedBlocksWindow`ブロックを進むにつれて、キーが追加されます。`SignedBlocksWindow`パラメーターは、バリデーターの活性を追跡するために使用されるスライディングウィンドウのサイズ(ブロック数)を定義します。
 
-存储的用于跟踪验证者活跃度的信息如下:
+バリデーターの活性を追跡するために保存される情報は次のとおりです。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/slashing/v1beta1/slashing.proto#L11-L33 

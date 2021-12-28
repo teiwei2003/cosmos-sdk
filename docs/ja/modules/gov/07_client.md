@@ -1,12 +1,12 @@
-# 客户
+# クライアント
 
-##命令行界面
+## CLI
 
-用户可以使用 CLI 查询“gov”模块并与之交互。
+ユーザーは、CLIを使用して `gov`モジュールを照会および操作できます。
 
-### 询问
+### Query
 
-`query` 命令允许用户查询 `gov` 状态。 
+`query`コマンドを使用すると、ユーザーは` gov`状態を照会できます。
 
 ```bash
 simd query gov --help
@@ -14,19 +14,19 @@ simd query gov --help
 
 #### deposit
 
-`deposit` 命令允许用户从给定存款人处查询给定提案的存款。 
+`deposit`コマンドを使用すると、ユーザーは特定の預金者からの特定の提案について預金を照会できます。 
 
 ```bash
 simd query gov deposit [proposal-id] [depositer-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query gov deposit 1 cosmos1..
 ```
 
-Example Output:
+出力例:
 
 ```bash
 amount:
@@ -38,19 +38,19 @@ proposal_id: "1"
 
 #### deposits
 
-The `deposits` command allows users to query all deposits for a given proposal.
+`deposits`コマンドを使用すると、ユーザーは特定のプロポーザルのすべてのデポジットを照会できます。
 
 ```bash
 simd query gov deposits [proposal-id] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query gov deposits 1
 ```
 
-Example Output:
+出力例:
 
 ```bash
 deposits:
@@ -66,19 +66,19 @@ pagination:
 
 #### param
 
-The `param` command allows users to query a given parameter for the `gov` module.
+`param`コマンドを使用すると、ユーザーは` gov`モジュールの特定のパラメーターを照会できます。
 
 ```bash
 simd query gov param [param-type] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query gov param voting
 ```
 
-Example Output:
+出力例:
 
 ```bash
 voting_period: "172800000000000"
@@ -86,19 +86,19 @@ voting_period: "172800000000000"
 
 #### params
 
-The `params` command allows users to query all parameters for the `gov` module.
+`params`コマンドを使用すると、ユーザーは` gov`モジュールのすべてのパラメーターを照会できます。
 
 ```bash
 simd query gov params [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query gov params
 ```
 
-Example Output:
+出力例:
 
 ```bash
 deposit_params:
@@ -116,19 +116,19 @@ voting_params:
 
 #### proposal
 
-The `proposal` command allows users to query a given proposal.
+`proposal`コマンドを使用すると、ユーザーは特定の提案を照会できます。
 
 ```bash
 simd query gov proposal [proposal-id] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query gov proposal 1
 ```
 
-Example Output:
+出力例:
 
 ```bash
 messages: [
@@ -157,19 +157,19 @@ voting_start_time: "0001-01-01T00:00:00Z"
 
 #### proposals
 
-The `proposals` command allows users to query all proposals with optional filters.
+`proposals`コマンドを使用すると、ユーザーはオプションのフィルターを使用してすべての提案を照会できます。
 
 ```bash
 simd query gov proposals [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query gov proposals
 ```
 
-Example Output:
+出力例:
 
 ```bash
 pagination:
@@ -198,19 +198,19 @@ proposals:
 
 #### proposer
 
-The `proposer` command allows users to query the proposer for a given proposal.
+`proposer`コマンドを使用すると、ユーザーは特定の提案について提案者に問い合わせることができます。
 
 ```bash
 simd query gov proposer [proposal-id] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query gov proposer 1
 ```
 
-Example Output:
+出力例:
 
 ```bash
 proposal_id: "1"
@@ -219,19 +219,19 @@ proposer: cosmos1r0tllwu5c9dtgwg3wr28lpvf76hg85f5zmh9l2
 
 #### tally
 
-The `tally` command allows users to query the tally of a given proposal vote.
+`tally`コマンドを使用すると、ユーザーは特定の提案投票の集計を照会できます。
 
 ```bash
 simd query gov tally [proposal-id] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query gov tally 1
 ```
 
-Example Output:
+出力例:
 
 ```bash
 abstain: "0"
@@ -242,19 +242,19 @@ no_with_veto: "0"
 
 #### vote
 
-The `vote` command allows users to query a vote for a given proposal.
+`vote`コマンドを使用すると、ユーザーは特定の提案に対する投票を照会できます。
 
 ```bash
 simd query gov vote [proposal-id] [voter-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query gov vote 1 cosmos1..
 ```
 
-Example Output:
+出力例:
 
 ```bash
 option: VOTE_OPTION_YES
@@ -267,19 +267,19 @@ voter: cosmos1..
 
 #### votes
 
-The `votes` command allows users to query all votes for a given proposal.
+`votes`コマンドを使用すると、ユーザーは特定の提案に対するすべての投票を照会できます。
 
 ```bash
 simd query gov votes [proposal-id] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query gov votes 1
 ```
 
-Example Output:
+出力例:
 
 ```bash
 pagination:
@@ -296,7 +296,7 @@ votes:
 
 ### Transactions
 
-The `tx` commands allow users to interact with the `gov` module.
+`tx`コマンドを使用すると、ユーザーは` gov`モジュールを操作できます。
 
 ```bash
 simd tx gov --help
@@ -304,13 +304,13 @@ simd tx gov --help
 
 #### deposit
 
-The `deposit` command allows users to deposit tokens for a given proposal.
+`deposit`コマンドを使用すると、ユーザーは特定のプロポーザルのトークンをデポジットできます。
 
 ```bash
 simd tx gov deposit [proposal-id] [deposit] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx gov deposit 1 10000000stake --from cosmos1..
@@ -318,25 +318,25 @@ simd tx gov deposit 1 10000000stake --from cosmos1..
 
 #### submit-proposal
 
-The `submit-proposal` command allows users to submit a governance proposal and to optionally include an initial deposit.
+`submit-proposal`コマンドを使用すると、ユーザーはガバナンス提案を送信し、オプションで初期デポジットを含めることができます。
 
 ```bash
 simd tx gov submit-proposal [command] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx gov submit-proposal --title="Test Proposal" --description="testing, testing, 1, 2, 3" --type="Text" --deposit="10000000stake" --from cosmos1..
 ```
 
-Example (`cancel-software-upgrade`):
+例 (`cancel-software-upgrade`):
 
 ```bash
 simd tx gov submit-proposal cancel-software-upgrade --title="Test Proposal" --description="testing, testing, 1, 2, 3" --deposit="10000000stake" --from cosmos1..
 ```
 
-Example (`community-pool-spend`):
+例 (`community-pool-spend`):
 
 ```bash
 simd tx gov submit-proposal community-pool-spend proposal.json --from cosmos1..
@@ -352,7 +352,7 @@ simd tx gov submit-proposal community-pool-spend proposal.json --from cosmos1..
 }
 ```
 
-Example (`param-change`):
+例 (`param-change`):
 
 ```bash
 simd tx gov submit-proposal param-change proposal.json --from cosmos1..
@@ -373,7 +373,7 @@ simd tx gov submit-proposal param-change proposal.json --from cosmos1..
 }
 ```
 
-Example (`software-upgrade`):
+例 (`software-upgrade`):
 
 ```bash
 simd tx gov submit-proposal software-upgrade v2 --title="Test Proposal" --description="testing, testing, 1, 2, 3" --upgrade-height 1000000 --from cosmos1..
@@ -381,13 +381,13 @@ simd tx gov submit-proposal software-upgrade v2 --title="Test Proposal" --descri
 
 #### vote
 
-The `vote` command allows users to submit a vote for a given governance proposal.
+`vote`コマンドを使用すると、ユーザーは特定のガバナンス提案に投票を送信できます。
 
 ```bash
 simd tx gov vote [command] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx gov vote 1 yes --from cosmos1..
@@ -395,13 +395,13 @@ simd tx gov vote 1 yes --from cosmos1..
 
 #### weighted-vote
 
-The `weighted-vote` command allows users to submit a weighted vote for a given governance proposal.
+`weighted-vote`コマンドを使用すると、ユーザーは特定のガバナンス提案に対して加重投票を送信できます。
 
 ```bash
 simd tx gov weighted-vote [proposal-id] [weighted-options]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx gov weighted-vote 1 yes=0.5,no=0.5 --from cosmos1
@@ -409,17 +409,17 @@ simd tx gov weighted-vote 1 yes=0.5,no=0.5 --from cosmos1
 
 ## gRPC
 
-A user can query the `gov` module using gRPC endpoints.
+ユーザーは、gRPCエンドポイントを使用して `gov`モジュールにクエリを実行できます。
 
 ### Proposal
 
-The `Proposal` endpoint allows users to query a given proposal.
+`Proposal`エンドポイントを使用すると、ユーザーは特定のプロポーザルを照会できます。
 
 ```bash
 cosmos.gov.v1beta1.Query/Proposal
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -428,7 +428,7 @@ grpcurl -plaintext \
     cosmos.gov.v1beta1.Query/Proposal
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -458,13 +458,13 @@ Example Output:
 
 ### Proposals
 
-The `Proposals` endpoint allows users to query all proposals with optional filters.
+`Proposals`エンドポイントを使用すると、ユーザーはオプションのフィルターを使用してすべての提案を照会できます。
 
 ```bash
 cosmos.gov.v1beta1.Query/Proposals
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -472,7 +472,7 @@ grpcurl -plaintext \
     cosmos.gov.v1beta1.Query/Proposals
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -522,13 +522,13 @@ Example Output:
 
 ### Vote
 
-The `Vote` endpoint allows users to query a vote for a given proposal.
+`Vote`エンドポイントを使用すると、ユーザーは特定の提案に対する投票を照会できます。
 
 ```bash
 cosmos.gov.v1beta1.Query/Vote
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -537,7 +537,7 @@ grpcurl -plaintext \
     cosmos.gov.v1beta1.Query/Vote
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -557,13 +557,13 @@ Example Output:
 
 ### Votes
 
-The `Votes` endpoint allows users to query all votes for a given proposal.
+`Votes`エンドポイントを使用すると、ユーザーは特定の提案に対するすべての投票を照会できます。
 
 ```bash
 cosmos.gov.v1beta1.Query/Votes
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -572,7 +572,7 @@ grpcurl -plaintext \
     cosmos.gov.v1beta1.Query/Votes
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -597,7 +597,7 @@ Example Output:
 
 ### Params
 
-The `Params` endpoint allows users to query all parameters for the `gov` module.
+`Params`エンドポイントを使用すると、ユーザーは` gov`モジュールのすべてのパラメーターを照会できます。
 
 <!-- TODO: #10197 Querying governance params outputs nil values -->
 
@@ -605,7 +605,7 @@ The `Params` endpoint allows users to query all parameters for the `gov` module.
 cosmos.gov.v1beta1.Query/Params
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -614,7 +614,7 @@ grpcurl -plaintext \
     cosmos.gov.v1beta1.Query/Params
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -634,13 +634,13 @@ Example Output:
 
 ### Deposit
 
-The `Deposit` endpoint allows users to query a deposit for a given proposal from a given depositor.
+`Deposit`エンドポイントを使用すると、ユーザーは特定の預金者からの特定の提案について預金を照会できます。
 
 ```bash
 cosmos.gov.v1beta1.Query/Deposit
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -649,7 +649,7 @@ grpcurl -plaintext \
     cosmos.gov.v1beta1.Query/Deposit
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -668,13 +668,13 @@ Example Output:
 
 ### deposits
 
-The `Deposits` endpoint allows users to query all deposits for a given proposal.
+`Deposits`エンドポイントを使用すると、ユーザーは特定のプロポーザルのすべてのデポジットを照会できます。
 
 ```bash
 cosmos.gov.v1beta1.Query/Deposits
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -683,7 +683,7 @@ grpcurl -plaintext \
     cosmos.gov.v1beta1.Query/Deposits
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -707,13 +707,13 @@ Example Output:
 
 ### TallyResult
 
-The `TallyResult` endpoint allows users to query the tally of a given proposal.
+`TallyResult`エンドポイントを使用すると、ユーザーは特定のプロポーザルの集計を照会できます。
 
 ```bash
 cosmos.gov.v1beta1.Query/TallyResult
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -722,7 +722,7 @@ grpcurl -plaintext \
     cosmos.gov.v1beta1.Query/TallyResult
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -737,23 +737,23 @@ Example Output:
 
 ## REST
 
-A user can query the `gov` module using REST endpoints.
+ユーザーは、RESTエンドポイントを使用して `gov`モジュールにクエリを実行できます。
 
 ### proposal
 
-The `proposals` endpoint allows users to query a given proposal.
+`proposals`エンドポイントを使用すると、ユーザーは特定のプロポーザルを照会できます。
 
 ```bash
 /cosmos/gov/v1beta1/proposals/{proposal_id}
 ```
 
-Example:
+例:
 
 ```bash
 curl localhost:1317/cosmos/gov/v1beta1/proposals/1
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -787,19 +787,19 @@ Example Output:
 
 ### proposals
 
-The `proposals` endpoint also allows users to query all proposals with optional filters.
+`proposals`エンドポイントを使用すると、ユーザーはオプションのフィルターを使用してすべての提案を照会することもできます。
 
 ```bash
 /cosmos/gov/v1beta1/proposals
 ```
 
-Example:
+例:
 
 ```bash
 curl localhost:1317/cosmos/gov/v1beta1/proposals
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -860,19 +860,19 @@ Example Output:
 
 ### voter vote
 
-The `votes` endpoint allows users to query a vote for a given proposal.
+`votes`エンドポイントを使用すると、ユーザーは特定の提案に対する投票を照会できます。
 
 ```bash
 /cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}
 ```
 
-Example:
+例:
 
 ```bash
 curl localhost:1317/cosmos/gov/v1beta1/proposals/1/votes/cosmos1..
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -892,19 +892,19 @@ Example Output:
 
 ### votes
 
-The `votes` endpoint allows users to query all votes for a given proposal.
+`votes`エンドポイントを使用すると、ユーザーは特定のプロポーザルのすべての投票を照会できます。
 
 ```bash
 /cosmos/gov/v1beta1/proposals/{proposal_id}/votes
 ```
 
-Example:
+例:
 
 ```bash
 curl localhost:1317/cosmos/gov/v1beta1/proposals/1/votes
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -930,7 +930,7 @@ Example Output:
 
 ### params
 
-The `params` endpoint allows users to query all parameters for the `gov` module.
+`params`エンドポイントを使用すると、ユーザーは` gov`モジュールのすべてのパラメーターを照会できます。
 
 <!-- TODO: #10197 Querying governance params outputs nil values -->
 
@@ -938,13 +938,13 @@ The `params` endpoint allows users to query all parameters for the `gov` module.
 /cosmos/gov/v1beta1/params/{params_type}
 ```
 
-Example:
+例:
 
 ```bash
 curl localhost:1317/cosmos/gov/v1beta1/params/voting
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -966,19 +966,19 @@ Example Output:
 
 ### deposits
 
-The `deposits` endpoint allows users to query a deposit for a given proposal from a given depositor.
+`deposits`エンドポイントを使用すると、ユーザーは特定の預金者からの特定の提案について預金を照会できます。
 
 ```bash
 /cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}
 ```
 
-Example:
+例:
 
 ```bash
 curl localhost:1317/cosmos/gov/v1beta1/proposals/1/deposits/cosmos1..
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -997,19 +997,19 @@ Example Output:
 
 ### proposal deposits
 
-The `deposits` endpoint allows users to query all deposits for a given proposal.
+`deposits`エンドポイントを使用すると、ユーザーは特定のプロポーザルのすべてのデポジットを照会できます。
 
 ```bash
 /cosmos/gov/v1beta1/proposals/{proposal_id}/deposits
 ```
 
-Example:
+例:
 
 ```bash
 curl localhost:1317/cosmos/gov/v1beta1/proposals/1/deposits
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1034,19 +1034,19 @@ Example Output:
 
 ### tally
 
-The `tally` endpoint allows users to query the tally of a given proposal.
+`tally`エンドポイントを使用すると、ユーザーは特定のプロポーザルの集計を照会できます。
 
 ```bash
 /cosmos/gov/v1beta1/proposals/{proposal_id}/tally
 ```
 
-Example:
+例:
 
 ```bash
 curl localhost:1317/cosmos/gov/v1beta1/proposals/1/tally
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {

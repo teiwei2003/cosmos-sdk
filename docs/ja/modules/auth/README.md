@@ -1,39 +1,39 @@
-# `认证`
+# `認証`
 
-## 摘要
+## 概要
 
-本文档指定了 Cosmos SDK 的 auth 模块。
+このドキュメントでは、CosmosSDKの認証モジュールを指定します。
 
-auth 模块负责指定基础交易和账户类型
-对于应用程序，因为 SDK 本身与这些细节无关。它包含
-ante 处理程序，其中所有基本交易有效性检查(签名、随机数、辅助字段)
-执行，并暴露帐户管理器，允许其他模块读取、写入和修改帐户。
+authモジュールは、基本的なトランザクションとアカウントタイプを指定する役割を果たします
+アプリケーションの場合、SDK自体はこれらの詳細とは何の関係もないためです。 を含む
+すべての基本的なトランザクションの有効性チェック(署名、乱数、補助フィールド)が行われるアンティハンドラー
+アカウントマネージャーを実行して公開し、他のモジュールがアカウントの読み取り、書き込み、変更を行えるようにします。
 
-该模块用于 Cosmos Hub。
+このモジュールは、Cosmosハブで使用されます。
 
-## 内容
+## コンテンツ
 
-1. **[概念](01_concepts.md)**
-   - [Gas & Fees](01_concepts.md#gas-&-fees)
-2. **[状态](02_state.md)**
-   - [账户](02_state.md#accounts)
-3. **[AnteHandlers](03_antehandlers.md)**
-   - [处理程序](03_antehandlers.md#handlers)
-4. **[Keepers](04_keepers.md)**
-   - [账户管理员](04_keepers.md#account-keeper)
-5. **[归属](05_vesting.md)**
-   - [介绍和要求](05_vesting.md#intro-and-requirements)
-   - [归属账户类型](05_vesting.md#vesting-account-types)
-   - [归属账户规范](05_vesting.md#vesting-account-specification)
-   - [Keepers & Handlers](05_vesting.md#keepers-&-handlers)
-   - [创世初始化](05_vesting.md#genesis-initialization)
-   - [例子](05_vesting.md#examples)
-   - [词汇](05_vesting.md#glossary)
-6. **[参数](06_params.md)**
-7. **[客户端](07_client.md)**
-   - **[认证](07_client.md#auth)**
-      - [CLI](07_client.md#cli)
-      - [gRPC](07_client.md#grpc)
-      - [REST](07_client.md#rest)
-   - **[归属](07_client.md#vesting)**
-      - [CLI](07_client.md#vesting#cli) 
+1。**[コンセプト](01_concepts.md)**
+   - [ガスと料金](01_concepts.md＃gas-＆-料金)
+2。**[State](02_state.md)**
+   - [アカウント](02_state.md＃accounts)
+3。**[AnteHandlers](03_antehandlers.md)**
+   - [ハンドラー](03_antehandlers.md＃handlers)
+4。**[キーパー](04_keepers.md)**
+   - [アカウント管理者](04_keepers.md＃account-keeper)
+5。**[帰属](05_vesting.md)**
+   - [はじめにと要件](05_vesting.md＃intro-and-requirements)
+   - [アトリビューションアカウントタイプ](05_vesting.md＃vesting-account-types)
+   - [権利確定アカウントの仕様](05_vesting.md＃vesting-account-specification)
+   - [キーパーとハンドラー](05_vesting.md＃keepers-＆-ハンドラー)
+   - [ジェネシス初期化](05_vesting.md＃genesis-初期化)
+   - [例](05_vesting.md＃examples)
+   - [語彙](05_vesting.md＃glossary)
+6。**[パラメータ](06_params.md)**
+7。**[クライアント](07_client.md)**
+   - **[認証](07_client.md＃auth)**
+      - [CLI](07_client.md＃cli)
+      - [gRPC](07_client.md＃grpc)
+      - [REST](07_client.md＃rest)
+   - **[帰属](07_client.md＃vesting)**
+      - [CLI](07_client.md＃vesting＃cli)
