@@ -1,12 +1,12 @@
-# 客户
+# クライアント
 
-##命令行界面
+## CLI
 
-用户可以使用 CLI 查询“mint”模块并与之交互。
+ユーザーは、CLIを使用して `mint`モジュールを照会および操作できます。
 
-### 询问
+### Query
 
-`query` 命令允许用户查询 `mint` 状态。 
+`query`コマンドを使用すると、ユーザーは` mint`状態を照会できます。
 
 ```
 simd query mint --help
@@ -14,19 +14,19 @@ simd query mint --help
 
 #### annual-provisions
 
-The `annual-provisions` command allow users to query the current minting annual provisions value
+`annual-provisions`コマンドを使用すると、ユーザーは現在の造幣局の年間引当金の値を照会できます。
 
 ```
 simd query mint annual-provisions [flags]
 ```
 
-Example:
+例:
 
 ```
 simd query mint annual-provisions
 ```
 
-Example Output:
+出力例:
 
 ```
 22268504368893.612100895088410693
@@ -34,19 +34,19 @@ Example Output:
 
 #### inflation
 
-The `inflation` command allow users to query the current minting inflation value
+`inflation`コマンドを使用すると、ユーザーは現在のミンティングインフレ値を照会できます。
 
 ```
 simd query mint inflation [flags]
 ```
 
-Example:
+例:
 
 ```
 simd query mint inflation
 ```
 
-Example Output:
+出力例:
 
 ```
 0.199200302563256955
@@ -54,13 +54,13 @@ Example Output:
 
 #### params
 
-The `params` command allow users to query the current minting parameters
+`params`コマンドを使用すると、ユーザーは現在のミンティングパラメータを照会できます。
 
 ```
 simd query mint params [flags]
 ```
 
-Example:
+例:
 
 ```
 blocks_per_year: "4360000"
@@ -73,23 +73,23 @@ mint_denom: stake
 
 ## gRPC
 
-A user can query the `mint` module using gRPC endpoints.
+ユーザーは、gRPCエンドポイントを使用して `mint`モジュールにクエリを実行できます。
 
 ### AnnualProvisions
 
-The `AnnualProvisions` endpoint allow users to query the current minting annual provisions value
+`AnnualProvisions`エンドポイントを使用すると、ユーザーは現在の造幣局の年間引当金の値を照会できます。
 
 ```
 /cosmos.mint.v1beta1.Query/AnnualProvisions
 ```
 
-Example:
+例:
 
 ```
 grpcurl -plaintext localhost:9090 cosmos.mint.v1beta1.Query/AnnualProvisions
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -99,19 +99,19 @@ Example Output:
 
 ### Inflation
 
-The `Inflation` endpoint allow users to query the current minting inflation value
+`Inflation`エンドポイントにより、ユーザーは現在のミンティングインフレ値を照会できます
 
 ```
 /cosmos.mint.v1beta1.Query/Inflation
 ```
 
-Example:
+例:
 
 ```
 grpcurl -plaintext localhost:9090 cosmos.mint.v1beta1.Query/Inflation
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -121,19 +121,19 @@ Example Output:
 
 ### Params
 
-The `Params` endpoint allow users to query the current minting parameters
+`Params`エンドポイントにより、ユーザーは現在のミンティングパラメータをクエリできます
 
 ```
 /cosmos.mint.v1beta1.Query/Params
 ```
 
-Example:
+例:
 
 ```
 grpcurl -plaintext localhost:9090 cosmos.mint.v1beta1.Query/Params
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -150,7 +150,7 @@ Example Output:
 
 ## REST
 
-A user can query the `mint` module using REST endpoints.
+ユーザーは、RESTエンドポイントを使用して `mint`モジュールにクエリを実行できます。
 
 ### annual-provisions
 
@@ -158,13 +158,13 @@ A user can query the `mint` module using REST endpoints.
 /cosmos/mint/v1beta1/annual_provisions
 ```
 
-Example:
+例:
 
 ```
 curl "localhost:1317/cosmos/mint/v1beta1/annual_provisions"
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -178,13 +178,13 @@ Example Output:
 /cosmos/mint/v1beta1/inflation
 ```
 
-Example:
+例:
 
 ```
 curl "localhost:1317/cosmos/mint/v1beta1/inflation"
 ```
 
-Example Output:
+出力例:
 
 ```
 {
@@ -198,13 +198,13 @@ Example Output:
 /cosmos/mint/v1beta1/params
 ```
 
-Example:
+例:
 
 ```
 curl "localhost:1317/cosmos/mint/v1beta1/params"
 ```
 
-Example Output:
+出力例:
 
 ```
 {

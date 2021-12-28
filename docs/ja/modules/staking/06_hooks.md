@@ -1,23 +1,21 @@
-# 钩子
+# Hooks
 
-当某个事件发生时，其他模块可能会注册要执行的操作
-发生在 Staking 内。 可以注册这些事件以执行
-对赌注事件的“之前”或“之后”(根据挂钩名称)。 这
-以下挂钩可以通过 staking 注册: 
+他のモジュールは、ステーキング内で特定のイベントが発生したときに実行する操作を登録する場合があります。
+これらのイベントは、ステーキングイベントの「前」または「後」のいずれかを実行するように登録できます（フック名に従って）。 次のフックをステーキングに登録できます。
 
 - `AfterValidatorCreated(Context, ValAddress) error`
-    - called when a validator is created
+    - バリデーターが作成されたときに呼び出されます
 - `BeforeValidatorModified(Context, ValAddress) error`
-    - called when a validator's state is changed
+    - バリデーターの状態が変更されたときに呼び出されます
 - `AfterValidatorRemoved(Context, ConsAddress, ValAddress) error`
-    - called when a validator is deleted
+    - バリデーターが削除されたときに呼び出されます
 - `AfterValidatorBonded(Context, ConsAddress, ValAddress) error`
-    - called when a validator is bonded
+    - バリデーターが結合されたときに呼び出されます
 - `AfterValidatorBeginUnbonding(Context, ConsAddress, ValAddress) error`
-    - called when a validator begins unbonding
+    - バリデーターが結合解除を開始したときに呼び出されます
 - `BeforeDelegationCreated(Context, AccAddress, ValAddress) error`
-    - called when a delegation is created
+    - 委任が作成されたときに呼び出されます
 - `BeforeDelegationSharesModified(Context, AccAddress, ValAddress) error`
-    - called when a delegation's shares are modified
+    - 代表団の株式が変更されたときに呼び出されます
 - `BeforeDelegationRemoved(Context, AccAddress, ValAddress) error`
-    - called when a delegation is removed
+    - 委任が削除されたときに呼び出されます

@@ -1,12 +1,12 @@
-# 客户
+# クライアント
 
-##命令行界面
+## CLI
 
-用户可以使用 CLI 查询“staking”模块并与之交互。
+ユーザーは、CLIを使用して `stakeing`モジュールを照会および操作できます。
 
-### 询问
+### Query
 
-`query` 命令允许用户查询 `staking` 状态。 
+`query`コマンドを使用すると、ユーザーは` stakeing`状態を照会できます。 
 
 ```bash
 simd query staking --help
@@ -14,21 +14,21 @@ simd query staking --help
 
 #### delegation
 
-The `delegation` command allows users to query delegations for an individual delegator on an individual validator.
+`delegation`コマンドを使用すると、ユーザーは個々のバリデーターで個々の委任者の委任を照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking delegation [delegator-addr] [validator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking delegation cosmos1gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p cosmosvaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj
 ```
 
-Example Output:
+出力例:
 
 ```bash
 balance:
@@ -42,21 +42,21 @@ delegation:
 
 #### delegations
 
-The `delegations` command allows users to query delegations for an individual delegator on all validators.
+`delegations`コマンドを使用すると、ユーザーはすべてのバリデーターの個々の委任者の委任を照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking delegations [delegator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking delegations cosmos1gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p
 ```
 
-Example Output:
+出力例:
 
 ```bash
 delegation_responses:
@@ -81,21 +81,21 @@ pagination:
 
 #### delegations-to
 
-The `delegations-to` command allows users to query delegations on an individual validator.
+`delegations-to`コマンドを使用すると、ユーザーは個々のバリデーターの委任を照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking delegations-to [validator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking delegations-to cosmosvaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj
 ```
 
-Example Output:
+出力例:
 
 ```bash
 - balance:
@@ -119,21 +119,21 @@ pagination:
 
 #### historical-info
 
-The `historical-info` command allows users to query historical information at given height.
+`historical-info`コマンドを使用すると、ユーザーは指定された高さの履歴情報を照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking historical-info [height] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking historical-info 10
 ```
 
-Example Output:
+出力例:
 
 ```bash
 header:
@@ -185,21 +185,21 @@ valset:
 
 #### params
 
-The `params` command allows users to query values set as staking parameters.
+`params`コマンドを使用すると、ユーザーはステーキングパラメータとして設定された値をクエリできます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking params [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking params
 ```
 
-Example Output:
+出力例:
 
 ```bash
 bond_denom: stake
@@ -211,21 +211,21 @@ unbonding_time: 1814400s
 
 #### pool
 
-The `pool` command allows users to query values for amounts stored in the staking pool.
+`pool`コマンドを使用すると、ユーザーはステーキングプールに保存されている金額の値を照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd q staking pool [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd q staking pool
 ```
 
-Example Output:
+出力例:
 
 ```bash
 bonded_tokens: "10000000"
@@ -234,21 +234,21 @@ not_bonded_tokens: "0"
 
 #### redelegation
 
-The `redelegation` command allows users to query a redelegation record based on delegator and a source and destination validator address.
+`redelegation`コマンドを使用すると、ユーザーは委任者と送信元および宛先のバリデーターアドレスに基づいて再委任レコードを照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking redelegation [delegator-addr] [src-validator-addr] [dst-validator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking redelegation cosmos1gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p cosmosvaloper1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm cosmosvaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj
 ```
 
-Example Output:
+出力例:
 
 ```bash
 pagination: null
@@ -275,21 +275,21 @@ redelegation_responses:
 
 #### redelegations
 
-The `redelegations` command allows users to query all redelegation records for an individual delegator.
+`redelegations`コマンドを使用すると、ユーザーは個々の委任者のすべての再委任レコードを照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking redelegations [delegator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking redelegation cosmos1gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p
 ```
 
-Example Output:
+出力例:
 
 ```bash
 pagination:
@@ -330,21 +330,21 @@ redelegation_responses:
 
 #### redelegations-from
 
-The `redelegations-from` command allows users to query delegations that are redelegating _from_ a validator.
+`redelegations-from`コマンドを使用すると、ユーザーはバリデーターを_from_再委任している委任を照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking redelegations-from [validator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking redelegations-from cosmosvaloper1y4rzzrgl66eyhzt6gse2k7ej3zgwmngeleucjy
 ```
 
-Example Output:
+出力例:
 
 ```bash
 pagination:
@@ -385,21 +385,21 @@ redelegation_responses:
 
 #### unbonding-delegation
 
-The `unbonding-delegation` command allows users to query unbonding delegations for an individual delegator on an individual validator.
+`unbonding-delegation`コマンドを使用すると、ユーザーは、個々のバリデーター上の個々の委任者の非結合委任を照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking unbonding-delegation [delegator-addr] [validator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking unbonding-delegation cosmos1gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p cosmosvaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj
 ```
 
-Example Output:
+出力例:
 
 ```bash
 delegator_address: cosmos1gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p
@@ -413,21 +413,21 @@ validator_address: cosmosvaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj
 
 #### unbonding-delegations
 
-The `unbonding-delegations` command allows users to query all unbonding-delegations records for one delegator.
+`unbonding-delegations`コマンドを使用すると、ユーザーは1人の委任者のすべてのunbonding-delegationsレコードを照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking unbonding-delegations [delegator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking unbonding-delegations cosmos1gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p
 ```
 
-Example Output:
+出力例:
 
 ```bash
 pagination:
@@ -446,21 +446,21 @@ unbonding_responses:
 
 #### unbonding-delegations-from
 
-The `unbonding-delegations-from` command allows users to query delegations that are unbonding _from_ a validator.
+`unbonding-delegations-from`コマンドを使用すると、ユーザーはバリデーターの結合を解除している委任を照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking unbonding-delegations-from [validator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking unbonding-delegations-from cosmosvaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj
 ```
 
-Example Output:
+出力例:
 
 ```bash
 pagination:
@@ -485,21 +485,21 @@ unbonding_responses:
 
 #### validator
 
-The `validator` command allows users to query details about an individual validator.
+`validator`コマンドを使用すると、ユーザーは個々のバリデーターに関する詳細を照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking validator [validator-addr] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking validator cosmosvaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj
 ```
 
-Example Output:
+出力例:
 
 ```bash
 commission:
@@ -532,21 +532,21 @@ unbonding_time: "1970-01-01T00:00:00Z"
 
 #### validators
 
-The `validators` command allows users to query details about all validators on a network.
+`validators`コマンドを使用すると、ユーザーはネットワーク上のすべてのバリデーターに関する詳細を照会できます。
 
-Usage:
+使用法:
 
 ```bash
 simd query staking validators [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query staking validators
 ```
 
-Example Output:
+出力例:
 
 ```bash
 pagination:
@@ -609,7 +609,7 @@ description:
 
 ### Transactions
 
-The `tx` commands allows users to interact with the `staking` module.
+`texas`コマンドを使用すると、ユーザーは` stacking`モジュールを操作できます。
 
 ```bash
 simd tx staking --help
@@ -617,15 +617,15 @@ simd tx staking --help
 
 #### create-validator
 
-The command `create-validator` allows users to create new validator initialized with a self-delegation to it.
+コマンド `create-validator`を使用すると、ユーザーは自己委任で初期化された新しいバリデーターを作成できます。
 
-Usage:
+使用法:
 
 ```bash
 simd tx staking create-validator [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx staking create-validator \
@@ -647,15 +647,15 @@ simd tx staking create-validator \
 
 #### delegate
 
-The command `delegate` allows users to delegate liquid tokens to a validator.
+コマンド `delegate`を使用すると、ユーザーはリキッドトークンをバリデーターに委任できます。
 
-Usage:
+使用法:
 
 ```bash
 simd tx staking delegate [validator-addr] [amount] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx staking delegate cosmosvaloper1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 1000stake --from mykey
@@ -663,15 +663,15 @@ simd tx staking delegate cosmosvaloper1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 10
 
 #### edit-validator
 
-The command `edit-validator` allows users to edit an existing validator account.
+コマンド `edit-validator`を使用すると、ユーザーは既存のバリデーターアカウントを編集できます。
 
-Usage:
+使用法:
 
 ```bash
 simd tx staking edit-validator [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx staking edit-validator --moniker "new_moniker_name" --website "new_webiste_url" --from mykey
@@ -679,15 +679,15 @@ simd tx staking edit-validator --moniker "new_moniker_name" --website "new_webis
 
 #### redelegate
 
-The command `redelegate` allows users to redelegate illiquid tokens from one validator to another.
+コマンド `redelegate`を使用すると、ユーザーは非流動的なトークンをあるバリデーターから別のバリデーターに再デリゲートできます。
 
-Usage:
+使用法:
 
 ```bash
 simd tx staking redelegate [src-validator-addr] [dst-validator-addr] [amount] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx staking redelegate cosmosvaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj cosmosvaloper1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 100stake --from mykey
@@ -695,15 +695,15 @@ simd tx staking redelegate cosmosvaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 
 
 #### unbond
 
-The command `unbond` allows users to unbond shares from a validator.
+コマンド `unbond`を使用すると、ユーザーはバリデーターから共有の結合を解除できます。
 
-Usage:
+使用法:
 
 ```bash
 simd tx staking unbond [validator-addr] [amount] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx staking unbond cosmosvaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 100stake --from mykey
@@ -711,23 +711,23 @@ simd tx staking unbond cosmosvaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 100s
 
 ## gRPC
 
-A user can query the `staking` module using gRPC endpoints.
+ユーザーは、gRPCエンドポイントを使用して `stakeing`モジュールをクエリできます。
 
 ### Validators
 
-The `Validators` endpoint queries all validators that match the given status.
+`Validators`エンドポイントは、指定されたステータスに一致するすべてのバリデーターを照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/Validators
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext localhost:9090 cosmos.staking.v1beta1.Query/Validators
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -761,20 +761,20 @@ Example Output:
 
 ### Validator
 
-The `Validator` endpoint queries validator information for given validator address.
+`Validator`エンドポイントは、指定されたバリデーターアドレスのバリデーター情報を照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/Validator
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext -d '{"validator_addr":"cosmosvaloper1rne8lgs98p0jqe82sgt0qr4rdn4hgvmgp9ggcc"}' \
 localhost:9090 cosmos.staking.v1beta1.Query/Validator
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -803,20 +803,20 @@ Example Output:
 
 ### ValidatorDelegations
 
-The `ValidatorDelegations` endpoint queries delegate information for given validator.
+`ValidatorDelegations`エンドポイントは、指定されたバリデーターのデリゲート情報を照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/ValidatorDelegations
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext -d '{"validator_addr":"cosmosvaloper1rne8lgs98p0jqe82sgt0qr4rdn4hgvmgp9ggcc"}' \
 localhost:9090 cosmos.staking.v1beta1.Query/ValidatorDelegations
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -841,20 +841,20 @@ Example Output:
 
 ### ValidatorUnbondingDelegations
 
-The `ValidatorUnbondingDelegations` endpoint queries delegate information for given validator.
+`ValidatorUnbondingDelegations`エンドポイントは、指定されたバリデーターのデリゲート情報を照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/ValidatorUnbondingDelegations
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext -d '{"validator_addr":"cosmosvaloper1rne8lgs98p0jqe82sgt0qr4rdn4hgvmgp9ggcc"}' \
 localhost:9090 cosmos.staking.v1beta1.Query/ValidatorUnbondingDelegations
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -893,13 +893,13 @@ Example Output:
 
 ### Delegation
 
-The `Delegation` endpoint queries delegate information for given validator delegator pair.
+`Delegation`エンドポイントは、指定されたバリデーター委任者ペアの委任情報を照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/Delegation
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -907,7 +907,7 @@ grpcurl -plaintext \
 localhost:9090 cosmos.staking.v1beta1.Query/Delegation
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -930,13 +930,13 @@ Example Output:
 
 ### UnbondingDelegation
 
-The `UnbondingDelegation` endpoint queries unbonding information for given validator delegator.
+`UnbondingDelegation`エンドポイントは、指定されたバリデーター委任者の非結合情報を照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/UnbondingDelegation
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -944,7 +944,7 @@ grpcurl -plaintext \
 localhost:9090 cosmos.staking.v1beta1.Query/UnbondingDelegation
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -971,13 +971,13 @@ Example Output:
 
 ### DelegatorDelegations
 
-The `DelegatorDelegations` endpoint queries all delegations of a given delegator address.
+`DelegatorDelegations`エンドポイントは、指定された委任者アドレスのすべての委任を照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/DelegatorDelegations
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -985,7 +985,7 @@ grpcurl -plaintext \
 localhost:9090 cosmos.staking.v1beta1.Query/DelegatorDelegations
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1001,13 +1001,13 @@ Example Output:
 
 ### DelegatorUnbondingDelegations
 
-The `DelegatorUnbondingDelegations` endpoint queries all unbonding delegations of a given delegator address.
+`DelegatorUnbondingDelegations`エンドポイントは、指定された委任者アドレスのすべての結合解除された委任を照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/DelegatorUnbondingDelegations
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -1015,7 +1015,7 @@ grpcurl -plaintext \
 localhost:9090 cosmos.staking.v1beta1.Query/DelegatorUnbondingDelegations
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1048,13 +1048,13 @@ Example Output:
 
 ### Redelegations
 
-The `Redelegations` endpoint queries redelegations of given address.
+`Redelegations`エンドポイントは、指定されたアドレスの再委任を照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/Redelegations
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -1062,7 +1062,7 @@ grpcurl -plaintext \
 localhost:9090 cosmos.staking.v1beta1.Query/Redelegations
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1093,13 +1093,13 @@ Example Output:
 
 ### DelegatorValidators
 
-The `DelegatorValidators` endpoint queries all validators information for given delegator.
+`DelegatorValidators`エンドポイントは、指定されたデリゲーターのすべてのバリデーター情報を照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/DelegatorValidators
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -1107,7 +1107,7 @@ grpcurl -plaintext \
 localhost:9090 cosmos.staking.v1beta1.Query/DelegatorValidators
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1151,13 +1151,13 @@ Example Output:
 
 ### DelegatorValidator
 
-The `DelegatorValidator` endpoint queries validator information for given delegator validator
+`DelegatorValidator`エンドポイントは、指定されたデリゲーターバリデーターのバリデーター情報を照会します
 
 ```bash
 cosmos.staking.v1beta1.Query/DelegatorValidator
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -1165,7 +1165,7 @@ grpcurl -plaintext \
 localhost:9090 cosmos.staking.v1beta1.Query/DelegatorValidator
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1207,13 +1207,13 @@ Example Output:
 cosmos.staking.v1beta1.Query/HistoricalInfo
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext -d '{"height" : 1}' localhost:9090 cosmos.staking.v1beta1.Query/HistoricalInfo
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1281,19 +1281,19 @@ Example Output:
 
 ### Pool
 
-The `Pool` endpoint queries the pool information.
+`Pool`エンドポイントはプール情報を照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/Pool
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext -d localhost:9090 cosmos.staking.v1beta1.Query/Pool
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1306,19 +1306,19 @@ Example Output:
 
 ### Params
 
-The `Params` endpoint queries the pool information.
+`Params`エンドポイントはプール情報を照会します。
 
 ```bash
 cosmos.staking.v1beta1.Query/Params
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext localhost:9090 cosmos.staking.v1beta1.Query/Params
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1334,23 +1334,23 @@ Example Output:
 
 ## REST
 
-A user can query the `staking` module using REST endpoints.
+ユーザーは、RESTエンドポイントを使用して `stakeing`モジュールにクエリを実行できます。
 
 ### DelegatorDelegations
 
-The `DelegtaorDelegations` REST endpoint queries all delegations of a given delegator address.
+`DelegtaorDelegations` RESTエンドポイントは、指定された委任者アドレスのすべての委任を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/delegations/{delegatorAddr}
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET "http://localhost:1317/cosmos/staking/v1beta1/delegations/cosmos1vcs68xf2tnqes5tg0khr0vyevm40ff6zdxatp5" -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1387,13 +1387,13 @@ Example Output:
 
 ### Redelegations
 
-The `Redelegations` REST endpoint queries redelegations of given address.
+`Redelegations` RESTエンドポイントは、指定されたアドレスの再委任を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/delegators/{delegatorAddr}/redelegations
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET \
@@ -1401,7 +1401,7 @@ curl -X GET \
 -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1432,13 +1432,13 @@ Example Output:
 
 ### DelegatorUnbondingDelegations
 
-The `DelegatorUnbondingDelegations` REST endpoint queries all unbonding delegations of a given delegator address.
+`DelegatorUnbondingDelegations` RESTエンドポイントは、指定された委任者アドレスのすべての結合解除された委任を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/delegators/{delegatorAddr}/unbonding_delegations
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET \
@@ -1446,7 +1446,7 @@ curl -X GET \
 -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1473,13 +1473,13 @@ Example Output:
 
 ### DelegatorValidators
 
-The `DelegatorValidators` REST endpoint queries all validators information for given delegator address.
+`DelegatorValidators` RESTエンドポイントは、指定されたデリゲーターアドレスのすべてのバリデーター情報を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/delegators/{delegatorAddr}/validators
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET \
@@ -1487,7 +1487,7 @@ curl -X GET \
 -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1531,13 +1531,13 @@ Example Output:
 
 ### DelegatorValidator
 
-The `DelegatorValidator` REST endpoint queries validator information for given delegator validator pair.
+`DelegatorValidator` RESTエンドポイントは、指定されたデリゲーターバリデーターペアのバリデーター情報を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/delegators/{delegatorAddr}/validators/{validatorAddr}
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET \
@@ -1545,7 +1545,7 @@ curl -X GET \
 -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1583,19 +1583,19 @@ Example Output:
 
 ### HistoricalInfo
 
-The `HistoricalInfo` REST endpoint queries the historical information for given height.
+`HistoricalInfo` RESTエンドポイントは、指定された高さの履歴情報を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/historical_info/{height}
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET "http://localhost:1317/cosmos/staking/v1beta1/historical_info/153332" -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1691,19 +1691,19 @@ Example Output:
 
 ### Parameters
 
-The `Parameters` REST endpoint queries the staking parameters.
+`Parameters`RESTエンドポイントはステーキングパラメータをクエリします。
 
 ```bash
 /cosmos/staking/v1beta1/params
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET "http://localhost:1317/cosmos/staking/v1beta1/params" -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1719,19 +1719,19 @@ Example Output:
 
 ### Pool
 
-The `Pool` REST endpoint queries the pool information.
+`Pool`RESTエンドポイントはプール情報を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/pool
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET "http://localhost:1317/cosmos/staking/v1beta1/pool" -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1744,19 +1744,19 @@ Example Output:
 
 ### Validators
 
-The `Validators` REST endpoint queries all validators that match the given status.
+`Validators` RESTエンドポイントは、指定されたステータスに一致するすべてのバリデーターを照会します。
 
 ```bash
 /cosmos/staking/v1beta1/validators
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET "http://localhost:1317/cosmos/staking/v1beta1/validators" -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1829,13 +1829,13 @@ Example Output:
 
 ### Validator
 
-The `Validator` REST endpoint queries validator information for given validator address.
+`Validator` RESTエンドポイントは、指定されたバリデーターアドレスのバリデーター情報を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/validators/{validatorAddr}
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET \
@@ -1843,7 +1843,7 @@ curl -X GET \
 -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1881,19 +1881,19 @@ Example Output:
 
 ### ValidatorDelegations
 
-The `ValidatorDelegations` REST endpoint queries delegate information for given validator.
+`ValidatorDelegations` RESTエンドポイントは、指定されたバリデーターのデリゲート情報を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/validators/{validatorAddr}/delegations
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET "http://localhost:1317/cosmos/staking/v1beta1/validators/cosmosvaloper16msryt3fqlxtvsy8u5ay7wv2p8mglfg9g70e3q/delegations" -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1963,13 +1963,13 @@ Example Output:
 
 ### Delegation
 
-The `Delegation` REST endpoint queries delegate information for given validator delegator pair.
+`Delegation` RESTエンドポイントは、指定されたバリデーターデリゲーターペアのデリゲート情報を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/validators/{validatorAddr}/delegations/{delegatorAddr}
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET \
@@ -1977,7 +1977,7 @@ curl -X GET \
 -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -1997,13 +1997,13 @@ Example Output:
 
 ### UnbondingDelegation
 
-The `UnbondingDelegation` REST endpoint queries unbonding information for given validator delegator pair.
+`UnbondingDelegation` RESTエンドポイントは、指定されたバリデーターデリゲーターペアの非結合情報を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/validators/{validatorAddr}/delegations/{delegatorAddr}/unbonding_delegation
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET \
@@ -2011,7 +2011,7 @@ curl -X GET \
 -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -2032,13 +2032,13 @@ Example Output:
 
 ### ValidatorUnbondingDelegations
 
-The `ValidatorUnbondingDelegations` REST endpoint queries unbonding delegations of a validator.
+`ValidatorUnbondingDelegations` RESTエンドポイントは、バリデーターの非結合委任を照会します。
 
 ```bash
 /cosmos/staking/v1beta1/validators/{validatorAddr}/unbonding_delegations
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET \
@@ -2046,7 +2046,7 @@ curl -X GET \
 -H  "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {

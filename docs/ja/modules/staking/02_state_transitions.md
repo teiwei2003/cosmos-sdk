@@ -1,172 +1,158 @@
-# 状态转换
+# 状態遷移
 
-本文档描述了与以下相关的状态转换操作:
+このドキュメントでは、以下に関連する状態遷移操作について説明します。
 
-1. [验证器](./02_state_transitions.md#validators)
-2. [委托](./02_state_transitions.md#delegations)
-3. [斜线](./02_state_transitions.md#slashing)
+1. [バリデーター](./ 02_state_transitions.md＃validators)
+2. [委任](./ 02_state_transitions.md＃delegations)
+3. [スラッシュ](./ 02_state_transitions.md＃slashing)
 
-## 验证器
+## バリデーター
 
-验证器中的状态转换在每个 [`EndBlock`](./05_end_block.md#validator-set-changes) 上执行
-为了检查活动的“ValidatorSet”中的变化。
+バリデーターの状態遷移は、[`EndBlock`](./ 05_end_block.md＃validator-set-changes)ごとに実行されます。
+アクティブな`ValidatorSet`の変更を確認するため。
 
-验证器可以是“Unbonded”、“Unbonding”或“Bonded”。 `未绑定`
-和“Unbonding”统称为“Not Bonded”。验证者可以移动
-直接在所有状态之间，除了从“Bonded”到“Unbonded”。
+バリデーターは、`Unbonded`、`Unbonding`、または`Bonded`にすることができます。「非接着」と`Unbonding`はまとめて`NotBonded`と呼ばれます。バリデーターは、`Bonded`から`Unbonded`を除いて、すべての状態間を直接移動できます。
 
-### 未绑定到绑定
+### 結合されていない結合
 
-当验证者在 ValidatorPowerIndex 中的排名超过
-“LastValidator”的那个。
+次の遷移は、`ValidatorPowerIndex`でのバリデーターのランキングが`LastValidator`のランキングを超えると発生します。
 
-- 将 `validator.Status` 设置为 `Bonded`
-- 将 `validator.Tokens` 从 `NotBondedTokens` 发送到 `BondedPool` `ModuleAccount`
-- 从 `ValidatorByPowerIndex` 中删除现有记录
-- 向 `ValidatorByPowerIndex` 添加一条新的更新记录
-- 更新此验证器的 `Validator` 对象
-- 如果存在，删除此验证器的任何“ValidatorQueue”记录
+-`validator.Status`を`Bonded`に設定します
+-`validator.Tokens`を`NotBondedTokens`から`BondedPool``ModuleAccount`に送信します
+-`ValidatorByPowerIndex`から既存のレコードを削除します
+- 新しい更新されたレコードを`ValidatorByPowerIndex`に追加します
+- このバリデーターの`Validator`オブジェクトを更新します
+- 存在する場合は、このバリデーターの`ValidatorQueue`レコードを削除します
 
-### 绑定到解绑
+### 結合と非結合
 
 当验证者开始解除绑定过程时，会发生以下操作:
 
-- 将 `validator.Tokens` 从 `BondedPool` 发送到 `NotBondedTokens` `ModuleAccount`
-- 将 `validator.Status` 设置为 `Unbonding`
-- 从 `ValidatorByPowerIndex` 中删除现有记录
-- 向 `ValidatorByPowerIndex` 添加一条新的更新记录
-- 更新此验证器的 `Validator` 对象
-- 为这个验证器在 `ValidatorQueue` 中插入一条新记录
+- 将`validator.Tokens`从`BondedPool`发送到`NotBondedTokens``ModuleAccount`
+- 将`validator.Status`设置为`Unbonding`
+- 从`ValidatorByPowerIndex`中删除现有记录
+- 向`ValidatorByPowerIndex`添加一条新的更新记录
+- 更新此验证器的`Validator`对象
+- 为这个验证器在`ValidatorQueue`中插入一条新记录
 
-### 解除绑定到解除绑定
+### 未結合から非結合へ
 
-当“ValidatorQueue”对象出现时，验证器从解除绑定状态变为解除绑定状态
-从保税到非保税
+`ValidatorQueue`オブジェクトが結合から非結合に移動すると、バリデーターは非結合から非結合に移動します
 
-- 更新此验证器的 `Validator` 对象
-- 将 `validator.Status` 设置为 `Unbonded`
+- このバリデーターの`Validator`オブジェクトを更新します
+-`validator.Status`を`Unbonded`に設定します
 
-### 入狱/出狱
+### Jail/Unjail
 
-当验证者被监禁时，它实际上会从 Tendermint 集合中删除。
-这个过程也可以逆转。发生以下操作:
+バリデーターが投獄されると、テンダーミントセットから効果的に削除されます。
+このプロセスは逆にすることもできます。 次の操作が発生します。
 
-- 设置 `Validator.Jailed` 并更新对象
-- 如果被监禁，从`ValidatorByPowerIndex` 中删除记录
-- 如果未监禁，则将记录添加到 `ValidatorByPowerIndex`
+-`Validator.Jailed`を設定し、オブジェクトを更新します
+- 投獄された場合、`ValidatorByPowerIndex`からレコードを削除します
+- ジェイルされていない場合は、`ValidatorByPowerIndex`にレコードを追加します
 
-被监禁的验证器不存在于以下任何存储中:
+投獄されたバリデーターは、次のストレージのいずれにも存在しません。
 
-- 电力存储(从共识权力到地址) 
+- パワーストア(コンセンサスパワーからアドレスまで)
 
 ## Delegations
 
-### Delegate
+### 委任
 
-当委托发生时，验证器和委托对象都会受到影响
+委任が発生すると、バリデーターと委任オブジェクトの両方が影響を受けます
 
-- 根据委托的代币和验证者的汇率确定委托人的份额
-- 从发送帐户中删除令牌
-- 添加共享委托对象或将它们添加到创建的验证器对象
-- 添加新的委托人份额并更新`Validator`对象
-- 将`delegation.Amount`从委托人的账户转移到`BondedPool`或`NotBondedPool``ModuleAccount`，具体取决于`validator.Status`是否为`Bonded`
-- 从 `ValidatorByPowerIndex` 中删除现有记录
-- 向 `ValidatorByPowerIndex` 添加一条新的更新记录
+- 委任されたトークンとバリデーターの為替レートに基づいて、委任者のシェアを決定します
+- 送信アカウントからトークンを削除します
+- addは委任オブジェクトを共有するか、作成されたバリデーターオブジェクトに追加します
+- 新しい委任共有を追加し、`Validator`オブジェクトを更新します
+-`validator.Status`が`Bonded`であるかどうかに応じて、`delegation.Amount`を委任者のアカウントから`BondedPool`または`NotBondedPool``ModuleAccount`に転送します
+-`ValidatorByPowerIndex`から既存のレコードを削除します
+- 新しい更新されたレコードを`ValidatorByPowerIndex`に追加します
 
-### 开始解绑
+### 接着解除を開始します
 
-作为 Undelegate 和 Complete Unbonding 状态转换的一部分 Unbond
-可以调用委托。
+UndelegateおよびCompleteUnbonding状態遷移の一部として、UnbondDelegationが呼び出される場合があります。
 
-- 从委托人中减去未绑定股份
-- 如果验证器是“Unbonding”或“Bonded”，则将代币添加到“UnbondingDelegation”条目中
-- 如果验证人是“Unbonded”，则将代币直接发送给提款人
-  帐户
-- 如果没有更多共享，则更新委托或删除委托
-- 如果委托是验证者的操作者并且没有更多的股份存在，则触发监狱验证者
-- 更新验证器，删除委托人股份和相关代币
-- 如果验证者状态为“Bonded”，则转移未绑定的“Coins”价值
-  从`BondedPool` 到`NotBondedPool``ModuleAccount` 的共享
-- 如果验证器未绑定并且没有更多的委托份额，则删除验证器。
+- 委任者から非結合株を差し引く
+- バリデーターが`Unbonding`または`Bonded`の場合、トークンを`UnbondingDelegation`エントリに追加します
+- バリデーターが`Unbonded`の場合、トークンを直接引き出しに送信します
+   アカウント
+- 委任を更新するか、共有がなくなった場合は委任を削除します
+- 委任がバリデーターのオペレーターであり、それ以上共有が存在しない場合は、jailバリデーターをトリガーします
+- 委任者の共有と関連するコインを削除してバリデーターを更新します
+- バリデーターの状態が`Bonded`の場合、非結合の`Coins`相当を転送します
+  `BondedPool`から`NotBondedPool``ModuleAccount`への共有
+- バリデーターが結合されておらず、委任シェアがなくなった場合は、バリデーターを削除します。
 
-### 完全解绑
+### 完全な剥離
 
-对于未立即完成的取消委托，请执行以下操作
-当解除绑定委托队列元素成熟时发生:
+すぐに完了しない委任の場合、結合解除委任キュー要素が成熟すると、次の操作が発生します。
 
-- 从 `UnbondingDelegation` 对象中删除条目
-- 将代币从 `NotBondedPool` `ModuleAccount` 转移到委托人 `Account`
+-`UnbondingDelegation`オブジェクトからエントリを削除します
+- トークンを`NotBondedPool``ModuleAccount`から委任者`Account`に転送します
 
-### 开始重新授权
+### 再委任を開始する
 
-重新委派会影响委派、源和目标验证器。
+再委任は、委任、送信元、および宛先のバリデーターに影響します。
 
-- 执行来自源验证器的“unbond”委托以检索未绑定股票的代币价值
-- 使用未绑定的代币，将它们“委托”给目标验证器
-- 如果`sourceValidator.Status` 是`Bonded`，而`destinationValidator` 不是，
-  将新委托的代币从 `BondedPool` 转移到 `NotBondedPool` `ModuleAccount`
-- 否则，如果 `sourceValidator.Status` 不是 `Bonded`，并且 `destinationValidator`
-  是`Bonded`，将新委托的代币从`NotBondedPool`转移到`BondedPool``ModuleAccount`
-- 在相关“重新授权”的新条目中记录代币数量
+- ソースバリデーターから「unbond」委任を実行して、結合されていない共有のトークンに相当するトークンを取得します
+- 結合されていないトークンを使用して、それらを宛先バリデーターに「委任」します
+-`sourceValidator.Status`が`Bonded`であり、`destinationValidator`がそうでない場合
+   新しく委任されたトークンを`BondedPool`から`NotBondedPool``ModuleAccount`に転送します
+- それ以外の場合、`sourceValidator.Status`が`Bonded`でなく、`destinationValidator`
+   が`Bonded`の場合、新しく委任されたトークンを`NotBondedPool`から`BondedPool``ModuleAccount`に転送します
+- 関連する`再委任`の新しいエントリにトークンの金額を記録します
 
-从重新授权开始到完成，被授权人处于“伪解绑”状态，并且仍然可以
-因在重新授权开始之前发生的违规行为而受到惩罚。
+再委任が開始されてから完了するまで、委任者は「疑似非結合」の状態にあり、再委任が開始される前に発生した違反については引き続き削減できます。。
 
-### 完成重新授权
+### 完全な再委任
 
-当重新授权完成时，会发生以下情况:
+再委任が完了すると、次のことが発生します。
 
-- 从 `Redelegation` 对象中删除条目
+-`Redelegation`オブジェクトからエントリを削除します
 
-## 削减
+## スラッシュ
 
-### 斜线验证器
+### スラッシュバリデーター
 
-当验证器被削减时，会发生以下情况:
+バリデーターがスラッシュされると、以下が発生します。
 
-- 总`slashAmount` 计算为`slashFactor`(链参数)\* `TokensFromConsensusPower`，
-  违规时绑定到验证器的令牌总数。
-- 每次解除绑定授权和伪解除绑定重新授权，使得违规发生在解除绑定之前或
-  从验证器开始的重新授权被初始余额的“slashFactor”百分比削减。
-- 从重新授权和解除授权中削减的每一笔金额都从
-  总斜线金额。
-- 然后从 `BondedPool` 中的验证者代币中削减 `remaingSlashAmount` 或
-  `NonBondedPool` 取决于验证器的状态。这减少了代币的总供应量。
+- 合計`slashAmount`は`slashFactor`(チェーンパラメータ)として計算されます\ *`TokensFromConsensusPower`、違反時にバリデーターに結合されたトークンの総数。
+- すべての非結合委任および疑似非結合再委任。これにより、非結合または非結合の前に違反が発生します。バリデーターから開始された再委任は、initialBalanceの`slashFactor`パーセンテージによってスラッシュされます。
+- 再委任および非結合の委任から削減された各金額は、総スラッシュ量。
+- 次に、`remaingSlashAmount`は`BondedPool`またはバリデーターのステータスに応じて`NonBondedPool`。 これにより、トークンの総供給量が減少します。
 
-如果由于任何需要提交证据的违规行为(例如双重签名)而出现斜线，则斜线
-发生在包含证据的区块，而不是发生违规的区块。
-否则，验证者不会被追溯削减，只有当他们被抓住时。
+提出する証拠を必要とする違反によるスラッシュの場合(たとえば、二重署名)、スラッシュ
+違反が発生したブロックではなく、証拠が含まれているブロックで発生します。
+言い換えると、バリデーターは、キャッチされた場合にのみ、遡及的にスラッシュされません。
 
-### 斜线解除绑定委托
+### 接着解除の委任をスラッシュ
 
-当验证者被削减时，那些开始解除绑定的验证者的解除绑定委托也会被削减
-违规后。来自验证者的每个解除绑定委托中的每个条目
-被“slashFactor”削减。削减的金额是根据“InitialBalance”计算的
-并设置上限以防止由此产生的负余额。完成(或成熟)的解除绑定不会被削减。
+バリデーターがスラッシュされると、結合解除を開始したバリデーターからの結合解除された代表団もスラッシュされます。
+違反の時の後。 バリデーターからのすべての非結合委任のすべてのエントリ`slashFactor`によってスラッシュされます。 スラッシュ量は、の「InitialBalance」から計算されます。
+委任とは、結果として生じるマイナスのバランスを防ぐために制限されています。 完了した(または成熟した)結合解除はスラッシュされません。。
 
-### 斜线重新授权
+### スラッシュの再委任
 
-当验证器被削减时，所有在验证器之后开始的验证器的重新授权也会被削减
-违规。重新授权被“slashFactor”削减。
-在违规之前开始的重新授权不会被削减。
-削减的金额是根据委托的“InitialBalance”计算的，上限为
-防止由此产生的负余额。
-成熟的再授权(已完成伪解除绑定)不会被削减。
+バリデーターがスラッシュされると、違反後に開始されたバリデーターからのすべての再委任もスラッシュされます。 再委任は`slashFactor`によってスラッシュされます。
+違反の前に開始された再委任はスラッシュされません。
+削減された金額は、委任の「InitialBalance」から計算され、結果として生じるマイナスのバランスを防ぐために制限されます。
+(疑似アンボンディングを完了した)成熟した再委任はスラッシュされません。
 
-## 如何计算份额
+## 株式の計算方法
 
-在任何给定的时间点，每个验证者都有一定数量的代币“T”，并有一定数量的已发行股份“S”。
-每个委托人‘i’持有一定数量的股份‘S_i’。
-代币的数量是委托给验证者的所有代币的总和，加上奖励，减去斜线。
+任意の時点で、各バリデーターにはいくつかのトークン`T`があり、発行された株式の数`S`があります。
+各委任者`i`は、多数の共有`S_i`を保持します。
+トークンの数は、バリデーターに委任されたすべてのトークンの合計に、報酬からスラッシュを差し引いたものです。
 
-委托人有权获得与其股份比例成比例的一部分基础代币。
-因此，委托人`i` 有权获得验证人代币的`T * S_i / S`。
+委任者は、共有の割合に比例する基になるトークンの一部を受け取る権利があります。
+したがって、委任者`i`は、バリデーターのトークンの`T * S_i / S`を受け取る権利があります。
 
-当委托人将新代币委托给验证人时，他们会收到与他们的贡献成正比的份额。
-因此，当委托人`j` 委托`T_j` 代币时，他们会收到`S_j = S * T_j / T` 份额。
-现在代币总数为‘T + T_j’，股份总数为‘S + S_j’。
-`j 的份额比例与其贡献的总代币的比例相同:`(S + S_j) / S = (T + T_j) / T`。
+委任者が新しいトークンをバリデーターに委任すると、その貢献に比例した数のシェアを受け取ります。
+したがって、委任者`j`が`T_j`トークンを委任すると、それらは`S_j = S * T_j / T`共有を受け取ります。
+トークンの総数は`T + T_j`になり、共有の総数は`S + S_j`になります。
+`j`のシェアの割合は、貢献したトークンの合計の割合と同じです：`(S + S_j)/ S =(T + T_j)/ T`。
 
-一个特殊情况是初始委托，当`T = 0` 和`S = 0` 时，所以`T_j / T` 是未定义的。
-对于初始委托，委托“T_j”代币的委托人“j”获得“S_j = T_j”份额。
-所以一个没有收到任何奖励也没有被削减的验证者将拥有 `T = S`。 
+特殊なケースは、`T = 0`および`S = 0`の場合の最初の委任であるため、`T_j / T`は未定義です。
+最初の委任では、`T_j`トークンを委任する委任者`j`は`S_j = T_j`共有を受け取ります。
+したがって、報酬を受け取っておらず、スラッシュもされていないバリデーターは、`T = S`になります。 

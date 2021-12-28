@@ -1,213 +1,159 @@
-# 状态
+# 状態
 
-## 水池
+## プール
 
-池用于跟踪债券面额的保税和非保税代币供应。
+プールは、債券建ての債券および非債券のトークン供給を追跡するために使用されます。
 
 ## LastTotalPower
 
-LastTotalPower 跟踪在前一个结束块期间记录的绑定令牌总量。
-以“Last”为前缀的存储条目必须保持不变，直到 EndBlock。
+LastTotalPowerは、前のエンドブロック中に記録された結合トークンの合計量を追跡します。
+「Last」で始まるストアエントリは、EndBlockまで変更しないでください。
 
-- LastTotalPower: `0x12 -> ProtocolBuffer(sdk.Int)`
+- LastTotalPower:`0x12 -> ProtocolBuffer(sdk.Int)`
 
-## 参数
+## パラメータ
 
-params 是一个模块范围的配置结构，用于存储系统参数
-并定义了 staking 模块的整体功能。
+Paramsは、システムパラメータを格納し、ステーキングモジュールの全体的な機能を定義するモジュール全体の構成構造です。
 
-- 参数:`Paramsspace("staking") -> legacy_amino(params)`
+- パラメータ:`Paramsspace("staking") -> legacy_amino(params)`
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.1/proto/cosmos/staking/v1beta1/staking.proto#L230-L241
 
-## 验证器
+## バリデーター
 
-验证器可以具有以下三种状态之一
+バリデーターは、3つのステータスのいずれかを持つことができます
 
-- `Unbonded`:验证器不在活动集中。他们不能签署区块，也不能赚取
-  奖励。他们可以接待代表团。
-- `Bonded`":一旦验证器收到足够的绑定代币，他们就会自动加入
-  [`EndBlock`](./05_end_block.md#validator-set-changes) 期间的活动集，并且它们的状态更新为“已绑定”。
-  他们正在签署区块并获得奖励。他们可以接待更多的代表团。
-  他们可能会因不当行为而受到惩罚。解除其委托的该验证者的委托人
-  必须等待 UnbondingTime 的持续时间，一个特定于链的参数，在此期间
-  如果犯下这些罪行，它们仍然可以因源验证器的罪行而受到惩罚
-  在代币被绑定的时间段内。
-- `Unbonding`:当验证者离开活动集时，无论是出于选择还是由于削减、监禁或
-  墓碑，开始解除他们所有代表团的束缚。然后所有代表团必须等待 UnbondingTime
-  在他们的代币从“BondedPool”转移到他们的账户之前。
+-`Unbonded`:バリデーターがアクティブセットにありません。 ブロックに署名したり、報酬を獲得したりすることはできません。 彼らは代表団を受け入れることができます。
+-`Bonded`":バリデーターが十分な結合トークンを受け取ると、[`EndBlock`](./ 05_end_block.md＃validator-set-changes)中にアクティブセットに自動的に参加し、ステータスが`Bonded`に更新されます。
+彼らはブロックに署名し、報酬を受け取っています。 彼らはさらに委任を受けることができます。
+それらは、不正行為のためにスラッシュされる可能性があります。 委任を解除するこのバリデーターの委任者は、チェーン固有のパラメーターであるUnbondingTimeの期間を待機する必要があります。その間、トークンが結合されている期間中にこれらの違反がコミットされた場合、ソースバリデーターの違反に対してスラッシュ可能です。
+-`Unbonding`:バリデーターが選択によって、またはスラッシュ、ジェイル、またはトゥームストーンのためにアクティブセットを離れると、すべての委任の結合が解除されます。 その後、すべての委任は、トークンが`BondedPool`からアカウントに移動される前に、UnbondingTimeを待機する必要があります。
 
-验证器对象应该主要由
-`OperatorAddr`，验证者操作者的 SDK 验证者地址。二
-每个验证器对象维护额外的索引，以实现
-削减和验证器集更新所需的查找。第三个特殊索引
-(`LastValidatorPower`) 也保持不变，但保持不变
-在每个区块中，与反映验证者的前两个​​索引不同
-块内的记录。 
+バリデーターオブジェクトは、主に保存され、
+`OperatorAddr`、バリデーターのオペレーターのSDKバリデーターアドレス。 スラッシュとバリデーターセットの更新に必要なルックアップを満たすために、バリデーターオブジェクトごとに2つの追加のインデックスが維持されます。 3番目の特別なインデックス(`LastValidatorPower`)も維持されますが、ブロック内のバリデーターレコードをミラーリングする最初の2つのインデックスとは異なり、各ブロック全体で一定のままです。 
 
-- 验证器:`0x21 | OperatorAddrLen (1 字节) | OperatorAddr -> ProtocolBuffer(validator)`
-- ValidatorsByConsAddr: `0x22 | ConsAddrLen (1 字节) | ConsAddr -> OperatorAddr`
-- ValidatorsByPower:`0x23 | BigEndian(ConsensusPower) | OperatorAddrLen (1 字节) | OperatorAddr -> OperatorAddr`
-- LastValidatorsPower:`0x11 | OperatorAddrLen (1 字节) | OperatorAddr -> ProtocolBuffer(ConsensusPower)`
+- Validators:`0x21 | OperatorAddrLen(1バイト)| OperatorAddr-> ProtocolBuffer(validator)`
+- ValidatorsByConsAddr：`0x22 | ConsAddrLen(1バイト)| ConsAddr-> OperatorAddr`
+- ValidatorsByPower：`0x23 | BigEndian(ConsensusPower)| OperatorAddrLen(1バイト)| OperatorAddr-> OperatorAddr`
+- LastValidatorsPower：`0x11 | OperatorAddrLen(1バイト)| OperatorAddr-> ProtocolBuffer(ConsensusPower)`
 
-`Validators` 是主要索引 - 它确保每个操作符只能有一个
-关联的验证器，该验证器的公钥可以在
-未来。委托人可以引用验证人的不可变操作符，无需
-关注不断变化的公钥。
+`Validators`はプライマリインデックスです。これにより、各オペレーターが関連付けられたバリデーターを1つだけ持つことができ、そのバリデーターの公開鍵は将来変更される可能性があります。 委任者は、公開鍵の変更を気にすることなく、バリデーターの不変演算子を参照できます。
 
-`ValidatorByConsAddr` 是一个额外的索引，可以进行斜线查找。
-Tendermint 上报证据时，会提供验证人地址，所以这个
-需要 map 才能找到操作符。请注意，`ConsAddr` 对应于
-可以从验证器的“ConsPubKey”派生的地址。
+`ValidatorByConsAddr`は、スラッシュのルックアップを可能にする追加のインデックスです。
+Tendermintが証拠を報告するとき、それはバリデーターアドレスを提供するので、このマップはオペレーターを見つけるために必要です。`ConsAddr`は、バリデーターの`ConsPubKey`から取得できるアドレスに対応していることに注意してください。
 
-`ValidatorsByPower` 是一个额外的索引，它提供了一个排序列表
-潜在的验证器来快速确定当前的活动集。这里
-默认情况下，ConsensusPower 是 validator.Tokens/10^6。请注意，所有验证器
-`Jailed` 为 true 的地方不存储在这个索引中。
+`ValidatorsByPower`は、現在アクティブなセットをすばやく判別するための潜在的なバリデーターのソートされたリストを提供する追加のインデックスです。 ここで、ConsensusPowerはデフォルトでvalidator.Tokens/10^6です。`Jailed`がtrueであるすべてのバリデーターは、このインデックス内に格納されないことに注意してください。
 
-`LastValidatorsPower` 是一个特殊的索引，它提供了历史列表
-最后一个区块的绑定验证器。该索引在块期间保持不变，但
-在 [`EndBlock`](./05_end_block.md) 中发生的验证器集更新过程中更新。
+`LastValidatorsPower`は、最後のブロックの結合されたバリデーターの履歴リストを提供する特別なインデックスです。 このインデックスはブロック中は一定のままですが、[`EndBlock`](./ 05_end_block.md)で行われるバリデーターセットの更新プロセス中に更新されます。
 
-每个验证器的状态都存储在一个“验证器”结构中:
+各バリデーターの状態は、`Validator`構造体に格納されます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L65-L99
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L24-L63
 
-## 代表团
+## 委任
 
-委托通过结合`DelegatorAddr`(委托人的地址)来识别
-使用 `ValidatorAddr` 委托人在存储中被索引如下:
+委任は、`DelegatorAddr`(委任者のアドレス)と`ValidatorAddr`を組み合わせることによって識別されます。委任者は、ストアで次のようにインデックス付けされます。
 
-- 委托:`0x31 | DelegatorAddrLen (1 字节) |委托人地址 | ValidatorAddrLen(1 字节)| ValidatorAddr -> ProtocolBuffer(delegation)`
+- 委任：`0x31 | DelegatorAddrLen(1バイト)| DelegatorAddr | ValidatorAddrLen(1バイト)| ValidatorAddr-> ProtocolBuffer(delegation)`
 
-利益相关者可以将硬币委托给验证者；在这种情况下他们的
-资金保存在“委托”数据结构中。它归一个人所有
-委托人，并与一个验证人的份额相关联。发件人
-交易是债券的所有者。
+ステーク保有者は、コインをバリデーターに委任することができます。この状況では、彼らの資金は「委任」データ構造で保持されます。これは1人の委任者によって所有され、1人の検証者の共有に関連付けられています。
+トランザクションの送信者は、債券の所有者です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L159-L170
 
-### 委托人股份
+### 委任者の共有
 
-当一个人将代币委托给验证者时，他们会根据
-动态汇率，根据委托给代币的代币总数计算如下
-验证器和迄今为止发行的股票数量:
+1人のトークンをバリデーターに委任すると、動的為替レートに基づいて、バリデーターに委任されたトークンの総数とこれまでに発行されたシェアの数から次のように計算された委任株の数が発行されます。
 
-`每个令牌的份额 = validator.TotalShares() / validator.Tokens()`
+`Shares per Token = validator.TotalShares() / validator.Tokens()`
 
-仅收到的股份数量存储在委托条目中。当委托人然后
-Undelegates，他们收到的代币数量是根据他们当前的股份数量计算的
-持有和反向汇率:
+受け取ったシェアの数だけがDelegationEntryに保存されます。 次に委任者が委任を解除すると、委任者が受け取るトークンの量は、現在保有している株式数と逆為替レートから計算されます。
 
-`每股代币数 = validator.Tokens() / validatorShares()`
+`Tokens per Share = validator.Tokens() / validatorShares()`
 
-这些“股份”只是一种会计机制。它们不是可替代的资产。的原因
-这种机制是为了简化围绕削减的核算。而不是反复削减
-每个委托条目的代币，而不是验证者的总绑定代币可以被削减，
-有效地降低了每份已发行的委托人股份的价值。 
+これらの「共有」は、単なる会計メカニズムです。 それらは代替可能な資産ではありません。 このメカニズムの理由は、スラッシュに関するアカウンティングを簡素化するためです。
+すべての委任エントリのトークンを繰り返しスラッシュするのではなく、代わりに、バリデーターの結合されたトークンの合計をスラッシュして、発行された各委任共有の値を効果的に減らすことができます。 
 
-## 解除绑定委托
+## 結合解除委任
 
-“委托”中的股份可以不绑定，但它们必须存在一段时间
-一个“UnbondingDelegation”，如果拜占庭行为是可以减少的
-检测到。
+「委任」の共有は結合解除できますが、ビザンチンの動作が検出された場合に共有を減らすことができる「結合解除委任」としてしばらくの間存在する必要があります。
 
-`UnbondingDelegation` 在存储中被索引为:
+`UnbondingDelegation`は、ストアで次のようにインデックス付けされます。
 
-- 解除绑定委托:`0x32 | DelegatorAddrLen (1 字节) |委托人地址 | ValidatorAddrLen(1 字节)| ValidatorAddr -> ProtocolBuffer(unbondingDelegation)`
-- UnbondingDelegationsFromValidator:`0x33 | ValidatorAddrLen(1 字节)|验证器地址 | DelegatorAddrLen (1 字节) | DelegatorAddr -> nil`
+- UnbondingDelegation：`0x32 | DelegatorAddrLen(1バイト)| DelegatorAddr | ValidatorAddrLen(1バイト)| ValidatorAddr-> ProtocolBuffer(unbondingDelegation)`
+- UnbondingDelegationsFromValidator：`0x33 | ValidatorAddrLen(1バイト)| ValidatorAddr | DelegatorAddrLen(1バイト)| DelegatorAddr-> nil`
 
-此处的第一张地图用于查询，以查找所有未绑定的委托
-给定的委托人，而第二张地图用于斜线，以查找所有
-与给定验证器关联的解除绑定委托需要
-削减。
+ここでの最初のマップはクエリで使用され、特定の委任者のすべての非結合委任を検索します。2番目のマップはスラッシュで使用され、特定のバリデーターに関連付けられている、スラッシュが必要なすべての非結合委任を検索します。
 
-每次启动解除绑定时都会创建一个 UnbondingDelegation 对象。
+UnbondingDelegationオブジェクトは、結合解除が開始されるたびに作成されます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L172-L198
 
-## 重新授权
+## 再委任
 
-价值“委托”的保税代币可以立即从
-源验证器到不同的验证器(目标验证器)。然而当
-发生这种情况时，他们必须在“重新委托”对象中进行跟踪，从而他们的
-如果他们的代币导致了拜占庭故障，则可以削减股票
-由源验证器提交。
+「委任」に相当する結合トークンは、ソースバリデーターから別のバリデーター(宛先バリデーター)に即座に再委任できます。
+ただし、これが発生した場合は、`Redelegation`オブジェクトで追跡する必要があります。これにより、トークンがソースバリデーターによってコミットされたビザンチンフォールトに寄与した場合、共有を大幅に削減できます。
 
-`Redelegation` 在存储中被索引为:
+`Redelegation`は、ストアで次のようにインデックス付けされます。
 
-- 重新委托:`0x34 | DelegatorAddrLen (1 字节) |委托人地址 | ValidatorAddrLen(1 字节)| ValidatorSrcAddr | ValidatorDstAddr -> ProtocolBuffer(redelegation)`
-- RedelelegationsBySrc:`0x35 | ValidatorSrcAddrLen(1 字节)| ValidatorSrcAddr | ValidatorDstAddrLen(1 字节)| ValidatorDstAddr | DelegatorAddrLen (1 字节) | DelegatorAddr -> nil`
-- RedelelegationsByDst:`0x36 | ValidatorDstAddrLen(1 字节)| ValidatorDstAddr | ValidatorSrcAddrLen(1 字节)| ValidatorSrcAddr | DelegatorAddrLen (1 字节) | DelegatorAddr -> nil`
+- 再委任：`0x34 | DelegatorAddrLen(1バイト)| DelegatorAddr | ValidatorAddrLen(1バイト)| ValidatorSrcAddr | ValidatorDstAddr-> ProtocolBuffer(redelegation)`
+- RedelegationsBySrc：`0x35 | ValidatorSrcAddrLen(1バイト)| ValidatorSrcAddr | ValidatorDstAddrLen(1バイト)| ValidatorDstAddr | DelegatorAddrLen(1バイト)| DelegatorAddr-> nil`
+- RedelegationsByDst：`0x36 | ValidatorDstAddrLen(1バイト)| ValidatorDstAddr | ValidatorSrcAddrLen(1バイト)| ValidatorSrcAddr | DelegatorAddrLen(1バイト)| DelegatorAddr-> nil`
 
-此处的第一张地图用于查询，以查找给定的所有重新授权
-委托人。第二个地图用于基于`ValidatorSrcAddr`的斜线，
-而第三张地图用于基于`ValidatorDstAddr`的削减。
+ここでの最初のマップは、特定の委任者のすべての再委任を検索するためのクエリに使用されます。 2番目のマップは`ValidatorSrcAddr`に基づくスラッシュに使用され、3番目のマップは`ValidatorDstAddr`に基づくスラッシュに使用されます。
 
-每次重新委派发生时都会创建一个重新委派对象。阻止
-在以下情况下可能不会发生“重新授权跳跃”重新授权:
+再委任オブジェクトは、再委任が発生するたびに作成されます。 「再委任ホッピング」を防ぐために、次の状況では再委任が発生しない場合があります。
 
--(重新)委托人已经有另一个不成熟的重新委托正在进行中
-  带有验证器的目的地(我们称之为“验证器 X”)
-- 并且，(重新)委托人正在尝试创建_新_重新委托
-  这个新的重新授权的源验证器是“Validator X”。
+- (再)委任者はすでに別の未熟な再委任が進行中です
+   バリデーターへの宛先を指定します(これを「バリデーターX」と呼びましょう)
+- そして、(再)委任者は_new_再委任を作成しようとしています
+   ここで、この新しい再委任のソースバリデーターは`ValidatorX`です。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L200-L228
 
-## 队列
+## Queues
 
-所有队列对象都按时间戳排序。任何队列中使用的时间是
-首先四舍五入到最接近的纳秒然后排序。可排序的时间格式
-used 是对 RFC3339Nano 的轻微修改并使用格式字符串
-`"2006-01-02T15:04:05.000000000"`。特别是这种格式:
+すべてのキューオブジェクトはタイムスタンプで並べ替えられます。 キュー内で使用される時間は、最初に最も近いナノ秒に丸められ、次にソートされます。 使用されるソート可能な時間形式は、RFC3339Nanoのわずかな変更であり、形式文字列`" 2006-01-02T15：04：05.000000000 "`を使用します。 特にこのフォーマット:
 
-- 右填充全零
-- 删除时区信息(使用 UTC)
+- 右はすべてゼロを埋めます
+- タイムゾーン情報を削除します(UTCを使用)
 
-在所有情况下，存储的时间戳代表队列的成熟时间
-元素。 
+すべての場合において、保存されたタイムスタンプはキュー要素の成熟時間を表します。 
 
 ### UnbondingDelegationQueue
 
-为了跟踪解绑授权的进展，解绑授权
-保留代表团队列。
+結合解除された委任の進行状況を追跡する目的で、結合解除された委任キューが保持されます。
 
-- 解除绑定委托:`0x41 |格式(时间)-> []DVPair`
+- UnbondingDelegation：`0x41 | format(time)-> [] DVPair`
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L123-L133
 
-### 重新授权队列
+### RedelegationQueue
 
-为了跟踪重新授权的进度，重新授权队列是
-保留。
+結合解除されたバリデーターの進行状況を追跡する目的で、バリデーターキューが保持されます。
 
-- 重新委托队列:`0x42 |格式(时间)-> []DVVTriplet`
+- RedelegationQueue:`0x42 | format(time) -> []DVVTriplet`
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L140-L152
 
-### 验证器队列
+### ValidatorQueue
 
-为了跟踪解除绑定验证器的进度，验证器
-队列被保留。
+結合解除されたバリデーターの進行状況を追跡する目的で、バリデーターキューが保持されます。。
 
 - ValidatorQueueTime:`0x43 |格式(时间)-> []sdk.ValAddress`
 
-作为每个键的存储对象是一个验证器操作员地址数组，来自
-可以访问验证器对象。通常预计只有
-单个验证器记录将与给定的时间戳相关联，但这是可能的
-多个验证器存在于同一位置的队列中。
+各キーとして格納されているオブジェクトは、バリデーターオブジェクトにアクセスできるバリデーターオペレーターアドレスの配列です。 通常、特定のタイムスタンプに関連付けられるバリデーターレコードは1つだけであると予想されますが、同じ場所のキューに複数のバリデーターが存在する可能性があります。
 
-## 历史信息
+## 履歴情報
 
-历史信息对象在每个块中被存储和修剪，以便 staking 保持者持续存在
-由 staking 模块参数定义的 `n` 最近的历史信息:`HistoricalEntries`。
+履歴情報オブジェクトは、ステーキングキーパーがステーキングモジュールパラメータ`HistoricalEntries`によって定義された`n`最新の履歴情報を保持するように、各ブロックで保存およびプルーニングされます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/staking/v1beta1/staking.proto#L15-L22
 
-在每个 BeginBlock 中，Staking 管理员将保留当前的 ​​Header 和提交的验证器
-`HistoricalInfo` 对象中的当前块。验证者按其地址排序，以确保
-它们处于确定性顺序中。
-最旧的历史条目将被修剪以确保只存在参数定义的数量
-历史条目。 
+各BeginBlockで、ステーキングキーパーは現在のヘッダーとコミットしたバリデーターを保持します
+`HistoricalInfo`オブジェクトの現在のブロック。 バリデーターは、アドレスに基づいて並べ替えられ、次のことを確認します。
+それらは決定論的な順序になっています。
+最も古いHistoricalEntriesは、パラメーターで定義された数の
+履歴エントリ。

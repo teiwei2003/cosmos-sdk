@@ -1,12 +1,12 @@
-# 开始块
+# 開始-ブロック
 
-每个 abci 开始块调用，历史信息将被存储和修剪
-根据`HistoricalEntries`参数。
+各abciがブロック呼び出しを開始すると、履歴情報が保存され、プルーニングされます
+`HistoricalEntries`パラメータによると。
 
-## 历史信息跟踪
+## 履歴情報の追跡
 
-如果`HistoricalEntries` 参数为0，则`BeginBlock` 执行无操作。
+`HistoricalEntries`パラメータが0の場合、` BeginBlock`はno-opを実行します。
 
-否则，最新的历史信息存储在键“historicalInfoKey|height”下，而任何早于“height - HistoricalEntries”的条目都将被删除。
-在大多数情况下，这会导致每个块修剪单个条目。
-但是，如果参数“HistoricalEntries”已更改为较低的值，则存储中将有多个必须修剪的条目。 
+それ以外の場合、最新の履歴情報はキー `historicalInfoKey | height`の下に保存され、` height --HistoricalEntries`より古いエントリは削除されます。
+ほとんどの場合、これにより、ブロックごとに1つのエントリがプルーニングされます。
+ただし、パラメータ `HistoricalEntries`が低い値に変更された場合、プルーニングする必要のある複数のエントリがストアに存在します。

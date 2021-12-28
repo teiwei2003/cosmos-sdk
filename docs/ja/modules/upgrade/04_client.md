@@ -1,12 +1,12 @@
-# 客户
+# クライアント
 
-##命令行界面
+## CLI
 
-用户可以使用 CLI 查询“升级”模块并与之交互。
+ユーザーは、CLIを使用して `upgrade`モジュールを照会および操作できます。
 
-### 询问
+### Query
 
-`query` 命令允许用户查询 `upgrade` 状态。 
+`query`コマンドを使用すると、ユーザーは` upgrade`状態を照会できます。 
 
 ```bash
 simd query upgrade --help
@@ -14,22 +14,22 @@ simd query upgrade --help
 
 #### applied
 
-`applied` 命令允许用户查询区块头以获取应用完成升级的高度。 
+`applied`コマンドを使用すると、ユーザーは、完了したアップグレードが適用された高さをブロックヘッダーに問い合わせることができます。 
 
 ```bash
 simd query upgrade applied [upgrade-name] [flags]
 ```
 
-如果之前在链上执行了 upgrade-name，这将返回应用它的块的标头。
-这有助于客户端确定哪个二进制文件在给定的块范围内有效，以及了解过去迁移的更多上下文。 
+upgrade-nameが以前にチェーンで実行されていた場合、これはそれが適用されたブロックのヘッダーを返します。
+これは、クライアントが特定の範囲のブロックでどのバイナリが有効であったかを判断するのに役立ち、過去の移行を理解するためのより多くのコンテキストを提供します。 
 
-Example:
+例:
 
 ```bash
 simd query upgrade applied "test-upgrade"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 "block_id": {
@@ -70,22 +70,22 @@ Example Output:
 
 #### module versions
 
-The `module_versions` command gets a list of module names and their respective consensus versions.
+`module_versions`コマンドは、モジュール名とそれぞれのコンセンサスバージョンのリストを取得します。
 
-Following the command with a specific module name will return only
-that module's information.
+特定のモジュール名でコマンドを実行すると、のみが返されます
+そのモジュールの情報。
 
 ```bash
 simd query upgrade module_versions [optional module_name] [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query upgrade module_versions
 ```
 
-Example Output:
+出力例:
 
 ```bash
 module_versions:
@@ -127,13 +127,13 @@ module_versions:
   version: "1"
 ```
 
-Example:
+例:
 
 ```bash
 regen query upgrade module_versions ibc
 ```
 
-Example Output:
+出力例:
 
 ```bash
 module_versions:
@@ -143,19 +143,19 @@ module_versions:
 
 #### plan
 
-The `plan` command gets the currently scheduled upgrade plan, if one exists.
+`plan`コマンドは、現在スケジュールされているアップグレードプラン（存在する場合）を取得します。
 
 ```bash
 regen query upgrade plan [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query upgrade plan
 ```
 
-Example Output:
+出力例:
 
 ```bash
 height: "130"
@@ -167,23 +167,23 @@ upgraded_client_state: null
 
 ## REST
 
-A user can query the `upgrade` module using REST endpoints.
+ユーザーは、RESTエンドポイントを使用して `upgrade`モジュールを照会できます。
 
 ### Applied Plan
 
-`AppliedPlan` queries a previously applied upgrade plan by its name.
+`AppliedPlan`は、以前に適用されたアップグレードプランをその名前で照会します。
 
 ```bash
 /cosmos/upgrade/v1beta1/applied_plan/{name}
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET "http://localhost:1317/cosmos/upgrade/v1beta1/applied_plan/v2.0-upgrade" -H "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -193,19 +193,19 @@ Example Output:
 
 ### Current Plan
 
-`CurrentPlan` queries the current upgrade plan.
+`CurrentPlan`は、現在のアップグレードプランを照会します。
 
 ```bash
 /cosmos/upgrade/v1beta1/current_plan
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET "http://localhost:1317/cosmos/upgrade/v1beta1/current_plan" -H "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -215,19 +215,19 @@ Example Output:
 
 ### Module versions
 
-`ModuleVersions` queries the list of module versions from state.
+`ModuleVersions`は、状態からモジュールバージョンのリストを照会します。
 
 ```bash
 /cosmos/upgrade/v1beta1/module_versions
 ```
 
-Example:
+例:
 
 ```bash
 curl -X GET "http://localhost:1317/cosmos/upgrade/v1beta1/module_versions" -H "accept: application/json"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -310,17 +310,17 @@ Example Output:
 
 ## gRPC
 
-A user can query the `upgrade` module using gRPC endpoints.
+ユーザーは、gRPCエンドポイントを使用して `upgrade`モジュールをクエリできます。
 
 ### Applied Plan
 
-`AppliedPlan` queries a previously applied upgrade plan by its name.
+`AppliedPlan`は、以前に適用されたアップグレードプランをその名前で照会します。
 
 ```bash
 cosmos.upgrade.v1beta1.Query/AppliedPlan
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext \
@@ -329,7 +329,7 @@ grpcurl -plaintext \
     cosmos.upgrade.v1beta1.Query/AppliedPlan
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -339,19 +339,19 @@ Example Output:
 
 ### Current Plan
 
-`CurrentPlan` queries the current upgrade plan.
+`CurrentPlan`は、現在のアップグレードプランを照会します。
 
 ```bash
 cosmos.upgrade.v1beta1.Query/CurrentPlan
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext localhost:9090 cosmos.slashing.v1beta1.Query/CurrentPlan
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -361,19 +361,19 @@ Example Output:
 
 ### Module versions
 
-`ModuleVersions` queries the list of module versions from state.
+`ModuleVersions`は、状態からモジュールバージョンのリストを照会します。
 
 ```bash
 cosmos.upgrade.v1beta1.Query/ModuleVersions
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext localhost:9090 cosmos.slashing.v1beta1.Query/ModuleVersions
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {

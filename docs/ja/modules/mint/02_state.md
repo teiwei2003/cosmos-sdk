@@ -1,17 +1,17 @@
-# 状态
+# 状態
 
-##铸币厂
+## ミンター
 
-铸币厂是保存当前通货膨胀信息的空间。
+ミンターは、現在のインフレ情報を保持するためのスペースです。
 
-- 铸币厂:`0x00 -> ProtocolBuffer(铸币厂)`
+- ミンター: `0x00 -> ProtocolBuffer(minter)`
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc7/proto/cosmos/mint/v1beta1/mint.proto#L8-L19
 
-## 参数
+## パラメータ
 
-铸造参数保存在全局参数存储中。
+ミンティングパラメータは、グローバルパラメータストアに保持されます。
 
-- 参数:`mint/params -> legacy_amino(params)`
+- パラメータ:`mint/params -> legacy_amino(params)`
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc7/proto/cosmos/mint/v1beta1/mint.proto#L21-L53 

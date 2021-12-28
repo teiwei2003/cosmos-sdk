@@ -1,21 +1,21 @@
-# 与节点交互
+# ノードとの相互作用
 
-有多种与节点交互的方式:使用 CLI、使用 gRPC 或使用 REST 端点。 {概要}
+ノードと対話するには、CLIを使用する、gRPCを使用する、RESTエンドポイントを使用するなどの複数の方法があります。{概要}
 
-## 先决条件阅读
+## 前提条件の読み
 
-- [gRPC、REST 和 Tendermint 端点](../core/grpc_rest.md) {prereq}
-- [运行节点](./run-node.md) {prereq}
+- [gRPC、REST、Tendermintエンドポイント](../core/grpc_rest.md){prereq}
+- [ノードの実行](./run-node.md){前提条件}
 
-## 使用 CLI
+## CLIの使用
 
-现在您的链正在运行，是时候尝试将代币从您创建的第一个帐户发送到第二个帐户了。 在新的终端窗口中，首先运行以下查询命令:
+チェーンが実行されたので、作成した最初のアカウントから2番目のアカウントにトークンを送信してみます。 新しいターミナルウィンドウで、次のクエリコマンドを実行することから始めます。
 
 ```bash
 simd query bank balances $MY_VALIDATOR_ADDRESS --chain-id my-test-chain
 ```
 
-您应该看到您创建的帐户的当前余额，等于您授予它的原始“stake”余额减去您通过“gentx”委托的金额。 现在，创建第二个帐户: 
+作成したアカウントの現在の残高が表示されます。これは、付与した「ステーク」の元の残高から「gentx」を介して委任した金額を差し引いたものに等しくなります。 次に、2番目のアカウントを作成します。
 
 ```bash
 simd keys add recipient --keyring-backend test
@@ -24,7 +24,7 @@ simd keys add recipient --keyring-backend test
 RECIPIENT=$(simd keys show recipient -a --keyring-backend test)
 ```
 
-上面的命令创建了一个尚未在链上注册的本地密钥对。 第一次从另一个账户接收代币时会创建一个账户。 现在，运行以下命令将令牌发送到“收件人”帐户: 
+上記のコマンドは、チェーンにまだ登録されていないローカルキーペアを作成します。 アカウントは、別のアカウントからトークンを初めて受け取ったときに作成されます。 次に、次のコマンドを実行して、トークンを`recipient`アカウントに送信します。
 
 ```bash
 simd tx bank send $MY_VALIDATOR_ADDRESS $RECIPIENT 1000000stake --chain-id my-test-chain --keyring-backend test
@@ -33,40 +33,40 @@ simd tx bank send $MY_VALIDATOR_ADDRESS $RECIPIENT 1000000stake --chain-id my-te
 simd query bank balances $RECIPIENT --chain-id my-test-chain
 ```
 
-Finally, delegate some of the stake tokens sent to the `recipient` account to the validator:
+最後に、`recipient`アカウントに送信されたステークトークンの一部をバリデーターに委任します。
 
 ```bash
 simd tx staking delegate $(simd keys show my_validator --bech val -a --keyring-backend test) 500stake --from recipient --chain-id my-test-chain --keyring-backend test
 
-# Query the total delegations to `validator`.
+# Query the total delegations to`validator`.
 simd query staking delegations-to $(simd keys show my_validator --bech val -a --keyring-backend test) --chain-id my-test-chain
 ```
 
-You should see two delegations, the first one made from the `gentx`, and the second one you just performed from the `recipient` account.
+2つの委任が表示されます。最初の委任は`gentx`から作成され、2番目の委任は`recipient`アカウントから実行したばかりです。
 
-## 使用 gRPC
+## gRPCの使用
 
-Protobuf 生态系统为不同的用例开发了工具，包括从 `*.proto` 文件到各种语言的代码生成。 这些工具允许轻松构建客户端。 通常，客户端连接(即传输)可以很容易地插入和替换。 让我们探索一种最流行的传输方式:[gRPC](../core/grpc_rest.md)。
+Protobufエコシステムは、`* .proto`ファイルからさまざまな言語へのコード生成など、さまざまなユースケース向けのツールを開発しました。これらのツールを使用すると、クライアントを簡単に構築できます。多くの場合、クライアント接続(つまり、トランスポート)は、非常に簡単に接続および交換できます。 最も人気のあるトランスポートの1つである[gRPC](../core/grpc_rest.md)を見てみましょう。
 
-由于代码生成库很大程度上取决于您自己的技术堆栈，我们将仅提供三种替代方案: 
+コード生成ライブラリは独自の技術スタックに大きく依存しているため、次の3つの選択肢のみを紹介します。
 
-- `grpcurl` 用于通用调试和测试，
-- 通过 Go 编程，
-- 适用于 JavaScript/TypeScript 开发人员的 CosmJS。
+- 一般的なデバッグとテスト用の`grpcurl`、
+- プログラムでGoを介して、
+- JavaScript/TypeScript開発者向けのCosmJS。
 
 ### grpcurl
 
-[grpcurl](https://github.com/fullstorydev/grpcurl) 类似于 `curl` 但对于 gRPC。 它也可用作 Go 库，但我们将仅将其用作 CLI 命令以进行调试和测试。 按照上一个链接中的说明进行安装。
+[grpcurl](https://github.com/fullstorydev/grpcurl)は`curl`に似ていますが、gRPC用です。 Goライブラリとしても利用できますが、デバッグとテストの目的でCLIコマンドとしてのみ使用します。 前のリンクの指示に従ってインストールしてください。
 
-假设您有一个本地节点正在运行(本地网络或连接的实时网络)，您应该能够运行以下命令来列出可用的 Protobuf 服务(您可以将 `localhost:9000` 替换为另一个的 gRPC 服务器端点 节点，在 [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml)) 中的 `grpc.address` 字段下配置: 
+ローカルノードが実行されている(ローカルネットまたはライブネットワークに接続されている)と仮定すると、次のコマンドを実行して、使用可能なProtobufサービスを一覧表示できます(`localhost：9000`を別のgRPCサーバーエンドポイントに置き換えることができます) ノード。[`app.toml`](../run-node/run-node.md＃configuring-the-node-using-apptoml))内の`grpc.address`フィールドで構成されます。 
 
 ```bash
 grpcurl -plaintext localhost:9090 list
 ```
 
-您应该会看到一个 gRPC 服务列表，例如 `cosmos.bank.v1beta1.Query`。 这称为反射，它是一个 Protobuf 端点，返回所有可用端点的描述。 每一个都代表一个不同的 Protobuf 服务，每个服务都公开了多个可以查询的 RPC 方法。
+`cosmos.bank.v1beta1.Query`のようなgRPCサービスのリストが表示されます。 これはリフレクションと呼ばれ、使用可能なすべてのエンドポイントの説明を返すProtobufエンドポイントです。 これらはそれぞれ異なるProtobufサービスを表し、各サービスはクエリを実行できる複数のRPCメソッドを公開します。
 
-为了获得服务的描述，您可以运行以下命令: 
+サービスの説明を取得するには、次のコマンドを実行できます。 
 
 ```bash
 grpcurl \
@@ -74,7 +74,7 @@ grpcurl \
     describe cosmos.bank.v1beta1.Query                  # Service we want to inspect
 ```
 
-It's also possible to execute an RPC call to query the node for information:
+RPC呼び出しを実行して、ノードに情報を照会することもできます。
 
 ```bash
 grpcurl \
@@ -84,11 +84,11 @@ grpcurl \
     cosmos.bank.v1beta1.Query/AllBalances
 ```
 
-所有可用 gRPC 查询端点的列表[即将推出](https://github.com/cosmos/cosmos-sdk/issues/7786)。
+利用可能なすべてのgRPCクエリエンドポイントのリストは[近日公開](https://github.com/cosmos/cosmos-sdk/issues/7786)です。
 
-#### 使用 grpcurl 查询历史状态
+#### grpcurlを使用して履歴状態を照会する
 
-您还可以通过将一些 [gRPC 元数据](https://github.com/grpc/grpc-go/blob/master/Documentation/grpc-metadata.md) 传递给查询来查询历史数据:`x-cosmos -block-height` 元数据应包含要查询的块。 如上使用 grpcurl，命令如下所示: 
+[gRPCメタデータ](https://github.com/grpc/grpc-go/blob/master/Documentation/grpc-metadata.md)をクエリに渡すことで履歴データをクエリすることもできます：`x-cosmos -block-height`メタデータには、クエリするブロックが含まれている必要があります。 上記のようにgrpcurlを使用すると、コマンドは次のようになります。
 
 ```bash
 grpcurl \
@@ -99,11 +99,12 @@ grpcurl \
     cosmos.bank.v1beta1.Query/AllBalances
 ```
 
-假设该块的状态尚未被节点修剪，此查询应返回非空响应。
+そのブロックの状態がノードによってまだプルーニングされていないと仮定すると、このクエリは空でない応答を返す必要があります。
 
-### 通过 Go 编程
+### Go経由でプログラム的に
 
-以下代码段展示了如何在 Go 程序中使用 gRPC 查询状态。 这个想法是创建一个gRPC连接，并使用Protobuf生成的客户端代码来查询gRPC服务器。 
+次のスニペットは、Goプログラム内でgRPCを使用して状態をクエリする方法を示しています。 アイデアは、gRPC接続を作成し、Protobufで生成されたクライアントコードを使用してgRPCサーバーにクエリを実行することです。 
+
 ```go
 import (
     "context"
@@ -115,40 +116,40 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx"
 )
 
-func queryState() error {
+func queryState() error{
     myAddress, err := sdk.AccAddressFromBech32("cosmos1...")
-    if err != nil {
+    if err != nil{
         return err
     }
 
-    // Create a connection to the gRPC server.
+   //Create a connection to the gRPC server.
     grpcConn := grpc.Dial(
-        "127.0.0.1:9090", // your gRPC server address.
-        grpc.WithInsecure(), // The Cosmos SDK doesn't support any transport security mechanism.
+        "127.0.0.1:9090",//your gRPC server address.
+        grpc.WithInsecure(),//The Cosmos SDK doesn't support any transport security mechanism.
     )
     defer grpcConn.Close()
 
-    // This creates a gRPC client to query the x/bank service.
+   //This creates a gRPC client to query the x/bank service.
     bankClient := banktypes.NewQueryClient(grpcConn)
     bankRes, err := bankClient.Balance(
         context.Background(),
         &banktypes.QueryBalanceRequest{Address: myAddress, Denom: "atom"},
     )
-    if err != nil {
+    if err != nil{
         return err
     }
 
-    fmt.Println(bankRes.GetBalance()) // Prints the account balance
+    fmt.Println(bankRes.GetBalance())//Prints the account balance
 
     return nil
 }
 ```
 
-您可以使用从任何其他 Protobuf 服务生成的客户端替换查询客户端(这里我们使用的是“x/bank”)。 所有可用 gRPC 查询端点的列表[即将推出](https://github.com/cosmos/cosmos-sdk/issues/7786)。
+クエリクライアント(ここでは`x/bank`を使用しています)を他のProtobufサービスから生成されたものに置き換えることができます。 利用可能なすべてのgRPCクエリエンドポイントのリストは[近日公開](https://github.com/cosmos/cosmos-sdk/issues/7786)です。
 
-#### 使用 Go 查询历史状态
+#### Goを使用して履歴状態を照会します
 
-历史区块的查询是通过在 gRPC 请求中添加区块高度元数据来完成的。 
+履歴ブロックのクエリは、gRPCリクエストにブロックの高さのメタデータを追加することで実行されます。 
 
 ```go
 import (
@@ -162,21 +163,21 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/tx"
 )
 
-func queryState() error {
-    // --snip--
+func queryState() error{
+   //--snip--
 
     var header metadata.MD
     bankRes, err = bankClient.Balance(
-        metadata.AppendToOutgoingContext(context.Background(), grpctypes.GRPCBlockHeightHeader, "12"), // Add metadata to request
+        metadata.AppendToOutgoingContext(context.Background(), grpctypes.GRPCBlockHeightHeader, "12"),//Add metadata to request
         &banktypes.QueryBalanceRequest{Address: myAddress, Denom: denom},
-        grpc.Header(&header), // Retrieve header from response
+        grpc.Header(&header),//Retrieve header from response
     )
-    if err != nil {
+    if err != nil{
         return err
     }
     blockHeight = header.Get(grpctypes.GRPCBlockHeightHeader)
 
-    fmt.Println(blockHeight) // Prints the block height (12)
+    fmt.Println(blockHeight)//Prints the block height (12)
 
     return nil
 }
@@ -184,13 +185,13 @@ func queryState() error {
 
 ### CosmJS
 
-CosmJS 文档可以在 [https://cosmos.github.io/cosmjs](https://cosmos.github.io/cosmjs) 找到。 截至 2021 年 1 月，CosmJS 文档仍在进行中。
+CosmJSのドキュメントは、[https://cosmos.github.io/cosmjs](https://cosmos.github.io/cosmjs)にあります。 2021年1月の時点で、CosmJSのドキュメントはまだ作成中です。
 
-## 使用 REST 端点
+## RESTエンドポイントの使用
 
-如 [gRPC 指南](../core/grpc_rest.md) 中所述，Cosmos SDK 上的所有 gRPC 服务都可用于通过 gRPC 网关进行更方便的基于 REST 的查询。 URL 路径的格式基于 Protobuf 服务方法的完全限定名称，但可能包含小的自定义，以便最终 URL 看起来更地道。 例如，`cosmos.bank.v1beta1.Query/AllBalances` 方法的 REST 端点是 `GET /cosmos/bank/v1beta1/balances/{address}`。 请求参数作为查询参数传递。
+[gRPCガイド](../core/grpc_rest.md)で説明されているように、Cosmos SDKのすべてのgRPCサービスは、gRPCゲートウェイを介してより便利なRESTベースのクエリで利用できるようになっています。 URLパスの形式は、Protobufサービスメソッドの完全修飾名に基づいていますが、最終的なURLがより慣用的に見えるように、小さなカスタマイズが含まれている場合があります。 たとえば、`cosmos.bank.v1beta1.Query/AllBalances`メソッドのRESTエンドポイントは`GET/cosmos/bank/v1beta1/balances/{address}`です。 リクエスト引数はクエリパラメータとして渡されます。
 
-作为一个具体的例子，发出余额请求的 `curl` 命令是: 
+具体的な例として、残高要求を行うための`curl`コマンドは次のとおりです。
 
 ```bash
 curl \
@@ -199,13 +200,13 @@ curl \
     http://localhost:1317/cosmos/bank/v1beta1/balances/$MY_VALIDATOR
 ```
 
-确保将“localhost:1317”替换为您节点的 REST 端点，在“api.address”字段下配置。
+必ず`localhost：1317`を、`api.address`フィールドで設定されたノードのRESTエンドポイントに置き換えてください。
 
-所有可用 REST 端点的列表可作为 Swagger 规范文件提供，可以在 `localhost:1317/swagger` 中查看。 确保在您的 [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml) 文件中将 `api.swagger` 字段设置为 true。
+使用可能なすべてのRESTエンドポイントのリストは、Swagger仕様ファイルとして入手でき、`localhost：1317/swagger`で表示できます。 [`app.toml`](../run-node/run-node.md＃configuring-the-node-using-apptoml)ファイルで`api.swagger`フィールドがtrueに設定されていることを確認してください。
 
-### 使用 REST 查询历史状态
+### RESTを使用して履歴状態を照会する
 
-查询历史状态是使用 HTTP 标头 `x-cosmos-block-height` 完成的。 例如，curl 命令如下所示: 
+履歴状態のクエリは、HTTPヘッダー`x-cosmos-block-height`を使用して行われます。 たとえば、curlコマンドは次のようになります。 
 
 ```bash
 curl \
@@ -215,12 +216,12 @@ curl \
     http://localhost:1317/cosmos/bank/v1beta1/balances/$MY_VALIDATOR
 ```
 
-假设该块的状态尚未被节点修剪，此查询应返回非空响应。
+そのブロックの状態がノードによってまだプルーニングされていないと仮定すると、このクエリは空でない応答を返す必要があります。
 
-### 跨域资源共享(CORS)
+### クロスオリジンリソースシェアリング(CORS)
 
-[CORS 政策](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) 默认未启用以帮助提高安全性。 如果您想在公共环境中使用 rest-server，我们建议您提供反向代理，这可以通过 [nginx](https://www.nginx.com/) 来完成。 出于测试和开发目的，[`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml) 中有一个“enabled-unsafe-cors”字段。
+[CORSポリシー](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)は、セキュリティを支援するためにデフォルトで有効になっていません。 パブリック環境でrest-serverを使用する場合は、リバースプロキシを提供することをお勧めします。これは、[nginx](https://www.nginx.com/)を使用して実行できます。 テストと開発の目的で、[`app.toml`](../run-node/run-node.md＃configuring-the-node-using-apptoml)内に`enabled-unsafe-cors`フィールドがあります。
 
-## 下一个 {hide}
+## 次へ{非表示}
 
-使用 gRPC 和 REST 发送交易需要一些额外的步骤:生成交易、签名，最后广播它。 阅读[生成和签署交易](./txs.md)。 {hide} 
+gRPCとRESTを使用してトランザクションを送信するには、トランザクションを生成し、署名し、最後にブロードキャストするという追加の手順が必要です。 [トランザクションの生成と署名](./txs.md)についてお読みください。{非表示} 

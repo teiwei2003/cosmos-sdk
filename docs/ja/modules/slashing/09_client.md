@@ -1,8 +1,8 @@
-# 命令行界面
+# CLI
 
-用户可以使用 CLI 查询“slashing”模块并与之交互。
+ユーザーは、CLIを使用して`slashing`モジュールを照会および操作できます。
 
-### 询问
+### Query
 
 `query` 命令允许用户查询 `slashing` 状态。 
 
@@ -12,19 +12,19 @@ simd query slashing --help
 
 #### params
 
-The `params` command allows users to query genesis parameters for the slashing module.
+`params`コマンドを使用すると、ユーザーはスラッシュモジュールのジェネシスパラメータを照会できます。
 
 ```bash
 simd query slashing params [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query slashing params
 ```
 
-Example Output:
+出力例:
 
 ```bash
 downtime_jail_duration: 600s
@@ -36,20 +36,20 @@ slash_fraction_downtime: "0.010000000000000000"
 
 #### signing-info
 
-The `signing-info` command allows users to query signing-info of the validator using consensus public key.
+`signing-info`コマンドを使用すると、ユーザーはコンセンサス公開鍵を使用してバリデーターの署名情報を照会できます。
 
 ```bash
 simd query slashing signing-infos [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query slashing signing-info '{"@type":"/cosmos.crypto.ed25519.PubKey","key":"Auxs3865HpB/EfssYOzfqNhEJjzys6jD5B6tPgC8="}'
 
 ```
 
-Example Output:
+出力例:
 
 ```bash
 address: cosmosvalcons1nrqsld3aw6lh6t082frdqc84uwxn0t958c
@@ -62,19 +62,19 @@ tombstoned: false
 
 #### signing-infos
 
-The `signing-infos` command allows users to query signing infos of all validators.
+`signing-infos`コマンドを使用すると、ユーザーはすべてのバリデーターの署名情報を照会できます。
 
 ```bash
 simd query slashing signing-infos [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd query slashing signing-infos
 ```
 
-Example Output:
+出力例:
 
 ```bash
 info:
@@ -91,7 +91,7 @@ pagination:
 
 ### Transactions
 
-The `tx` commands allow users to interact with the `slashing` module.
+`tx`コマンドを使用すると、ユーザーは` slashing`モジュールを操作できます。
 
 ```bash
 simd tx slashing --help
@@ -99,13 +99,13 @@ simd tx slashing --help
 
 #### unjail
 
-The `unjail` command allows users to unjail a validator previously jailed for downtime.
+`unjail`コマンドを使用すると、ユーザーは以前にダウンタイムのために投獄されていたバリデーターを投獄解除できます。
 
 ```bash
   simd tx slashing unjail --from mykey [flags]
 ```
 
-Example:
+例:
 
 ```bash
 simd tx slashing unjail --from mykey
@@ -113,23 +113,23 @@ simd tx slashing unjail --from mykey
 
 ## gRPC
 
-A user can query the `slashing` module using gRPC endpoints.
+ユーザーは、gRPCエンドポイントを使用して `slashing`モジュールをクエリできます。
 
 ### Params
 
-The `Params` endpoint allows users to query the parameters of slashing module.
+`Params`エンドポイントを使用すると、ユーザーはスラッシュモジュールのパラメーターを照会できます。
 
 ```bash
 cosmos.slashing.v1beta1.Query/Params
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext localhost:9090 cosmos.slashing.v1beta1.Query/Params
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -145,19 +145,19 @@ Example Output:
 
 ### SigningInfo
 
-The SigningInfo queries the signing info of given cons address.
+SigningInfoは、指定された短所アドレスの署名情報を照会します。
 
 ```bash
 cosmos.slashing.v1beta1.Query/SigningInfo
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext -d '{"cons_address":"cosmosvalcons1nrqsld3aw6lh6t082frdqc84uwxn0t958c"}' localhost:9090 cosmos.slashing.v1beta1.Query/SigningInfo
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -171,19 +171,19 @@ Example Output:
 
 ### SigningInfos
 
-The SigningInfos queries signing info of all validators.
+SigningInfosは、すべてのバリデーターの署名情報を照会します。
 
 ```bash
 cosmos.slashing.v1beta1.Query/SigningInfos
 ```
 
-Example:
+例:
 
 ```bash
 grpcurl -plaintext localhost:9090 cosmos.slashing.v1beta1.Query/SigningInfos
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -202,7 +202,7 @@ Example Output:
 
 ## REST
 
-A user can query the `slashing` module using REST endpoints.
+ユーザーは、RESTエンドポイントを使用して `slashing`モジュールにクエリを実行できます。
 
 ### Params
 
@@ -210,13 +210,13 @@ A user can query the `slashing` module using REST endpoints.
 /cosmos/slashing/v1beta1/params
 ```
 
-Example:
+例:
 
 ```bash
 curl "localhost:1317/cosmos/slashing/v1beta1/params"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -235,13 +235,13 @@ Example Output:
 /cosmos/slashing/v1beta1/signing_infos/%s
 ```
 
-Example:
+例:
 
 ```bash
 curl "localhost:1317/cosmos/slashing/v1beta1/signing_infos/cosmosvalcons1nrqslkwd3pz096lh6t082frdqc84uwxn0t958c"
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
@@ -262,13 +262,13 @@ Example Output:
 /cosmos/slashing/v1beta1/signing_infos
 ```
 
-Example:
+例:
 
 ```bash
 curl "localhost:1317/cosmos/slashing/v1beta1/signing_infos
 ```
 
-Example Output:
+出力例:
 
 ```bash
 {
