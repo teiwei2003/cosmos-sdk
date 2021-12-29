@@ -5,8 +5,8 @@
 証拠は、「MsgSubmitEvidence」メッセージを介して送信されます。
 
 ```protobuf
-// MsgSubmitEvidence represents a message that supports submitting arbitrary
-// Evidence of misbehavior such as equivocation or counterfactual signing.
+//MsgSubmitEvidence represents a message that supports submitting arbitrary
+//Evidence of misbehavior such as equivocation or counterfactual signing.
 message MsgSubmitEvidence {
   string              submitter = 1;
   google.protobuf.Any evidence  = 2;
@@ -14,7 +14,7 @@ message MsgSubmitEvidence {
 ```
 
 `MsgSubmitEvidence`メッセージの`Evidence`には対応するものが必要であることに注意してください
-処理するために `x / evidence`モジュールの`Router`に登録された `Handler`
+処理するために `x/evidence`モジュールの`Router`に登録された `Handler`
 正しくルーティングされます。
 
 `Evidence`が対応する`Handler`に登録されている場合、それは処理されます

@@ -1,46 +1,46 @@
 <!--
-layout: homepage
-title: Cosmos SDK Documentation
-description: Cosmos SDK is the world’s most popular framework for building application-specific blockchains.
-sections:
-  - title: 介绍
-    desc: 高级介绍 Cosmos SDK.
-    url: /zh/intro/overview.html
-    icon: introduction
-  - title: 基础
-    desc: Anatomy of a blockchain, transaction lifecycle, accounts and more.
-    icon: basics
-    url: /zh/basics/app-anatomy.html
-  - title: 核心概念
-    desc: Read about the core concepts like baseapp, the store, or the server.
-    icon: core
-    url: /zh/core/baseapp.html
-  - title: 模块构筑
-    desc: Discover how to build modules for the Cosmos SDK.
-    icon: modules
-    url: /zh/building-modules/intro.html
-  - title: 运行一个节点
-    desc: Running and interacting with nodes using the CLI and API.
-    icon: interfaces
-    url: /zh/run-node/
-  - title: 模块
-    desc: Explore existing modules to build your application with.
-    icon: specifications
-    url: /zh/modules/
-stack:
-  - title: Cosmos Hub
-    desc: The first of thousands of interconnected blockchains on the Cosmos Network.
-    color: "#BA3FD9"
-    label: hub
-    url: http://hub.cosmos.network
-  - title: Tendermint Core
-    desc: The leading BFT engine for building blockchains, powering Cosmos SDK.
-    color: "#00BB00"
-    label: core
-    url: http://docs.tendermint.com
-footer:
-  newsletter: false
-aside: false
+レイアウト：ホームページ
+タイトル：CosmosSDKドキュメント
+説明：Cosmos SDKは、アプリケーション固有のブロックチェーンを構築するための世界で最も人気のあるフレームワークです。
+セクション：
+  -タイトル：はじめに
+    desc：CosmosSDKの概要。
+    url：/intro/overview.html
+    アイコン：はじめに
+  -タイトル：基本
+    desc：ブロックチェーン、トランザクションライフサイクル、アカウントなどの構造。
+    アイコン：基本
+    url：/basics/app-anatomy.html
+  -タイトル：コアコンセプト
+    desc：baseapp、ストア、サーバーなどのコアコンセプトについて読んでください。
+    アイコン：コア
+    url：/core/baseapp.html
+  -タイトル：モジュールの構築
+    desc：CosmosSDKのモジュールを構築する方法をご覧ください。
+    アイコン：モジュール
+    url：/building-modules/intro.html
+  -タイトル：ノードの実行
+    desc：CLIとAPIを使用してノードを実行および操作します。
+    アイコン：インターフェース
+    url：/ run-node /
+  -タイトル：モジュール
+    desc：アプリケーションを構築するための既存のモジュールを調べます。
+    アイコン：仕様
+    url：/ modules /
+スタック：
+  -タイトル：コスモスハブ
+    desc：CosmosNetwork上の数千の相互接続されたブロックチェーンの最初のもの。
+    色：「＃BA3FD9」
+    ラベル：ハブ
+    url：http：//hub.cosmos.network
+  -タイトル：テンダーミントコア
+    desc：Cosmos SDKを強化する、ブロックチェーンを構築するための主要なBFTエンジン。
+    色：「＃00BB00」
+    ラベル：コア
+    url：http：//docs.tendermint.com
+フッター：
+  ニュースレター：false
+余談：false
 -->
 
 # CosmosSDKドキュメント

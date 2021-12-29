@@ -1,7 +1,7 @@
-# Protobuf Documentation
+# Protobuf 文档
 <a name="top"></a>
 
-## Table of Contents
+## 目录
 
 - [cosmos/auth/v1beta1/auth.proto](#cosmos/auth/v1beta1/auth.proto)
     - [BaseAccount](#cosmos.auth.v1beta1.BaseAccount)
@@ -793,9 +793,9 @@
 <a name="cosmos.auth.v1beta1.BaseAccount"></a>
 
 ### BaseAccount
-BaseAccount defines a base account type. It contains all the necessary fields
-for basic account functionality. Any custom account type should extend this
-type for additional functionality (e.g. vesting).
+BaseAccount 定义了基本帐户类型。 它包含所有必要的字段
+用于基本帐户功能。 任何自定义帐户类型都应扩展此
+附加功能的类型（例如归属）。
 
 
 | Field | Type | Label | Description |
@@ -813,7 +813,7 @@ type for additional functionality (e.g. vesting).
 <a name="cosmos.auth.v1beta1.ModuleAccount"></a>
 
 ### ModuleAccount
-ModuleAccount defines an account for modules that holds coins on a pool.
+ModuleAccount 为在池中持有硬币的模块定义了一个帐户。
 
 
 | Field | Type | Label | Description |
@@ -830,7 +830,7 @@ ModuleAccount defines an account for modules that holds coins on a pool.
 <a name="cosmos.auth.v1beta1.Params"></a>
 
 ### Params
-Params defines the parameters for the auth module.
+Params 定义了 auth 模块的参数。
 
 
 | Field | Type | Label | Description |
@@ -865,7 +865,7 @@ Params defines the parameters for the auth module.
 <a name="cosmos.auth.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the auth module's genesis state.
+GenesisState 定义了 auth 模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -897,8 +897,8 @@ GenesisState defines the auth module's genesis state.
 <a name="cosmos.base.query.v1beta1.PageRequest"></a>
 
 ### PageRequest
-PageRequest is to be embedded in gRPC request messages for efficient
-pagination. Ex:
+PageRequest 将嵌入到 gRPC 请求消息中以实现高效分页。
+Ex:
 
  message SomeRequest {
          Foo some_parameter = 1;
@@ -924,8 +924,7 @@ Since: cosmos-sdk 0.43 |
 <a name="cosmos.base.query.v1beta1.PageResponse"></a>
 
 ### PageResponse
-PageResponse is to be embedded in gRPC response messages where the
-corresponding request message has used PageRequest.
+PageResponse 将嵌入到 gRPC 响应消息中，其中相应的请求消息已使用 PageRequest。
 
  message SomeResponse {
          repeated Bar results = 1;
@@ -962,7 +961,7 @@ corresponding request message has used PageRequest.
 <a name="cosmos.auth.v1beta1.AddressBytesToStringRequest"></a>
 
 ### AddressBytesToStringRequest
-AddressBytesToStringRequest is the request type for AddressString rpc method
+AddressBytesToStringRequest 是 AddressString rpc 方法的请求类型
 
 
 | Field | Type | Label | Description |
@@ -977,7 +976,7 @@ AddressBytesToStringRequest is the request type for AddressString rpc method
 <a name="cosmos.auth.v1beta1.AddressBytesToStringResponse"></a>
 
 ### AddressBytesToStringResponse
-AddressBytesToStringResponse is the response type for AddressString rpc method
+AddressBytesToStringResponse 是 AddressString rpc 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -992,7 +991,7 @@ AddressBytesToStringResponse is the response type for AddressString rpc method
 <a name="cosmos.auth.v1beta1.AddressStringToBytesRequest"></a>
 
 ### AddressStringToBytesRequest
-AddressStringToBytesRequest is the request type for AccountBytes rpc method
+AddressStringToBytesRequest 是 AccountBytes rpc 方法的请求类型
 
 
 | Field | Type | Label | Description |
@@ -1007,7 +1006,7 @@ AddressStringToBytesRequest is the request type for AccountBytes rpc method
 <a name="cosmos.auth.v1beta1.AddressStringToBytesResponse"></a>
 
 ### AddressStringToBytesResponse
-AddressStringToBytesResponse is the response type for AddressBytes rpc method
+AddressStringToBytesResponse 是 AddressBytes rpc 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -1022,7 +1021,7 @@ AddressStringToBytesResponse is the response type for AddressBytes rpc method
 <a name="cosmos.auth.v1beta1.Bech32PrefixRequest"></a>
 
 ### Bech32PrefixRequest
-Bech32PrefixRequest is the request type for Bech32Prefix rpc method
+Bech32PrefixRequest 是 Bech32Prefix rpc 方法的请求类型
 
 
 
@@ -1032,7 +1031,7 @@ Bech32PrefixRequest is the request type for Bech32Prefix rpc method
 <a name="cosmos.auth.v1beta1.Bech32PrefixResponse"></a>
 
 ### Bech32PrefixResponse
-Bech32PrefixResponse is the response type for Bech32Prefix rpc method
+Bech32PrefixResponse 是 Bech32Prefix rpc 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -1047,7 +1046,7 @@ Bech32PrefixResponse is the response type for Bech32Prefix rpc method
 <a name="cosmos.auth.v1beta1.QueryAccountRequest"></a>
 
 ### QueryAccountRequest
-QueryAccountRequest is the request type for the Query/Account RPC method.
+QueryAccountRequest 是 Query/Account RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -1062,7 +1061,7 @@ QueryAccountRequest is the request type for the Query/Account RPC method.
 <a name="cosmos.auth.v1beta1.QueryAccountResponse"></a>
 
 ### QueryAccountResponse
-QueryAccountResponse is the response type for the Query/Account RPC method.
+QueryAccountResponse 是 Query/Account RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -1077,7 +1076,7 @@ QueryAccountResponse is the response type for the Query/Account RPC method.
 <a name="cosmos.auth.v1beta1.QueryAccountsRequest"></a>
 
 ### QueryAccountsRequest
-QueryAccountsRequest is the request type for the Query/Accounts RPC method.
+QueryAccountsRequest 是 Query/Accounts RPC 方法的请求类型。
 
 Since: cosmos-sdk 0.43
 
@@ -1094,9 +1093,9 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.auth.v1beta1.QueryAccountsResponse"></a>
 
 ### QueryAccountsResponse
-QueryAccountsResponse is the response type for the Query/Accounts RPC method.
+QueryAccountsResponse 是 Query/Accounts RPC 方法的响应类型。
 
-Since: cosmos-sdk 0.43
+自: cosmos-sdk 0.43
 
 
 | Field | Type | Label | Description |
@@ -1112,7 +1111,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.auth.v1beta1.QueryModuleAccountsRequest"></a>
 
 ### QueryModuleAccountsRequest
-QueryModuleAccountsRequest is the request type for the Query/ModuleAccounts RPC method.
+QueryModuleAccountsRequest 是 Query/ModuleAccounts RPC 方法的请求类型。
 
 
 
@@ -1122,7 +1121,7 @@ QueryModuleAccountsRequest is the request type for the Query/ModuleAccounts RPC 
 <a name="cosmos.auth.v1beta1.QueryModuleAccountsResponse"></a>
 
 ### QueryModuleAccountsResponse
-QueryModuleAccountsResponse is the response type for the Query/ModuleAccounts RPC method.
+QueryModuleAccountsResponse 是 Query/ModuleAccounts RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -1137,7 +1136,7 @@ QueryModuleAccountsResponse is the response type for the Query/ModuleAccounts RP
 <a name="cosmos.auth.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method.
+QueryParamsRequest 是 Query/Params RPC 方法的请求类型。
 
 
 
@@ -1147,7 +1146,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method.
 <a name="cosmos.auth.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method.
+QueryParamsResponse 是 Query/Params RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -1168,7 +1167,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method.
 <a name="cosmos.auth.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+Query 定义了 gRPC 查询器服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -1190,14 +1189,13 @@ Since: cosmos-sdk 0.43 | GET|/cosmos/auth/v1beta1/accounts|
 <p align="right"><a href="#top">Top</a></p>
 
 ## cosmos/authz/v1beta1/authz.proto
-Since: cosmos-sdk 0.43
+自: cosmos-sdk 0.43
 
 
 <a name="cosmos.authz.v1beta1.GenericAuthorization"></a>
 
 ### GenericAuthorization
-GenericAuthorization gives the grantee unrestricted permissions to execute
-the provided method on behalf of the granter's account.
+GenericAuthorization 授予受让人不受限制的权限，可以代表受让人的帐户执行所提供的方法。
 
 
 | Field | Type | Label | Description |
@@ -1212,8 +1210,7 @@ the provided method on behalf of the granter's account.
 <a name="cosmos.authz.v1beta1.Grant"></a>
 
 ### Grant
-Grant gives permissions to execute
-the provide method with expiration time.
+授予权限以执行具有到期时间的提供方法。
 
 
 | Field | Type | Label | Description |
@@ -1245,7 +1242,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.authz.v1beta1.EventGrant"></a>
 
 ### EventGrant
-EventGrant is emitted on Msg/Grant
+EventGrant 在 Msg/Grant 上发出
 
 
 | Field | Type | Label | Description |
@@ -1262,7 +1259,7 @@ EventGrant is emitted on Msg/Grant
 <a name="cosmos.authz.v1beta1.EventRevoke"></a>
 
 ### EventRevoke
-EventRevoke is emitted on Msg/Revoke
+EventRevoke在Msg/Revoke上发出
 
 
 | Field | Type | Label | Description |
@@ -1295,7 +1292,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.authz.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the authz module's genesis state.
+GenesisState 定义了 authz 模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -1310,7 +1307,7 @@ GenesisState defines the authz module's genesis state.
 <a name="cosmos.authz.v1beta1.GrantAuthorization"></a>
 
 ### GrantAuthorization
-GrantAuthorization defines the GenesisState/GrantAuthorization type.
+GrantAuthorization 定义了 GenesisState/GrantAuthorization 类型。
 
 
 | Field | Type | Label | Description |
@@ -1344,7 +1341,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.authz.v1beta1.QueryGranterGrantsRequest"></a>
 
 ### QueryGranterGrantsRequest
-QueryGranterGrantsRequest is the request type for the Query/GranterGrants RPC method.
+QueryGranterGrantsRequest 是 Query/GranterGrants RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -1360,7 +1357,7 @@ QueryGranterGrantsRequest is the request type for the Query/GranterGrants RPC me
 <a name="cosmos.authz.v1beta1.QueryGranterGrantsResponse"></a>
 
 ### QueryGranterGrantsResponse
-QueryGranterGrantsResponse is the response type for the Query/GranterGrants RPC method.
+QueryGranterGrantsResponse 是 Query/GranterGrants RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -1376,7 +1373,7 @@ QueryGranterGrantsResponse is the response type for the Query/GranterGrants RPC 
 <a name="cosmos.authz.v1beta1.QueryGrantsRequest"></a>
 
 ### QueryGrantsRequest
-QueryGrantsRequest is the request type for the Query/Grants RPC method.
+QueryGrantsRequest是Query/Grants RPC方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -1394,7 +1391,7 @@ QueryGrantsRequest is the request type for the Query/Grants RPC method.
 <a name="cosmos.authz.v1beta1.QueryGrantsResponse"></a>
 
 ### QueryGrantsResponse
-QueryGrantsResponse is the response type for the Query/Authorizations RPC method.
+QueryGrantsResponse 是 Query/Authorizations RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -1416,7 +1413,7 @@ QueryGrantsResponse is the response type for the Query/Authorizations RPC method
 <a name="cosmos.authz.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+Query 定义了 gRPC 查询器服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -1437,9 +1434,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.authz.v1beta1.MsgExec"></a>
 
 ### MsgExec
-MsgExec attempts to execute the provided messages using
-authorizations granted to the grantee. Each message should have only
-one signer corresponding to the granter of the authorization.
+MsgExec 尝试使用授予受让人的授权来执行提供的消息。 每条消息应该只有一个与授权授予者相对应的签名者。
 
 
 | Field | Type | Label | Description |
@@ -1455,7 +1450,7 @@ one signer corresponding to the granter of the authorization.
 <a name="cosmos.authz.v1beta1.MsgExecResponse"></a>
 
 ### MsgExecResponse
-MsgExecResponse defines the Msg/MsgExecResponse response type.
+MsgExecResponse 定义了 Msg/MsgExecResponse 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -1470,8 +1465,7 @@ MsgExecResponse defines the Msg/MsgExecResponse response type.
 <a name="cosmos.authz.v1beta1.MsgGrant"></a>
 
 ### MsgGrant
-MsgGrant is a request type for Grant method. It declares authorization to the grantee
-on behalf of the granter with the provided expiration time.
+MsgGrant 是 Grant 方法的请求类型。 它代表授予者声明对授予者的授权，并具有提供的到期时间。
 
 
 | Field | Type | Label | Description |
@@ -1488,7 +1482,7 @@ on behalf of the granter with the provided expiration time.
 <a name="cosmos.authz.v1beta1.MsgGrantResponse"></a>
 
 ### MsgGrantResponse
-MsgGrantResponse defines the Msg/MsgGrant response type.
+消息授予响应定义消息/消息授予响应类型。
 
 
 
@@ -1498,8 +1492,7 @@ MsgGrantResponse defines the Msg/MsgGrant response type.
 <a name="cosmos.authz.v1beta1.MsgRevoke"></a>
 
 ### MsgRevoke
-MsgRevoke revokes any authorization with the provided sdk.Msg type on the
-granter's account with that has been granted to the grantee.
+MsgRevoke 撤销授予者帐户上提供的 sdk.Msg 类型的任何授权，该授权已授予被授予者。
 
 
 | Field | Type | Label | Description |
@@ -1516,7 +1509,7 @@ granter's account with that has been granted to the grantee.
 <a name="cosmos.authz.v1beta1.MsgRevokeResponse"></a>
 
 ### MsgRevokeResponse
-MsgRevokeResponse defines the Msg/MsgRevokeResponse response type.
+MsgRevokeResponse 定义了 Msg/MsgRevokeResponse 响应类型。
 
 
 
@@ -1532,7 +1525,7 @@ MsgRevokeResponse defines the Msg/MsgRevokeResponse response type.
 <a name="cosmos.authz.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the authz Msg service.
+Msg定义了authz Msg服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -1554,10 +1547,9 @@ Msg defines the authz Msg service.
 <a name="cosmos.base.v1beta1.Coin"></a>
 
 ### Coin
-Coin defines a token with a denomination and an amount.
+Coin 定义了一个带有面额和数量的代币。
 
-NOTE: The amount field is an Int which implements the custom method
-signatures required by gogoproto.
+注意：amount 字段是一个 Int，它实现了 gogoproto 所需的自定义方法签名。
 
 
 | Field | Type | Label | Description |
@@ -1573,10 +1565,9 @@ signatures required by gogoproto.
 <a name="cosmos.base.v1beta1.DecCoin"></a>
 
 ### DecCoin
-DecCoin defines a token with a denomination and a decimal amount.
+DecCoin 定义了一个带有面额和十进制金额的代币。
 
-NOTE: The amount field is an Dec which implements the custom method
-signatures required by gogoproto.
+注意：amount 字段是一个 Dec，它实现了 gogoproto 所需的自定义方法签名。
 
 
 | Field | Type | Label | Description |
@@ -1592,7 +1583,7 @@ signatures required by gogoproto.
 <a name="cosmos.base.v1beta1.DecProto"></a>
 
 ### DecProto
-DecProto defines a Protobuf wrapper around a Dec object.
+DecProto 定义了一个围绕 Dec 对象的 Protobuf 包装器。
 
 
 | Field | Type | Label | Description |
@@ -1607,7 +1598,7 @@ DecProto defines a Protobuf wrapper around a Dec object.
 <a name="cosmos.base.v1beta1.IntProto"></a>
 
 ### IntProto
-IntProto defines a Protobuf wrapper around an Int object.
+IntProto 定义了一个围绕 Int 对象的 Protobuf 包装器。
 
 
 | Field | Type | Label | Description |
@@ -1638,8 +1629,7 @@ IntProto defines a Protobuf wrapper around an Int object.
 <a name="cosmos.bank.v1beta1.SendAuthorization"></a>
 
 ### SendAuthorization
-SendAuthorization allows the grantee to spend up to spend_limit coins from
-the granter's account.
+SendAuthorization 允许受赠者从受赠者的帐户中花费最多 pay_limit 硬币。
 
 Since: cosmos-sdk 0.43
 
@@ -1672,9 +1662,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.bank.v1beta1.DenomUnit"></a>
 
 ### DenomUnit
-DenomUnit represents a struct that describes a given
-denomination unit of the basic token.
-
+DenomUnit 表示一个结构体，它描述了基本标记的给定面额单位。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1690,7 +1678,7 @@ denomination unit of the basic token.
 <a name="cosmos.bank.v1beta1.Input"></a>
 
 ### Input
-Input models transaction input.
+输入模型交易输入。
 
 
 | Field | Type | Label | Description |
@@ -1706,9 +1694,7 @@ Input models transaction input.
 <a name="cosmos.bank.v1beta1.Metadata"></a>
 
 ### Metadata
-Metadata represents a struct that describes
-a basic token.
-
+元数据表示描述基本令牌的结构。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1737,7 +1723,7 @@ Since: cosmos-sdk 0.45 |
 <a name="cosmos.bank.v1beta1.Output"></a>
 
 ### Output
-Output models transaction outputs.
+输出模型交易输出。
 
 
 | Field | Type | Label | Description |
@@ -1753,7 +1739,7 @@ Output models transaction outputs.
 <a name="cosmos.bank.v1beta1.Params"></a>
 
 ### Params
-Params defines the parameters for the bank module.
+Params 定义了银行模块的参数。
 
 
 | Field | Type | Label | Description |
@@ -1769,8 +1755,7 @@ Params defines the parameters for the bank module.
 <a name="cosmos.bank.v1beta1.SendEnabled"></a>
 
 ### SendEnabled
-SendEnabled maps coin denom to a send_enabled status (whether a denom is
-sendable).
+SendEnabled 将硬币 denom 映射到 send_enabled 状态（denom 是否可发送）。
 
 
 | Field | Type | Label | Description |
@@ -1786,9 +1771,8 @@ sendable).
 <a name="cosmos.bank.v1beta1.Supply"></a>
 
 ### Supply
-Supply represents a struct that passively keeps track of the total supply
-amounts in the network.
-This message is deprecated now that supply is indexed by denom.
+Supply 代表一个结构，它被动地跟踪网络中的总供应量。
+由于供应按 denom 索引，因此不推荐使用此消息。
 
 
 | Field | Type | Label | Description |
@@ -1819,9 +1803,7 @@ This message is deprecated now that supply is indexed by denom.
 <a name="cosmos.bank.v1beta1.Balance"></a>
 
 ### Balance
-Balance defines an account address and balance pair used in the bank module's
-genesis state.
-
+Balance 定义了在银行模块的创世状态中使用的帐户地址和余额对。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1836,7 +1818,7 @@ genesis state.
 <a name="cosmos.bank.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the bank module's genesis state.
+GenesisState 定义了银行模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -1870,9 +1852,7 @@ GenesisState defines the bank module's genesis state.
 <a name="cosmos.bank.v1beta1.DenomOwner"></a>
 
 ### DenomOwner
-DenomOwner defines structure representing an account that owns or holds a
-particular denominated token. It contains the account address and account
-balance of the denominated token.
+DenomOwner 定义表示拥有或持有特定计价代币的帐户的结构。 它包含计价代币的账户地址和账户余额。
 
 
 | Field | Type | Label | Description |
@@ -1888,7 +1868,7 @@ balance of the denominated token.
 <a name="cosmos.bank.v1beta1.QueryAllBalancesRequest"></a>
 
 ### QueryAllBalancesRequest
-QueryBalanceRequest is the request type for the Query/AllBalances RPC method.
+QueryBalanceRequest 是 Query/AllBalances RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -1904,8 +1884,7 @@ QueryBalanceRequest is the request type for the Query/AllBalances RPC method.
 <a name="cosmos.bank.v1beta1.QueryAllBalancesResponse"></a>
 
 ### QueryAllBalancesResponse
-QueryAllBalancesResponse is the response type for the Query/AllBalances RPC
-method.
+QueryAllBalancesResponse 是 Query/AllBalances RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -1921,7 +1900,7 @@ method.
 <a name="cosmos.bank.v1beta1.QueryBalanceRequest"></a>
 
 ### QueryBalanceRequest
-QueryBalanceRequest is the request type for the Query/Balance RPC method.
+QueryBalanceRequest 是 Query/Balance RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -1937,7 +1916,7 @@ QueryBalanceRequest is the request type for the Query/Balance RPC method.
 <a name="cosmos.bank.v1beta1.QueryBalanceResponse"></a>
 
 ### QueryBalanceResponse
-QueryBalanceResponse is the response type for the Query/Balance RPC method.
+QueryBalanceResponse 是 Query/Balance RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -1952,7 +1931,7 @@ QueryBalanceResponse is the response type for the Query/Balance RPC method.
 <a name="cosmos.bank.v1beta1.QueryDenomMetadataRequest"></a>
 
 ### QueryDenomMetadataRequest
-QueryDenomMetadataRequest is the request type for the Query/DenomMetadata RPC method.
+QueryDenomMetadataRequest 是 Query/DenomMetadata RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -1967,9 +1946,7 @@ QueryDenomMetadataRequest is the request type for the Query/DenomMetadata RPC me
 <a name="cosmos.bank.v1beta1.QueryDenomMetadataResponse"></a>
 
 ### QueryDenomMetadataResponse
-QueryDenomMetadataResponse is the response type for the Query/DenomMetadata RPC
-method.
-
+QueryDenomMetadataResponse 是 Query/DenomMetadata RPC 方法的响应类型。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1983,10 +1960,7 @@ method.
 <a name="cosmos.bank.v1beta1.QueryDenomOwnersRequest"></a>
 
 ### QueryDenomOwnersRequest
-QueryDenomOwnersRequest defines the request type for the DenomOwners RPC query,
-which queries for a paginated set of all account holders of a particular
-denomination.
-
+QueryDenomOwnersRequest 定义了 DenomOwners RPC 查询的请求类型，该查询查询特定面额的所有账户持有人的分页集合。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -2001,7 +1975,7 @@ denomination.
 <a name="cosmos.bank.v1beta1.QueryDenomOwnersResponse"></a>
 
 ### QueryDenomOwnersResponse
-QueryDenomOwnersResponse defines the RPC response of a DenomOwners RPC query.
+QueryDenomOwnersResponse 定义了 DenomOwners RPC 查询的 RPC 响应。
 
 
 | Field | Type | Label | Description |
@@ -2017,8 +1991,7 @@ QueryDenomOwnersResponse defines the RPC response of a DenomOwners RPC query.
 <a name="cosmos.bank.v1beta1.QueryDenomsMetadataRequest"></a>
 
 ### QueryDenomsMetadataRequest
-QueryDenomsMetadataRequest is the request type for the Query/DenomsMetadata RPC method.
-
+QueryDenomsMetadataRequest 是 Query/DenomsMetadata RPC 方法的请求类型。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -2032,9 +2005,7 @@ QueryDenomsMetadataRequest is the request type for the Query/DenomsMetadata RPC 
 <a name="cosmos.bank.v1beta1.QueryDenomsMetadataResponse"></a>
 
 ### QueryDenomsMetadataResponse
-QueryDenomsMetadataResponse is the response type for the Query/DenomsMetadata RPC
-method.
-
+QueryDenomsMetadataResponse 是 Query/DenomsMetadata RPC 方法的响应类型。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -2049,7 +2020,7 @@ method.
 <a name="cosmos.bank.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest defines the request type for querying x/bank parameters.
+QueryParamsRequest 定义了查询 x/bank 参数的请求类型。
 
 
 
@@ -2059,7 +2030,7 @@ QueryParamsRequest defines the request type for querying x/bank parameters.
 <a name="cosmos.bank.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse defines the response type for querying x/bank parameters.
+QueryParamsResponse 定义了查询 x/bank 参数的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -2074,7 +2045,7 @@ QueryParamsResponse defines the response type for querying x/bank parameters.
 <a name="cosmos.bank.v1beta1.QuerySupplyOfRequest"></a>
 
 ### QuerySupplyOfRequest
-QuerySupplyOfRequest is the request type for the Query/SupplyOf RPC method.
+QuerySupplyOfRequest 是 Query/SupplyOf RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -2089,7 +2060,7 @@ QuerySupplyOfRequest is the request type for the Query/SupplyOf RPC method.
 <a name="cosmos.bank.v1beta1.QuerySupplyOfResponse"></a>
 
 ### QuerySupplyOfResponse
-QuerySupplyOfResponse is the response type for the Query/SupplyOf RPC method.
+QuerySupplyOfResponse 是 Query/SupplyOf RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -2104,8 +2075,7 @@ QuerySupplyOfResponse is the response type for the Query/SupplyOf RPC method.
 <a name="cosmos.bank.v1beta1.QueryTotalSupplyRequest"></a>
 
 ### QueryTotalSupplyRequest
-QueryTotalSupplyRequest is the request type for the Query/TotalSupply RPC
-method.
+QueryTotalSupplyRequest 是 Query/TotalSupply RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -2122,8 +2092,7 @@ Since: cosmos-sdk 0.43 |
 <a name="cosmos.bank.v1beta1.QueryTotalSupplyResponse"></a>
 
 ### QueryTotalSupplyResponse
-QueryTotalSupplyResponse is the response type for the Query/TotalSupply RPC
-method
+QueryTotalSupplyResponse 是 Query/TotalSupply RPC 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -2147,7 +2116,7 @@ Since: cosmos-sdk 0.43 |
 <a name="cosmos.bank.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+Query 定义了 gRPC 查询器服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -2174,7 +2143,7 @@ Query defines the gRPC querier service.
 <a name="cosmos.bank.v1beta1.MsgMultiSend"></a>
 
 ### MsgMultiSend
-MsgMultiSend represents an arbitrary multi-in, multi-out send message.
+MsgMultiSend 表示任意多进多出的发送消息。
 
 
 | Field | Type | Label | Description |
@@ -2190,7 +2159,7 @@ MsgMultiSend represents an arbitrary multi-in, multi-out send message.
 <a name="cosmos.bank.v1beta1.MsgMultiSendResponse"></a>
 
 ### MsgMultiSendResponse
-MsgMultiSendResponse defines the Msg/MultiSend response type.
+MsgMultiSendResponse 定义了 Msg/MultiSend 响应类型。
 
 
 
@@ -2200,7 +2169,7 @@ MsgMultiSendResponse defines the Msg/MultiSend response type.
 <a name="cosmos.bank.v1beta1.MsgSend"></a>
 
 ### MsgSend
-MsgSend represents a message to send coins from one account to another.
+MsgSend 表示将硬币从一个帐户发送到另一个帐户的消息。
 
 
 | Field | Type | Label | Description |
@@ -2217,7 +2186,7 @@ MsgSend represents a message to send coins from one account to another.
 <a name="cosmos.bank.v1beta1.MsgSendResponse"></a>
 
 ### MsgSendResponse
-MsgSendResponse defines the Msg/Send response type.
+MsgSendResponse 定义了 Msg/Send 响应类型。
 
 
 
@@ -2233,7 +2202,7 @@ MsgSendResponse defines the Msg/Send response type.
 <a name="cosmos.bank.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the bank Msg service.
+Msg 定义了银行消息服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -2254,7 +2223,7 @@ Msg defines the bank Msg service.
 <a name="cosmos.base.abci.v1beta1.ABCIMessageLog"></a>
 
 ### ABCIMessageLog
-ABCIMessageLog defines a structure containing an indexed tx ABCI message log.
+ABCIMessageLog 定义了一个包含索引的 tx ABCI 消息日志的结构。
 
 
 | Field | Type | Label | Description |
@@ -2271,8 +2240,7 @@ ABCIMessageLog defines a structure containing an indexed tx ABCI message log.
 <a name="cosmos.base.abci.v1beta1.Attribute"></a>
 
 ### Attribute
-Attribute defines an attribute wrapper where the key and value are
-strings instead of raw bytes.
+Attribute 定义了一个属性包装器，其中键和值是字符串而不是原始字节。
 
 
 | Field | Type | Label | Description |
@@ -2288,7 +2256,7 @@ strings instead of raw bytes.
 <a name="cosmos.base.abci.v1beta1.GasInfo"></a>
 
 ### GasInfo
-GasInfo defines tx execution gas context.
+GasInfo 定义了 tx 执行气体上下文。
 
 
 | Field | Type | Label | Description |
@@ -2304,8 +2272,7 @@ GasInfo defines tx execution gas context.
 <a name="cosmos.base.abci.v1beta1.MsgData"></a>
 
 ### MsgData
-MsgData defines the data returned in a Result object during message
-execution.
+MsgData 定义了消息执行期间在 Result 对象中返回的数据。
 
 
 | Field | Type | Label | Description |
@@ -2321,7 +2288,7 @@ execution.
 <a name="cosmos.base.abci.v1beta1.Result"></a>
 
 ### Result
-Result is the union of ResponseFormat and ResponseCheckTx.
+结果是 ResponseFormat 和 ResponseCheckTx 的并集。
 
 
 | Field | Type | Label | Description |
@@ -2341,7 +2308,7 @@ Since: cosmos-sdk 0.45 |
 <a name="cosmos.base.abci.v1beta1.SearchTxsResult"></a>
 
 ### SearchTxsResult
-SearchTxsResult defines a structure for querying txs pageable
+SearchTxsResult 定义了一个用于查询 txs pageable 的结构
 
 
 | Field | Type | Label | Description |
@@ -2361,8 +2328,7 @@ SearchTxsResult defines a structure for querying txs pageable
 <a name="cosmos.base.abci.v1beta1.SimulationResponse"></a>
 
 ### SimulationResponse
-SimulationResponse defines the response generated when a transaction is
-successfully simulated.
+SimulationResponse 定义了成功模拟事务时生成的响应。
 
 
 | Field | Type | Label | Description |
@@ -2378,8 +2344,7 @@ successfully simulated.
 <a name="cosmos.base.abci.v1beta1.StringEvent"></a>
 
 ### StringEvent
-StringEvent defines en Event object wrapper where all the attributes
-contain key/value pairs that are strings instead of raw bytes.
+StringEvent 定义了事件对象包装器，其中所有属性都包含字符串而不是原始字节的键/值对。
 
 
 | Field | Type | Label | Description |
@@ -2395,8 +2360,7 @@ contain key/value pairs that are strings instead of raw bytes.
 <a name="cosmos.base.abci.v1beta1.TxMsgData"></a>
 
 ### TxMsgData
-TxMsgData defines a list of MsgData. A transaction will have a MsgData object
-for each message.
+TxMsgData 定义了一个 MsgData 列表。 对于每条消息，事务都有一个 MsgData 对象。
 
 
 | Field | Type | Label | Description |
@@ -2414,8 +2378,7 @@ Since: cosmos-sdk 0.45 |
 <a name="cosmos.base.abci.v1beta1.TxResponse"></a>
 
 ### TxResponse
-TxResponse defines a structure containing relevant tx data and metadata. The
-tags are stringified and the log is JSON decoded.
+TxResponse 定义了一个包含相关交易数据和元数据的结构。 标签是字符串化的，日志是 JSON 解码的。
 
 
 | Field | Type | Label | Description |
@@ -2460,7 +2423,7 @@ Since: cosmos-sdk 0.42.11, 0.44.5, 0.45 |
 <a name="cosmos.base.kv.v1beta1.Pair"></a>
 
 ### Pair
-Pair defines a key/value bytes tuple.
+Pair 定义了一个键/值字节元组。
 
 
 | Field | Type | Label | Description |
@@ -2476,7 +2439,7 @@ Pair defines a key/value bytes tuple.
 <a name="cosmos.base.kv.v1beta1.Pairs"></a>
 
 ### Pairs
-Pairs defines a repeated slice of Pair objects.
+Pairs 定义了 Pair 对象的重复切片。
 
 
 | Field | Type | Label | Description |
@@ -2507,7 +2470,7 @@ Pairs defines a repeated slice of Pair objects.
 <a name="cosmos.base.reflection.v1beta1.ListAllInterfacesRequest"></a>
 
 ### ListAllInterfacesRequest
-ListAllInterfacesRequest is the request type of the ListAllInterfaces RPC.
+ListAllInterfacesRequest 是 ListAllInterfaces RPC 的请求类型。
 
 
 
@@ -2517,7 +2480,7 @@ ListAllInterfacesRequest is the request type of the ListAllInterfaces RPC.
 <a name="cosmos.base.reflection.v1beta1.ListAllInterfacesResponse"></a>
 
 ### ListAllInterfacesResponse
-ListAllInterfacesResponse is the response type of the ListAllInterfaces RPC.
+ListAllInterfacesResponse 是 ListAllInterfaces RPC 的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -2532,8 +2495,7 @@ ListAllInterfacesResponse is the response type of the ListAllInterfaces RPC.
 <a name="cosmos.base.reflection.v1beta1.ListImplementationsRequest"></a>
 
 ### ListImplementationsRequest
-ListImplementationsRequest is the request type of the ListImplementations
-RPC.
+ListImplementationsRequest 是 ListImplementations RPC 的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -2548,8 +2510,7 @@ RPC.
 <a name="cosmos.base.reflection.v1beta1.ListImplementationsResponse"></a>
 
 ### ListImplementationsResponse
-ListImplementationsResponse is the response type of the ListImplementations
-RPC.
+ListImplementationsResponse 是 ListImplementations RPC 的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -2570,7 +2531,7 @@ RPC.
 <a name="cosmos.base.reflection.v1beta1.ReflectionService"></a>
 
 ### ReflectionService
-ReflectionService defines a service for interface reflection.
+ReflectionService 定义了一个接口反射服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -2591,7 +2552,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.base.reflection.v2alpha1.AppDescriptor"></a>
 
 ### AppDescriptor
-AppDescriptor describes a cosmos-sdk based application
+AppDescriptor 描述了一个基于 cosmos-sdk 的应用程序
 
 
 | Field | Type | Label | Description |
@@ -2611,8 +2572,7 @@ AppDescriptor describes a cosmos-sdk based application
 <a name="cosmos.base.reflection.v2alpha1.AuthnDescriptor"></a>
 
 ### AuthnDescriptor
-AuthnDescriptor provides information on how to sign transactions without relying
-on the online RPCs GetTxMetadata and CombineUnsignedTxAndSignatures
+AuthnDescriptor 提供有关如何在不依赖在线 RPC GetTxMetadata 和 CombineUnsignedTxAndSignatures 的情况下签署交易的信息
 
 
 | Field | Type | Label | Description |
@@ -2627,7 +2587,7 @@ on the online RPCs GetTxMetadata and CombineUnsignedTxAndSignatures
 <a name="cosmos.base.reflection.v2alpha1.ChainDescriptor"></a>
 
 ### ChainDescriptor
-ChainDescriptor describes chain information of the application
+ChainDescriptor 描述应用的链信息
 
 
 | Field | Type | Label | Description |
@@ -2642,7 +2602,7 @@ ChainDescriptor describes chain information of the application
 <a name="cosmos.base.reflection.v2alpha1.CodecDescriptor"></a>
 
 ### CodecDescriptor
-CodecDescriptor describes the registered interfaces and provides metadata information on the types
+CodecDescriptor 描述注册的接口并提供有关类型的元数据信息
 
 
 | Field | Type | Label | Description |
@@ -2657,7 +2617,7 @@ CodecDescriptor describes the registered interfaces and provides metadata inform
 <a name="cosmos.base.reflection.v2alpha1.ConfigurationDescriptor"></a>
 
 ### ConfigurationDescriptor
-ConfigurationDescriptor contains metadata information on the sdk.Config
+ConfigurationDescriptor 包含有关 sdk.Config 的元数据信息
 
 
 | Field | Type | Label | Description |
@@ -2672,7 +2632,7 @@ ConfigurationDescriptor contains metadata information on the sdk.Config
 <a name="cosmos.base.reflection.v2alpha1.GetAuthnDescriptorRequest"></a>
 
 ### GetAuthnDescriptorRequest
-GetAuthnDescriptorRequest is the request used for the GetAuthnDescriptor RPC
+GetAuthnDescriptorRequest 是用于 GetAuthnDescriptor RPC 的请求
 
 
 
@@ -2682,7 +2642,7 @@ GetAuthnDescriptorRequest is the request used for the GetAuthnDescriptor RPC
 <a name="cosmos.base.reflection.v2alpha1.GetAuthnDescriptorResponse"></a>
 
 ### GetAuthnDescriptorResponse
-GetAuthnDescriptorResponse is the response returned by the GetAuthnDescriptor RPC
+GetAuthnDescriptorResponse 是 GetAuthnDescriptor RPC 返回的响应
 
 
 | Field | Type | Label | Description |
@@ -2697,7 +2657,7 @@ GetAuthnDescriptorResponse is the response returned by the GetAuthnDescriptor RP
 <a name="cosmos.base.reflection.v2alpha1.GetChainDescriptorRequest"></a>
 
 ### GetChainDescriptorRequest
-GetChainDescriptorRequest is the request used for the GetChainDescriptor RPC
+GetCodecDescriptorRequest 是用于 GetCodecDescriptor RPC 的请求
 
 
 
@@ -2707,7 +2667,7 @@ GetChainDescriptorRequest is the request used for the GetChainDescriptor RPC
 <a name="cosmos.base.reflection.v2alpha1.GetChainDescriptorResponse"></a>
 
 ### GetChainDescriptorResponse
-GetChainDescriptorResponse is the response returned by the GetChainDescriptor RPC
+GetChainDescriptorResponse 是 GetChainDescriptorRPC 返回的响应。
 
 
 | Field | Type | Label | Description |
@@ -2722,7 +2682,7 @@ GetChainDescriptorResponse is the response returned by the GetChainDescriptor RP
 <a name="cosmos.base.reflection.v2alpha1.GetCodecDescriptorRequest"></a>
 
 ### GetCodecDescriptorRequest
-GetCodecDescriptorRequest is the request used for the GetCodecDescriptor RPC
+GetCodecDescriptorRequest 是用于 GetCodecDescriptorRPC 的请求。
 
 
 
@@ -2732,7 +2692,7 @@ GetCodecDescriptorRequest is the request used for the GetCodecDescriptor RPC
 <a name="cosmos.base.reflection.v2alpha1.GetCodecDescriptorResponse"></a>
 
 ### GetCodecDescriptorResponse
-GetCodecDescriptorResponse is the response returned by the GetCodecDescriptor RPC
+GetCodecDescriptorResponse 是 GetCodecDescriptorRPC 返回的响应。
 
 
 | Field | Type | Label | Description |
@@ -2747,7 +2707,7 @@ GetCodecDescriptorResponse is the response returned by the GetCodecDescriptor RP
 <a name="cosmos.base.reflection.v2alpha1.GetConfigurationDescriptorRequest"></a>
 
 ### GetConfigurationDescriptorRequest
-GetConfigurationDescriptorRequest is the request used for the GetConfigurationDescriptor RPC
+GetConfigurationDescriptorRequest 是用于 GetConfigurationDescriptor RPC 的请求
 
 
 
@@ -2757,7 +2717,7 @@ GetConfigurationDescriptorRequest is the request used for the GetConfigurationDe
 <a name="cosmos.base.reflection.v2alpha1.GetConfigurationDescriptorResponse"></a>
 
 ### GetConfigurationDescriptorResponse
-GetConfigurationDescriptorResponse is the response returned by the GetConfigurationDescriptor RPC
+GetConfigurationDescriptorResponse 是 GetConfigurationDescriptor RPC 返回的响应
 
 
 | Field | Type | Label | Description |
@@ -2772,7 +2732,7 @@ GetConfigurationDescriptorResponse is the response returned by the GetConfigurat
 <a name="cosmos.base.reflection.v2alpha1.GetQueryServicesDescriptorRequest"></a>
 
 ### GetQueryServicesDescriptorRequest
-GetQueryServicesDescriptorRequest is the request used for the GetQueryServicesDescriptor RPC
+GetQueryServicesDescriptorRequest 是用于 GetQueryServicesDescriptor RPC 的请求
 
 
 
@@ -2782,8 +2742,7 @@ GetQueryServicesDescriptorRequest is the request used for the GetQueryServicesDe
 <a name="cosmos.base.reflection.v2alpha1.GetQueryServicesDescriptorResponse"></a>
 
 ### GetQueryServicesDescriptorResponse
-GetQueryServicesDescriptorResponse is the response returned by the GetQueryServicesDescriptor RPC
-
+GetQueryServicesDescriptorResponse 是 GetQueryServicesDescriptor RPC 返回的响应
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -2797,7 +2756,7 @@ GetQueryServicesDescriptorResponse is the response returned by the GetQueryServi
 <a name="cosmos.base.reflection.v2alpha1.GetTxDescriptorRequest"></a>
 
 ### GetTxDescriptorRequest
-GetTxDescriptorRequest is the request used for the GetTxDescriptor RPC
+GetTxDescriptorRequest 是用于 GetTxDescriptor RPC 的请求
 
 
 
@@ -2807,7 +2766,7 @@ GetTxDescriptorRequest is the request used for the GetTxDescriptor RPC
 <a name="cosmos.base.reflection.v2alpha1.GetTxDescriptorResponse"></a>
 
 ### GetTxDescriptorResponse
-GetTxDescriptorResponse is the response returned by the GetTxDescriptor RPC
+GetTxDescriptorResponse 是 GetTxDescriptor RPC 返回的响应
 
 
 | Field | Type | Label | Description |
@@ -2822,8 +2781,7 @@ GetTxDescriptorResponse is the response returned by the GetTxDescriptor RPC
 <a name="cosmos.base.reflection.v2alpha1.InterfaceAcceptingMessageDescriptor"></a>
 
 ### InterfaceAcceptingMessageDescriptor
-InterfaceAcceptingMessageDescriptor describes a protobuf message which contains
-an interface represented as a google.protobuf.Any
+InterfaceAcceptingMessageDescriptor 描述了一个 protobuf 消息，其中包含一个表示为 google.protobuf.Any 的接口
 
 
 | Field | Type | Label | Description |
@@ -2839,7 +2797,7 @@ an interface represented as a google.protobuf.Any
 <a name="cosmos.base.reflection.v2alpha1.InterfaceDescriptor"></a>
 
 ### InterfaceDescriptor
-InterfaceDescriptor describes the implementation of an interface
+InterfaceDescriptor 描述了一个接口的实现
 
 
 | Field | Type | Label | Description |
@@ -2856,7 +2814,7 @@ InterfaceDescriptor describes the implementation of an interface
 <a name="cosmos.base.reflection.v2alpha1.InterfaceImplementerDescriptor"></a>
 
 ### InterfaceImplementerDescriptor
-InterfaceImplementerDescriptor describes an interface implementer
+InterfaceImplementerDescriptor 描述了一个接口实现者
 
 
 | Field | Type | Label | Description |
@@ -2872,7 +2830,7 @@ InterfaceImplementerDescriptor describes an interface implementer
 <a name="cosmos.base.reflection.v2alpha1.MsgDescriptor"></a>
 
 ### MsgDescriptor
-MsgDescriptor describes a cosmos-sdk message that can be delivered with a transaction
+MsgDescriptor 描述了一个可以与事务一起传递的 cosmos-sdk 消息
 
 
 | Field | Type | Label | Description |
@@ -2887,10 +2845,7 @@ MsgDescriptor describes a cosmos-sdk message that can be delivered with a transa
 <a name="cosmos.base.reflection.v2alpha1.QueryMethodDescriptor"></a>
 
 ### QueryMethodDescriptor
-QueryMethodDescriptor describes a queryable method of a query service
-no other info is provided beside method name and tendermint queryable path
-because it would be redundant with the grpc reflection service
-
+QueryMethodDescriptor 描述了查询服务的可查询方法，除了方法名称和tendermint 可查询路径之外没有提供其他信息，因为它与 grpc 反射服务是多余的
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -2905,7 +2860,7 @@ because it would be redundant with the grpc reflection service
 <a name="cosmos.base.reflection.v2alpha1.QueryServiceDescriptor"></a>
 
 ### QueryServiceDescriptor
-QueryServiceDescriptor describes a cosmos-sdk queryable service
+QueryServiceDescriptor 描述了一个 cosmos-sdk 可查询服务
 
 
 | Field | Type | Label | Description |
@@ -2922,7 +2877,7 @@ QueryServiceDescriptor describes a cosmos-sdk queryable service
 <a name="cosmos.base.reflection.v2alpha1.QueryServicesDescriptor"></a>
 
 ### QueryServicesDescriptor
-QueryServicesDescriptor contains the list of cosmos-sdk queriable services
+QueryServicesDescriptor 包含 cosmos-sdk 可查询服务列表
 
 
 | Field | Type | Label | Description |
@@ -2937,10 +2892,7 @@ QueryServicesDescriptor contains the list of cosmos-sdk queriable services
 <a name="cosmos.base.reflection.v2alpha1.SigningModeDescriptor"></a>
 
 ### SigningModeDescriptor
-SigningModeDescriptor provides information on a signing flow of the application
-NOTE(fdymylja): here we could go as far as providing an entire flow on how
-to sign a message given a SigningModeDescriptor, but it's better to think about
-this another time
+SigningModeDescriptor 提供有关应用程序签名流程的信息 NOTE(fdymylja)：这里我们可以提供有关如何在给定 SigningModeDescriptor 的情况下签署消息的完整流程，但最好再考虑一下
 
 
 | Field | Type | Label | Description |
@@ -2957,7 +2909,7 @@ this another time
 <a name="cosmos.base.reflection.v2alpha1.TxDescriptor"></a>
 
 ### TxDescriptor
-TxDescriptor describes the accepted transaction type
+TxDescriptor 描述接受的交易类型
 
 
 | Field | Type | Label | Description |
@@ -2979,7 +2931,7 @@ TxDescriptor describes the accepted transaction type
 <a name="cosmos.base.reflection.v2alpha1.ReflectionService"></a>
 
 ### ReflectionService
-ReflectionService defines a service for application reflection.
+ReflectionService 为应用程序反射定义了一个服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -3004,7 +2956,7 @@ ReflectionService defines a service for application reflection.
 <a name="cosmos.base.snapshots.v1beta1.Metadata"></a>
 
 ### Metadata
-Metadata contains SDK-specific snapshot metadata.
+元数据包含特定于 SDK 的快照元数据。
 
 
 | Field | Type | Label | Description |
@@ -3019,7 +2971,7 @@ Metadata contains SDK-specific snapshot metadata.
 <a name="cosmos.base.snapshots.v1beta1.Snapshot"></a>
 
 ### Snapshot
-Snapshot contains Tendermint state sync snapshot info.
+快照包含 Tendermint 状态同步快照信息。
 
 
 | Field | Type | Label | Description |
@@ -3054,8 +3006,7 @@ Snapshot contains Tendermint state sync snapshot info.
 <a name="cosmos.base.store.v1beta1.CommitID"></a>
 
 ### CommitID
-CommitID defines the committment information when a specific store is
-committed.
+提交 ID 定义提交特定存储时的提交信息。
 
 
 | Field | Type | Label | Description |
@@ -3071,8 +3022,7 @@ committed.
 <a name="cosmos.base.store.v1beta1.CommitInfo"></a>
 
 ### CommitInfo
-CommitInfo defines commit information used by the multi-store when committing
-a version/height.
+CommitInfo 定义了多存储在提交版本/高度时使用的提交信息。
 
 
 | Field | Type | Label | Description |
@@ -3088,9 +3038,7 @@ a version/height.
 <a name="cosmos.base.store.v1beta1.StoreInfo"></a>
 
 ### StoreInfo
-StoreInfo defines store-specific commit information. It contains a reference
-between a store name and the commit ID.
-
+StoreInfo 定义特定于商店的提交信息。 它包含存储名称和提交 ID 之间的引用。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -3121,9 +3069,7 @@ between a store name and the commit ID.
 <a name="cosmos.base.store.v1beta1.StoreKVPair"></a>
 
 ### StoreKVPair
-StoreKVPair is a KVStore KVPair used for listening to state changes (Sets and Deletes)
-It optionally includes the StoreKey for the originating KVStore and a Boolean flag to distinguish between Sets and
-Deletes
+StoreKVPair 是一个 KVStore KVPair，用于监听状态变化（Sets 和 Deletes），它可选地包含用于原始 KVStore 的 StoreKey 和一个用于区分 Sets 和 Deletes 的布尔标志
 
 Since: cosmos-sdk 0.43
 
@@ -3159,7 +3105,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.base.store.v1beta1.SnapshotIAVLItem"></a>
 
 ### SnapshotIAVLItem
-SnapshotIAVLItem is an exported IAVL node.
+SnapshotIAVLItem 是导出的 IAVL 节点。
 
 
 | Field | Type | Label | Description |
@@ -3177,7 +3123,7 @@ SnapshotIAVLItem is an exported IAVL node.
 <a name="cosmos.base.store.v1beta1.SnapshotItem"></a>
 
 ### SnapshotItem
-SnapshotItem is an item contained in a rootmulti.Store snapshot.
+SnapshotItem 是包含在 rootmulti.Store 快照中的项目。
 
 
 | Field | Type | Label | Description |
@@ -3193,7 +3139,7 @@ SnapshotItem is an item contained in a rootmulti.Store snapshot.
 <a name="cosmos.base.store.v1beta1.SnapshotStoreItem"></a>
 
 ### SnapshotStoreItem
-SnapshotStoreItem contains metadata about a snapshotted store.
+SnapshotStoreItem 包含有关快照存储的元数据。
 
 
 | Field | Type | Label | Description |
@@ -3224,7 +3170,7 @@ SnapshotStoreItem contains metadata about a snapshotted store.
 <a name="cosmos.base.tendermint.v1beta1.GetBlockByHeightRequest"></a>
 
 ### GetBlockByHeightRequest
-GetBlockByHeightRequest is the request type for the Query/GetBlockByHeight RPC method.
+GetBlockByHeightRequest 是 Query/GetBlockByHeight RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -3239,7 +3185,7 @@ GetBlockByHeightRequest is the request type for the Query/GetBlockByHeight RPC m
 <a name="cosmos.base.tendermint.v1beta1.GetBlockByHeightResponse"></a>
 
 ### GetBlockByHeightResponse
-GetBlockByHeightResponse is the response type for the Query/GetBlockByHeight RPC method.
+GetBlockByHeightResponse 是 Query/GetBlockByHeight RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -3255,7 +3201,7 @@ GetBlockByHeightResponse is the response type for the Query/GetBlockByHeight RPC
 <a name="cosmos.base.tendermint.v1beta1.GetLatestBlockRequest"></a>
 
 ### GetLatestBlockRequest
-GetLatestBlockRequest is the request type for the Query/GetLatestBlock RPC method.
+GetLatestBlockRequest 是 Query/GetLatestBlock RPC 方法的请求类型。
 
 
 
@@ -3265,7 +3211,7 @@ GetLatestBlockRequest is the request type for the Query/GetLatestBlock RPC metho
 <a name="cosmos.base.tendermint.v1beta1.GetLatestBlockResponse"></a>
 
 ### GetLatestBlockResponse
-GetLatestBlockResponse is the response type for the Query/GetLatestBlock RPC method.
+GetLatestBlockResponse 是 Query/GetLatestBlock RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -3281,7 +3227,7 @@ GetLatestBlockResponse is the response type for the Query/GetLatestBlock RPC met
 <a name="cosmos.base.tendermint.v1beta1.GetLatestValidatorSetRequest"></a>
 
 ### GetLatestValidatorSetRequest
-GetLatestValidatorSetRequest is the request type for the Query/GetValidatorSetByHeight RPC method.
+GetLatestValidatorSetRequest 是 Query/GetValidatorSetByHeight RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -3296,7 +3242,7 @@ GetLatestValidatorSetRequest is the request type for the Query/GetValidatorSetBy
 <a name="cosmos.base.tendermint.v1beta1.GetLatestValidatorSetResponse"></a>
 
 ### GetLatestValidatorSetResponse
-GetLatestValidatorSetResponse is the response type for the Query/GetValidatorSetByHeight RPC method.
+GetLatestValidatorSetResponse 是 Query/GetValidatorSetByHeight RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -3313,7 +3259,7 @@ GetLatestValidatorSetResponse is the response type for the Query/GetValidatorSet
 <a name="cosmos.base.tendermint.v1beta1.GetNodeInfoRequest"></a>
 
 ### GetNodeInfoRequest
-GetNodeInfoRequest is the request type for the Query/GetNodeInfo RPC method.
+GetNodeInfoRequest 是 Query/GetNodeInfo RPC 方法的请求类型。
 
 
 
@@ -3323,7 +3269,7 @@ GetNodeInfoRequest is the request type for the Query/GetNodeInfo RPC method.
 <a name="cosmos.base.tendermint.v1beta1.GetNodeInfoResponse"></a>
 
 ### GetNodeInfoResponse
-GetNodeInfoResponse is the response type for the Query/GetNodeInfo RPC method.
+GetNodeInfoResponse 是 Query/GetNodeInfo RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -3339,7 +3285,7 @@ GetNodeInfoResponse is the response type for the Query/GetNodeInfo RPC method.
 <a name="cosmos.base.tendermint.v1beta1.GetSyncingRequest"></a>
 
 ### GetSyncingRequest
-GetSyncingRequest is the request type for the Query/GetSyncing RPC method.
+GetSyncingRequest 是 Query/GetSyncing RPC 方法的请求类型。
 
 
 
@@ -3349,7 +3295,7 @@ GetSyncingRequest is the request type for the Query/GetSyncing RPC method.
 <a name="cosmos.base.tendermint.v1beta1.GetSyncingResponse"></a>
 
 ### GetSyncingResponse
-GetSyncingResponse is the response type for the Query/GetSyncing RPC method.
+GetSyncingResponse 是 Query/GetSyncing RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -3364,7 +3310,7 @@ GetSyncingResponse is the response type for the Query/GetSyncing RPC method.
 <a name="cosmos.base.tendermint.v1beta1.GetValidatorSetByHeightRequest"></a>
 
 ### GetValidatorSetByHeightRequest
-GetValidatorSetByHeightRequest is the request type for the Query/GetValidatorSetByHeight RPC method.
+GetValidatorSetByHeightRequest 是 Query/GetValidatorSetByHeight RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -3380,7 +3326,7 @@ GetValidatorSetByHeightRequest is the request type for the Query/GetValidatorSet
 <a name="cosmos.base.tendermint.v1beta1.GetValidatorSetByHeightResponse"></a>
 
 ### GetValidatorSetByHeightResponse
-GetValidatorSetByHeightResponse is the response type for the Query/GetValidatorSetByHeight RPC method.
+GetValidatorSetByHeightResponse 是 Query/GetValidatorSetByHeight RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -3397,7 +3343,7 @@ GetValidatorSetByHeightResponse is the response type for the Query/GetValidatorS
 <a name="cosmos.base.tendermint.v1beta1.Module"></a>
 
 ### Module
-Module is the type for VersionInfo
+Module 是 VersionInfo 的类型
 
 
 | Field | Type | Label | Description |
@@ -3414,7 +3360,7 @@ Module is the type for VersionInfo
 <a name="cosmos.base.tendermint.v1beta1.Validator"></a>
 
 ### Validator
-Validator is the type for the validator-set.
+Validator 是validator-set的类型。
 
 
 | Field | Type | Label | Description |
@@ -3432,7 +3378,7 @@ Validator is the type for the validator-set.
 <a name="cosmos.base.tendermint.v1beta1.VersionInfo"></a>
 
 ### VersionInfo
-VersionInfo is the type for the GetNodeInfoResponse message.
+VersionInfo 是 GetNodeInfoResponse 消息的类型。
 
 
 | Field | Type | Label | Description |
@@ -3460,7 +3406,7 @@ VersionInfo is the type for the GetNodeInfoResponse message.
 <a name="cosmos.base.tendermint.v1beta1.Service"></a>
 
 ### Service
-Service defines the gRPC querier service for tendermint queries.
+Service 定义了用于tendermint 查询的gRPC 查询器服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -3485,8 +3431,7 @@ Service defines the gRPC querier service for tendermint queries.
 <a name="cosmos.capability.v1beta1.Capability"></a>
 
 ### Capability
-Capability defines an implementation of an object capability. The index
-provided to a Capability must be globally unique.
+能力定义了对象能力的实现。 提供给 Capability 的索引必须是全局唯一的。
 
 
 | Field | Type | Label | Description |
@@ -3501,8 +3446,7 @@ provided to a Capability must be globally unique.
 <a name="cosmos.capability.v1beta1.CapabilityOwners"></a>
 
 ### CapabilityOwners
-CapabilityOwners defines a set of owners of a single Capability. The set of
-owners must be unique.
+CapabilityOwners 定义了单个 Capability 的一组所有者。 所有者集必须是唯一的。
 
 
 | Field | Type | Label | Description |
@@ -3517,8 +3461,7 @@ owners must be unique.
 <a name="cosmos.capability.v1beta1.Owner"></a>
 
 ### Owner
-Owner defines a single capability owner. An owner is defined by the name of
-capability and the module name.
+Owner 定义单个功能所有者。 所有者由能力名称和模块名称定义。
 
 
 | Field | Type | Label | Description |
@@ -3550,7 +3493,7 @@ capability and the module name.
 <a name="cosmos.capability.v1beta1.GenesisOwners"></a>
 
 ### GenesisOwners
-GenesisOwners defines the capability owners with their corresponding index.
+GenesisOwners 定义了能力所有者及其相应的索引。
 
 
 | Field | Type | Label | Description |
@@ -3566,7 +3509,7 @@ GenesisOwners defines the capability owners with their corresponding index.
 <a name="cosmos.capability.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the capability module's genesis state.
+GenesisState 定义了能力模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -3598,7 +3541,7 @@ GenesisState defines the capability module's genesis state.
 <a name="cosmos.crisis.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the crisis module's genesis state.
+GenesisState 定义了危机模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -3629,7 +3572,7 @@ GenesisState defines the crisis module's genesis state.
 <a name="cosmos.crisis.v1beta1.MsgVerifyInvariant"></a>
 
 ### MsgVerifyInvariant
-MsgVerifyInvariant represents a message to verify a particular invariance.
+MsgVerifyInvariant 表示验证特定不变性的消息。
 
 
 | Field | Type | Label | Description |
@@ -3646,7 +3589,7 @@ MsgVerifyInvariant represents a message to verify a particular invariance.
 <a name="cosmos.crisis.v1beta1.MsgVerifyInvariantResponse"></a>
 
 ### MsgVerifyInvariantResponse
-MsgVerifyInvariantResponse defines the Msg/VerifyInvariant response type.
+MsgVerifyInvariantResponse 定义了 Msg/VerifyInvariant 响应类型。
 
 
 
@@ -3662,7 +3605,7 @@ MsgVerifyInvariantResponse defines the Msg/VerifyInvariant response type.
 <a name="cosmos.crisis.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the bank Msg service.
+Msg 定义了银行消息服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -3682,8 +3625,8 @@ Msg defines the bank Msg service.
 <a name="cosmos.crypto.ed25519.PrivKey"></a>
 
 ### PrivKey
-Deprecated: PrivKey defines a ed25519 private key.
-NOTE: ed25519 keys must not be used in SDK apps except in a tendermint validator context.
+已弃用：PrivKey 定义了 ed25519 私钥。
+注意：ed25519 密钥不得在 SDK 应用程序中使用，除非在tendermint 验证器上下文中。
 
 
 | Field | Type | Label | Description |
@@ -3698,12 +3641,9 @@ NOTE: ed25519 keys must not be used in SDK apps except in a tendermint validator
 <a name="cosmos.crypto.ed25519.PubKey"></a>
 
 ### PubKey
-PubKey is an ed25519 public key for handling Tendermint keys in SDK.
-It's needed for Any serialization and SDK compatibility.
-It must not be used in a non Tendermint key context because it doesn't implement
-ADR-28. Nevertheless, you will like to use ed25519 in app user level
-then you must create a new proto message and follow ADR-28 for Address construction.
-
+PubKey 是一个 ed25519 公钥，用于处理 SDK 中的 Tendermint 密钥。
+任何序列化和 SDK 兼容性都需要它。
+它不能用于非 Tendermint 键上下文，因为它没有实现 ADR-28。 尽管如此，您希望在应用程序用户级别使用 ed25519，然后您必须创建一个新的 proto 消息并遵循 ADR-28 进行地址构建。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -3733,7 +3673,7 @@ then you must create a new proto message and follow ADR-28 for Address construct
 <a name="cosmos.crypto.hd.v1.BIP44Params"></a>
 
 ### BIP44Params
-BIP44Params is used as path field in ledger item in Record.
+BIP44Params 用作记录中分类帐项中的路径字段。
 
 
 | Field | Type | Label | Description |
@@ -3768,7 +3708,7 @@ BIP44Params is used as path field in ledger item in Record.
 <a name="cosmos.crypto.keyring.v1.Record"></a>
 
 ### Record
-Record is used for representing a key in the keyring.
+Record 用于表示密钥环中的密钥。
 
 
 | Field | Type | Label | Description |
@@ -3788,7 +3728,7 @@ Record is used for representing a key in the keyring.
 <a name="cosmos.crypto.keyring.v1.Record.Ledger"></a>
 
 ### Record.Ledger
-Ledger item
+分类帐项目
 
 
 | Field | Type | Label | Description |
@@ -3803,8 +3743,8 @@ Ledger item
 <a name="cosmos.crypto.keyring.v1.Record.Local"></a>
 
 ### Record.Local
-Item is a keyring item stored in a keyring backend.
-Local item
+Item 是存储在密钥环后端的密钥环项目。
+本地项目
 
 
 | Field | Type | Label | Description |
@@ -3820,7 +3760,7 @@ Local item
 <a name="cosmos.crypto.keyring.v1.Record.Multi"></a>
 
 ### Record.Multi
-Multi item
+多项目
 
 
 
@@ -3830,7 +3770,7 @@ Multi item
 <a name="cosmos.crypto.keyring.v1.Record.Offline"></a>
 
 ### Record.Offline
-Offline item
+线下项目
 
 
 
@@ -3856,9 +3796,7 @@ Offline item
 <a name="cosmos.crypto.multisig.LegacyAminoPubKey"></a>
 
 ### LegacyAminoPubKey
-LegacyAminoPubKey specifies a public key type
-which nests multiple public keys and a threshold,
-it uses legacy amino address rules.
+LegacyAminoPubKey 指定了一个公钥类型，它嵌套了多个公钥和一个阈值，它使用了传统的氨基地址规则。
 
 
 | Field | Type | Label | Description |
@@ -3890,10 +3828,9 @@ it uses legacy amino address rules.
 <a name="cosmos.crypto.multisig.v1beta1.CompactBitArray"></a>
 
 ### CompactBitArray
-CompactBitArray is an implementation of a space efficient bit array.
-This is used to ensure that the encoded data takes up a minimal amount of
-space after proto encoding.
-This is not thread safe, and is not intended for concurrent usage.
+CompactBitArray 是空间高效位数组的实现。
+这用于确保编码数据在 proto 编码后占用最少的空间。
+这不是线程安全的，也不适用于并发使用。
 
 
 | Field | Type | Label | Description |
@@ -3909,9 +3846,8 @@ This is not thread safe, and is not intended for concurrent usage.
 <a name="cosmos.crypto.multisig.v1beta1.MultiSignature"></a>
 
 ### MultiSignature
-MultiSignature wraps the signatures from a multisig.LegacyAminoPubKey.
-See cosmos.tx.v1betata1.ModeInfo.Multi for how to specify which signers
-signed and with which modes.
+MultiSignature 包装来自 multisig.LegacyAminoPubKey 的签名。
+请参阅 cosmos.tx.v1betata1.ModeInfo.Multi 了解如何指定哪些签名者签名以及使用哪些模式。
 
 
 | Field | Type | Label | Description |
@@ -3942,7 +3878,7 @@ signed and with which modes.
 <a name="cosmos.crypto.secp256k1.PrivKey"></a>
 
 ### PrivKey
-PrivKey defines a secp256k1 private key.
+PrivKey 定义了一个 secp256k1 私钥。
 
 
 | Field | Type | Label | Description |
@@ -3957,11 +3893,7 @@ PrivKey defines a secp256k1 private key.
 <a name="cosmos.crypto.secp256k1.PubKey"></a>
 
 ### PubKey
-PubKey defines a secp256k1 public key
-Key is the compressed form of the pubkey. The first byte depends is a 0x02 byte
-if the y-coordinate is the lexicographically largest of the two associated with
-the x-coordinate. Otherwise the first byte is a 0x03.
-This prefix is followed with the x-coordinate.
+PubKey 定义了一个 secp256k1 公钥 Key 是公钥的压缩形式。 如果 y 坐标是与 x 坐标关联的两个字节中字典序最大的，则第一个字节取决于 0x02 字节。 否则第一个字节是 0x03。 此前缀后跟 x 坐标。
 
 
 | Field | Type | Label | Description |
@@ -3992,7 +3924,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.crypto.secp256r1.PrivKey"></a>
 
 ### PrivKey
-PrivKey defines a secp256r1 ECDSA private key.
+PrivKey 定义了一个 secp256r1 ECDSA 私钥。
 
 
 | Field | Type | Label | Description |
@@ -4007,7 +3939,7 @@ PrivKey defines a secp256r1 ECDSA private key.
 <a name="cosmos.crypto.secp256r1.PubKey"></a>
 
 ### PubKey
-PubKey defines a secp256r1 ECDSA public key.
+PubKey 定义了一个 secp256r1 ECDSA 公钥。
 
 
 | Field | Type | Label | Description |
@@ -4038,9 +3970,7 @@ PubKey defines a secp256r1 ECDSA public key.
 <a name="cosmos.distribution.v1beta1.CommunityPoolSpendProposal"></a>
 
 ### CommunityPoolSpendProposal
-CommunityPoolSpendProposal details a proposal for use of community funds,
-together with how many coins are proposed to be spent, and to which
-recipient account.
+CommunityPoolSpendProposal 详细说明了使用社区资金的建议，以及建议花费的代币数量以及接收者帐户。
 
 
 | Field | Type | Label | Description |
@@ -4058,8 +3988,7 @@ recipient account.
 <a name="cosmos.distribution.v1beta1.CommunityPoolSpendProposalWithDeposit"></a>
 
 ### CommunityPoolSpendProposalWithDeposit
-CommunityPoolSpendProposalWithDeposit defines a CommunityPoolSpendProposal
-with a deposit
+CommunityPoolSpendProposalWithDeposit 定义了一个带有存款的 CommunityPoolSpendProposal
 
 
 | Field | Type | Label | Description |
@@ -4078,8 +4007,8 @@ with a deposit
 <a name="cosmos.distribution.v1beta1.DelegationDelegatorReward"></a>
 
 ### DelegationDelegatorReward
-DelegationDelegatorReward represents the properties
-of a delegator's delegation reward.
+DelegationDelegatorReward 代表的属性
+代表的委托奖励。
 
 
 | Field | Type | Label | Description |
@@ -4095,12 +4024,7 @@ of a delegator's delegation reward.
 <a name="cosmos.distribution.v1beta1.DelegatorStartingInfo"></a>
 
 ### DelegatorStartingInfo
-DelegatorStartingInfo represents the starting info for a delegator reward
-period. It tracks the previous validator period, the delegation's amount of
-staking token, and the creation height (to check later on if any slashes have
-occurred). NOTE: Even though validators are slashed to whole staking tokens,
-the delegators within the validator may be left with less than a full token,
-thus sdk.Dec is used.
+DelegatorStartingInfo 表示委托人奖励期的开始信息。 它跟踪前一个验证器周期、委托的质押令牌数量和创建高度（稍后检查是否发生了任何斜线）。 注意：即使验证器被削减到整个 staking 代币，验证器中的委托人可能会剩下少于一个完整的代币，因此使用 sdk.Dec。
 
 
 | Field | Type | Label | Description |
@@ -4117,7 +4041,7 @@ thus sdk.Dec is used.
 <a name="cosmos.distribution.v1beta1.FeePool"></a>
 
 ### FeePool
-FeePool is the global fee pool for distribution.
+FeePool 是用于分发的全球费用池。
 
 
 | Field | Type | Label | Description |
@@ -4132,7 +4056,7 @@ FeePool is the global fee pool for distribution.
 <a name="cosmos.distribution.v1beta1.Params"></a>
 
 ### Params
-Params defines the set of params for the distribution module.
+参数定义分发模块的参数集。
 
 
 | Field | Type | Label | Description |
@@ -4150,9 +4074,7 @@ Params defines the set of params for the distribution module.
 <a name="cosmos.distribution.v1beta1.ValidatorAccumulatedCommission"></a>
 
 ### ValidatorAccumulatedCommission
-ValidatorAccumulatedCommission represents accumulated commission
-for a validator kept as a running counter, can be withdrawn at any time.
-
+ValidatorAccumulatedCommission 代表作为运行计数器保存的验证器的累积佣金，可以随时提取。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -4166,9 +4088,7 @@ for a validator kept as a running counter, can be withdrawn at any time.
 <a name="cosmos.distribution.v1beta1.ValidatorCurrentRewards"></a>
 
 ### ValidatorCurrentRewards
-ValidatorCurrentRewards represents current rewards and current
-period for a validator kept as a running counter and incremented
-each block as long as the validator's tokens remain constant.
+ValidatorCurrentRewards 代表验证者的当前奖励和当前周期，作为运行计数器保持并在每个区块递增，只要验证者的代币保持不变。
 
 
 | Field | Type | Label | Description |
@@ -4184,18 +4104,10 @@ each block as long as the validator's tokens remain constant.
 <a name="cosmos.distribution.v1beta1.ValidatorHistoricalRewards"></a>
 
 ### ValidatorHistoricalRewards
-ValidatorHistoricalRewards represents historical rewards for a validator.
-Height is implicit within the store key.
-Cumulative reward ratio is the sum from the zeroeth period
-until this period of rewards / tokens, per the spec.
-The reference count indicates the number of objects
-which might need to reference this historical entry at any point.
-ReferenceCount =
-   number of outstanding delegations which ended the associated period (and
-   might need to read that record)
- + number of slashes which ended the associated period (and might need to
- read that record)
- + one per validator for the zeroeth period, set on initialization
+ValidatorHistoricalRewards 代表验证者的历史奖励。 高度在存储键中是隐含的。 根据规范，累积奖励率是从第零期到此期奖励/代币的总和。 引用计数指示可能需要在任何时候引用此历史条目的对象数。
+ReferenceCount = 结束相关期间的未完成授权的数量（并且可能需要读取该记录）
+  + 结束相关期间的斜线数（并且可能需要读取该记录）
+  + 第零时期每个验证器一个，在初始化时设置
 
 
 | Field | Type | Label | Description |
@@ -4211,8 +4123,7 @@ ReferenceCount =
 <a name="cosmos.distribution.v1beta1.ValidatorOutstandingRewards"></a>
 
 ### ValidatorOutstandingRewards
-ValidatorOutstandingRewards represents outstanding (un-withdrawn) rewards
-for a validator inexpensive to track, allows simple sanity checks.
+ValidatorOutstandingRewards 代表一个验证者的优秀（未撤回）奖励，跟踪成本低，允许简单的健全性检查。
 
 
 | Field | Type | Label | Description |
@@ -4227,10 +4138,10 @@ for a validator inexpensive to track, allows simple sanity checks.
 <a name="cosmos.distribution.v1beta1.ValidatorSlashEvent"></a>
 
 ### ValidatorSlashEvent
-ValidatorSlashEvent represents a validator slash event.
-Height is implicit within the store key.
-This is needed to calculate appropriate amount of staking tokens
-for delegations which are withdrawn after a slash has occurred.
+ValidatorSlashEvent 表示验证器斜线事件。
+高度在存储键中是隐含的。
+这是计算适当数量的抵押代币所必需的
+对于在出现斜线后撤回的代表团。
 
 
 | Field | Type | Label | Description |
@@ -4246,7 +4157,7 @@ for delegations which are withdrawn after a slash has occurred.
 <a name="cosmos.distribution.v1beta1.ValidatorSlashEvents"></a>
 
 ### ValidatorSlashEvents
-ValidatorSlashEvents is a collection of ValidatorSlashEvent messages.
+ValidatorSlashEvents 是 ValidatorSlashEvent 消息的集合。
 
 
 | Field | Type | Label | Description |
@@ -4277,7 +4188,7 @@ ValidatorSlashEvents is a collection of ValidatorSlashEvent messages.
 <a name="cosmos.distribution.v1beta1.DelegatorStartingInfoRecord"></a>
 
 ### DelegatorStartingInfoRecord
-DelegatorStartingInfoRecord used for import / export via genesis json.
+DelegatorStartingInfoRecord 用于通过 genesis json 导入/导出。
 
 
 | Field | Type | Label | Description |
@@ -4294,9 +4205,7 @@ DelegatorStartingInfoRecord used for import / export via genesis json.
 <a name="cosmos.distribution.v1beta1.DelegatorWithdrawInfo"></a>
 
 ### DelegatorWithdrawInfo
-DelegatorWithdrawInfo is the address for where distributions rewards are
-withdrawn to by default this struct is only used at genesis to feed in
-default withdraw addresses.
+DelegatorWithdrawInfo 是分配奖励默认提取到的地址，该结构仅在创世时用于提供默认提取地址。
 
 
 | Field | Type | Label | Description |
@@ -4312,7 +4221,7 @@ default withdraw addresses.
 <a name="cosmos.distribution.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the distribution module's genesis state.
+GenesisState 定义分发模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -4336,8 +4245,7 @@ GenesisState defines the distribution module's genesis state.
 <a name="cosmos.distribution.v1beta1.ValidatorAccumulatedCommissionRecord"></a>
 
 ### ValidatorAccumulatedCommissionRecord
-ValidatorAccumulatedCommissionRecord is used for import / export via genesis
-json.
+ValidatorAccumulatedCommissionRecord 用于通过 genesis json 导入/导出。
 
 
 | Field | Type | Label | Description |
@@ -4353,7 +4261,7 @@ json.
 <a name="cosmos.distribution.v1beta1.ValidatorCurrentRewardsRecord"></a>
 
 ### ValidatorCurrentRewardsRecord
-ValidatorCurrentRewardsRecord is used for import / export via genesis json.
+ValidatorCurrentRewardsRecord 用于通过 genesis json 导入/导出。
 
 
 | Field | Type | Label | Description |
@@ -4369,8 +4277,7 @@ ValidatorCurrentRewardsRecord is used for import / export via genesis json.
 <a name="cosmos.distribution.v1beta1.ValidatorHistoricalRewardsRecord"></a>
 
 ### ValidatorHistoricalRewardsRecord
-ValidatorHistoricalRewardsRecord is used for import / export via genesis
-json.
+ValidatorHistoricalRewardsRecord 用于通过 genesis json 导入/导出。
 
 
 | Field | Type | Label | Description |
@@ -4387,7 +4294,7 @@ json.
 <a name="cosmos.distribution.v1beta1.ValidatorOutstandingRewardsRecord"></a>
 
 ### ValidatorOutstandingRewardsRecord
-ValidatorOutstandingRewardsRecord is used for import/export via genesis json.
+ValidatorOutstandingRewardsRecord 用于通过 genesis json 导入/导出。
 
 
 | Field | Type | Label | Description |
@@ -4403,7 +4310,7 @@ ValidatorOutstandingRewardsRecord is used for import/export via genesis json.
 <a name="cosmos.distribution.v1beta1.ValidatorSlashEventRecord"></a>
 
 ### ValidatorSlashEventRecord
-ValidatorSlashEventRecord is used for import / export via genesis json.
+ValidatorSlashEventRecord 用于通过 genesis json 导入/导出。
 
 
 | Field | Type | Label | Description |
@@ -4437,8 +4344,7 @@ ValidatorSlashEventRecord is used for import / export via genesis json.
 <a name="cosmos.distribution.v1beta1.QueryCommunityPoolRequest"></a>
 
 ### QueryCommunityPoolRequest
-QueryCommunityPoolRequest is the request type for the Query/CommunityPool RPC
-method.
+QueryCommunityPoolRequest 是 Query/CommunityPool RPC 方法的请求类型。
 
 
 
@@ -4448,8 +4354,7 @@ method.
 <a name="cosmos.distribution.v1beta1.QueryCommunityPoolResponse"></a>
 
 ### QueryCommunityPoolResponse
-QueryCommunityPoolResponse is the response type for the Query/CommunityPool
-RPC method.
+QueryCommunityPoolResponse 是 Query/CommunityPool RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -4464,9 +4369,7 @@ RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegationRewardsRequest"></a>
 
 ### QueryDelegationRewardsRequest
-QueryDelegationRewardsRequest is the request type for the
-Query/DelegationRewards RPC method.
-
+QueryDelegationRewardsRequest 是 Query/DelegationRewards RPC 方法的请求类型。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -4481,8 +4384,7 @@ Query/DelegationRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegationRewardsResponse"></a>
 
 ### QueryDelegationRewardsResponse
-QueryDelegationRewardsResponse is the response type for the
-Query/DelegationRewards RPC method.
+QueryDelegationRewardsResponse 是 Query/DelegationRewards RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -4497,8 +4399,8 @@ Query/DelegationRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegationTotalRewardsRequest"></a>
 
 ### QueryDelegationTotalRewardsRequest
-QueryDelegationTotalRewardsRequest is the request type for the
-Query/DelegationTotalRewards RPC method.
+QueryDelegationTotalRewardsRequest 是请求类型
+Query/DelegationTotalRewards RPC 方法。
 
 
 | Field | Type | Label | Description |
@@ -4513,8 +4415,8 @@ Query/DelegationTotalRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegationTotalRewardsResponse"></a>
 
 ### QueryDelegationTotalRewardsResponse
-QueryDelegationTotalRewardsResponse is the response type for the
-Query/DelegationTotalRewards RPC method.
+QueryDelegationTotalRewardsResponse 是响应类型
+Query/DelegationTotalRewards RPC 方法。
 
 
 | Field | Type | Label | Description |
@@ -4530,8 +4432,7 @@ Query/DelegationTotalRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegatorValidatorsRequest"></a>
 
 ### QueryDelegatorValidatorsRequest
-QueryDelegatorValidatorsRequest is the request type for the
-Query/DelegatorValidators RPC method.
+QueryDelegatorValidatorsRequest 是 Query/DelegatorValidators RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -4546,9 +4447,7 @@ Query/DelegatorValidators RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegatorValidatorsResponse"></a>
 
 ### QueryDelegatorValidatorsResponse
-QueryDelegatorValidatorsResponse is the response type for the
-Query/DelegatorValidators RPC method.
-
+QueryDelegatorValidatorsResponse 是 Query/DelegatorValidators RPC 方法的响应类型。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -4562,8 +4461,7 @@ Query/DelegatorValidators RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegatorWithdrawAddressRequest"></a>
 
 ### QueryDelegatorWithdrawAddressRequest
-QueryDelegatorWithdrawAddressRequest is the request type for the
-Query/DelegatorWithdrawAddress RPC method.
+QueryDelegatorWithdrawAddressRequest 是 Query/DelegatorWithdrawAddress RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -4578,8 +4476,7 @@ Query/DelegatorWithdrawAddress RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegatorWithdrawAddressResponse"></a>
 
 ### QueryDelegatorWithdrawAddressResponse
-QueryDelegatorWithdrawAddressResponse is the response type for the
-Query/DelegatorWithdrawAddress RPC method.
+QueryDelegatorWithdrawAddressResponse 是 Query/DelegatorWithdrawAddress RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -4594,7 +4491,7 @@ Query/DelegatorWithdrawAddress RPC method.
 <a name="cosmos.distribution.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method.
+QueryParamsRequest 是 Query/Params RPC 方法的请求类型。
 
 
 
@@ -4604,7 +4501,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method.
 <a name="cosmos.distribution.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method.
+QueryParamsResponse 是 Query/Params RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -4619,8 +4516,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method.
 <a name="cosmos.distribution.v1beta1.QueryValidatorCommissionRequest"></a>
 
 ### QueryValidatorCommissionRequest
-QueryValidatorCommissionRequest is the request type for the
-Query/ValidatorCommission RPC method
+QueryValidatorCommissionRequest 是 Query/ValidatorCommission RPC 方法的请求类型
 
 
 | Field | Type | Label | Description |
@@ -4635,8 +4531,7 @@ Query/ValidatorCommission RPC method
 <a name="cosmos.distribution.v1beta1.QueryValidatorCommissionResponse"></a>
 
 ### QueryValidatorCommissionResponse
-QueryValidatorCommissionResponse is the response type for the
-Query/ValidatorCommission RPC method
+QueryValidatorCommissionResponse 是 Query/ValidatorCommission RPC 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -4651,8 +4546,7 @@ Query/ValidatorCommission RPC method
 <a name="cosmos.distribution.v1beta1.QueryValidatorOutstandingRewardsRequest"></a>
 
 ### QueryValidatorOutstandingRewardsRequest
-QueryValidatorOutstandingRewardsRequest is the request type for the
-Query/ValidatorOutstandingRewards RPC method.
+QueryValidatorCommissionResponse 是Query/ValidatorCommission RPC 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -4667,8 +4561,7 @@ Query/ValidatorOutstandingRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryValidatorOutstandingRewardsResponse"></a>
 
 ### QueryValidatorOutstandingRewardsResponse
-QueryValidatorOutstandingRewardsResponse is the response type for the
-Query/ValidatorOutstandingRewards RPC method.
+QueryValidatorOutstandingRewardsResponse 是 Query/ValidatorOutstandingRewards RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -4683,8 +4576,8 @@ Query/ValidatorOutstandingRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryValidatorSlashesRequest"></a>
 
 ### QueryValidatorSlashesRequest
-QueryValidatorSlashesRequest is the request type for the
-Query/ValidatorSlashes RPC method
+QueryValidatorSlashesRequest 是请求类型
+Query/ValidatorSlashes RPC 方法
 
 
 | Field | Type | Label | Description |
@@ -4702,8 +4595,8 @@ Query/ValidatorSlashes RPC method
 <a name="cosmos.distribution.v1beta1.QueryValidatorSlashesResponse"></a>
 
 ### QueryValidatorSlashesResponse
-QueryValidatorSlashesResponse is the response type for the
-Query/ValidatorSlashes RPC method.
+QueryValidatorSlashesResponse 是响应类型
+Query/ValidatorSlashes RPC 方法。
 
 
 | Field | Type | Label | Description |
@@ -4725,7 +4618,7 @@ Query/ValidatorSlashes RPC method.
 <a name="cosmos.distribution.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service for distribution module.
+Query 定义了分发模块的 gRPC 查询器服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -4753,8 +4646,7 @@ Query defines the gRPC querier service for distribution module.
 <a name="cosmos.distribution.v1beta1.MsgFundCommunityPool"></a>
 
 ### MsgFundCommunityPool
-MsgFundCommunityPool allows an account to directly
-fund the community pool.
+MsgFundCommunityPool 允许账户直接资助社区池。
 
 
 | Field | Type | Label | Description |
@@ -4770,7 +4662,7 @@ fund the community pool.
 <a name="cosmos.distribution.v1beta1.MsgFundCommunityPoolResponse"></a>
 
 ### MsgFundCommunityPoolResponse
-MsgFundCommunityPoolResponse defines the Msg/FundCommunityPool response type.
+MsgFundCommunityPoolResponse 定义了 Msg/FundCommunityPool 响应类型。
 
 
 
@@ -4780,8 +4672,7 @@ MsgFundCommunityPoolResponse defines the Msg/FundCommunityPool response type.
 <a name="cosmos.distribution.v1beta1.MsgSetWithdrawAddress"></a>
 
 ### MsgSetWithdrawAddress
-MsgSetWithdrawAddress sets the withdraw address for
-a delegator (or validator self-delegation).
+MsgSetWithdrawAddress 设置提款地址委托人（或验证人自我委托）。
 
 
 | Field | Type | Label | Description |
@@ -4797,7 +4688,7 @@ a delegator (or validator self-delegation).
 <a name="cosmos.distribution.v1beta1.MsgSetWithdrawAddressResponse"></a>
 
 ### MsgSetWithdrawAddressResponse
-MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type.
+Msg tWithdrawAddress Response 定义了 Message/SetWithdrawAddress 响应类型。
 
 
 
@@ -4807,8 +4698,7 @@ MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type.
 <a name="cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"></a>
 
 ### MsgWithdrawDelegatorReward
-MsgWithdrawDelegatorReward represents delegation withdrawal to a delegator
-from a single validator.
+MsgWithdrawDelegatorReward 代表从单个验证器向委托人撤回委托。
 
 
 | Field | Type | Label | Description |
@@ -4824,7 +4714,7 @@ from a single validator.
 <a name="cosmos.distribution.v1beta1.MsgWithdrawDelegatorRewardResponse"></a>
 
 ### MsgWithdrawDelegatorRewardResponse
-MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward response type.
+MsgWithdrawDelegatorRewardResponse 定义了 Msg/WithdrawDelegatorReward 响应类型。
 
 
 
@@ -4834,8 +4724,7 @@ MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward respo
 <a name="cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission"></a>
 
 ### MsgWithdrawValidatorCommission
-MsgWithdrawValidatorCommission withdraws the full commission to the validator
-address.
+MsgWithdrawValidatorCommission 将全部佣金提取到验证者地址。
 
 
 | Field | Type | Label | Description |
@@ -4850,8 +4739,7 @@ address.
 <a name="cosmos.distribution.v1beta1.MsgWithdrawValidatorCommissionResponse"></a>
 
 ### MsgWithdrawValidatorCommissionResponse
-MsgWithdrawValidatorCommissionResponse defines the Msg/WithdrawValidatorCommission response type.
-
+MsgWithdrawValidatorCommissionResponse 定义了 Msg/WithdrawValidatorCommission 响应类型。
 
 
 
@@ -4866,7 +4754,7 @@ MsgWithdrawValidatorCommissionResponse defines the Msg/WithdrawValidatorCommissi
 <a name="cosmos.distribution.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the distribution Msg service.
+Msg 定义了分发Msg 服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -4889,8 +4777,7 @@ Msg defines the distribution Msg service.
 <a name="cosmos.evidence.v1beta1.Equivocation"></a>
 
 ### Equivocation
-Equivocation implements the Evidence interface and defines evidence of double
-signing misbehavior.
+Equivocation 实现了 Evidence 接口并定义了双重签名不当行为的证据。
 
 
 | Field | Type | Label | Description |
@@ -4924,7 +4811,7 @@ signing misbehavior.
 <a name="cosmos.evidence.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the evidence module's genesis state.
+GenesisState 定义了证据模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -4955,8 +4842,7 @@ GenesisState defines the evidence module's genesis state.
 <a name="cosmos.evidence.v1beta1.QueryAllEvidenceRequest"></a>
 
 ### QueryAllEvidenceRequest
-QueryEvidenceRequest is the request type for the Query/AllEvidence RPC
-method.
+QueryEvidenceRequest 是 Query/AllEvidence RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -4971,8 +4857,7 @@ method.
 <a name="cosmos.evidence.v1beta1.QueryAllEvidenceResponse"></a>
 
 ### QueryAllEvidenceResponse
-QueryAllEvidenceResponse is the response type for the Query/AllEvidence RPC
-method.
+QueryAllEvidenceResponse 是 Query/AllEvidence RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -4988,7 +4873,7 @@ method.
 <a name="cosmos.evidence.v1beta1.QueryEvidenceRequest"></a>
 
 ### QueryEvidenceRequest
-QueryEvidenceRequest is the request type for the Query/Evidence RPC method.
+QueryEvidenceRequest 是 Query/Evidence RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -5003,7 +4888,7 @@ QueryEvidenceRequest is the request type for the Query/Evidence RPC method.
 <a name="cosmos.evidence.v1beta1.QueryEvidenceResponse"></a>
 
 ### QueryEvidenceResponse
-QueryEvidenceResponse is the response type for the Query/Evidence RPC method.
+QueryEvidenceResponse 是 Query/Evidence RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5024,7 +4909,7 @@ QueryEvidenceResponse is the response type for the Query/Evidence RPC method.
 <a name="cosmos.evidence.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+Query 定义了 gRPC 查询器服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -5045,8 +4930,7 @@ Query defines the gRPC querier service.
 <a name="cosmos.evidence.v1beta1.MsgSubmitEvidence"></a>
 
 ### MsgSubmitEvidence
-MsgSubmitEvidence represents a message that supports submitting arbitrary
-Evidence of misbehavior such as equivocation or counterfactual signing.
+MsgSubmitEvidence 表示支持提交任意不当行为证据的消息，例如模棱两可或反事实签名。
 
 
 | Field | Type | Label | Description |
@@ -5062,7 +4946,7 @@ Evidence of misbehavior such as equivocation or counterfactual signing.
 <a name="cosmos.evidence.v1beta1.MsgSubmitEvidenceResponse"></a>
 
 ### MsgSubmitEvidenceResponse
-MsgSubmitEvidenceResponse defines the Msg/SubmitEvidence response type.
+MsgSubmitEvidenceResponse 定义了 Msg/SubmitEvidence 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5083,7 +4967,7 @@ MsgSubmitEvidenceResponse defines the Msg/SubmitEvidence response type.
 <a name="cosmos.evidence.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the evidence Msg service.
+Msg 定义了证据消息服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -5103,7 +4987,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.feegrant.v1beta1.AllowedMsgAllowance"></a>
 
 ### AllowedMsgAllowance
-AllowedMsgAllowance creates allowance only for specified message types.
+AllowedMsgAllowance 仅为指定的消息类型创建允许。
 
 
 | Field | Type | Label | Description |
@@ -5119,8 +5003,7 @@ AllowedMsgAllowance creates allowance only for specified message types.
 <a name="cosmos.feegrant.v1beta1.BasicAllowance"></a>
 
 ### BasicAllowance
-BasicAllowance implements Allowance with a one-time grant of tokens
-that optionally expires. The grantee can use up to SpendLimit to cover fees.
+BasicAllowance 通过一次性授予可选择过期的令牌来实现 Allowance。受助人最多可以使用 SpendLimit 来支付费用。
 
 
 | Field | Type | Label | Description |
@@ -5136,7 +5019,7 @@ that optionally expires. The grantee can use up to SpendLimit to cover fees.
 <a name="cosmos.feegrant.v1beta1.Grant"></a>
 
 ### Grant
-Grant is stored in the KVStore to record a grant with full context
+授权存储在 KVStore 中以记录具有完整上下文的授权
 
 
 | Field | Type | Label | Description |
@@ -5153,8 +5036,7 @@ Grant is stored in the KVStore to record a grant with full context
 <a name="cosmos.feegrant.v1beta1.PeriodicAllowance"></a>
 
 ### PeriodicAllowance
-PeriodicAllowance extends Allowance to allow for both a maximum cap,
-as well as a limit per time period.
+PeriodicAllowance 扩展了 Allowance 以允许最大上限和每个时间段的限制。
 
 
 | Field | Type | Label | Description |
@@ -5189,7 +5071,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.feegrant.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState contains a set of fee allowances, persisted from the store
+GenesisState 包含一组费用津贴，从商店中保留
 
 
 | Field | Type | Label | Description |
@@ -5220,7 +5102,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.feegrant.v1beta1.QueryAllowanceRequest"></a>
 
 ### QueryAllowanceRequest
-QueryAllowanceRequest is the request type for the Query/Allowance RPC method.
+QueryAllowanceRequest 是 Query/Allowance RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -5236,7 +5118,7 @@ QueryAllowanceRequest is the request type for the Query/Allowance RPC method.
 <a name="cosmos.feegrant.v1beta1.QueryAllowanceResponse"></a>
 
 ### QueryAllowanceResponse
-QueryAllowanceResponse is the response type for the Query/Allowance RPC method.
+QueryAllowanceResponse 是 Query/Allowance RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5251,7 +5133,7 @@ QueryAllowanceResponse is the response type for the Query/Allowance RPC method.
 <a name="cosmos.feegrant.v1beta1.QueryAllowancesRequest"></a>
 
 ### QueryAllowancesRequest
-QueryAllowancesRequest is the request type for the Query/Allowances RPC method.
+QueryAllowancesRequest 是 Query/Allowances RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -5267,7 +5149,7 @@ QueryAllowancesRequest is the request type for the Query/Allowances RPC method.
 <a name="cosmos.feegrant.v1beta1.QueryAllowancesResponse"></a>
 
 ### QueryAllowancesResponse
-QueryAllowancesResponse is the response type for the Query/Allowances RPC method.
+QueryAllowancesResponse 是 Query/Allowances RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5289,7 +5171,7 @@ QueryAllowancesResponse is the response type for the Query/Allowances RPC method
 <a name="cosmos.feegrant.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+Query 定义了 gRPC 查询器服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -5310,8 +5192,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.feegrant.v1beta1.MsgGrantAllowance"></a>
 
 ### MsgGrantAllowance
-MsgGrantAllowance adds permission for Grantee to spend up to Allowance
-of fees from the account of Granter.
+MsgGrantAllowance 添加了允许受赠人从受赠人的帐户中花费最多津贴的费用。
 
 
 | Field | Type | Label | Description |
@@ -5328,7 +5209,7 @@ of fees from the account of Granter.
 <a name="cosmos.feegrant.v1beta1.MsgGrantAllowanceResponse"></a>
 
 ### MsgGrantAllowanceResponse
-MsgGrantAllowanceResponse defines the Msg/GrantAllowanceResponse response type.
+MsgGrantAllowanceResponse 定义了 Msg/GrantAllowanceResponse 响应类型。
 
 
 
@@ -5338,7 +5219,7 @@ MsgGrantAllowanceResponse defines the Msg/GrantAllowanceResponse response type.
 <a name="cosmos.feegrant.v1beta1.MsgRevokeAllowance"></a>
 
 ### MsgRevokeAllowance
-MsgRevokeAllowance removes any existing Allowance from Granter to Grantee.
+MsgRevokeAllowance 删除从授予者到被授予者的任何现有津贴。
 
 
 | Field | Type | Label | Description |
@@ -5354,7 +5235,7 @@ MsgRevokeAllowance removes any existing Allowance from Granter to Grantee.
 <a name="cosmos.feegrant.v1beta1.MsgRevokeAllowanceResponse"></a>
 
 ### MsgRevokeAllowanceResponse
-MsgRevokeAllowanceResponse defines the Msg/RevokeAllowanceResponse response type.
+MsgRevokeAllowanceResponse 定义了 Msg/RevokeAllowanceResponse 响应类型。
 
 
 
@@ -5370,7 +5251,7 @@ MsgRevokeAllowanceResponse defines the Msg/RevokeAllowanceResponse response type
 <a name="cosmos.feegrant.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the feegrant msg service.
+Msg 定义了feegrant msg 服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -5391,7 +5272,7 @@ Msg defines the feegrant msg service.
 <a name="cosmos.genutil.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the raw genesis transaction in JSON.
+GenesisState 定义了 JSON 中的原始创世交易。
 
 
 | Field | Type | Label | Description |
@@ -5422,8 +5303,7 @@ GenesisState defines the raw genesis transaction in JSON.
 <a name="cosmos.gov.v1beta1.Deposit"></a>
 
 ### Deposit
-Deposit defines an amount deposited by an account address to an active
-proposal.
+存款定义了帐户地址存入的活跃提案的金额。
 
 
 | Field | Type | Label | Description |
@@ -5440,7 +5320,7 @@ proposal.
 <a name="cosmos.gov.v1beta1.DepositParams"></a>
 
 ### DepositParams
-DepositParams defines the params for deposits on governance proposals.
+DepositParams 定义了治理提案中存款的参数。
 
 
 | Field | Type | Label | Description |
@@ -5456,7 +5336,7 @@ DepositParams defines the params for deposits on governance proposals.
 <a name="cosmos.gov.v1beta1.Proposal"></a>
 
 ### Proposal
-Proposal defines the core field members of a governance proposal.
+提案定义了治理提案的核心字段成员。
 
 
 | Field | Type | Label | Description |
@@ -5479,7 +5359,7 @@ Proposal defines the core field members of a governance proposal.
 <a name="cosmos.gov.v1beta1.TallyParams"></a>
 
 ### TallyParams
-TallyParams defines the params for tallying votes on governance proposals.
+TallyParams 定义了用于统计治理提案投票的参数。
 
 
 | Field | Type | Label | Description |
@@ -5496,7 +5376,7 @@ TallyParams defines the params for tallying votes on governance proposals.
 <a name="cosmos.gov.v1beta1.TallyResult"></a>
 
 ### TallyResult
-TallyResult defines a standard tally for a governance proposal.
+TallyResult 定义了治理提案的标准计数。
 
 
 | Field | Type | Label | Description |
@@ -5514,8 +5394,7 @@ TallyResult defines a standard tally for a governance proposal.
 <a name="cosmos.gov.v1beta1.TextProposal"></a>
 
 ### TextProposal
-TextProposal defines a standard text proposal whose changes need to be
-manually updated in case of approval.
+TextProposal 定义了一个标准的文本提案，其更改需要在批准的情况下手动更新。
 
 
 | Field | Type | Label | Description |
@@ -5531,8 +5410,8 @@ manually updated in case of approval.
 <a name="cosmos.gov.v1beta1.Vote"></a>
 
 ### Vote
-Vote defines a vote on a governance proposal.
-A Vote consists of a proposal ID, the voter, and the vote option.
+投票定义了对治理提案的投票。
+投票由提案 ID、投票者和投票选项组成。
 
 
 | Field | Type | Label | Description |
@@ -5550,7 +5429,7 @@ A Vote consists of a proposal ID, the voter, and the vote option.
 <a name="cosmos.gov.v1beta1.VotingParams"></a>
 
 ### VotingParams
-VotingParams defines the params for voting on governance proposals.
+VotingParams 定义了对治理提案进行投票的参数。
 
 
 | Field | Type | Label | Description |
@@ -5565,7 +5444,7 @@ VotingParams defines the params for voting on governance proposals.
 <a name="cosmos.gov.v1beta1.WeightedVoteOption"></a>
 
 ### WeightedVoteOption
-WeightedVoteOption defines a unit of vote for vote split.
+WeightedVoteOption 定义了投票分裂的投票单位。
 
 Since: cosmos-sdk 0.43
 
@@ -5585,7 +5464,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.gov.v1beta1.ProposalStatus"></a>
 
 ### ProposalStatus
-ProposalStatus enumerates the valid statuses of a proposal.
+ProposalStatus 枚举提案的有效状态。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -5601,7 +5480,7 @@ ProposalStatus enumerates the valid statuses of a proposal.
 <a name="cosmos.gov.v1beta1.VoteOption"></a>
 
 ### VoteOption
-VoteOption enumerates the valid vote options for a given governance proposal.
+VoteOption 枚举给定治理提案的有效投票选项。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -5630,7 +5509,7 @@ VoteOption enumerates the valid vote options for a given governance proposal.
 <a name="cosmos.gov.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the gov module's genesis state.
+GenesisState 定义了 gov 模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -5667,7 +5546,7 @@ GenesisState defines the gov module's genesis state.
 <a name="cosmos.gov.v1beta1.QueryDepositRequest"></a>
 
 ### QueryDepositRequest
-QueryDepositRequest is the request type for the Query/Deposit RPC method.
+QueryDepositRequest 是 Query/Deposit RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -5683,7 +5562,7 @@ QueryDepositRequest is the request type for the Query/Deposit RPC method.
 <a name="cosmos.gov.v1beta1.QueryDepositResponse"></a>
 
 ### QueryDepositResponse
-QueryDepositResponse is the response type for the Query/Deposit RPC method.
+QueryDepositResponse 是 Query/Deposit RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5698,7 +5577,7 @@ QueryDepositResponse is the response type for the Query/Deposit RPC method.
 <a name="cosmos.gov.v1beta1.QueryDepositsRequest"></a>
 
 ### QueryDepositsRequest
-QueryDepositsRequest is the request type for the Query/Deposits RPC method.
+QueryDepositsRequest 是 Query/Deposits RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -5714,7 +5593,7 @@ QueryDepositsRequest is the request type for the Query/Deposits RPC method.
 <a name="cosmos.gov.v1beta1.QueryDepositsResponse"></a>
 
 ### QueryDepositsResponse
-QueryDepositsResponse is the response type for the Query/Deposits RPC method.
+QueryDepositsResponse 是 Query/Deposits RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5730,7 +5609,7 @@ QueryDepositsResponse is the response type for the Query/Deposits RPC method.
 <a name="cosmos.gov.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method.
+QueryParamsRequest 是 Query/Params RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -5745,7 +5624,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method.
 <a name="cosmos.gov.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method.
+QueryParamsResponse 是 Query/Params RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5762,7 +5641,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method.
 <a name="cosmos.gov.v1beta1.QueryProposalRequest"></a>
 
 ### QueryProposalRequest
-QueryProposalRequest is the request type for the Query/Proposal RPC method.
+QueryProposalRequest 是 Query/Proposal RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -5777,7 +5656,7 @@ QueryProposalRequest is the request type for the Query/Proposal RPC method.
 <a name="cosmos.gov.v1beta1.QueryProposalResponse"></a>
 
 ### QueryProposalResponse
-QueryProposalResponse is the response type for the Query/Proposal RPC method.
+QueryProposalResponse 是 Query/Proposal RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5792,7 +5671,7 @@ QueryProposalResponse is the response type for the Query/Proposal RPC method.
 <a name="cosmos.gov.v1beta1.QueryProposalsRequest"></a>
 
 ### QueryProposalsRequest
-QueryProposalsRequest is the request type for the Query/Proposals RPC method.
+QueryProposalsRequest 是 Query/Proposals RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -5810,8 +5689,7 @@ QueryProposalsRequest is the request type for the Query/Proposals RPC method.
 <a name="cosmos.gov.v1beta1.QueryProposalsResponse"></a>
 
 ### QueryProposalsResponse
-QueryProposalsResponse is the response type for the Query/Proposals RPC
-method.
+QueryProposalsResponse 是 Query/Proposals RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5827,7 +5705,7 @@ method.
 <a name="cosmos.gov.v1beta1.QueryTallyResultRequest"></a>
 
 ### QueryTallyResultRequest
-QueryTallyResultRequest is the request type for the Query/Tally RPC method.
+QueryTallyResultRequest 是 Query/Tally RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -5842,7 +5720,7 @@ QueryTallyResultRequest is the request type for the Query/Tally RPC method.
 <a name="cosmos.gov.v1beta1.QueryTallyResultResponse"></a>
 
 ### QueryTallyResultResponse
-QueryTallyResultResponse is the response type for the Query/Tally RPC method.
+QueryTallyResultResponse 是 Query/Tally RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5857,7 +5735,7 @@ QueryTallyResultResponse is the response type for the Query/Tally RPC method.
 <a name="cosmos.gov.v1beta1.QueryVoteRequest"></a>
 
 ### QueryVoteRequest
-QueryVoteRequest is the request type for the Query/Vote RPC method.
+QueryVoteRequest 是 Query/Vote RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -5873,7 +5751,7 @@ QueryVoteRequest is the request type for the Query/Vote RPC method.
 <a name="cosmos.gov.v1beta1.QueryVoteResponse"></a>
 
 ### QueryVoteResponse
-QueryVoteResponse is the response type for the Query/Vote RPC method.
+QueryVoteResponse 是 Query/Vote RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5888,7 +5766,7 @@ QueryVoteResponse is the response type for the Query/Vote RPC method.
 <a name="cosmos.gov.v1beta1.QueryVotesRequest"></a>
 
 ### QueryVotesRequest
-QueryVotesRequest is the request type for the Query/Votes RPC method.
+QueryVotesRequest 是 Query/Votes RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -5904,7 +5782,7 @@ QueryVotesRequest is the request type for the Query/Votes RPC method.
 <a name="cosmos.gov.v1beta1.QueryVotesResponse"></a>
 
 ### QueryVotesResponse
-QueryVotesResponse is the response type for the Query/Votes RPC method.
+QueryVotesResponse 是 Query/Votes RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -5926,7 +5804,7 @@ QueryVotesResponse is the response type for the Query/Votes RPC method.
 <a name="cosmos.gov.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service for gov module
+Query 定义了 gov 模块的 gRPC 查询器服务
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -5953,7 +5831,7 @@ Query defines the gRPC querier service for gov module
 <a name="cosmos.gov.v1beta1.MsgDeposit"></a>
 
 ### MsgDeposit
-MsgDeposit defines a message to submit a deposit to an existing proposal.
+MsgDeposit 定义了向现有提案提交存款的消息。
 
 
 | Field | Type | Label | Description |
@@ -5970,7 +5848,7 @@ MsgDeposit defines a message to submit a deposit to an existing proposal.
 <a name="cosmos.gov.v1beta1.MsgDepositResponse"></a>
 
 ### MsgDepositResponse
-MsgDepositResponse defines the Msg/Deposit response type.
+MsgDepositResponse 定义了 Msg/Deposit 响应类型。
 
 
 
@@ -5980,8 +5858,7 @@ MsgDepositResponse defines the Msg/Deposit response type.
 <a name="cosmos.gov.v1beta1.MsgSubmitProposal"></a>
 
 ### MsgSubmitProposal
-MsgSubmitProposal defines an sdk.Msg type that supports submitting arbitrary
-proposal Content.
+MsgSubmitProposal 定义了一个 sdk.Msg 类型，支持提交任意提案内容。
 
 
 | Field | Type | Label | Description |
@@ -5998,7 +5875,7 @@ proposal Content.
 <a name="cosmos.gov.v1beta1.MsgSubmitProposalResponse"></a>
 
 ### MsgSubmitProposalResponse
-MsgSubmitProposalResponse defines the Msg/SubmitProposal response type.
+MsgSubmitProposalResponse 定义了 Msg/SubmitProposal 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -6013,7 +5890,7 @@ MsgSubmitProposalResponse defines the Msg/SubmitProposal response type.
 <a name="cosmos.gov.v1beta1.MsgVote"></a>
 
 ### MsgVote
-MsgVote defines a message to cast a vote.
+MsgVote 定义了用于投票的消息。
 
 
 | Field | Type | Label | Description |
@@ -6030,7 +5907,7 @@ MsgVote defines a message to cast a vote.
 <a name="cosmos.gov.v1beta1.MsgVoteResponse"></a>
 
 ### MsgVoteResponse
-MsgVoteResponse defines the Msg/Vote response type.
+MsgVoteResponse 定义了 Msg/Vote 响应类型。
 
 
 
@@ -6040,7 +5917,7 @@ MsgVoteResponse defines the Msg/Vote response type.
 <a name="cosmos.gov.v1beta1.MsgVoteWeighted"></a>
 
 ### MsgVoteWeighted
-MsgVoteWeighted defines a message to cast a vote.
+MsgVoteWeighted 定义了用于投票的消息。
 
 Since: cosmos-sdk 0.43
 
@@ -6059,7 +5936,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.gov.v1beta1.MsgVoteWeightedResponse"></a>
 
 ### MsgVoteWeightedResponse
-MsgVoteWeightedResponse defines the Msg/VoteWeighted response type.
+MsgVoteWeightedResponse 定义了 Msg/VoteWeighted 响应类型。
 
 Since: cosmos-sdk 0.43
 
@@ -6077,7 +5954,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.gov.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the bank Msg service.
+Msg 定义了银行消息服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -6102,8 +5979,7 @@ Since: cosmos-sdk 0.43 | |
 <a name="cosmos.gov.v1beta2.Deposit"></a>
 
 ### Deposit
-Deposit defines an amount deposited by an account address to an active
-proposal.
+存款定义了帐户地址存入的活跃提案的金额。
 
 
 | Field | Type | Label | Description |
@@ -6120,7 +5996,7 @@ proposal.
 <a name="cosmos.gov.v1beta2.DepositParams"></a>
 
 ### DepositParams
-DepositParams defines the params for deposits on governance proposals.
+DepositParams 定义了治理提案中存款的参数。
 
 
 | Field | Type | Label | Description |
@@ -6136,7 +6012,7 @@ DepositParams defines the params for deposits on governance proposals.
 <a name="cosmos.gov.v1beta2.Proposal"></a>
 
 ### Proposal
-Proposal defines the core field members of a governance proposal.
+提案定义了治理提案的核心字段成员。
 
 
 | Field | Type | Label | Description |
@@ -6159,7 +6035,7 @@ Proposal defines the core field members of a governance proposal.
 <a name="cosmos.gov.v1beta2.TallyParams"></a>
 
 ### TallyParams
-TallyParams defines the params for tallying votes on governance proposals.
+TallyParams 定义了用于统计治理提案投票的参数。
 
 
 | Field | Type | Label | Description |
@@ -6176,7 +6052,7 @@ TallyParams defines the params for tallying votes on governance proposals.
 <a name="cosmos.gov.v1beta2.TallyResult"></a>
 
 ### TallyResult
-TallyResult defines a standard tally for a governance proposal.
+TallyResult 定义了治理提案的标准计数。
 
 
 | Field | Type | Label | Description |
@@ -6194,8 +6070,7 @@ TallyResult defines a standard tally for a governance proposal.
 <a name="cosmos.gov.v1beta2.Vote"></a>
 
 ### Vote
-Vote defines a vote on a governance proposal.
-A Vote consists of a proposal ID, the voter, and the vote option.
+Vote 定义了对治理提案的投票。Vote 由提案 ID、投票者和投票选项组成。
 
 
 | Field | Type | Label | Description |
@@ -6213,7 +6088,7 @@ A Vote consists of a proposal ID, the voter, and the vote option.
 <a name="cosmos.gov.v1beta2.VotingParams"></a>
 
 ### VotingParams
-VotingParams defines the params for voting on governance proposals.
+VotingParams 定义了对治理提案进行投票的参数。
 
 
 | Field | Type | Label | Description |
@@ -6228,7 +6103,7 @@ VotingParams defines the params for voting on governance proposals.
 <a name="cosmos.gov.v1beta2.WeightedVoteOption"></a>
 
 ### WeightedVoteOption
-WeightedVoteOption defines a unit of vote for vote split.
+WeightedVoteOption 定义了投票分裂的投票单位。
 
 
 | Field | Type | Label | Description |
@@ -6246,7 +6121,7 @@ WeightedVoteOption defines a unit of vote for vote split.
 <a name="cosmos.gov.v1beta2.ProposalStatus"></a>
 
 ### ProposalStatus
-ProposalStatus enumerates the valid statuses of a proposal.
+ProposalStatus 枚举提案的有效状态。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -6262,7 +6137,7 @@ ProposalStatus enumerates the valid statuses of a proposal.
 <a name="cosmos.gov.v1beta2.VoteOption"></a>
 
 ### VoteOption
-VoteOption enumerates the valid vote options for a given governance proposal.
+VoteOption 枚举给定治理提案的有效投票选项。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -6291,7 +6166,7 @@ VoteOption enumerates the valid vote options for a given governance proposal.
 <a name="cosmos.gov.v1beta2.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the gov module's genesis state.
+GenesisState 定义了 gov 模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -6328,7 +6203,7 @@ GenesisState defines the gov module's genesis state.
 <a name="cosmos.gov.v1beta2.QueryDepositRequest"></a>
 
 ### QueryDepositRequest
-QueryDepositRequest is the request type for the Query/Deposit RPC method.
+QueryDepositRequest 是 Query/Deposit RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -6344,7 +6219,7 @@ QueryDepositRequest is the request type for the Query/Deposit RPC method.
 <a name="cosmos.gov.v1beta2.QueryDepositResponse"></a>
 
 ### QueryDepositResponse
-QueryDepositResponse is the response type for the Query/Deposit RPC method.
+QueryDepositResponse 是 Query/Deposit RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -6359,7 +6234,7 @@ QueryDepositResponse is the response type for the Query/Deposit RPC method.
 <a name="cosmos.gov.v1beta2.QueryDepositsRequest"></a>
 
 ### QueryDepositsRequest
-QueryDepositsRequest is the request type for the Query/Deposits RPC method.
+QueryDepositsRequest 是 Query/Deposits RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -6375,7 +6250,7 @@ QueryDepositsRequest is the request type for the Query/Deposits RPC method.
 <a name="cosmos.gov.v1beta2.QueryDepositsResponse"></a>
 
 ### QueryDepositsResponse
-QueryDepositsResponse is the response type for the Query/Deposits RPC method.
+QueryDepositsResponse 是 Query/Deposits RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -6391,7 +6266,7 @@ QueryDepositsResponse is the response type for the Query/Deposits RPC method.
 <a name="cosmos.gov.v1beta2.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method.
+QueryParamsRequest 是 Query/Params RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -6406,7 +6281,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method.
 <a name="cosmos.gov.v1beta2.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method.
+QueryParamsResponse 是 Query/Params RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -6423,7 +6298,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method.
 <a name="cosmos.gov.v1beta2.QueryProposalRequest"></a>
 
 ### QueryProposalRequest
-QueryProposalRequest is the request type for the Query/Proposal RPC method.
+QueryProposalRequest 是 Query/Proposal RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -6438,7 +6313,7 @@ QueryProposalRequest is the request type for the Query/Proposal RPC method.
 <a name="cosmos.gov.v1beta2.QueryProposalResponse"></a>
 
 ### QueryProposalResponse
-QueryProposalResponse is the response type for the Query/Proposal RPC method.
+QueryProposalResponse 是 Query/Proposal RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -6453,7 +6328,7 @@ QueryProposalResponse is the response type for the Query/Proposal RPC method.
 <a name="cosmos.gov.v1beta2.QueryProposalsRequest"></a>
 
 ### QueryProposalsRequest
-QueryProposalsRequest is the request type for the Query/Proposals RPC method.
+QueryProposalsRequest 是 Query/Proposals RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -6471,8 +6346,7 @@ QueryProposalsRequest is the request type for the Query/Proposals RPC method.
 <a name="cosmos.gov.v1beta2.QueryProposalsResponse"></a>
 
 ### QueryProposalsResponse
-QueryProposalsResponse is the response type for the Query/Proposals RPC
-method.
+QueryProposalsResponse 是 Query/Proposals RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -6488,7 +6362,7 @@ method.
 <a name="cosmos.gov.v1beta2.QueryTallyResultRequest"></a>
 
 ### QueryTallyResultRequest
-QueryTallyResultRequest is the request type for the Query/Tally RPC method.
+QueryTallyResultRequest 是 Query/Tally RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -6503,7 +6377,7 @@ QueryTallyResultRequest is the request type for the Query/Tally RPC method.
 <a name="cosmos.gov.v1beta2.QueryTallyResultResponse"></a>
 
 ### QueryTallyResultResponse
-QueryTallyResultResponse is the response type for the Query/Tally RPC method.
+QueryTallyResultResponse 是 Query/Tally RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -6518,7 +6392,7 @@ QueryTallyResultResponse is the response type for the Query/Tally RPC method.
 <a name="cosmos.gov.v1beta2.QueryVoteRequest"></a>
 
 ### QueryVoteRequest
-QueryVoteRequest is the request type for the Query/Vote RPC method.
+QueryVoteRequest 是 Query/Vote RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -6534,7 +6408,7 @@ QueryVoteRequest is the request type for the Query/Vote RPC method.
 <a name="cosmos.gov.v1beta2.QueryVoteResponse"></a>
 
 ### QueryVoteResponse
-QueryVoteResponse is the response type for the Query/Vote RPC method.
+QueryVoteResponse 是 Query/Vote RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -6549,7 +6423,7 @@ QueryVoteResponse is the response type for the Query/Vote RPC method.
 <a name="cosmos.gov.v1beta2.QueryVotesRequest"></a>
 
 ### QueryVotesRequest
-QueryVotesRequest is the request type for the Query/Votes RPC method.
+QueryVotesRequestは、Query / VotesRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -6565,7 +6439,7 @@ QueryVotesRequest is the request type for the Query/Votes RPC method.
 <a name="cosmos.gov.v1beta2.QueryVotesResponse"></a>
 
 ### QueryVotesResponse
-QueryVotesResponse is the response type for the Query/Votes RPC method.
+QueryVotesResponse 是 Query/Votes RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -6587,7 +6461,7 @@ QueryVotesResponse is the response type for the Query/Votes RPC method.
 <a name="cosmos.gov.v1beta2.Query"></a>
 
 ### Query
-Query defines the gRPC querier service for gov module
+Query 定义了 gov 模块的 gRPC 查询器服务
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -6614,7 +6488,7 @@ Query defines the gRPC querier service for gov module
 <a name="cosmos.gov.v1beta2.MsgDeposit"></a>
 
 ### MsgDeposit
-MsgDeposit defines a message to submit a deposit to an existing proposal.
+MsgDeposit 定义了向现有提案提交存款的消息。
 
 
 | Field | Type | Label | Description |
@@ -6631,7 +6505,7 @@ MsgDeposit defines a message to submit a deposit to an existing proposal.
 <a name="cosmos.gov.v1beta2.MsgDepositResponse"></a>
 
 ### MsgDepositResponse
-MsgDepositResponse defines the Msg/Deposit response type.
+MsgDepositResponse 定义了 Msg/Deposit 响应类型。
 
 
 
@@ -6641,8 +6515,7 @@ MsgDepositResponse defines the Msg/Deposit response type.
 <a name="cosmos.gov.v1beta2.MsgSubmitProposal"></a>
 
 ### MsgSubmitProposal
-MsgSubmitProposal defines an sdk.Msg type that supports submitting arbitrary
-proposal Content.
+MsgSubmitProposal 定义了一个 sdk.Msg 类型，支持提交任意提案内容。
 
 
 | Field | Type | Label | Description |
@@ -6659,7 +6532,7 @@ proposal Content.
 <a name="cosmos.gov.v1beta2.MsgSubmitProposalResponse"></a>
 
 ### MsgSubmitProposalResponse
-MsgSubmitProposalResponse defines the Msg/SubmitProposal response type.
+MsgSubmitProposalResponse 定义了 Msg/SubmitProposal 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -6674,7 +6547,7 @@ MsgSubmitProposalResponse defines the Msg/SubmitProposal response type.
 <a name="cosmos.gov.v1beta2.MsgVote"></a>
 
 ### MsgVote
-MsgVote defines a message to cast a vote.
+MsgVote 定义了用于投票的消息。
 
 
 | Field | Type | Label | Description |
@@ -6691,7 +6564,7 @@ MsgVote defines a message to cast a vote.
 <a name="cosmos.gov.v1beta2.MsgVoteResponse"></a>
 
 ### MsgVoteResponse
-MsgVoteResponse defines the Msg/Vote response type.
+MsgVoteResponse 定义了 Msg/Vote 响应类型。
 
 
 
@@ -6701,7 +6574,7 @@ MsgVoteResponse defines the Msg/Vote response type.
 <a name="cosmos.gov.v1beta2.MsgVoteWeighted"></a>
 
 ### MsgVoteWeighted
-MsgVoteWeighted defines a message to cast a vote.
+MsgVoteWeighted 定义了用于投票的消息。
 
 Since: cosmos-sdk 0.43
 
@@ -6720,7 +6593,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.gov.v1beta2.MsgVoteWeightedResponse"></a>
 
 ### MsgVoteWeightedResponse
-MsgVoteWeightedResponse defines the Msg/VoteWeighted response type.
+MsgVoteWeightedResponse 定义了 Msg/VoteWeighted 响应类型。
 
 Since: cosmos-sdk 0.43
 
@@ -6738,7 +6611,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.gov.v1beta2.Msg"></a>
 
 ### Msg
-Msg defines the gov Msg service.
+Msg 定义了gov Msg 服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -6763,7 +6636,7 @@ Since: cosmos-sdk 0.43 | |
 <a name="cosmos.group.v1beta1.EventCreateGroup"></a>
 
 ### EventCreateGroup
-EventCreateGroup is an event emitted when a group is created.
+EventCreateGroup 是在创建组时发出的事件。
 
 
 | Field | Type | Label | Description |
@@ -6778,7 +6651,7 @@ EventCreateGroup is an event emitted when a group is created.
 <a name="cosmos.group.v1beta1.EventCreateGroupAccount"></a>
 
 ### EventCreateGroupAccount
-EventCreateGroupAccount is an event emitted when a group account is created.
+EventCreateGroupAccount 是在创建组帐户时发出的事件。
 
 
 | Field | Type | Label | Description |
@@ -6793,7 +6666,7 @@ EventCreateGroupAccount is an event emitted when a group account is created.
 <a name="cosmos.group.v1beta1.EventCreateProposal"></a>
 
 ### EventCreateProposal
-EventCreateProposal is an event emitted when a proposal is created.
+EventCreateProposal 是在创建提案时发出的事件。
 
 
 | Field | Type | Label | Description |
@@ -6808,7 +6681,7 @@ EventCreateProposal is an event emitted when a proposal is created.
 <a name="cosmos.group.v1beta1.EventExec"></a>
 
 ### EventExec
-EventExec is an event emitted when a proposal is executed.
+EventExec 是在执行提案时发出的事件。
 
 
 | Field | Type | Label | Description |
@@ -6823,7 +6696,7 @@ EventExec is an event emitted when a proposal is executed.
 <a name="cosmos.group.v1beta1.EventUpdateGroup"></a>
 
 ### EventUpdateGroup
-EventUpdateGroup is an event emitted when a group is updated.
+EventUpdateGroup 是更新组时发出的事件。
 
 
 | Field | Type | Label | Description |
@@ -6838,7 +6711,7 @@ EventUpdateGroup is an event emitted when a group is updated.
 <a name="cosmos.group.v1beta1.EventUpdateGroupAccount"></a>
 
 ### EventUpdateGroupAccount
-EventUpdateGroupAccount is an event emitted when a group account is updated.
+EventUpdateGroupAccount 是更新组帐户时发出的事件。
 
 
 | Field | Type | Label | Description |
@@ -6853,7 +6726,7 @@ EventUpdateGroupAccount is an event emitted when a group account is updated.
 <a name="cosmos.group.v1beta1.EventVote"></a>
 
 ### EventVote
-EventVote is an event emitted when a voter votes on a proposal.
+eventVote是在选民投票上提案时发出的活动。
 
 
 | Field | Type | Label | Description |
@@ -6884,7 +6757,7 @@ EventVote is an event emitted when a voter votes on a proposal.
 <a name="cosmos.group.v1beta1.GroupAccountInfo"></a>
 
 ### GroupAccountInfo
-GroupAccountInfo represents the high-level on-chain information for a group account.
+GroupAccountInfo 代表一个群组账户的高级链上信息。
 
 
 | Field | Type | Label | Description |
@@ -6904,7 +6777,7 @@ GroupAccountInfo represents the high-level on-chain information for a group acco
 <a name="cosmos.group.v1beta1.GroupInfo"></a>
 
 ### GroupInfo
-GroupInfo represents the high-level on-chain information for a group.
+GroupInfo 代表一个组的高级链上信息。
 
 
 | Field | Type | Label | Description |
@@ -6923,7 +6796,7 @@ GroupInfo represents the high-level on-chain information for a group.
 <a name="cosmos.group.v1beta1.GroupMember"></a>
 
 ### GroupMember
-GroupMember represents the relationship between a group and a member.
+GroupMember 表示组和成员之间的关系。
 
 
 | Field | Type | Label | Description |
@@ -6939,8 +6812,7 @@ GroupMember represents the relationship between a group and a member.
 <a name="cosmos.group.v1beta1.Member"></a>
 
 ### Member
-Member represents a group member with an account address,
-non-zero weight and metadata.
+Member 代表具有帐户地址、非零权重和元数据的组成员。
 
 
 | Field | Type | Label | Description |
@@ -6957,7 +6829,7 @@ non-zero weight and metadata.
 <a name="cosmos.group.v1beta1.Members"></a>
 
 ### Members
-Members defines a repeated slice of Member objects.
+成员定义了成员对象的重复切片。
 
 
 | Field | Type | Label | Description |
@@ -6972,10 +6844,8 @@ Members defines a repeated slice of Member objects.
 <a name="cosmos.group.v1beta1.Proposal"></a>
 
 ### Proposal
-Proposal defines a group proposal. Any member of a group can submit a proposal
-for a group account to decide upon.
-A proposal consists of a set of `sdk.Msg`s that will be executed if the proposal
-passes as well as some optional metadata associated with the proposal.
+提案定义了一个组提案。 群组的任何成员都可以提交提案以供群组帐户决定。
+一个提案由一组 `sdk.Msg` 组成，如果提案通过，将执行这些 `sdk.Msg` 以及与提案相关的一些可选元数据。
 
 
 | Field | Type | Label | Description |
@@ -7002,7 +6872,7 @@ passes as well as some optional metadata associated with the proposal.
 <a name="cosmos.group.v1beta1.Tally"></a>
 
 ### Tally
-Tally represents the sum of weighted votes.
+Tally 代表加权投票的总和。
 
 
 | Field | Type | Label | Description |
@@ -7020,7 +6890,7 @@ Tally represents the sum of weighted votes.
 <a name="cosmos.group.v1beta1.ThresholdDecisionPolicy"></a>
 
 ### ThresholdDecisionPolicy
-ThresholdDecisionPolicy implements the DecisionPolicy interface
+ThresholdDecisionPolicy 实现了 DecisionPolicy 接口
 
 
 | Field | Type | Label | Description |
@@ -7036,7 +6906,7 @@ ThresholdDecisionPolicy implements the DecisionPolicy interface
 <a name="cosmos.group.v1beta1.Vote"></a>
 
 ### Vote
-Vote represents a vote for a proposal.
+Vote 代表对提案的投票。
 
 
 | Field | Type | Label | Description |
@@ -7057,7 +6927,7 @@ Vote represents a vote for a proposal.
 <a name="cosmos.group.v1beta1.Choice"></a>
 
 ### Choice
-Choice defines available types of choices for voting.
+选择定义了可用的投票选择类型。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -7072,7 +6942,7 @@ Choice defines available types of choices for voting.
 <a name="cosmos.group.v1beta1.Proposal.ExecutorResult"></a>
 
 ### Proposal.ExecutorResult
-ExecutorResult defines types of proposal executor results.
+ExecutorResult 定义了提案执行器结果的类型。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -7086,7 +6956,7 @@ ExecutorResult defines types of proposal executor results.
 <a name="cosmos.group.v1beta1.Proposal.Result"></a>
 
 ### Proposal.Result
-Result defines types of proposal results.
+结果定义了提案结果的类型。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -7100,7 +6970,7 @@ Result defines types of proposal results.
 <a name="cosmos.group.v1beta1.Proposal.Status"></a>
 
 ### Proposal.Status
-Status defines proposal statuses.
+状态定义提案状态。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -7128,7 +6998,7 @@ Status defines proposal statuses.
 <a name="cosmos.group.v1beta1.QueryGroupAccountInfoRequest"></a>
 
 ### QueryGroupAccountInfoRequest
-QueryGroupAccountInfoRequest is the Query/GroupAccountInfo request type.
+QueryGroupAccountInfoRequest 是 Query/GroupAccountInfo 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7143,7 +7013,7 @@ QueryGroupAccountInfoRequest is the Query/GroupAccountInfo request type.
 <a name="cosmos.group.v1beta1.QueryGroupAccountInfoResponse"></a>
 
 ### QueryGroupAccountInfoResponse
-QueryGroupAccountInfoResponse is the Query/GroupAccountInfo response type.
+QueryGroupAccountInfoResponse 是 Query/GroupAccountInfo 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7158,7 +7028,7 @@ QueryGroupAccountInfoResponse is the Query/GroupAccountInfo response type.
 <a name="cosmos.group.v1beta1.QueryGroupAccountsByAdminRequest"></a>
 
 ### QueryGroupAccountsByAdminRequest
-QueryGroupAccountsByAdminRequest is the Query/GroupAccountsByAdmin request type.
+QueryGroupAccountsByAdminRequest 是 Query/GroupAccountsByAdmin 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7174,7 +7044,7 @@ QueryGroupAccountsByAdminRequest is the Query/GroupAccountsByAdmin request type.
 <a name="cosmos.group.v1beta1.QueryGroupAccountsByAdminResponse"></a>
 
 ### QueryGroupAccountsByAdminResponse
-QueryGroupAccountsByAdminResponse is the Query/GroupAccountsByAdmin response type.
+QueryGroupAccountsByAdminResponse 是 Query/GroupAccountsByAdmin 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7190,7 +7060,7 @@ QueryGroupAccountsByAdminResponse is the Query/GroupAccountsByAdmin response typ
 <a name="cosmos.group.v1beta1.QueryGroupAccountsByGroupRequest"></a>
 
 ### QueryGroupAccountsByGroupRequest
-QueryGroupAccountsByGroupRequest is the Query/GroupAccountsByGroup request type.
+QueryGroupAccountsByGroupRequest 是 Query/GroupAccountsByGroup 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7206,7 +7076,7 @@ QueryGroupAccountsByGroupRequest is the Query/GroupAccountsByGroup request type.
 <a name="cosmos.group.v1beta1.QueryGroupAccountsByGroupResponse"></a>
 
 ### QueryGroupAccountsByGroupResponse
-QueryGroupAccountsByGroupResponse is the Query/GroupAccountsByGroup response type.
+QueryGroupAccountsByGroupResponse 是 Query/GroupAccountsByGroup 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7222,7 +7092,7 @@ QueryGroupAccountsByGroupResponse is the Query/GroupAccountsByGroup response typ
 <a name="cosmos.group.v1beta1.QueryGroupInfoRequest"></a>
 
 ### QueryGroupInfoRequest
-QueryGroupInfoRequest is the Query/GroupInfo request type.
+QueryGroupInfoRequest 是 Query/GroupInfo 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7237,7 +7107,7 @@ QueryGroupInfoRequest is the Query/GroupInfo request type.
 <a name="cosmos.group.v1beta1.QueryGroupInfoResponse"></a>
 
 ### QueryGroupInfoResponse
-QueryGroupInfoResponse is the Query/GroupInfo response type.
+QueryGroupInfoResponse 是 Query/GroupInfo 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7252,7 +7122,7 @@ QueryGroupInfoResponse is the Query/GroupInfo response type.
 <a name="cosmos.group.v1beta1.QueryGroupMembersRequest"></a>
 
 ### QueryGroupMembersRequest
-QueryGroupMembersRequest is the Query/GroupMembers request type.
+QueryGroupMembersRequest 是 Query/GroupMembers 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7268,7 +7138,7 @@ QueryGroupMembersRequest is the Query/GroupMembers request type.
 <a name="cosmos.group.v1beta1.QueryGroupMembersResponse"></a>
 
 ### QueryGroupMembersResponse
-QueryGroupMembersResponse is the Query/GroupMembersResponse response type.
+QueryGroupMembersResponse 是 Query/GroupMembersResponse 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7284,7 +7154,7 @@ QueryGroupMembersResponse is the Query/GroupMembersResponse response type.
 <a name="cosmos.group.v1beta1.QueryGroupsByAdminRequest"></a>
 
 ### QueryGroupsByAdminRequest
-QueryGroupsByAdminRequest is the Query/GroupsByAdmin request type.
+QueryGroupsByAdminRequest 是 Query/GroupsByAdmin 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7300,7 +7170,7 @@ QueryGroupsByAdminRequest is the Query/GroupsByAdmin request type.
 <a name="cosmos.group.v1beta1.QueryGroupsByAdminResponse"></a>
 
 ### QueryGroupsByAdminResponse
-QueryGroupsByAdminResponse is the Query/GroupsByAdminResponse response type.
+QueryGroupsByAdminResponse 是 Query/GroupsByAdminResponse 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7316,7 +7186,7 @@ QueryGroupsByAdminResponse is the Query/GroupsByAdminResponse response type.
 <a name="cosmos.group.v1beta1.QueryProposalRequest"></a>
 
 ### QueryProposalRequest
-QueryProposalRequest is the Query/Proposal request type.
+QueryProposalRequest 是查询/建议请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7331,7 +7201,7 @@ QueryProposalRequest is the Query/Proposal request type.
 <a name="cosmos.group.v1beta1.QueryProposalResponse"></a>
 
 ### QueryProposalResponse
-QueryProposalResponse is the Query/Proposal response type.
+QueryProposalResponse 是查询/建议响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7346,7 +7216,7 @@ QueryProposalResponse is the Query/Proposal response type.
 <a name="cosmos.group.v1beta1.QueryProposalsByGroupAccountRequest"></a>
 
 ### QueryProposalsByGroupAccountRequest
-QueryProposalsByGroupAccountRequest is the Query/ProposalByGroupAccount request type.
+QueryProposalsByGroupAccountRequest 是 Query/ProposalByGroupAccount 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7362,7 +7232,7 @@ QueryProposalsByGroupAccountRequest is the Query/ProposalByGroupAccount request 
 <a name="cosmos.group.v1beta1.QueryProposalsByGroupAccountResponse"></a>
 
 ### QueryProposalsByGroupAccountResponse
-QueryProposalsByGroupAccountResponse is the Query/ProposalByGroupAccount response type.
+QueryProposalsByGroupAccountResponse 是 Query/ProposalByGroupAccount 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7378,7 +7248,7 @@ QueryProposalsByGroupAccountResponse is the Query/ProposalByGroupAccount respons
 <a name="cosmos.group.v1beta1.QueryVoteByProposalVoterRequest"></a>
 
 ### QueryVoteByProposalVoterRequest
-QueryVoteByProposalVoterRequest is the Query/VoteByProposalVoter request type.
+QueryVoteByProposalVoterRequest 是 Query/VoteByProposalVoter 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7394,7 +7264,7 @@ QueryVoteByProposalVoterRequest is the Query/VoteByProposalVoter request type.
 <a name="cosmos.group.v1beta1.QueryVoteByProposalVoterResponse"></a>
 
 ### QueryVoteByProposalVoterResponse
-QueryVoteByProposalVoterResponse is the Query/VoteByProposalVoter response type.
+QueryVoteByProposalVoterResponse 是 Query/VoteByProposalVoter 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7409,7 +7279,7 @@ QueryVoteByProposalVoterResponse is the Query/VoteByProposalVoter response type.
 <a name="cosmos.group.v1beta1.QueryVotesByProposalRequest"></a>
 
 ### QueryVotesByProposalRequest
-QueryVotesByProposalRequest is the Query/VotesByProposal request type.
+QueryVotesByProposalRequest 是 Query/VotesByProposal 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7425,7 +7295,7 @@ QueryVotesByProposalRequest is the Query/VotesByProposal request type.
 <a name="cosmos.group.v1beta1.QueryVotesByProposalResponse"></a>
 
 ### QueryVotesByProposalResponse
-QueryVotesByProposalResponse is the Query/VotesByProposal response type.
+QueryVotesByProposalResponse 是 Query/VotesByProposal 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7441,7 +7311,7 @@ QueryVotesByProposalResponse is the Query/VotesByProposal response type.
 <a name="cosmos.group.v1beta1.QueryVotesByVoterRequest"></a>
 
 ### QueryVotesByVoterRequest
-QueryVotesByVoterRequest is the Query/VotesByVoter request type.
+QueryVotesByVoterRequest 是 Query/VotesByVoter 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7457,7 +7327,7 @@ QueryVotesByVoterRequest is the Query/VotesByVoter request type.
 <a name="cosmos.group.v1beta1.QueryVotesByVoterResponse"></a>
 
 ### QueryVotesByVoterResponse
-QueryVotesByVoterResponse is the Query/VotesByVoter response type.
+QueryVotesByVoterResponse 是 Query/VotesByVoter 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7479,7 +7349,7 @@ QueryVotesByVoterResponse is the Query/VotesByVoter response type.
 <a name="cosmos.group.v1beta1.Query"></a>
 
 ### Query
-Query is the cosmos.group.v1beta1 Query service.
+Query是 cosmos.group.v1beta1 查询服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -7509,7 +7379,7 @@ Query is the cosmos.group.v1beta1 Query service.
 <a name="cosmos.group.v1beta1.MsgCreateGroup"></a>
 
 ### MsgCreateGroup
-MsgCreateGroup is the Msg/CreateGroup request type.
+MsgCreateGroup 是 Msg/CreateGroup 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7526,7 +7396,7 @@ MsgCreateGroup is the Msg/CreateGroup request type.
 <a name="cosmos.group.v1beta1.MsgCreateGroupAccount"></a>
 
 ### MsgCreateGroupAccount
-MsgCreateGroupAccount is the Msg/CreateGroupAccount request type.
+MsgCreateGroupAccount 是 Msg/CreateGroupAccount 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7544,7 +7414,7 @@ MsgCreateGroupAccount is the Msg/CreateGroupAccount request type.
 <a name="cosmos.group.v1beta1.MsgCreateGroupAccountResponse"></a>
 
 ### MsgCreateGroupAccountResponse
-MsgCreateGroupAccountResponse is the Msg/CreateGroupAccount response type.
+MsgCreateGroupAccountResponse 是 Msg/CreateGroupAccount 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7559,7 +7429,7 @@ MsgCreateGroupAccountResponse is the Msg/CreateGroupAccount response type.
 <a name="cosmos.group.v1beta1.MsgCreateGroupResponse"></a>
 
 ### MsgCreateGroupResponse
-MsgCreateGroupResponse is the Msg/CreateGroup response type.
+MsgCreateGroupResponse 是 Msg/CreateGroup 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7574,7 +7444,7 @@ MsgCreateGroupResponse is the Msg/CreateGroup response type.
 <a name="cosmos.group.v1beta1.MsgCreateProposal"></a>
 
 ### MsgCreateProposal
-MsgCreateProposal is the Msg/CreateProposal request type.
+MsgCreateProposal 是 Msg/CreateProposal 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7593,7 +7463,7 @@ MsgCreateProposal is the Msg/CreateProposal request type.
 <a name="cosmos.group.v1beta1.MsgCreateProposalResponse"></a>
 
 ### MsgCreateProposalResponse
-MsgCreateProposalResponse is the Msg/CreateProposal response type.
+MsgCreateProposalResponse 是 Msg/CreateProposal 响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7608,7 +7478,7 @@ MsgCreateProposalResponse is the Msg/CreateProposal response type.
 <a name="cosmos.group.v1beta1.MsgExec"></a>
 
 ### MsgExec
-MsgExec is the Msg/Exec request type.
+MsgExec 是 Msg/Exec 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7624,7 +7494,7 @@ MsgExec is the Msg/Exec request type.
 <a name="cosmos.group.v1beta1.MsgExecResponse"></a>
 
 ### MsgExecResponse
-MsgExecResponse is the Msg/Exec request type.
+Msg Exec Response 是Message/Exec 请求类型。
 
 
 
@@ -7634,7 +7504,7 @@ MsgExecResponse is the Msg/Exec request type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountAdmin"></a>
 
 ### MsgUpdateGroupAccountAdmin
-MsgUpdateGroupAccountAdmin is the Msg/UpdateGroupAccountAdmin request type.
+MsgUpdateGroupAccountAdmin 是 Msg/UpdateGroupAccountAdmin 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7651,7 +7521,7 @@ MsgUpdateGroupAccountAdmin is the Msg/UpdateGroupAccountAdmin request type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountAdminResponse"></a>
 
 ### MsgUpdateGroupAccountAdminResponse
-MsgUpdateGroupAccountAdminResponse is the Msg/UpdateGroupAccountAdmin response type.
+MsgUpdateGroupAccountAdminResponse 是 Msg/UpdateGroupAccountAdmin 响应类型。
 
 
 
@@ -7661,7 +7531,7 @@ MsgUpdateGroupAccountAdminResponse is the Msg/UpdateGroupAccountAdmin response t
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountDecisionPolicy"></a>
 
 ### MsgUpdateGroupAccountDecisionPolicy
-MsgUpdateGroupAccountDecisionPolicy is the Msg/UpdateGroupAccountDecisionPolicy request type.
+MsgUpdateGroupAccountDecisionPolicy 是 Msg/UpdateGroupAccountDecisionPolicy 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7678,7 +7548,7 @@ MsgUpdateGroupAccountDecisionPolicy is the Msg/UpdateGroupAccountDecisionPolicy 
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountDecisionPolicyResponse"></a>
 
 ### MsgUpdateGroupAccountDecisionPolicyResponse
-MsgUpdateGroupAccountDecisionPolicyResponse is the Msg/UpdateGroupAccountDecisionPolicy response type.
+MsgUpdateGroupAccountDecisionPolicyResponse 是 Msg/UpdateGroupAccountDecisionPolicy 响应类型。
 
 
 
@@ -7688,7 +7558,7 @@ MsgUpdateGroupAccountDecisionPolicyResponse is the Msg/UpdateGroupAccountDecisio
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountMetadata"></a>
 
 ### MsgUpdateGroupAccountMetadata
-MsgUpdateGroupAccountMetadata is the Msg/UpdateGroupAccountMetadata request type.
+MsgUpdateGroupAccountMetadata 是 Msg/UpdateGroupAccountMetadata 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7705,7 +7575,7 @@ MsgUpdateGroupAccountMetadata is the Msg/UpdateGroupAccountMetadata request type
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountMetadataResponse"></a>
 
 ### MsgUpdateGroupAccountMetadataResponse
-MsgUpdateGroupAccountMetadataResponse is the Msg/UpdateGroupAccountMetadata response type.
+MsgUpdateGroupAccountMetadataResponse 是 Msg/UpdateGroupAccountMetadata 响应类型。
 
 
 
@@ -7715,7 +7585,7 @@ MsgUpdateGroupAccountMetadataResponse is the Msg/UpdateGroupAccountMetadata resp
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAdmin"></a>
 
 ### MsgUpdateGroupAdmin
-MsgUpdateGroupAdmin is the Msg/UpdateGroupAdmin request type.
+MsgUpdateGroupAdmin 是 Msg/UpdateGroupAdmin 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7732,7 +7602,7 @@ MsgUpdateGroupAdmin is the Msg/UpdateGroupAdmin request type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAdminResponse"></a>
 
 ### MsgUpdateGroupAdminResponse
-MsgUpdateGroupAdminResponse is the Msg/UpdateGroupAdmin response type.
+MsgUpdateGroupAdminResponse 是 Msg/UpdateGroupAdmin 响应类型。
 
 
 
@@ -7742,7 +7612,7 @@ MsgUpdateGroupAdminResponse is the Msg/UpdateGroupAdmin response type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupMembers"></a>
 
 ### MsgUpdateGroupMembers
-MsgUpdateGroupMembers is the Msg/UpdateGroupMembers request type.
+消息更新组成员是消息/更新组成员请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7759,7 +7629,7 @@ MsgUpdateGroupMembers is the Msg/UpdateGroupMembers request type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupMembersResponse"></a>
 
 ### MsgUpdateGroupMembersResponse
-MsgUpdateGroupMembersResponse is the Msg/UpdateGroupMembers response type.
+MsgUpdateGroupMembersResponse 是 Msg/UpdateGroupMembers 响应类型。
 
 
 
@@ -7769,7 +7639,7 @@ MsgUpdateGroupMembersResponse is the Msg/UpdateGroupMembers response type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupMetadata"></a>
 
 ### MsgUpdateGroupMetadata
-MsgUpdateGroupMetadata is the Msg/UpdateGroupMetadata request type.
+MsgUpdateGroupMetadata 是 Msg/UpdateGroupMetadata 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7786,7 +7656,7 @@ MsgUpdateGroupMetadata is the Msg/UpdateGroupMetadata request type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupMetadataResponse"></a>
 
 ### MsgUpdateGroupMetadataResponse
-MsgUpdateGroupMetadataResponse is the Msg/UpdateGroupMetadata response type.
+MsgUpdateGroupMetadataResponse 是 Msg/UpdateGroupMetadata 响应类型。
 
 
 
@@ -7796,7 +7666,7 @@ MsgUpdateGroupMetadataResponse is the Msg/UpdateGroupMetadata response type.
 <a name="cosmos.group.v1beta1.MsgVote"></a>
 
 ### MsgVote
-MsgVote is the Msg/Vote request type.
+MsgVote 是 Msg/Vote 请求类型。
 
 
 | Field | Type | Label | Description |
@@ -7815,7 +7685,7 @@ MsgVote is the Msg/Vote request type.
 <a name="cosmos.group.v1beta1.MsgVoteResponse"></a>
 
 ### MsgVoteResponse
-MsgVoteResponse is the Msg/Vote response type.
+MsgVoteResponse 是 Msg/Vote 响应类型。
 
 
 
@@ -7827,7 +7697,7 @@ MsgVoteResponse is the Msg/Vote response type.
 <a name="cosmos.group.v1beta1.Exec"></a>
 
 ### Exec
-Exec defines modes of execution of a proposal on creation or on new vote.
+Exec 定义了提案在创建或新投票时的执行模式。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -7843,7 +7713,7 @@ Exec defines modes of execution of a proposal on creation or on new vote.
 <a name="cosmos.group.v1beta1.Msg"></a>
 
 ### Msg
-Msg is the cosmos.group.v1beta1 Msg service.
+消息是 cosmos.group.v1beta1 消息服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -7873,7 +7743,7 @@ Msg is the cosmos.group.v1beta1 Msg service.
 <a name="cosmos.mint.v1beta1.Minter"></a>
 
 ### Minter
-Minter represents the minting state.
+Minter 代表铸币状态。
 
 
 | Field | Type | Label | Description |
@@ -7889,7 +7759,7 @@ Minter represents the minting state.
 <a name="cosmos.mint.v1beta1.Params"></a>
 
 ### Params
-Params holds parameters for the mint module.
+Params 保存 mint 模块的参数。
 
 
 | Field | Type | Label | Description |
@@ -7925,7 +7795,7 @@ Params holds parameters for the mint module.
 <a name="cosmos.mint.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the mint module's genesis state.
+GenesisState 定义了 mint 模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -7957,8 +7827,7 @@ GenesisState defines the mint module's genesis state.
 <a name="cosmos.mint.v1beta1.QueryAnnualProvisionsRequest"></a>
 
 ### QueryAnnualProvisionsRequest
-QueryAnnualProvisionsRequest is the request type for the
-Query/AnnualProvisions RPC method.
+QueryAnnualProvisionsRequest 是 Query/AnnualProvisions RPC 方法的请求类型。
 
 
 
@@ -7968,8 +7837,7 @@ Query/AnnualProvisions RPC method.
 <a name="cosmos.mint.v1beta1.QueryAnnualProvisionsResponse"></a>
 
 ### QueryAnnualProvisionsResponse
-QueryAnnualProvisionsResponse is the response type for the
-Query/AnnualProvisions RPC method.
+QueryAnnualProvisionsResponse 是 Query/AnnualProvisions RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7984,7 +7852,7 @@ Query/AnnualProvisions RPC method.
 <a name="cosmos.mint.v1beta1.QueryInflationRequest"></a>
 
 ### QueryInflationRequest
-QueryInflationRequest is the request type for the Query/Inflation RPC method.
+QueryInflationRequest 是 Query/Inflation RPC 方法的请求类型。
 
 
 
@@ -7994,8 +7862,7 @@ QueryInflationRequest is the request type for the Query/Inflation RPC method.
 <a name="cosmos.mint.v1beta1.QueryInflationResponse"></a>
 
 ### QueryInflationResponse
-QueryInflationResponse is the response type for the Query/Inflation RPC
-method.
+QueryInflationResponse 是 Query/Inflation RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -8010,7 +7877,7 @@ method.
 <a name="cosmos.mint.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method.
+QueryParamsRequest 是 Query/Params RPC 方法的请求类型。
 
 
 
@@ -8020,7 +7887,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method.
 <a name="cosmos.mint.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method.
+QueryParamsResponse 是 Query/Params RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -8041,7 +7908,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method.
 <a name="cosmos.mint.v1beta1.Query"></a>
 
 ### Query
-Query provides defines the gRPC querier service.
+Query 提供定义了 gRPC 查询器服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8063,7 +7930,7 @@ Query provides defines the gRPC querier service.
 <a name="cosmos.nft.v1beta1.EventBurn"></a>
 
 ### EventBurn
-EventBurn is emitted on Burn
+EventBurn 在 Burn 上发出
 
 
 | Field | Type | Label | Description |
@@ -8080,7 +7947,7 @@ EventBurn is emitted on Burn
 <a name="cosmos.nft.v1beta1.EventMint"></a>
 
 ### EventMint
-EventMint is emitted on Mint
+EventMint 在 Mint 上发出
 
 
 | Field | Type | Label | Description |
@@ -8097,7 +7964,7 @@ EventMint is emitted on Mint
 <a name="cosmos.nft.v1beta1.EventSend"></a>
 
 ### EventSend
-EventSend is emitted on Msg/Send
+EventSend 在 Msg/Send 上发出
 
 
 | Field | Type | Label | Description |
@@ -8131,7 +7998,7 @@ EventSend is emitted on Msg/Send
 <a name="cosmos.nft.v1beta1.Class"></a>
 
 ### Class
-Class defines the class of the nft type.
+Class 定义了 nft 类型的类。
 
 
 | Field | Type | Label | Description |
@@ -8152,7 +8019,7 @@ Class defines the class of the nft type.
 <a name="cosmos.nft.v1beta1.NFT"></a>
 
 ### NFT
-NFT defines the NFT.
+NFT 定义了 NFT。
 
 
 | Field | Type | Label | Description |
@@ -8187,7 +8054,7 @@ NFT defines the NFT.
 <a name="cosmos.nft.v1beta1.Entry"></a>
 
 ### Entry
-Entry Defines all nft owned by a person
+条目定义一个人拥有的所有 nft
 
 
 | Field | Type | Label | Description |
@@ -8203,7 +8070,7 @@ Entry Defines all nft owned by a person
 <a name="cosmos.nft.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the nft module's genesis state.
+GenesisState 定义了 nft 模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -8235,7 +8102,7 @@ GenesisState defines the nft module's genesis state.
 <a name="cosmos.nft.v1beta1.QueryBalanceRequest"></a>
 
 ### QueryBalanceRequest
-QueryBalanceRequest is the request type for the Query/Balance RPC method
+QueryBalanceRequest 是 Query/Balance RPC 方法的请求类型
 
 
 | Field | Type | Label | Description |
@@ -8251,7 +8118,7 @@ QueryBalanceRequest is the request type for the Query/Balance RPC method
 <a name="cosmos.nft.v1beta1.QueryBalanceResponse"></a>
 
 ### QueryBalanceResponse
-QueryBalanceResponse is the response type for the Query/Balance RPC method
+QueryBalanceResponse 是 Query/Balance RPC 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -8266,7 +8133,7 @@ QueryBalanceResponse is the response type for the Query/Balance RPC method
 <a name="cosmos.nft.v1beta1.QueryClassRequest"></a>
 
 ### QueryClassRequest
-QueryClassRequest is the request type for the Query/Class RPC method
+QueryClassRequest 是 Query/Class RPC 方法的请求类型
 
 
 | Field | Type | Label | Description |
@@ -8281,8 +8148,7 @@ QueryClassRequest is the request type for the Query/Class RPC method
 <a name="cosmos.nft.v1beta1.QueryClassResponse"></a>
 
 ### QueryClassResponse
-QueryClassResponse is the response type for the Query/Class RPC method
-
+QueryClassResponse 是 Query/Class RPC 方法的响应类型
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -8296,7 +8162,7 @@ QueryClassResponse is the response type for the Query/Class RPC method
 <a name="cosmos.nft.v1beta1.QueryClassesRequest"></a>
 
 ### QueryClassesRequest
-QueryClassesRequest is the request type for the Query/Classes RPC method
+QueryClassesRequest 是 Query/Classes RPC 方法的请求类型
 
 
 | Field | Type | Label | Description |
@@ -8311,7 +8177,7 @@ QueryClassesRequest is the request type for the Query/Classes RPC method
 <a name="cosmos.nft.v1beta1.QueryClassesResponse"></a>
 
 ### QueryClassesResponse
-QueryClassesResponse is the response type for the Query/Classes RPC method
+QueryClassesResponse 是 Query/Classes RPC 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -8327,7 +8193,7 @@ QueryClassesResponse is the response type for the Query/Classes RPC method
 <a name="cosmos.nft.v1beta1.QueryNFTRequest"></a>
 
 ### QueryNFTRequest
-QueryNFTRequest is the request type for the Query/NFT RPC method
+QueryNFTRequest 是 Query/NFT RPC 方法的请求类型
 
 
 | Field | Type | Label | Description |
@@ -8343,7 +8209,7 @@ QueryNFTRequest is the request type for the Query/NFT RPC method
 <a name="cosmos.nft.v1beta1.QueryNFTResponse"></a>
 
 ### QueryNFTResponse
-QueryNFTResponse is the response type for the Query/NFT RPC method
+QueryNFTResponse 是 Query/NFT RPC 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -8358,7 +8224,7 @@ QueryNFTResponse is the response type for the Query/NFT RPC method
 <a name="cosmos.nft.v1beta1.QueryNFTsOfClassRequest"></a>
 
 ### QueryNFTsOfClassRequest
-QueryNFTsOfClassRequest is the request type for the Query/NFTsOfClass RPC method
+QueryNFTsOfClassRequest 是 Query/NFTsOfClass RPC 方法的请求类型
 
 
 | Field | Type | Label | Description |
@@ -8375,7 +8241,7 @@ QueryNFTsOfClassRequest is the request type for the Query/NFTsOfClass RPC method
 <a name="cosmos.nft.v1beta1.QueryNFTsOfClassResponse"></a>
 
 ### QueryNFTsOfClassResponse
-QueryNFTsOfClassResponse is the response type for the Query/NFTsOfClass and Query/NFTsOfClassByOwner RPC methods
+QueryNFTsOfClassResponse 是 Query/NFTsOfClass 和 Query/NFTsOfClassByOwner RPC 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -8391,7 +8257,7 @@ QueryNFTsOfClassResponse is the response type for the Query/NFTsOfClass and Quer
 <a name="cosmos.nft.v1beta1.QueryOwnerRequest"></a>
 
 ### QueryOwnerRequest
-QueryOwnerRequest is the request type for the Query/Owner RPC method
+QueryOwnerRequest 是 Query/Owner RPC 方法的请求类型
 
 
 | Field | Type | Label | Description |
@@ -8407,7 +8273,7 @@ QueryOwnerRequest is the request type for the Query/Owner RPC method
 <a name="cosmos.nft.v1beta1.QueryOwnerResponse"></a>
 
 ### QueryOwnerResponse
-QueryOwnerResponse is the response type for the Query/Owner RPC method
+QueryOwnerResponse 是 Query/Owner RPC 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -8422,7 +8288,7 @@ QueryOwnerResponse is the response type for the Query/Owner RPC method
 <a name="cosmos.nft.v1beta1.QuerySupplyRequest"></a>
 
 ### QuerySupplyRequest
-QuerySupplyRequest is the request type for the Query/Supply RPC method
+QuerySupplyRequest 是 Query/Supply RPC 方法的请求类型
 
 
 | Field | Type | Label | Description |
@@ -8437,7 +8303,7 @@ QuerySupplyRequest is the request type for the Query/Supply RPC method
 <a name="cosmos.nft.v1beta1.QuerySupplyResponse"></a>
 
 ### QuerySupplyResponse
-QuerySupplyResponse is the response type for the Query/Supply RPC method
+QuerySupplyResponse 是 Query/Supply RPC 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -8458,7 +8324,7 @@ QuerySupplyResponse is the response type for the Query/Supply RPC method
 <a name="cosmos.nft.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+Query 定义了 gRPC 查询器服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8484,7 +8350,7 @@ Query defines the gRPC querier service.
 <a name="cosmos.nft.v1beta1.MsgSend"></a>
 
 ### MsgSend
-MsgSend represents a message to send a nft from one account to another account.
+MsgSend 表示从一个帐户向另一个帐户发送 nft 的消息。
 
 
 | Field | Type | Label | Description |
@@ -8502,7 +8368,7 @@ MsgSend represents a message to send a nft from one account to another account.
 <a name="cosmos.nft.v1beta1.MsgSendResponse"></a>
 
 ### MsgSendResponse
-MsgSendResponse defines the Msg/Send response type.
+MsgSendResponse 定义了 Msg/Send 响应类型。
 
 
 
@@ -8518,7 +8384,7 @@ MsgSendResponse defines the Msg/Send response type.
 <a name="cosmos.nft.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the nft Msg service.
+Msg 定义了 nft Msg 服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8538,8 +8404,7 @@ Msg defines the nft Msg service.
 <a name="cosmos.params.v1beta1.ParamChange"></a>
 
 ### ParamChange
-ParamChange defines an individual parameter change, for use in
-ParameterChangeProposal.
+ParamChange 定义了一个单独的参数更改，用于 ParameterChangeProposal。
 
 
 | Field | Type | Label | Description |
@@ -8556,7 +8421,7 @@ ParameterChangeProposal.
 <a name="cosmos.params.v1beta1.ParameterChangeProposal"></a>
 
 ### ParameterChangeProposal
-ParameterChangeProposal defines a proposal to change one or more parameters.
+ParameterChangeProposal 定义了更改一个或多个参数的提议。
 
 
 | Field | Type | Label | Description |
@@ -8589,7 +8454,7 @@ ParameterChangeProposal defines a proposal to change one or more parameters.
 <a name="cosmos.params.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is request type for the Query/Params RPC method.
+QueryParamsRequest 是 Query/Params RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -8605,7 +8470,7 @@ QueryParamsRequest is request type for the Query/Params RPC method.
 <a name="cosmos.params.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is response type for the Query/Params RPC method.
+QueryParamsResponse 是 Query/Params RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -8620,8 +8485,8 @@ QueryParamsResponse is response type for the Query/Params RPC method.
 <a name="cosmos.params.v1beta1.QuerySubspacesRequest"></a>
 
 ### QuerySubspacesRequest
-QuerySubspacesRequest defines a request type for querying for all registered
-subspaces and all keys for a subspace.
+QuerySubspacesRequest 定义了一个请求类型，用于查询所有已注册的
+子空间和子空间的所有键。
 
 
 
@@ -8631,8 +8496,8 @@ subspaces and all keys for a subspace.
 <a name="cosmos.params.v1beta1.QuerySubspacesResponse"></a>
 
 ### QuerySubspacesResponse
-QuerySubspacesResponse defines the response types for querying for all
-registered subspaces and all keys for a subspace.
+QuerySubspacesResponse 定义了所有查询的响应类型
+注册的子空间和子空间的所有键。
 
 
 | Field | Type | Label | Description |
@@ -8647,8 +8512,8 @@ registered subspaces and all keys for a subspace.
 <a name="cosmos.params.v1beta1.Subspace"></a>
 
 ### Subspace
-Subspace defines a parameter subspace name and all the keys that exist for
-the subspace.
+子空间定义了一个参数子空间名称和所有存在的键
+子空间。
 
 
 | Field | Type | Label | Description |
@@ -8670,7 +8535,7 @@ the subspace.
 <a name="cosmos.params.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+Query 定义了 gRPC 查询器服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8691,7 +8556,7 @@ Query defines the gRPC querier service.
 <a name="cosmos.slashing.v1beta1.Params"></a>
 
 ### Params
-Params represents the parameters used for by the slashing module.
+Params 表示 slashing 模块使用的参数。
 
 
 | Field | Type | Label | Description |
@@ -8710,8 +8575,7 @@ Params represents the parameters used for by the slashing module.
 <a name="cosmos.slashing.v1beta1.ValidatorSigningInfo"></a>
 
 ### ValidatorSigningInfo
-ValidatorSigningInfo defines a validator's signing info for monitoring their
-liveness activity.
+ValidatorSigningInfo 定义了验证者的签名信息，用于监控他们的活跃度活动。
 
 
 | Field | Type | Label | Description |
@@ -8747,7 +8611,7 @@ liveness activity.
 <a name="cosmos.slashing.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the slashing module's genesis state.
+GenesisState 定义了 slashing 模块的创世状态。
 
 
 | Field | Type | Label | Description |
@@ -8764,7 +8628,7 @@ GenesisState defines the slashing module's genesis state.
 <a name="cosmos.slashing.v1beta1.MissedBlock"></a>
 
 ### MissedBlock
-MissedBlock contains height and missed status as boolean.
+MissedBlock 包含高度和未命中状态为布尔值。
 
 
 | Field | Type | Label | Description |
@@ -8780,7 +8644,7 @@ MissedBlock contains height and missed status as boolean.
 <a name="cosmos.slashing.v1beta1.SigningInfo"></a>
 
 ### SigningInfo
-SigningInfo stores validator signing info of corresponding address.
+SigningInfo 存储对应地址的验证者签名信息。
 
 
 | Field | Type | Label | Description |
@@ -8796,8 +8660,8 @@ SigningInfo stores validator signing info of corresponding address.
 <a name="cosmos.slashing.v1beta1.ValidatorMissedBlocks"></a>
 
 ### ValidatorMissedBlocks
-ValidatorMissedBlocks contains array of missed blocks of corresponding
-address.
+ValidatorMissedBlocks 包含对应的遗漏块数组
+地址。
 
 
 | Field | Type | Label | Description |
@@ -8829,7 +8693,7 @@ address.
 <a name="cosmos.slashing.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method
+QueryParamsRequest 是 Query/Params RPC 方法的请求类型
 
 
 
@@ -8839,7 +8703,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method
 <a name="cosmos.slashing.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method
+QueryParamsResponse 是 Query/Params RPC 方法的响应类型
 
 
 | Field | Type | Label | Description |
@@ -8854,8 +8718,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method
 <a name="cosmos.slashing.v1beta1.QuerySigningInfoRequest"></a>
 
 ### QuerySigningInfoRequest
-QuerySigningInfoRequest is the request type for the Query/SigningInfo RPC
-method
+QuerySigningInfoRequest 是 Query/SigningInfo RPC 方法的请求类型
 
 
 | Field | Type | Label | Description |
@@ -8870,8 +8733,8 @@ method
 <a name="cosmos.slashing.v1beta1.QuerySigningInfoResponse"></a>
 
 ### QuerySigningInfoResponse
-QuerySigningInfoResponse is the response type for the Query/SigningInfo RPC
-method
+QuerySigningInfoResponse 是 Query/SigningInfo RPC 的响应类型
+方法
 
 
 | Field | Type | Label | Description |
@@ -8886,8 +8749,8 @@ method
 <a name="cosmos.slashing.v1beta1.QuerySigningInfosRequest"></a>
 
 ### QuerySigningInfosRequest
-QuerySigningInfosRequest is the request type for the Query/SigningInfos RPC
-method
+QuerySigningInfosRequest 是 Query/SigningInfos RPC 的请求类型
+方法
 
 
 | Field | Type | Label | Description |
@@ -8902,8 +8765,8 @@ method
 <a name="cosmos.slashing.v1beta1.QuerySigningInfosResponse"></a>
 
 ### QuerySigningInfosResponse
-QuerySigningInfosResponse is the response type for the Query/SigningInfos RPC
-method
+QuerySigningInfosResponse 是 Query/SigningInfos RPC 的响应类型
+方法
 
 
 | Field | Type | Label | Description |
@@ -8925,7 +8788,7 @@ method
 <a name="cosmos.slashing.v1beta1.Query"></a>
 
 ### Query
-Query provides defines the gRPC querier service
+Query 提供定义了 gRPC 查询器服务
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8947,7 +8810,7 @@ Query provides defines the gRPC querier service
 <a name="cosmos.slashing.v1beta1.MsgUnjail"></a>
 
 ### MsgUnjail
-MsgUnjail defines the Msg/Unjail request type
+MsgUnjail 定义了 Msg/Unjail 请求类型
 
 
 | Field | Type | Label | Description |
@@ -8962,7 +8825,7 @@ MsgUnjail defines the Msg/Unjail request type
 <a name="cosmos.slashing.v1beta1.MsgUnjailResponse"></a>
 
 ### MsgUnjailResponse
-MsgUnjailResponse defines the Msg/Unjail response type
+MsgUnjail Response 定义了 Message/Unjail 响应类型
 
 
 
@@ -8978,7 +8841,7 @@ MsgUnjailResponse defines the Msg/Unjail response type
 <a name="cosmos.slashing.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the slashing Msg service.
+Msg 定义了slashing Msg 服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8998,7 +8861,7 @@ Msg defines the slashing Msg service.
 <a name="cosmos.staking.v1beta1.StakeAuthorization"></a>
 
 ### StakeAuthorization
-StakeAuthorization defines authorization for delegate/undelegate/redelegate.
+StakeAuthorization 定义了委托/取消委托/重新委托的授权。
 
 Since: cosmos-sdk 0.43
 
@@ -9018,7 +8881,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.staking.v1beta1.StakeAuthorization.Validators"></a>
 
 ### StakeAuthorization.Validators
-Validators defines list of validator addresses.
+验证器定义验证器地址列表。
 
 
 | Field | Type | Label | Description |
@@ -9035,7 +8898,7 @@ Validators defines list of validator addresses.
 <a name="cosmos.staking.v1beta1.AuthorizationType"></a>
 
 ### AuthorizationType
-AuthorizationType defines the type of staking module authorization type
+AuthorizationType 定义了 Staking 模块授权类型的类型
 
 Since: cosmos-sdk 0.43
 
@@ -9065,7 +8928,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.staking.v1beta1.Commission"></a>
 
 ### Commission
-Commission defines commission parameters for a given validator.
+佣金定义给定验证器的佣金参数。
 
 
 | Field | Type | Label | Description |
@@ -9081,8 +8944,8 @@ Commission defines commission parameters for a given validator.
 <a name="cosmos.staking.v1beta1.CommissionRates"></a>
 
 ### CommissionRates
-CommissionRates defines the initial commission rates to be used for creating
-a validator.
+CommissionRates 定义了用于创建的初始佣金率
+一个验证器。
 
 
 | Field | Type | Label | Description |
@@ -9099,9 +8962,8 @@ a validator.
 <a name="cosmos.staking.v1beta1.DVPair"></a>
 
 ### DVPair
-DVPair is struct that just has a delegator-validator pair with no other data.
-It is intended to be used as a marshalable pointer. For example, a DVPair can
-be used to construct the key to getting an UnbondingDelegation from state.
+DVPair 是一个结构体，它只有一个委托者-验证者对，没有其他数据。
+它旨在用作可编组指针。 例如，DVPair 可用于构造从状态获取 UnbondingDelegation 的密钥。
 
 
 | Field | Type | Label | Description |
@@ -9117,7 +8979,7 @@ be used to construct the key to getting an UnbondingDelegation from state.
 <a name="cosmos.staking.v1beta1.DVPairs"></a>
 
 ### DVPairs
-DVPairs defines an array of DVPair objects.
+DVPairs 定义了一组 DVPair 对象。
 
 
 | Field | Type | Label | Description |
@@ -9132,10 +8994,10 @@ DVPairs defines an array of DVPair objects.
 <a name="cosmos.staking.v1beta1.DVVTriplet"></a>
 
 ### DVVTriplet
-DVVTriplet is struct that just has a delegator-validator-validator triplet
-with no other data. It is intended to be used as a marshalable pointer. For
-example, a DVVTriplet can be used to construct the key to getting a
-Redelegation from state.
+DVVTriplet 是只有一个委托人-验证人-验证人三元组的结构
+没有其他数据。 它旨在用作可编组指针。 为了
+例如，一个 DVVTriplet 可用于构造获得
+从州重新授权。
 
 
 | Field | Type | Label | Description |
@@ -9152,7 +9014,7 @@ Redelegation from state.
 <a name="cosmos.staking.v1beta1.DVVTriplets"></a>
 
 ### DVVTriplets
-DVVTriplets defines an array of DVVTriplet objects.
+DVV Triplets 定义了一组 DVV Triplet 对象。
 
 
 | Field | Type | Label | Description |
@@ -9167,9 +9029,7 @@ DVVTriplets defines an array of DVVTriplet objects.
 <a name="cosmos.staking.v1beta1.Delegation"></a>
 
 ### Delegation
-Delegation represents the bond with tokens held by an account. It is
-owned by one delegator, and is associated with the voting power of one
-validator.
+委托代表与账户持有的代币的债券。 它由一名委托人拥有，并与一名验证人的投票权相关联。
 
 
 | Field | Type | Label | Description |
@@ -9186,8 +9046,8 @@ validator.
 <a name="cosmos.staking.v1beta1.DelegationResponse"></a>
 
 ### DelegationResponse
-DelegationResponse is equivalent to Delegation except that it contains a
-balance in addition to shares which is more suitable for client responses.
+委托响应等价于委托，除了它包含一个
+除了股票之外的余额更适合客户响应。
 
 
 | Field | Type | Label | Description |
@@ -9203,7 +9063,7 @@ balance in addition to shares which is more suitable for client responses.
 <a name="cosmos.staking.v1beta1.Description"></a>
 
 ### Description
-Description defines a validator description.
+描述定义验证器描述。
 
 
 | Field | Type | Label | Description |
@@ -9222,10 +9082,10 @@ Description defines a validator description.
 <a name="cosmos.staking.v1beta1.HistoricalInfo"></a>
 
 ### HistoricalInfo
-HistoricalInfo contains header and validator information for a given block.
-It is stored as part of staking module's state, which persists the `n` most
-recent HistoricalInfo
-(`n` is set by the staking module's `historical_entries` parameter).
+HistoricalInfo 包含给定块的标头和验证器信息。
+它被存储为 staking 模块状态的一部分，它最持久地保持 `n`
+最近的历史信息 
+(`n` 由堆叠模块的 `historical entries` 参数设置 ).
 
 
 | Field | Type | Label | Description |
@@ -9241,7 +9101,7 @@ recent HistoricalInfo
 <a name="cosmos.staking.v1beta1.Params"></a>
 
 ### Params
-Params defines the parameters for the staking module.
+params 定义了 staking 模块的参数 .
 
 
 | Field | Type | Label | Description |
@@ -9261,8 +9121,8 @@ Params defines the parameters for the staking module.
 <a name="cosmos.staking.v1beta1.Pool"></a>
 
 ### Pool
-Pool is used for tracking bonded and not-bonded token supply of the bond
-denomination.
+池用于跟踪债券的保税和非保税代币供应
+面值
 
 
 | Field | Type | Label | Description |
@@ -9278,8 +9138,8 @@ denomination.
 <a name="cosmos.staking.v1beta1.Redelegation"></a>
 
 ### Redelegation
-Redelegation contains the list of a particular delegator's redelegating bonds
-from a particular source validator to a particular destination validator.
+重新委托包含特定委托人的重新委托债券的列表
+从特定的源验证器到特定的目标验证器。 
 
 
 | Field | Type | Label | Description |
@@ -9299,7 +9159,7 @@ redelegation entries |
 <a name="cosmos.staking.v1beta1.RedelegationEntry"></a>
 
 ### RedelegationEntry
-RedelegationEntry defines a redelegation object with relevant metadata.
+RedelegationEntry 定义了一个具有相关元数据的重新授权对象。 
 
 
 | Field | Type | Label | Description |
@@ -9317,9 +9177,7 @@ RedelegationEntry defines a redelegation object with relevant metadata.
 <a name="cosmos.staking.v1beta1.RedelegationEntryResponse"></a>
 
 ### RedelegationEntryResponse
-RedelegationEntryResponse is equivalent to a RedelegationEntry except that it
-contains a balance in addition to shares which is more suitable for client
-responses.
+RedelegationEntryResponse 等价于 RedelegationEntry，除了它包含更适合客户端响应的份额之外的余额。 
 
 
 | Field | Type | Label | Description |
@@ -9335,9 +9193,7 @@ responses.
 <a name="cosmos.staking.v1beta1.RedelegationResponse"></a>
 
 ### RedelegationResponse
-RedelegationResponse is equivalent to a Redelegation except that its entries
-contain a balance in addition to shares which is more suitable for client
-responses.
+RedelelegationResponse 等价于 Redelegation，不同之处在于它的条目除了更适合客户端响应的份额之外还包含余额。 
 
 
 | Field | Type | Label | Description |
@@ -9353,8 +9209,7 @@ responses.
 <a name="cosmos.staking.v1beta1.UnbondingDelegation"></a>
 
 ### UnbondingDelegation
-UnbondingDelegation stores all of a single delegator's unbonding bonds
-for a single validator in an time-ordered list.
+UnbondingDelegation 将单个委托人的所有解除绑定债券存储在一个按时间排序的列表中。 
 
 
 | Field | Type | Label | Description |
@@ -9373,7 +9228,7 @@ unbonding delegation entries |
 <a name="cosmos.staking.v1beta1.UnbondingDelegationEntry"></a>
 
 ### UnbondingDelegationEntry
-UnbondingDelegationEntry defines an unbonding object with relevant metadata.
+UnbondingDelegationEntry 定义了一个具有相关元数据的解除绑定对象。 
 
 
 | Field | Type | Label | Description |
@@ -9391,7 +9246,7 @@ UnbondingDelegationEntry defines an unbonding object with relevant metadata.
 <a name="cosmos.staking.v1beta1.ValAddresses"></a>
 
 ### ValAddresses
-ValAddresses defines a repeated set of validator addresses.
+ValAddresses 定义了一组重复的验证器地址。 
 
 
 | Field | Type | Label | Description |
@@ -9406,14 +9261,7 @@ ValAddresses defines a repeated set of validator addresses.
 <a name="cosmos.staking.v1beta1.Validator"></a>
 
 ### Validator
-Validator defines a validator, together with the total amount of the
-Validator's bond shares and their exchange rate to coins. Slashing results in
-a decrease in the exchange rate, allowing correct calculation of future
-undelegations without iterating over delegators. When coins are delegated to
-this validator, the validator is credited with a delegation whose number of
-bond shares is based on the amount of coins delegated divided by the current
-exchange rate. Voting power can be calculated as total bonded shares
-multiplied by exchange rate.
+Validator 定义了一个validator，连同Validator 的债券份额的总量和它们对硬币的汇率。 削减会导致汇率下降，从而可以正确计算未来的取消委托，而无需迭代委托人。 当代币被委托给这个验证者时，验证者将获得一个委托，其债券份额的数量基于委托代币的数量除以当前汇率。 投票权的计算方法为保税股份总数乘以汇率。 
 
 
 | Field | Type | Label | Description |
@@ -9440,7 +9288,7 @@ multiplied by exchange rate.
 <a name="cosmos.staking.v1beta1.BondStatus"></a>
 
 ### BondStatus
-BondStatus is the status of a validator.
+BondStatus 是验证者的状态。 
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -9468,7 +9316,7 @@ BondStatus is the status of a validator.
 <a name="cosmos.staking.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the staking module's genesis state.
+GenesisState 定义了 staking 模块的创世状态。 
 
 
 | Field | Type | Label | Description |
@@ -9490,7 +9338,7 @@ GenesisState defines the staking module's genesis state.
 <a name="cosmos.staking.v1beta1.LastValidatorPower"></a>
 
 ### LastValidatorPower
-LastValidatorPower required for validator set update logic.
+验证器集更新逻辑所需的 LastValidatorPower。 
 
 
 | Field | Type | Label | Description |
@@ -9522,7 +9370,7 @@ LastValidatorPower required for validator set update logic.
 <a name="cosmos.staking.v1beta1.QueryDelegationRequest"></a>
 
 ### QueryDelegationRequest
-QueryDelegationRequest is request type for the Query/Delegation RPC method.
+QueryDelegationRequest 是 Query/Delegation RPC 方法的请求类型。 
 
 
 | Field | Type | Label | Description |
@@ -9538,7 +9386,7 @@ QueryDelegationRequest is request type for the Query/Delegation RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegationResponse"></a>
 
 ### QueryDelegationResponse
-QueryDelegationResponse is response type for the Query/Delegation RPC method.
+QueryDelegationResponse 是 Query/Delegation RPC 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -9553,8 +9401,7 @@ QueryDelegationResponse is response type for the Query/Delegation RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorDelegationsRequest"></a>
 
 ### QueryDelegatorDelegationsRequest
-QueryDelegatorDelegationsRequest is request type for the
-Query/DelegatorDelegations RPC method.
+QueryDelegatorDelegationsRequest 是 Query/DelegatorDelegations RPC 方法的请求类型。 
 
 
 | Field | Type | Label | Description |
@@ -9570,8 +9417,7 @@ Query/DelegatorDelegations RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorDelegationsResponse"></a>
 
 ### QueryDelegatorDelegationsResponse
-QueryDelegatorDelegationsResponse is response type for the
-Query/DelegatorDelegations RPC method.
+QueryDelegatorDelegationsResponse 是 Query/DelegatorDelegations RPC 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -9587,8 +9433,7 @@ Query/DelegatorDelegations RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorUnbondingDelegationsRequest"></a>
 
 ### QueryDelegatorUnbondingDelegationsRequest
-QueryDelegatorUnbondingDelegationsRequest is request type for the
-Query/DelegatorUnbondingDelegations RPC method.
+QueryDelegatorUnbondingDelegationsRequest 是 Query/DelegatorUnbondingDelegations RPC 方法的请求类型。 
 
 
 | Field | Type | Label | Description |
@@ -9604,8 +9449,7 @@ Query/DelegatorUnbondingDelegations RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorUnbondingDelegationsResponse"></a>
 
 ### QueryDelegatorUnbondingDelegationsResponse
-QueryUnbondingDelegatorDelegationsResponse is response type for the
-Query/UnbondingDelegatorDelegations RPC method.
+QueryUnbondingDelegatorDelegationsResponse 是 Query/UnbondingDelegatorDelegations RPC 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -9621,8 +9465,7 @@ Query/UnbondingDelegatorDelegations RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorValidatorRequest"></a>
 
 ### QueryDelegatorValidatorRequest
-QueryDelegatorValidatorRequest is request type for the
-Query/DelegatorValidator RPC method.
+QueryDelegatorValidatorRequest 是 Query/DelegatorValidator RPC 方法的请求类型。 
 
 
 | Field | Type | Label | Description |
@@ -9638,8 +9481,7 @@ Query/DelegatorValidator RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorValidatorResponse"></a>
 
 ### QueryDelegatorValidatorResponse
-QueryDelegatorValidatorResponse response type for the
-Query/DelegatorValidator RPC method.
+QueryDelegatorValidatorResponse Query/DelegatorValidator RPC 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -9654,8 +9496,7 @@ Query/DelegatorValidator RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorValidatorsRequest"></a>
 
 ### QueryDelegatorValidatorsRequest
-QueryDelegatorValidatorsRequest is request type for the
-Query/DelegatorValidators RPC method.
+QueryDelegatorValidatorsRequest 是 Query/DelegatorValidators RPC 方法的请求类型。 
 
 
 | Field | Type | Label | Description |
@@ -9671,8 +9512,7 @@ Query/DelegatorValidators RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorValidatorsResponse"></a>
 
 ### QueryDelegatorValidatorsResponse
-QueryDelegatorValidatorsResponse is response type for the
-Query/DelegatorValidators RPC method.
+QueryDelegatorValidatorsResponse 是 Query/DelegatorValidators RPC 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -9688,8 +9528,7 @@ Query/DelegatorValidators RPC method.
 <a name="cosmos.staking.v1beta1.QueryHistoricalInfoRequest"></a>
 
 ### QueryHistoricalInfoRequest
-QueryHistoricalInfoRequest is request type for the Query/HistoricalInfo RPC
-method.
+QueryHistoricalInfoRequest 是 Query/HistoricalInfo RPC 方法的请求类型。 
 
 
 | Field | Type | Label | Description |
@@ -9704,8 +9543,7 @@ method.
 <a name="cosmos.staking.v1beta1.QueryHistoricalInfoResponse"></a>
 
 ### QueryHistoricalInfoResponse
-QueryHistoricalInfoResponse is response type for the Query/HistoricalInfo RPC
-method.
+QueryHistoricalInfoResponse 是 Query/HistoricalInfo RPC 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -9720,7 +9558,7 @@ method.
 <a name="cosmos.staking.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is request type for the Query/Params RPC method.
+QueryParamsRequest 是 Query/Params RPC 方法的请求类型。 
 
 
 
@@ -9730,7 +9568,7 @@ QueryParamsRequest is request type for the Query/Params RPC method.
 <a name="cosmos.staking.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is response type for the Query/Params RPC method.
+QueryParamsResponse 是 Query/Params RPC 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -9745,7 +9583,7 @@ QueryParamsResponse is response type for the Query/Params RPC method.
 <a name="cosmos.staking.v1beta1.QueryPoolRequest"></a>
 
 ### QueryPoolRequest
-QueryPoolRequest is request type for the Query/Pool RPC method.
+QueryPoolRequest 是 Query/Pool RPC 方法的请求类型。 
 
 
 
@@ -9755,7 +9593,7 @@ QueryPoolRequest is request type for the Query/Pool RPC method.
 <a name="cosmos.staking.v1beta1.QueryPoolResponse"></a>
 
 ### QueryPoolResponse
-QueryPoolResponse is response type for the Query/Pool RPC method.
+QueryPoolResponse 是 Query/Pool RPC 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -9770,8 +9608,7 @@ QueryPoolResponse is response type for the Query/Pool RPC method.
 <a name="cosmos.staking.v1beta1.QueryRedelegationsRequest"></a>
 
 ### QueryRedelegationsRequest
-QueryRedelegationsRequest is request type for the Query/Redelegations RPC
-method.
+QueryRedelegationsRequest 是 Query/Redelegations RPC 方法的请求类型。 
 
 
 | Field | Type | Label | Description |
@@ -9789,8 +9626,7 @@ method.
 <a name="cosmos.staking.v1beta1.QueryRedelegationsResponse"></a>
 
 ### QueryRedelegationsResponse
-QueryRedelegationsResponse is response type for the Query/Redelegations RPC
-method.
+QueryRedelegationsResponse 是 Query/Redelegations RPC 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -9806,8 +9642,7 @@ method.
 <a name="cosmos.staking.v1beta1.QueryUnbondingDelegationRequest"></a>
 
 ### QueryUnbondingDelegationRequest
-QueryUnbondingDelegationRequest is request type for the
-Query/UnbondingDelegation RPC method.
+QueryUnbondingDelegationRequest 是 Query/UnbondingDelegation RPC 方法的请求类型。 
 
 
 | Field | Type | Label | Description |
@@ -9823,8 +9658,7 @@ Query/UnbondingDelegation RPC method.
 <a name="cosmos.staking.v1beta1.QueryUnbondingDelegationResponse"></a>
 
 ### QueryUnbondingDelegationResponse
-QueryDelegationResponse is response type for the Query/UnbondingDelegation
-RPC method.
+QueryDelegationResponse 是 Query/UnbondingDelegation RPC 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -9839,8 +9673,7 @@ RPC method.
 <a name="cosmos.staking.v1beta1.QueryValidatorDelegationsRequest"></a>
 
 ### QueryValidatorDelegationsRequest
-QueryValidatorDelegationsRequest is request type for the
-Query/ValidatorDelegations RPC method
+QueryValidatorDelegationsRequest 是 Query/ValidatorDelegations RPC 方法的请求类型 
 
 
 | Field | Type | Label | Description |
@@ -9856,8 +9689,7 @@ Query/ValidatorDelegations RPC method
 <a name="cosmos.staking.v1beta1.QueryValidatorDelegationsResponse"></a>
 
 ### QueryValidatorDelegationsResponse
-QueryValidatorDelegationsResponse is response type for the
-Query/ValidatorDelegations RPC method
+QueryValidatorDelegationsResponse 是 Query/ValidatorDelegations RPC 方法的响应类型 
 
 
 | Field | Type | Label | Description |
@@ -9873,7 +9705,7 @@ Query/ValidatorDelegations RPC method
 <a name="cosmos.staking.v1beta1.QueryValidatorRequest"></a>
 
 ### QueryValidatorRequest
-QueryValidatorRequest is response type for the Query/Validator RPC method
+QueryValidatorRequest 是 Query/Validator RPC 方法的响应类型 
 
 
 | Field | Type | Label | Description |
@@ -9888,7 +9720,7 @@ QueryValidatorRequest is response type for the Query/Validator RPC method
 <a name="cosmos.staking.v1beta1.QueryValidatorResponse"></a>
 
 ### QueryValidatorResponse
-QueryValidatorResponse is response type for the Query/Validator RPC method
+QueryValidatorResponse 是 Query/Validator RPC 方法的响应类型 
 
 
 | Field | Type | Label | Description |
@@ -9903,8 +9735,7 @@ QueryValidatorResponse is response type for the Query/Validator RPC method
 <a name="cosmos.staking.v1beta1.QueryValidatorUnbondingDelegationsRequest"></a>
 
 ### QueryValidatorUnbondingDelegationsRequest
-QueryValidatorUnbondingDelegationsRequest is required type for the
-Query/ValidatorUnbondingDelegations RPC method
+QueryValidatorUnbondingDelegationsRequest 是 Query/ValidatorUnbondingDelegations RPC 方法的必需类型 
 
 
 | Field | Type | Label | Description |
@@ -9920,8 +9751,7 @@ Query/ValidatorUnbondingDelegations RPC method
 <a name="cosmos.staking.v1beta1.QueryValidatorUnbondingDelegationsResponse"></a>
 
 ### QueryValidatorUnbondingDelegationsResponse
-QueryValidatorUnbondingDelegationsResponse is response type for the
-Query/ValidatorUnbondingDelegations RPC method.
+QueryValidatorUnbondingDelegationsResponse 是 Query/ValidatorUnbondingDelegations RPC 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -9937,7 +9767,7 @@ Query/ValidatorUnbondingDelegations RPC method.
 <a name="cosmos.staking.v1beta1.QueryValidatorsRequest"></a>
 
 ### QueryValidatorsRequest
-QueryValidatorsRequest is request type for Query/Validators RPC method.
+QueryValidatorsRequest 是 Query/Validators RPC 方法的请求类型。 
 
 
 | Field | Type | Label | Description |
@@ -9953,7 +9783,7 @@ QueryValidatorsRequest is request type for Query/Validators RPC method.
 <a name="cosmos.staking.v1beta1.QueryValidatorsResponse"></a>
 
 ### QueryValidatorsResponse
-QueryValidatorsResponse is response type for the Query/Validators RPC method
+QueryValidatorsResponse 是 Query/Validators RPC 方法的响应类型 
 
 
 | Field | Type | Label | Description |
@@ -9975,7 +9805,7 @@ QueryValidatorsResponse is response type for the Query/Validators RPC method
 <a name="cosmos.staking.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+Query 定义了 gRPC 查询器服务。 
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -10008,8 +9838,7 @@ Query defines the gRPC querier service.
 <a name="cosmos.staking.v1beta1.MsgBeginRedelegate"></a>
 
 ### MsgBeginRedelegate
-MsgBeginRedelegate defines a SDK message for performing a redelegation
-of coins from a delegator and source validator to a destination validator.
+MsgBeginRedelegate 定义了一条 SDK 消息，用于将代币从委托人和源验证器重新委托到目标验证器。 
 
 
 | Field | Type | Label | Description |
@@ -10027,7 +9856,7 @@ of coins from a delegator and source validator to a destination validator.
 <a name="cosmos.staking.v1beta1.MsgBeginRedelegateResponse"></a>
 
 ### MsgBeginRedelegateResponse
-MsgBeginRedelegateResponse defines the Msg/BeginRedelegate response type.
+MsgBeginRedelegateResponse 定义了 Msg/BeginRedelegate 响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -10042,7 +9871,7 @@ MsgBeginRedelegateResponse defines the Msg/BeginRedelegate response type.
 <a name="cosmos.staking.v1beta1.MsgCreateValidator"></a>
 
 ### MsgCreateValidator
-MsgCreateValidator defines a SDK message for creating a new validator.
+MsgCreateValidator 定义了用于创建新验证器的 SDK 消息。 
 
 
 | Field | Type | Label | Description |
@@ -10063,7 +9892,7 @@ MsgCreateValidator defines a SDK message for creating a new validator.
 <a name="cosmos.staking.v1beta1.MsgCreateValidatorResponse"></a>
 
 ### MsgCreateValidatorResponse
-MsgCreateValidatorResponse defines the Msg/CreateValidator response type.
+MsgCreateValidatorResponse 定义了 Msg/CreateValidator 响应类型。 
 
 
 
@@ -10073,8 +9902,7 @@ MsgCreateValidatorResponse defines the Msg/CreateValidator response type.
 <a name="cosmos.staking.v1beta1.MsgDelegate"></a>
 
 ### MsgDelegate
-MsgDelegate defines a SDK message for performing a delegation of coins
-from a delegator to a validator.
+MsgDelegate 定义了一条 SDK 消息，用于执行从委托人到验证人的代币委托。 
 
 
 | Field | Type | Label | Description |
@@ -10091,7 +9919,7 @@ from a delegator to a validator.
 <a name="cosmos.staking.v1beta1.MsgDelegateResponse"></a>
 
 ### MsgDelegateResponse
-MsgDelegateResponse defines the Msg/Delegate response type.
+Msg Delegate Response 定义了Message/Delegate 响应类型。 
 
 
 
@@ -10101,7 +9929,7 @@ MsgDelegateResponse defines the Msg/Delegate response type.
 <a name="cosmos.staking.v1beta1.MsgEditValidator"></a>
 
 ### MsgEditValidator
-MsgEditValidator defines a SDK message for editing an existing validator.
+MsgEditValidator 定义了用于编辑现有验证器的 SDK 消息。 
 
 
 | Field | Type | Label | Description |
@@ -10119,7 +9947,7 @@ MsgEditValidator defines a SDK message for editing an existing validator.
 <a name="cosmos.staking.v1beta1.MsgEditValidatorResponse"></a>
 
 ### MsgEditValidatorResponse
-MsgEditValidatorResponse defines the Msg/EditValidator response type.
+MsgEditValidatorResponse 定义了 Msg/EditValidator 响应类型。 
 
 
 
@@ -10129,8 +9957,7 @@ MsgEditValidatorResponse defines the Msg/EditValidator response type.
 <a name="cosmos.staking.v1beta1.MsgUndelegate"></a>
 
 ### MsgUndelegate
-MsgUndelegate defines a SDK message for performing an undelegation from a
-delegate and a validator.
+MsgUndelegate 定义了一条 SDK 消息，用于执行来自委托和验证器的取消委托。 
 
 
 | Field | Type | Label | Description |
@@ -10147,7 +9974,7 @@ delegate and a validator.
 <a name="cosmos.staking.v1beta1.MsgUndelegateResponse"></a>
 
 ### MsgUndelegateResponse
-MsgUndelegateResponse defines the Msg/Undelegate response type.
+MsgUndelegateResponse 定义了 Msg/Undelegate 响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -10168,7 +9995,7 @@ MsgUndelegateResponse defines the Msg/Undelegate response type.
 <a name="cosmos.staking.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the staking Msg service.
+Msg 定义了质押 Msg 服务。 
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -10192,10 +10019,7 @@ Msg defines the staking Msg service.
 <a name="cosmos.tx.signing.v1beta1.SignatureDescriptor"></a>
 
 ### SignatureDescriptor
-SignatureDescriptor is a convenience type which represents the full data for
-a signature including the public key of the signer, signing modes and the
-signature itself. It is primarily used for coordinating signatures between
-clients.
+SignatureDescriptor 是一种方便的类型，它表示签名的完整数据，包括签名者的公钥、签名模式和签名本身。 它主要用于协调客户端之间的签名。 
 
 
 | Field | Type | Label | Description |
@@ -10212,7 +10036,7 @@ clients.
 <a name="cosmos.tx.signing.v1beta1.SignatureDescriptor.Data"></a>
 
 ### SignatureDescriptor.Data
-Data represents signature data
+数据代表签名数据 
 
 
 | Field | Type | Label | Description |
@@ -10228,7 +10052,7 @@ Data represents signature data
 <a name="cosmos.tx.signing.v1beta1.SignatureDescriptor.Data.Multi"></a>
 
 ### SignatureDescriptor.Data.Multi
-Multi is the signature data for a multisig public key
+Multi 是多重签名公钥的签名数据 
 
 
 | Field | Type | Label | Description |
@@ -10244,7 +10068,7 @@ Multi is the signature data for a multisig public key
 <a name="cosmos.tx.signing.v1beta1.SignatureDescriptor.Data.Single"></a>
 
 ### SignatureDescriptor.Data.Single
-Single is the signature data for a single signer
+Single 是单个签名者的签名数据
 
 
 | Field | Type | Label | Description |
@@ -10260,7 +10084,7 @@ Single is the signature data for a single signer
 <a name="cosmos.tx.signing.v1beta1.SignatureDescriptors"></a>
 
 ### SignatureDescriptors
-SignatureDescriptors wraps multiple SignatureDescriptor's.
+SignatureDescriptors 包装多个 SignatureDescriptor。
 
 
 | Field | Type | Label | Description |
@@ -10277,7 +10101,7 @@ SignatureDescriptors wraps multiple SignatureDescriptor's.
 <a name="cosmos.tx.signing.v1beta1.SignMode"></a>
 
 ### SignMode
-SignMode represents a signing mode with its own security guarantees.
+SignMode 代表一种具有自身安全保证的签名模式。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -10306,8 +10130,7 @@ SignMode represents a signing mode with its own security guarantees.
 <a name="cosmos.tx.v1beta1.AuthInfo"></a>
 
 ### AuthInfo
-AuthInfo describes the fee and signer modes that are used to sign a
-transaction.
+AuthInfo 描述了用于签署交易的费用和签名者模式。
 
 
 | Field | Type | Label | Description |
@@ -10326,10 +10149,7 @@ Since: cosmos-sdk 0.45 |
 <a name="cosmos.tx.v1beta1.AuxSignerData"></a>
 
 ### AuxSignerData
-AuxSignerData is the intermediary format that an auxiliary signer (e.g. a
-tipper) builds and sends to the fee payer (who will build and broadcast the
-actual tx). AuxSignerData is not a valid tx in itself, and will be rejected
-by the node if sent directly as-is.
+AuxSignerData 是辅助签名者（例如倾销者）构建并发送给费用支付者（谁将构建和广播实际 tx）的中间格式。 AuxSignerData 本身不是有效的 tx，如果直接按原样发送，将被节点拒绝。
 
 Since: cosmos-sdk 0.45
 
@@ -10349,9 +10169,7 @@ Since: cosmos-sdk 0.45
 <a name="cosmos.tx.v1beta1.Fee"></a>
 
 ### Fee
-Fee includes the amount of coins paid in fees and the maximum
-gas to be used by the transaction. The ratio yields an effective "gasprice",
-which must be above some miminum to be accepted into the mempool.
+费用包括以费用支付的硬币数量和交易使用的最大天然气量。 该比率产生一个有效的“gasprice”，它必须高于某个最小值才能被接受到内存池中。
 
 
 | Field | Type | Label | Description |
@@ -10369,7 +10187,7 @@ which must be above some miminum to be accepted into the mempool.
 <a name="cosmos.tx.v1beta1.ModeInfo"></a>
 
 ### ModeInfo
-ModeInfo describes the signing mode of a single or nested multisig signer.
+ModeInfo 描述了单个或嵌套多重签名者的签名模式。
 
 
 | Field | Type | Label | Description |
@@ -10385,7 +10203,7 @@ ModeInfo describes the signing mode of a single or nested multisig signer.
 <a name="cosmos.tx.v1beta1.ModeInfo.Multi"></a>
 
 ### ModeInfo.Multi
-Multi is the mode info for a multisig public key
+Multi 是 multisig 公钥的模式信息
 
 
 | Field | Type | Label | Description |
@@ -10401,9 +10219,7 @@ Multi is the mode info for a multisig public key
 <a name="cosmos.tx.v1beta1.ModeInfo.Single"></a>
 
 ### ModeInfo.Single
-Single is the mode info for a single signer. It is structured as a message
-to allow for additional fields such as locale for SIGN_MODE_TEXTUAL in the
-future
+Single 是单个签名者的模式信息。 它被构造为一条消息，以允许将来使用其他字段，例如 SIGN_MODE_TEXTUAL 的语言环境
 
 
 | Field | Type | Label | Description |
@@ -10418,7 +10234,7 @@ future
 <a name="cosmos.tx.v1beta1.SignDoc"></a>
 
 ### SignDoc
-SignDoc is the type used for generating sign bytes for SIGN_MODE_DIRECT.
+SignDoc 是用于为 SIGN_MODE_DIRECT 生成符号字节的类型。
 
 
 | Field | Type | Label | Description |
@@ -10436,8 +10252,7 @@ SignDoc is the type used for generating sign bytes for SIGN_MODE_DIRECT.
 <a name="cosmos.tx.v1beta1.SignDocDirectAux"></a>
 
 ### SignDocDirectAux
-SignDocDirectAux is the type used for generating sign bytes for
-SIGN_MODE_DIRECT_AUX.
+SignDocDirectAux 是用于为 SIGN_MODE_DIRECT_AUX 生成符号字节的类型。
 
 
 | Field | Type | Label | Description |
@@ -10457,8 +10272,7 @@ SIGN_MODE_DIRECT_AUX.
 <a name="cosmos.tx.v1beta1.SignerInfo"></a>
 
 ### SignerInfo
-SignerInfo describes the public key and signing mode of a single top-level
-signer.
+SignerInfo 描述了单个顶级签名者的公钥和签名模式。
 
 
 | Field | Type | Label | Description |
@@ -10475,7 +10289,7 @@ signer.
 <a name="cosmos.tx.v1beta1.Tip"></a>
 
 ### Tip
-Tip is the tip used for meta-transactions.
+Tip 是用于元交易的提示。
 
 
 | Field | Type | Label | Description |
@@ -10491,7 +10305,7 @@ Tip is the tip used for meta-transactions.
 <a name="cosmos.tx.v1beta1.Tx"></a>
 
 ### Tx
-Tx is the standard type used for broadcasting transactions.
+Tx 是用于广播交易的标准类型。
 
 
 | Field | Type | Label | Description |
@@ -10508,7 +10322,7 @@ Tx is the standard type used for broadcasting transactions.
 <a name="cosmos.tx.v1beta1.TxBody"></a>
 
 ### TxBody
-TxBody is the body of a transaction that all signers sign over.
+TxBody 是所有签名者都签署的交易主体。
 
 
 | Field | Type | Label | Description |
@@ -10527,11 +10341,7 @@ TxBody is the body of a transaction that all signers sign over.
 <a name="cosmos.tx.v1beta1.TxRaw"></a>
 
 ### TxRaw
-TxRaw is a variant of Tx that pins the signer's exact binary representation
-of body and auth_info. This is used for signing, broadcasting and
-verification. The binary `serialize(tx: TxRaw)` is stored in Tendermint and
-the hash `sha256(serialize(tx: TxRaw))` becomes the "txhash", commonly used
-as the transaction ID.
+TxRaw 是 Tx 的一个变体，它固定签名者的 body 和 auth_info 的精确二进制表示。 这用于签名、广播和验证。 二进制 `serialize(tx: TxRaw)`存储在 Tendermint 中，哈希 `sha256(serialize(tx: TxRaw))`存储在 Tendermint 中，哈希 "txhash",通常用作交易 ID。
 
 
 | Field | Type | Label | Description |
@@ -10564,8 +10374,7 @@ as the transaction ID.
 <a name="cosmos.tx.v1beta1.BroadcastTxRequest"></a>
 
 ### BroadcastTxRequest
-BroadcastTxRequest is the request type for the Service.BroadcastTxRequest
-RPC method.
+BroadcastTxRequest 是 Service.BroadcastTxRequest RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -10581,8 +10390,7 @@ RPC method.
 <a name="cosmos.tx.v1beta1.BroadcastTxResponse"></a>
 
 ### BroadcastTxResponse
-BroadcastTxResponse is the response type for the
-Service.BroadcastTx method.
+BroadcastTxResponse 是 Service.BroadcastTx 方法的响应类型。 
 
 
 | Field | Type | Label | Description |
@@ -10597,8 +10405,7 @@ Service.BroadcastTx method.
 <a name="cosmos.tx.v1beta1.GetTxRequest"></a>
 
 ### GetTxRequest
-GetTxRequest is the request type for the Service.GetTx
-RPC method.
+GetTxRequest 是 Service.GetTx RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -10613,7 +10420,7 @@ RPC method.
 <a name="cosmos.tx.v1beta1.GetTxResponse"></a>
 
 ### GetTxResponse
-GetTxResponse is the response type for the Service.GetTx method.
+GetTxResponse 是 Service.GetTx 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -10629,8 +10436,7 @@ GetTxResponse is the response type for the Service.GetTx method.
 <a name="cosmos.tx.v1beta1.GetTxsEventRequest"></a>
 
 ### GetTxsEventRequest
-GetTxsEventRequest is the request type for the Service.TxsByEvents
-RPC method.
+GetTxsEventRequest 是 Service.TxsByEvents RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -10647,8 +10453,7 @@ RPC method.
 <a name="cosmos.tx.v1beta1.GetTxsEventResponse"></a>
 
 ### GetTxsEventResponse
-GetTxsEventResponse is the response type for the Service.TxsByEvents
-RPC method.
+GetTxsEventResponse 是 Service.TxsByEvents RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -10665,8 +10470,7 @@ RPC method.
 <a name="cosmos.tx.v1beta1.SimulateRequest"></a>
 
 ### SimulateRequest
-SimulateRequest is the request type for the Service.Simulate
-RPC method.
+SimulateRequest 是 Service.Simulate RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -10684,8 +10488,7 @@ Since: cosmos-sdk 0.43 |
 <a name="cosmos.tx.v1beta1.SimulateResponse"></a>
 
 ### SimulateResponse
-SimulateResponse is the response type for the
-Service.SimulateRPC method.
+SimulateResponse 是 Service.SimulateRPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -10703,7 +10506,7 @@ Service.SimulateRPC method.
 <a name="cosmos.tx.v1beta1.BroadcastMode"></a>
 
 ### BroadcastMode
-BroadcastMode specifies the broadcast mode for the TxService.Broadcast RPC method.
+BroadcastMode 指定 TxService.Broadcast RPC 方法的广播模式。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -10717,7 +10520,7 @@ BroadcastMode specifies the broadcast mode for the TxService.Broadcast RPC metho
 <a name="cosmos.tx.v1beta1.OrderBy"></a>
 
 ### OrderBy
-OrderBy defines the sorting order
+OrderBy 定义排序顺序
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -10734,7 +10537,7 @@ OrderBy defines the sorting order
 <a name="cosmos.tx.v1beta1.Service"></a>
 
 ### Service
-Service defines a gRPC service for interacting with transactions.
+Service 定义了一个用于与事务交互的 gRPC 服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -10757,8 +10560,7 @@ Service defines a gRPC service for interacting with transactions.
 <a name="cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal"></a>
 
 ### CancelSoftwareUpgradeProposal
-CancelSoftwareUpgradeProposal is a gov Content type for cancelling a software
-upgrade.
+CancelSoftwareUpgradeProposal 是一种用于取消软件升级的 gov 内容类型。
 
 
 | Field | Type | Label | Description |
@@ -10774,7 +10576,7 @@ upgrade.
 <a name="cosmos.upgrade.v1beta1.ModuleVersion"></a>
 
 ### ModuleVersion
-ModuleVersion specifies a module and its consensus version.
+ModuleVersion 指定一个模块及其共识版本。
 
 Since: cosmos-sdk 0.43
 
@@ -10792,7 +10594,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.upgrade.v1beta1.Plan"></a>
 
 ### Plan
-Plan specifies information about a planned upgrade and when it should occur.
+计划指定有关计划升级及其发生时间的信息。
 
 
 | Field | Type | Label | Description |
@@ -10811,8 +10613,7 @@ Plan specifies information about a planned upgrade and when it should occur.
 <a name="cosmos.upgrade.v1beta1.SoftwareUpgradeProposal"></a>
 
 ### SoftwareUpgradeProposal
-SoftwareUpgradeProposal is a gov Content type for initiating a software
-upgrade.
+SoftwareUpgradeProposal 是用于启动软件升级的 gov 内容类型。
 
 
 | Field | Type | Label | Description |
@@ -10845,8 +10646,7 @@ upgrade.
 <a name="cosmos.upgrade.v1beta1.QueryAppliedPlanRequest"></a>
 
 ### QueryAppliedPlanRequest
-QueryCurrentPlanRequest is the request type for the Query/AppliedPlan RPC
-method.
+QueryCurrentPlanRequest 是 Query/AppliedPlan RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -10861,8 +10661,7 @@ method.
 <a name="cosmos.upgrade.v1beta1.QueryAppliedPlanResponse"></a>
 
 ### QueryAppliedPlanResponse
-QueryAppliedPlanResponse is the response type for the Query/AppliedPlan RPC
-method.
+QueryAppliedPlanResponse 是 Query/AppliedPlan RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -10877,8 +10676,7 @@ method.
 <a name="cosmos.upgrade.v1beta1.QueryCurrentPlanRequest"></a>
 
 ### QueryCurrentPlanRequest
-QueryCurrentPlanRequest is the request type for the Query/CurrentPlan RPC
-method.
+QueryCurrentPlanRequest 是 Query/CurrentPlan RPC 方法的请求类型。
 
 
 
@@ -10888,8 +10686,7 @@ method.
 <a name="cosmos.upgrade.v1beta1.QueryCurrentPlanResponse"></a>
 
 ### QueryCurrentPlanResponse
-QueryCurrentPlanResponse is the response type for the Query/CurrentPlan RPC
-method.
+QueryCurrentPlanResponse 是 Query/CurrentPlan RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -10904,8 +10701,7 @@ method.
 <a name="cosmos.upgrade.v1beta1.QueryModuleVersionsRequest"></a>
 
 ### QueryModuleVersionsRequest
-QueryModuleVersionsRequest is the request type for the Query/ModuleVersions
-RPC method.
+QueryModuleVersionsRequest 是 Query/ModuleVersions RPC 方法的请求类型。
 
 Since: cosmos-sdk 0.43
 
@@ -10922,8 +10718,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.upgrade.v1beta1.QueryModuleVersionsResponse"></a>
 
 ### QueryModuleVersionsResponse
-QueryModuleVersionsResponse is the response type for the Query/ModuleVersions
-RPC method.
+QueryModuleVersionsResponse 是 Query/ModuleVersions RPC 方法的响应类型。
 
 Since: cosmos-sdk 0.43
 
@@ -10940,8 +10735,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.upgrade.v1beta1.QueryUpgradedConsensusStateRequest"></a>
 
 ### QueryUpgradedConsensusStateRequest
-QueryUpgradedConsensusStateRequest is the request type for the Query/UpgradedConsensusState
-RPC method.
+QueryUpgradedConsensusStateRequest 是 Query/UpgradedConsensusState RPC 方法的请求类型。
 
 
 | Field | Type | Label | Description |
@@ -10956,8 +10750,7 @@ RPC method.
 <a name="cosmos.upgrade.v1beta1.QueryUpgradedConsensusStateResponse"></a>
 
 ### QueryUpgradedConsensusStateResponse
-QueryUpgradedConsensusStateResponse is the response type for the Query/UpgradedConsensusState
-RPC method.
+QueryUpgradedConsensusStateResponse 是 Query/UpgradedConsensusState RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -10978,7 +10771,7 @@ RPC method.
 <a name="cosmos.upgrade.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC upgrade querier service.
+Query 定义了 gRPC 升级查询器服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -11003,8 +10796,7 @@ Since: cosmos-sdk 0.43 | GET|/cosmos/upgrade/v1beta1/module_versions|
 <a name="cosmos.vesting.v1beta1.BaseVestingAccount"></a>
 
 ### BaseVestingAccount
-BaseVestingAccount implements the VestingAccount interface. It contains all
-the necessary fields needed for any vesting account implementation.
+BaseVestingAccount 实现了 VestingAccount 接口。 它包含任何归属账户实施所需的所有必要字段。
 
 
 | Field | Type | Label | Description |
@@ -11023,8 +10815,7 @@ the necessary fields needed for any vesting account implementation.
 <a name="cosmos.vesting.v1beta1.ContinuousVestingAccount"></a>
 
 ### ContinuousVestingAccount
-ContinuousVestingAccount implements the VestingAccount interface. It
-continuously vests by unlocking coins linearly with respect to time.
+ContinuousVestingAccount 实现了 VestingAccount 接口。 它通过随时间线性解锁硬币来持续归属。
 
 
 | Field | Type | Label | Description |
@@ -11040,9 +10831,7 @@ continuously vests by unlocking coins linearly with respect to time.
 <a name="cosmos.vesting.v1beta1.DelayedVestingAccount"></a>
 
 ### DelayedVestingAccount
-DelayedVestingAccount implements the VestingAccount interface. It vests all
-coins after a specific time, but non prior. In other words, it keeps them
-locked until a specified time.
+DelayedVestingAccount 实现了 VestingAccount 接口。 它在特定时间后授予所有代币，但不是在此之前。 换句话说，它会将它们锁定到指定的时间。
 
 
 | Field | Type | Label | Description |
@@ -11057,7 +10846,7 @@ locked until a specified time.
 <a name="cosmos.vesting.v1beta1.Period"></a>
 
 ### Period
-Period defines a length of time and amount of coins that will vest.
+期间定义了将授予的时间长度和硬币数量。
 
 
 | Field | Type | Label | Description |
@@ -11073,8 +10862,7 @@ Period defines a length of time and amount of coins that will vest.
 <a name="cosmos.vesting.v1beta1.PeriodicVestingAccount"></a>
 
 ### PeriodicVestingAccount
-PeriodicVestingAccount implements the VestingAccount interface. It
-periodically vests by unlocking coins during each specified period.
+PeriodicVestingAccount 实现了 VestingAccount 接口。 它通过在每个指定时期解锁硬币来定期归属。
 
 
 | Field | Type | Label | Description |
@@ -11091,9 +10879,7 @@ periodically vests by unlocking coins during each specified period.
 <a name="cosmos.vesting.v1beta1.PermanentLockedAccount"></a>
 
 ### PermanentLockedAccount
-PermanentLockedAccount implements the VestingAccount interface. It does
-not ever release coins, locking them indefinitely. Coins in this account can
-still be used for delegating and for governance votes even while locked.
+PermanentLockedAccount 实现了 VestingAccount 接口。 它永远不会释放硬币，无限期地锁定它们。 即使在锁定时，此帐户中的硬币仍可用于委托和治理投票。
 
 Since: cosmos-sdk 0.43
 
@@ -11126,8 +10912,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.vesting.v1beta1.MsgCreatePeriodicVestingAccount"></a>
 
 ### MsgCreatePeriodicVestingAccount
-MsgCreateVestingAccount defines a message that enables creating a vesting
-account.
+MsgCreateVestingAccount 定义了一条消息，用于创建归属账户。
 
 
 | Field | Type | Label | Description |
@@ -11145,8 +10930,7 @@ account.
 <a name="cosmos.vesting.v1beta1.MsgCreatePeriodicVestingAccountResponse"></a>
 
 ### MsgCreatePeriodicVestingAccountResponse
-MsgCreateVestingAccountResponse defines the Msg/CreatePeriodicVestingAccount
-response type.
+MsgCreateVestingAccountResponse 定义了 Msg/CreatePeriodicVestingAccount 响应类型。
 
 
 
@@ -11156,8 +10940,7 @@ response type.
 <a name="cosmos.vesting.v1beta1.MsgCreateVestingAccount"></a>
 
 ### MsgCreateVestingAccount
-MsgCreateVestingAccount defines a message that enables creating a vesting
-account.
+MsgCreateVestingAccount 定义了一条消息，用于创建归属账户。
 
 
 | Field | Type | Label | Description |
@@ -11176,7 +10959,7 @@ account.
 <a name="cosmos.vesting.v1beta1.MsgCreateVestingAccountResponse"></a>
 
 ### MsgCreateVestingAccountResponse
-MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount response type.
+MsgCreateVestingAccountResponse 定义了 Msg/CreateVestingAccount 响应类型。
 
 
 
@@ -11192,7 +10975,7 @@ MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount response ty
 <a name="cosmos.vesting.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the bank Msg service.
+Msg 定义了银行消息服务。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -11222,4 +11005,5 @@ Msg defines the bank Msg service.
 | <a name="bool" /> bool |  | bool | boolean | boolean | bool | bool | boolean | TrueClass/FalseClass |
 | <a name="string" /> string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | string | String | str/unicode | string | string | string | String (UTF-8) |
 | <a name="bytes" /> bytes | May contain any arbitrary sequence of bytes. | string | ByteString | str | []byte | ByteString | string | String (ASCII-8BIT) |
+
 

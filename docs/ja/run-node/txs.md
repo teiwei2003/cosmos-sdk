@@ -1,59 +1,59 @@
-# 生成、签署和广播交易
+# トランザクションの生成、署名、およびブロードキャスト
 
-本文档描述了如何生成(未签名)交易、对其进行签名(使用一个或多个密钥)并将其广播到网络。 {概要}
+このドキュメントでは、(署名されていない)トランザクションを生成し、(1つまたは複数のキーを使用して)署名し、ネットワークにブロードキャストする方法について説明します。{概要}
 
-## 使用 CLI
+## CLIの使用
 
-发送交易的最简单方法是使用 CLI，正如我们在上一页中看到的 [与节点交互](./interact-node.md#using-the-cli)。 例如，运行以下命令 
+前のページで[ノードとの対話](./interact-node.md＃using-the-cli)で見たように、トランザクションを送信する最も簡単な方法はCLIを使用することです。 たとえば、次のコマンドを実行します 
 
 ```bash
 simd tx bank send $MY_VALIDATOR_ADDRESS $RECIPIENT 1000stake --chain-id my-test-chain --keyring-backend test
 ```
 
-将运行以下步骤:
+次の手順を実行します。
 
-- 用一个 `Msg`(`x/bank` 的 `MsgSend`)生成一个交易，并将生成的交易打印到控制台。
-- 要求用户确认从`$MY_VALIDATOR_ADDRESS` 帐户发送交易。
-- 从钥匙圈中获取`$MY_VALIDATOR_ADDRESS`。 这是可能的，因为我们在上一步中[设置了 CLI 的密钥环](./keyring.md)。
-- 使用密钥环的帐户签署生成的交易。
-- 将签名的交易广播到网络。 这是可能的，因为 CLI 连接到节点的 Tendermint RPC 端点。
+- 1つの`Msg`(`x/bank`の`MsgSend`)を使用してトランザクションを生成し、生成されたトランザクションをコンソールに出力します。
+-`$ MY_VALIDATOR_ADDRESS`アカウントからトランザクションを送信するための確認をユーザーに依頼します。
+- キーリングから`$ MY_VALIDATOR_ADDRESS`をフェッチします。 これが可能なのは、前の手順で[CLIのキーリングを設定](./keyring.md)したためです。
+- 生成されたトランザクションにキーリングのアカウントで署名します。
+- 署名されたトランザクションをネットワークにブロードキャストします。 これが可能なのは、CLIがノードのTendermintRPCエンドポイントに接続しているためです。
 
-CLI 将所有必要的步骤捆绑到易于使用的用户体验中。 但是，也可以单独运行所有步骤。
+CLIは、必要なすべてのステップを使いやすいユーザーエクスペリエンスにバンドルします。 ただし、すべてのステップを個別に実行することも可能です。
 
-### 生成交易
+### 取引の生成
 
-生成交易可以简单地通过在任何 `tx` 命令上附加 `--generate-only` 标志来完成，例如: 
+トランザクションの生成は、任意の`tx`コマンドに`--generate-only`フラグを追加することで簡単に実行できます。例：
 
 ```bash
 simd tx bank send $MY_VALIDATOR_ADDRESS $RECIPIENT 1000stake --chain-id my-test-chain --generate-only
 ```
 
-这将在控制台中将未签名的交易输出为 JSON。 我们还可以通过将 `> unsigned_tx.json` 附加到上述命令，将未签名的交易保存到一个文件中(以便在签名者之间更容易地传递)。
+これにより、署名されていないトランザクションがコンソールにJSONとして出力されます。 上記のコマンドに`> unsigned_tx.json`を追加することで、署名されていないトランザクションをファイルに保存することもできます(署名者間でより簡単に受け渡されます)。
 
-### 签署交易
+### トランザクションへの署名
 
-使用 CLI 签署交易需要将未签名的交易保存在文件中。 让我们假设未签名的交易位于当前目录中名为“unsigned_tx.json”的文件中(请参阅上一段了解如何执行此操作)。 然后，只需运行以下命令: 
+CLIを使用してトランザクションに署名するには、署名されていないトランザクションをファイルに保存する必要があります。 署名されていないトランザクションが、現在のディレクトリの`unsigned_tx.json`というファイルにあると仮定します(これを行う方法については、前の段落を参照してください)。 次に、次のコマンドを実行するだけです。
 
 ```bash
 simd tx sign unsigned_tx.json --chain-id my-test-chain --keyring-backend test --from $MY_VALIDATOR_ADDRESS
 ```
 
-此命令将解码未签名的交易，并使用“SIGN_MODE_DIRECT”和“$MY_VALIDATOR_ADDRESS”的密钥对其进行签名，我们已经在密钥环中设置了该密钥。签名的交易将作为 JSON 输出到控制台，如上所述，我们可以通过附加 `> signed_tx.json` 将其保存到文件中。
+このコマンドは、署名されていないトランザクションをデコードし、キーリングにすでに設定されている`$ MY_VALIDATOR_ADDRESS`のキーを使用して`SIGN_MODE_DIRECT`で署名します。 署名されたトランザクションはJSONとしてコンソールに出力されます。上記のように、`> signed_tx.json`を追加することでファイルに保存できます。
 
-在 `tx sign` 命令中需要考虑的一些有用标志:
+`txsign`コマンドで考慮すべきいくつかの便利なフラグ：
 
-- `--sign-mode`:你可以使用 `amino-json` 使用 `SIGN_MODE_LEGACY_AMINO_JSON` 来签署交易，
-- `--offline`:在离线模式下登录。这意味着 `tx sign` 命令不会连接到节点来检索签名者的帐号和序列，这两者都是签名所必需的。在这种情况下，您必须手动提供 `--account-number` 和 `--sequence` 标志。这对于离线签名很有用，即在无法访问互联网的安全环境中签名。
+-`--sign-mode`：`SIGN_MODE_LEGACY_AMINO_JSON`を使用してトランザクションに署名するには、`amino-json`を使用できます。
+-`--offline`：オフラインモードでサインインします。 これは、`tx sign`コマンドがノードに接続して、署名に必要な署名者のアカウント番号とシーケンスを取得しないことを意味します。 この場合、`--account-number`フラグと`--sequence`フラグを手動で指定する必要があります。 これは、オフライン署名、つまりインターネットにアクセスできない安全な環境での署名に役立ちます。
 
-#### 与多个签名者签名
+#### 複数の署名者による署名
 
 ::: 警告
-请注意，使用多个签名者或多重签名帐户签署交易(其中至少有一个签​​名者使用“SIGN_MODE_DIRECT”)尚不可能。您可以关注 [this Github issue](https://github.com/cosmos/cosmos-sdk/issues/8141) 了解更多信息。
+少なくとも1人の署名者が`SIGN_MODE_DIRECT`を使用する、複数の署名者またはマルチシグアカウントでトランザクションに署名することはまだ不可能であることに注意してください。 詳細については、[このGithubの問題](https://github.com/cosmos/cosmos-sdk/issues/8141)をフォローしてください。
 :::
 
-使用“tx multisign”命令完成与多个签名者的签名。此命令假定所有签名者都使用“SIGN_MODE_LEGACY_AMINO_JSON”。该流程类似于“tx sign”命令流程，但不是签署未签名的交易文件，而是每个签署者签署由先前签署者签署的文件。 `tx multisign` 命令会将签名附加到现有交易中。签名者以与交易给出的相同顺序**签署交易非常重要，该顺序可以使用`GetSigners()`方法进行检索。
+複数の署名者による署名は、`txmultisign`コマンドを使用して実行されます。 このコマンドは、すべての署名者が`SIGN_MODE_LEGACY_AMINO_JSON`を使用することを前提としています。 フローは`tx sign`コマンドフローに似ていますが、署名されていないトランザクションファイルに署名する代わりに、各署名者が前の署名者によって署名されたファイルに署名します。`tx multisign`コマンドは、既存のトランザクションに署名を追加します。 署名者は、トランザクションで指定されたのと**同じ順序**でトランザクションに署名することが重要です。これは、`GetSigners()`メソッドを使用して取得できます。
 
-例如，从 `unsigned_tx.json` 开始，假设交易有 4 个签名者，我们将运行: 
+たとえば、`unsigned_tx.json`から始めて、トランザクションに4人の署名者がいると仮定すると、次のように実行します。
 
 ```bash
 # Let signer1 sign the unsigned tx.
@@ -65,51 +65,51 @@ simd tx multisign partial_tx_1.json signer_key_2 --chain-id my-test-chain --keyr
 simd tx multisign partial_tx_2.json signer_key_3 --chain-id my-test-chain --keyring-backend test > partial_tx_3.json
 ```
 
-### Broadcasting a Transaction
+### トランザクションのブロードキャスト
 
-使用以下命令广播事务: 
+トランザクションのブロードキャストは、次のコマンドを使用して実行されます。
 
 ```bash
 simd tx broadcast tx_signed.json
 ```
 
-您可以选择传递 `--broadcast-mode` 标志来指定从节点接收哪个响应:
+オプションで、`--broadcast-mode`フラグを渡して、ノードから受信する応答を指定できます。
 
-- `block`:CLI 等待 tx 在一个块中提交。
-- `sync`:CLI 仅等待 CheckTx 执行响应。
-- `async`:CLI 立即返回(交易可能会失败)。
+-`block`：CLIはtxがブロックにコミットされるのを待ちます。
+-`sync`：CLIはCheckTx実行応答のみを待機します。
+-`async`：CLIはすぐに戻ります(トランザクションが失敗する可能性があります)。
 
-### 对交易进行编码
+### トランザクションのエンコード
 
-为了使用 gRPC 或 REST 端点广播交易，需要先对交易进行编码。 这可以使用 CLI 来完成。
+gRPCまたはRESTエンドポイントを使用してトランザクションをブロードキャストするには、トランザクションを最初にエンコードする必要があります。 これは、CLIを使用して実行できます。
 
-使用以下命令对交易进行编码: 
+トランザクションのエンコードは、次のコマンドを使用して実行されます。
 
 ```bash
 simd tx encode tx_signed.json
 ```
 
-这将从文件中读取交易，使用 Protobuf 对其进行序列化，并在控制台中以 base64 格式输出交易字节。
+これにより、ファイルからトランザクションが読み取られ、Protobufを使用してシリアル化され、コンソールにトランザクションバイトがbase64として出力されます。
 
-### 解码交易
+### トランザクションのデコード
 
-CLI 还可用于解码事务字节。
+CLIを使用して、トランザクションバイトをデコードすることもできます。
 
-使用以下命令对交易进行解码: 
+トランザクションのデコードは、次のコマンドを使用して実行されます。
 
 ```bash
 simd tx decode [protobuf-byte-string]
 ```
 
-这将解码交易字节并在控制台中将交易输出为 JSON。 您还可以通过将 `> tx.json` 附加到上述命令来将交易保存到文件中。
+これにより、トランザクションバイトがデコードされ、コンソールにトランザクションがJSONとして出力されます。 上記のコマンドに`> tx.json`を追加して、トランザクションをファイルに保存することもできます。
 
-## 用 Go 编程
+## プログラムでGoを使用
 
-可以使用 Cosmos SDK 的“TxBuilder”接口通过 Go 以编程方式操作事务。
+Cosmos SDKの`TxBuilder`インターフェースを使用して、Goを介してプログラムでトランザクションを操作することができます。
 
-### 生成交易
+### 取引の生成
 
-在生成交易之前，需要创建一个“TxBuilder”的新实例。 由于 Cosmos SDK 支持 Amino 和 Protobuf 事务，第一步是决定使用哪种编码方案。 所有后续步骤都保持不变，无论您使用的是 Amino 还是 Protobuf，因为“TxBuilder”抽象了编码机制。 在以下代码段中，我们将使用 Protobuf。 
+トランザクションを生成する前に、`TxBuilder`の新しいインスタンスを作成する必要があります。 Cosmos SDKはAminoトランザクションとProtobufトランザクションの両方をサポートしているため、最初のステップは、使用するエンコード方式を決定することです。`TxBuilder`はエンコーディングメカニズムを抽象化するため、AminoまたはProtobufのどちらを使用していても、以降のすべての手順は変更されません。 次のスニペットでは、Protobufを使用します。 
 
 ```go
 import (
@@ -128,7 +128,7 @@ func sendTx() error {
 }
 ```
 
-我们还可以设置一些将发送和接收交易的密钥和地址。 在这里，出于本教程的目的，我们将使用一些虚拟数据来创建密钥。 
+トランザクションを送受信するいくつかのキーとアドレスを設定することもできます。 ここでは、チュートリアルの目的で、いくつかのダミーデータを使用してキーを作成します。 
 
 ```go
 import (
@@ -140,7 +140,7 @@ priv2, _, addr2 := testdata.KeyTestPubAddr()
 priv3, _, addr3 := testdata.KeyTestPubAddr()
 ```
 
-Populating the `TxBuilder` can be done via its [methods](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/client/tx_config.go#L32-L45):
+Populating the`TxBuilder`can be done via its [methods](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/client/tx_config.go#L32-L45):
 
 ```go
 import (
@@ -169,16 +169,16 @@ func sendTx() error {
 }
 ```
 
-此时，`TxBuilder` 的底层交易已准备好进行签名。
+この時点で、`TxBuilder`の基礎となるトランザクションに署名する準備ができています。
 
-### 签署交易
+### 取引に署名する
 
-我们将编码配置设置为使用 Protobuf，默认使用 `SIGN_MODE_DIRECT`。 根据 [ADR-020](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/docs/architecture/adr-020-protobuf-transaction-encoding.md)，每个签名者需要 签署所有其他签名者的`SignerInfo`s。 这意味着我们需要依次执行两个步骤:
+デフォルトで`SIGN_MODE_DIRECT`を使用するProtobufを使用するようにencodingconfigを設定します。 [ADR-020](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/docs/architecture/adr-020-protobuf-transaction-encoding.md)に従って、各署名者は 他のすべての署名者の`SignerInfo`に署名します。 これは、2つのステップを順番に実行する必要があることを意味します。
 
-- 对于每个签名者，在 `TxBuilder` 中填充签名者的 `SignerInfo`，
-- 一旦所有`SignerInfo`s 被填充，对于每个签名者，签署`SignDoc`(要签名的有效负载)。
+- 署名者ごとに、署名者の`SignerInfo`を`TxBuilder`内に入力します。
+- すべての`SignerInfo`が入力されたら、署名者ごとに、`SignDoc`(署名されるペイロード)に署名します。
 
-在当前的 `TxBuilder` 的 API 中，这两个步骤都是使用相同的方法完成的:`SetSignatures()`。 当前的 API 要求我们首先执行一轮 `SetSignatures()` _带有空签名_，只填充 `SignerInfo`s，第二轮 `SetSignatures()` 以实际签署正确的有效负载。
+現在の`TxBuilder`のAPIでは、両方のステップが同じメソッド`SetSignatures()`を使用して実行されます。 現在のAPIでは、最初に「SetSignatures()」のラウンドを_空の署名で_実行して、「SignerInfo」にデータを入力し、2回目の「SetSignatures()」を実行して実際に正しいペイロードに署名する必要があります。
 
 ```go
 import (
@@ -238,7 +238,7 @@ func sendTx() error {
 }
 ```
 
-“TxBuilder”现在已正确填充。 要打印它，您可以使用初始编码配置 `encCfg` 中的 `TxConfig` 接口: 
+これで、`TxBuilder`が正しく入力されます。 それを印刷するには、初期エンコーディング構成`encCfg`から`TxConfig`インターフェースを使用できます。
 
 ```go
 func sendTx() error {
@@ -259,9 +259,9 @@ func sendTx() error {
 }
 ```
 
-### Broadcasting a Transaction
+### 取引の放送
 
-广播交易的首选方式是使用 gRPC，但也可以使用 REST(通过 `gRPC-gateway`)或 Tendermint RPC。 [此处](../core/grpc_rest.md) 公开了这些方法之间差异的概述。 在本教程中，我们将仅描述 gRPC 方法。
+トランザクションをブロードキャストするための好ましい方法はgRPCを使用することですが、REST(`gRPC-gateway`経由)またはTendermintRPCを使用することも可能です。 これらのメソッドの違いの概要は[ここ](../core/grpc_rest.md)に公開されています。 このチュートリアルでは、gRPCメソッドについてのみ説明します。
 
 ```go
 import (
@@ -278,8 +278,8 @@ func sendTx(ctx context.Context) error {
 
     // Create a connection to the gRPC server.
     grpcConn := grpc.Dial(
-        "127.0.0.1:9090", // Or your gRPC server address.
-        grpc.WithInsecure(), // The Cosmos SDK doesn't support any transport security mechanism.
+        "127.0.0.1:9090",//Or your gRPC server address.
+        grpc.WithInsecure(),//The Cosmos SDK doesn't support any transport security mechanism.
     )
     defer grpcConn.Close()
 
@@ -291,22 +291,22 @@ func sendTx(ctx context.Context) error {
         ctx,
         &tx.BroadcastTxRequest{
             Mode:    tx.BroadcastMode_BROADCAST_MODE_SYNC,
-            TxBytes: txBytes, // Proto-binary of the signed transaction, see previous step.
+            TxBytes: txBytes,//Proto-binary of the signed transaction, see previous step.
         },
     )
     if err != nil {
         return err
     }
 
-    fmt.Println(grpcRes.TxResponse.Code) // Should be `0` if the tx is successful
+    fmt.Println(grpcRes.TxResponse.Code)//Should be`0`if the tx is successful
 
     return nil
 }
 ```
 
-#### Simulating a Transaction
+#### 取引のシミュレーション
 
-在广播一个事务之前，我们有时可能想要试运行该事务，以在不实际提交它的情况下估计有关该事务的一些信息。 这称为模拟交易，可以按如下方式完成:
+トランザクションをブロードキャストする前に、トランザクションをドライランして、実際にコミットせずにトランザクションに関する情報を推定したい場合があります。 これはトランザクションのシミュレーションと呼ばれ、次のように実行できます。
 
 ```go
 import (
@@ -344,13 +344,13 @@ func simulateTx() error {
 }
 ```
 
-## Using gRPC
+## gRPCの使用
 
-不可能使用 gRPC 生成或签署交易，只能广播一个。 为了使用 gRPC 广播交易，您需要使用 CLI 或使用 Go 以编程方式生成、签署和编码交易。
+gRPCを使用してトランザクションを生成または署名することはできず、ブロードキャストするだけです。 gRPCを使用してトランザクションをブロードキャストするには、CLIを使用するか、Goを使用してプログラムでトランザクションを生成、署名、およびエンコードする必要があります。
 
-### 广播交易
+### 取引の放送
 
-可以通过发送如下的“BroadcastTx”请求来使用 gRPC 端点广播交易，其中“txBytes”是签名交易的 protobuf 编码字节:
+gRPCエンドポイントを使用してトランザクションをブロードキャストするには、次のように`BroadcastTx`リクエストを送信します。ここで、`txBytes`は署名されたトランザクションのprotobufでエンコードされたバイトです。
 
 ```bash
 grpcurl -plaintext \
@@ -359,13 +359,13 @@ grpcurl -plaintext \
     cosmos.tx.v1beta1.Service/BroadcastTx
 ```
 
-## 使用 REST
+## RESTの使用
 
-不可能使用 REST 生成或签署交易，只能广播一个。 为了使用 REST 广播交易，您需要使用 CLI 或使用 Go 以编程方式生成、签署和编码交易。
+RESTを使用してトランザクションを生成または署名することはできず、ブロードキャストするだけです。 RESTを使用してトランザクションをブロードキャストするには、CLIを使用するか、Goを使用してプログラムでトランザクションを生成、署名、およびエンコードする必要があります。
 
-### 广播交易
+### 取引の放送
 
-使用 REST 端点(由 `gRPC-gateway` 提供服务)广播交易可以通过如下发送 POST 请求来完成，其中 `txBytes` 是签名交易的 protobuf 编码字节: 
+RESTエンドポイント(`gRPC-gateway`によって提供される)を使用してトランザクションをブロードキャストするには、次のようにPOSTリクエストを送信します。ここで、`txBytes`は署名されたトランザクションのprotobufエンコードされたバイトです。
 
 ```bash
 curl -X POST \
@@ -374,6 +374,6 @@ curl -X POST \
     localhost:1317/cosmos/tx/v1beta1/txs
 ```
 
-## 使用 CosmJS(JavaScript 和 TypeScript)
+## CosmOS(JavaScriptおよびTypeScript)の使用
 
-CosmJS 旨在用 JavaScript 构建可以嵌入 Web 应用程序的客户端库。 请参阅 [https://cosmos.github.io/cosmjs](https://cosmos.github.io/cosmjs) 了解更多信息。 截至 2021 年 1 月，CosmJS 文档仍在进行中。 
+CosmJSは、Webアプリケーションに埋め込むことができるJavaScriptでクライアントライブラリを構築することを目的としています。 詳細については、[https://cosmos.github.io/cosmjs](https://cosmos.github.io/cosmjs)を参照してください。 2021年1月の時点で、CosmJSのドキュメントはまだ作成中です。

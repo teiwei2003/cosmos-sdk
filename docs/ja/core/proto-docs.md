@@ -1,7 +1,7 @@
-# Protobuf Documentation
+# Protobufドキュメント
 <a name="top"></a>
 
-## Table of Contents
+## 目次
 
 - [cosmos/auth/v1beta1/auth.proto](#cosmos/auth/v1beta1/auth.proto)
     - [BaseAccount](#cosmos.auth.v1beta1.BaseAccount)
@@ -793,9 +793,9 @@
 <a name="cosmos.auth.v1beta1.BaseAccount"></a>
 
 ### BaseAccount
-BaseAccount defines a base account type. It contains all the necessary fields
-for basic account functionality. Any custom account type should extend this
-type for additional functionality (e.g. vesting).
+BaseAccountは、基本アカウントタイプを定義します。 必要なすべてのフィールドが含まれています
+基本的なアカウント機能用。 カスタムアカウントタイプはこれを拡張する必要があります
+追加機能（権利確定など）のタイプ。
 
 
 | Field | Type | Label | Description |
@@ -813,7 +813,7 @@ type for additional functionality (e.g. vesting).
 <a name="cosmos.auth.v1beta1.ModuleAccount"></a>
 
 ### ModuleAccount
-ModuleAccount defines an account for modules that holds coins on a pool.
+ModuleAccountは、プールにコインを保持するモジュールのアカウントを定義します。
 
 
 | Field | Type | Label | Description |
@@ -830,7 +830,7 @@ ModuleAccount defines an account for modules that holds coins on a pool.
 <a name="cosmos.auth.v1beta1.Params"></a>
 
 ### Params
-Params defines the parameters for the auth module.
+Paramsは、認証モジュールのパラメーターを定義します。
 
 
 | Field | Type | Label | Description |
@@ -865,7 +865,7 @@ Params defines the parameters for the auth module.
 <a name="cosmos.auth.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the auth module's genesis state.
+GenesisStateは、認証モジュールのジェネシス状態を定義します。
 
 
 | Field | Type | Label | Description |
@@ -897,8 +897,8 @@ GenesisState defines the auth module's genesis state.
 <a name="cosmos.base.query.v1beta1.PageRequest"></a>
 
 ### PageRequest
-PageRequest is to be embedded in gRPC request messages for efficient
-pagination. Ex:
+PageRequestは、効率的なページネーションのためにgRPCリクエストメッセージに埋め込まれます。 
+Ex:
 
  message SomeRequest {
          Foo some_parameter = 1;
@@ -924,8 +924,7 @@ Since: cosmos-sdk 0.43 |
 <a name="cosmos.base.query.v1beta1.PageResponse"></a>
 
 ### PageResponse
-PageResponse is to be embedded in gRPC response messages where the
-corresponding request message has used PageRequest.
+PageResponseは、対応するリクエストメッセージがPageRequestを使用しているgRPCレスポンスメッセージに埋め込まれます。
 
  message SomeResponse {
          repeated Bar results = 1;
@@ -962,7 +961,7 @@ corresponding request message has used PageRequest.
 <a name="cosmos.auth.v1beta1.AddressBytesToStringRequest"></a>
 
 ### AddressBytesToStringRequest
-AddressBytesToStringRequest is the request type for AddressString rpc method
+AddressBytesToStringRequestは、AddressStringrpcメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -977,7 +976,7 @@ AddressBytesToStringRequest is the request type for AddressString rpc method
 <a name="cosmos.auth.v1beta1.AddressBytesToStringResponse"></a>
 
 ### AddressBytesToStringResponse
-AddressBytesToStringResponse is the response type for AddressString rpc method
+AddressBytesToStringResponseは、AddressStringrpcメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -992,7 +991,7 @@ AddressBytesToStringResponse is the response type for AddressString rpc method
 <a name="cosmos.auth.v1beta1.AddressStringToBytesRequest"></a>
 
 ### AddressStringToBytesRequest
-AddressStringToBytesRequest is the request type for AccountBytes rpc method
+AddressStringToBytesRequestは、AccountBytesrpcメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -1007,7 +1006,7 @@ AddressStringToBytesRequest is the request type for AccountBytes rpc method
 <a name="cosmos.auth.v1beta1.AddressStringToBytesResponse"></a>
 
 ### AddressStringToBytesResponse
-AddressStringToBytesResponse is the response type for AddressBytes rpc method
+AddressStringToBytesResponseは、AddressBytesrpcメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -1022,7 +1021,7 @@ AddressStringToBytesResponse is the response type for AddressBytes rpc method
 <a name="cosmos.auth.v1beta1.Bech32PrefixRequest"></a>
 
 ### Bech32PrefixRequest
-Bech32PrefixRequest is the request type for Bech32Prefix rpc method
+Bech32PrefixRequestは、Bech32Prefixrpcメソッドのリクエストタイプです。
 
 
 
@@ -1032,7 +1031,7 @@ Bech32PrefixRequest is the request type for Bech32Prefix rpc method
 <a name="cosmos.auth.v1beta1.Bech32PrefixResponse"></a>
 
 ### Bech32PrefixResponse
-Bech32PrefixResponse is the response type for Bech32Prefix rpc method
+Bech32PrefixResponseは、Bech32Prefixrpcメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -1047,7 +1046,7 @@ Bech32PrefixResponse is the response type for Bech32Prefix rpc method
 <a name="cosmos.auth.v1beta1.QueryAccountRequest"></a>
 
 ### QueryAccountRequest
-QueryAccountRequest is the request type for the Query/Account RPC method.
+QueryAccountRequestは、Query / AccountRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -1062,7 +1061,7 @@ QueryAccountRequest is the request type for the Query/Account RPC method.
 <a name="cosmos.auth.v1beta1.QueryAccountResponse"></a>
 
 ### QueryAccountResponse
-QueryAccountResponse is the response type for the Query/Account RPC method.
+QueryAccountResponseは、Query / AccountRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -1077,7 +1076,7 @@ QueryAccountResponse is the response type for the Query/Account RPC method.
 <a name="cosmos.auth.v1beta1.QueryAccountsRequest"></a>
 
 ### QueryAccountsRequest
-QueryAccountsRequest is the request type for the Query/Accounts RPC method.
+QueryAccountsRequestは、Query / AccountsRPCメソッドのリクエストタイプです。
 
 Since: cosmos-sdk 0.43
 
@@ -1094,9 +1093,9 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.auth.v1beta1.QueryAccountsResponse"></a>
 
 ### QueryAccountsResponse
-QueryAccountsResponse is the response type for the Query/Accounts RPC method.
+QueryAccountsResponseは、Query / AccountsRPCメソッドの応答タイプです。
 
-Since: cosmos-sdk 0.43
+より: cosmos-sdk 0.43
 
 
 | Field | Type | Label | Description |
@@ -1112,7 +1111,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.auth.v1beta1.QueryModuleAccountsRequest"></a>
 
 ### QueryModuleAccountsRequest
-QueryModuleAccountsRequest is the request type for the Query/ModuleAccounts RPC method.
+QueryModuleAccountsRequestは、Query / ModuleAccountsRPCメソッドのリクエストタイプです。
 
 
 
@@ -1122,7 +1121,7 @@ QueryModuleAccountsRequest is the request type for the Query/ModuleAccounts RPC 
 <a name="cosmos.auth.v1beta1.QueryModuleAccountsResponse"></a>
 
 ### QueryModuleAccountsResponse
-QueryModuleAccountsResponse is the response type for the Query/ModuleAccounts RPC method.
+QueryModuleAccountsResponseは、Query / ModuleAccountsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -1137,7 +1136,7 @@ QueryModuleAccountsResponse is the response type for the Query/ModuleAccounts RP
 <a name="cosmos.auth.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method.
+QueryParamsRequestは、Query / ParamsRPCメソッドのリクエストタイプです。
 
 
 
@@ -1147,7 +1146,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method.
 <a name="cosmos.auth.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method.
+QueryParamsResponseは、Query / ParamsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -1168,7 +1167,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method.
 <a name="cosmos.auth.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+QueryはgRPCクエリアサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -1190,14 +1189,13 @@ Since: cosmos-sdk 0.43 | GET|/cosmos/auth/v1beta1/accounts|
 <p align="right"><a href="#top">Top</a></p>
 
 ## cosmos/authz/v1beta1/authz.proto
-Since: cosmos-sdk 0.43
+より: cosmos-sdk 0.43
 
 
 <a name="cosmos.authz.v1beta1.GenericAuthorization"></a>
 
 ### GenericAuthorization
-GenericAuthorization gives the grantee unrestricted permissions to execute
-the provided method on behalf of the granter's account.
+GenericAuthorizationは、付与者のアカウントに代わって提供されたメソッドを実行するための無制限の権限を被付与者に与えます。
 
 
 | Field | Type | Label | Description |
@@ -1212,8 +1210,7 @@ the provided method on behalf of the granter's account.
 <a name="cosmos.authz.v1beta1.Grant"></a>
 
 ### Grant
-Grant gives permissions to execute
-the provide method with expiration time.
+Grantは、実行する権限を与えます有効期限付きのprovideメソッド。
 
 
 | Field | Type | Label | Description |
@@ -1245,7 +1242,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.authz.v1beta1.EventGrant"></a>
 
 ### EventGrant
-EventGrant is emitted on Msg/Grant
+EventGrantはMsg / Grantで発行されます
 
 
 | Field | Type | Label | Description |
@@ -1262,7 +1259,7 @@ EventGrant is emitted on Msg/Grant
 <a name="cosmos.authz.v1beta1.EventRevoke"></a>
 
 ### EventRevoke
-EventRevoke is emitted on Msg/Revoke
+EventRevokeはMsg/Revokeで発行されます
 
 
 | Field | Type | Label | Description |
@@ -1295,7 +1292,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.authz.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the authz module's genesis state.
+GenesisStateは、authzモジュールのジェネシス状態を定義します。
 
 
 | Field | Type | Label | Description |
@@ -1310,7 +1307,7 @@ GenesisState defines the authz module's genesis state.
 <a name="cosmos.authz.v1beta1.GrantAuthorization"></a>
 
 ### GrantAuthorization
-GrantAuthorization defines the GenesisState/GrantAuthorization type.
+GrantAuthorizationは、GenesisState / GrantAuthorizationタイプを定義します。
 
 
 | Field | Type | Label | Description |
@@ -1344,7 +1341,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.authz.v1beta1.QueryGranterGrantsRequest"></a>
 
 ### QueryGranterGrantsRequest
-QueryGranterGrantsRequest is the request type for the Query/GranterGrants RPC method.
+QueryGranterGrantsRequestは、Query / GranterGrantsRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -1360,7 +1357,7 @@ QueryGranterGrantsRequest is the request type for the Query/GranterGrants RPC me
 <a name="cosmos.authz.v1beta1.QueryGranterGrantsResponse"></a>
 
 ### QueryGranterGrantsResponse
-QueryGranterGrantsResponse is the response type for the Query/GranterGrants RPC method.
+QueryGranterGrantsResponseは、Query / GranterGrantsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -1376,7 +1373,7 @@ QueryGranterGrantsResponse is the response type for the Query/GranterGrants RPC 
 <a name="cosmos.authz.v1beta1.QueryGrantsRequest"></a>
 
 ### QueryGrantsRequest
-QueryGrantsRequest is the request type for the Query/Grants RPC method.
+QueryGrantsRequestは、Query/Grants RPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -1394,7 +1391,7 @@ QueryGrantsRequest is the request type for the Query/Grants RPC method.
 <a name="cosmos.authz.v1beta1.QueryGrantsResponse"></a>
 
 ### QueryGrantsResponse
-QueryGrantsResponse is the response type for the Query/Authorizations RPC method.
+QueryGrantsResponseは、Query / AuthorizationsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -1416,7 +1413,7 @@ QueryGrantsResponse is the response type for the Query/Authorizations RPC method
 <a name="cosmos.authz.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+QueryはgRPCクエリアサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -1437,9 +1434,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.authz.v1beta1.MsgExec"></a>
 
 ### MsgExec
-MsgExec attempts to execute the provided messages using
-authorizations granted to the grantee. Each message should have only
-one signer corresponding to the granter of the authorization.
+MsgExecは、被付与者に付与された権限を使用して、提供されたメッセージを実行しようとします。 各メッセージには、承認の付与者に対応する署名者が1人だけ含まれている必要があります。
 
 
 | Field | Type | Label | Description |
@@ -1455,7 +1450,7 @@ one signer corresponding to the granter of the authorization.
 <a name="cosmos.authz.v1beta1.MsgExecResponse"></a>
 
 ### MsgExecResponse
-MsgExecResponse defines the Msg/MsgExecResponse response type.
+MsgExecResponseは、Msg / MsgExecResponse応答タイプを定義します。
 
 
 | Field | Type | Label | Description |
@@ -1470,8 +1465,7 @@ MsgExecResponse defines the Msg/MsgExecResponse response type.
 <a name="cosmos.authz.v1beta1.MsgGrant"></a>
 
 ### MsgGrant
-MsgGrant is a request type for Grant method. It declares authorization to the grantee
-on behalf of the granter with the provided expiration time.
+MsgGrantは、Grantメソッドのリクエストタイプです。 付与者に代わって、指定された有効期限で被付与者に承認を宣言します。
 
 
 | Field | Type | Label | Description |
@@ -1488,7 +1482,7 @@ on behalf of the granter with the provided expiration time.
 <a name="cosmos.authz.v1beta1.MsgGrantResponse"></a>
 
 ### MsgGrantResponse
-MsgGrantResponse defines the Msg/MsgGrant response type.
+Msg Grant Responseは、Message / MsgGrant応答タイプを定義します。
 
 
 
@@ -1498,8 +1492,7 @@ MsgGrantResponse defines the Msg/MsgGrant response type.
 <a name="cosmos.authz.v1beta1.MsgRevoke"></a>
 
 ### MsgRevoke
-MsgRevoke revokes any authorization with the provided sdk.Msg type on the
-granter's account with that has been granted to the grantee.
+MsgRevokeは、被付与者に付与された、付与者のアカウントで提供されたsdk.Msgタイプの承認を取り消します。
 
 
 | Field | Type | Label | Description |
@@ -1516,7 +1509,7 @@ granter's account with that has been granted to the grantee.
 <a name="cosmos.authz.v1beta1.MsgRevokeResponse"></a>
 
 ### MsgRevokeResponse
-MsgRevokeResponse defines the Msg/MsgRevokeResponse response type.
+MsgRevokeResponseは、Msg / MsgRevokeResponse応答タイプを定義します。
 
 
 
@@ -1532,7 +1525,7 @@ MsgRevokeResponse defines the Msg/MsgRevokeResponse response type.
 <a name="cosmos.authz.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the authz Msg service.
+Msgは、authzMsgサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -1554,10 +1547,9 @@ Msg defines the authz Msg service.
 <a name="cosmos.base.v1beta1.Coin"></a>
 
 ### Coin
-Coin defines a token with a denomination and an amount.
+コインは、金種と金額でトークンを定義します。
 
-NOTE: The amount field is an Int which implements the custom method
-signatures required by gogoproto.
+注：amountフィールドは、gogoprotoに必要なカスタムメソッドシグネチャを実装するIntです。
 
 
 | Field | Type | Label | Description |
@@ -1573,10 +1565,9 @@ signatures required by gogoproto.
 <a name="cosmos.base.v1beta1.DecCoin"></a>
 
 ### DecCoin
-DecCoin defines a token with a denomination and a decimal amount.
+DecCoinは、金額と小数のトークンを定義します。
 
-NOTE: The amount field is an Dec which implements the custom method
-signatures required by gogoproto.
+注：金額フィールドは、gogoprotoに必要なカスタムメソッドシグネチャを実装するDecです。
 
 
 | Field | Type | Label | Description |
@@ -1592,7 +1583,7 @@ signatures required by gogoproto.
 <a name="cosmos.base.v1beta1.DecProto"></a>
 
 ### DecProto
-DecProto defines a Protobuf wrapper around a Dec object.
+DecProtoは、Decオブジェクトの周りにProtobufラッパーを定義します。
 
 
 | Field | Type | Label | Description |
@@ -1607,7 +1598,7 @@ DecProto defines a Protobuf wrapper around a Dec object.
 <a name="cosmos.base.v1beta1.IntProto"></a>
 
 ### IntProto
-IntProto defines a Protobuf wrapper around an Int object.
+IntProtoは、Intオブジェクトの周りにProtobufラッパーを定義します。
 
 
 | Field | Type | Label | Description |
@@ -1638,8 +1629,7 @@ IntProto defines a Protobuf wrapper around an Int object.
 <a name="cosmos.bank.v1beta1.SendAuthorization"></a>
 
 ### SendAuthorization
-SendAuthorization allows the grantee to spend up to spend_limit coins from
-the granter's account.
+SendAuthorizationを使用すると、被付与者は、付与者のアカウントから最大spend_limitコインを使用できます。
 
 Since: cosmos-sdk 0.43
 
@@ -1672,9 +1662,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.bank.v1beta1.DenomUnit"></a>
 
 ### DenomUnit
-DenomUnit represents a struct that describes a given
-denomination unit of the basic token.
-
+DenomUnitは、基本トークンの特定の金種単位を記述する構造体を表します。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -1690,7 +1678,7 @@ denomination unit of the basic token.
 <a name="cosmos.bank.v1beta1.Input"></a>
 
 ### Input
-Input models transaction input.
+入力モデルトランザクション入力。
 
 
 | Field | Type | Label | Description |
@@ -1706,8 +1694,8 @@ Input models transaction input.
 <a name="cosmos.bank.v1beta1.Metadata"></a>
 
 ### Metadata
-Metadata represents a struct that describes
-a basic token.
+メタデータは、を説明する構造を表します
+基本的なトークン。
 
 
 | Field | Type | Label | Description |
@@ -1737,7 +1725,7 @@ Since: cosmos-sdk 0.45 |
 <a name="cosmos.bank.v1beta1.Output"></a>
 
 ### Output
-Output models transaction outputs.
+出力モデルトランザクション出力。
 
 
 | Field | Type | Label | Description |
@@ -1753,7 +1741,7 @@ Output models transaction outputs.
 <a name="cosmos.bank.v1beta1.Params"></a>
 
 ### Params
-Params defines the parameters for the bank module.
+Paramsは、バンクモジュールのパラメーターを定義します。
 
 
 | Field | Type | Label | Description |
@@ -1769,8 +1757,7 @@ Params defines the parameters for the bank module.
 <a name="cosmos.bank.v1beta1.SendEnabled"></a>
 
 ### SendEnabled
-SendEnabled maps coin denom to a send_enabled status (whether a denom is
-sendable).
+SendEnabledは、コインデノムをsend_enabledステータスにマップします（デノムが送信可能かどうか）。
 
 
 | Field | Type | Label | Description |
@@ -1786,9 +1773,8 @@ sendable).
 <a name="cosmos.bank.v1beta1.Supply"></a>
 
 ### Supply
-Supply represents a struct that passively keeps track of the total supply
-amounts in the network.
-This message is deprecated now that supply is indexed by denom.
+供給は、ネットワーク内の総供給量を受動的に追跡する構造体を表します。
+このメッセージは、供給がdenomによって索引付けされるようになったため、非推奨になりました。
 
 
 | Field | Type | Label | Description |
@@ -1819,8 +1805,7 @@ This message is deprecated now that supply is indexed by denom.
 <a name="cosmos.bank.v1beta1.Balance"></a>
 
 ### Balance
-Balance defines an account address and balance pair used in the bank module's
-genesis state.
+残高は、銀行モジュールの発生状態で使用される口座住所と残高のペアを定義します。
 
 
 | Field | Type | Label | Description |
@@ -1836,7 +1821,7 @@ genesis state.
 <a name="cosmos.bank.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the bank module's genesis state.
+GenesisStateは、バンクモジュールのジェネシス状態を定義します。
 
 
 | Field | Type | Label | Description |
@@ -1870,9 +1855,7 @@ GenesisState defines the bank module's genesis state.
 <a name="cosmos.bank.v1beta1.DenomOwner"></a>
 
 ### DenomOwner
-DenomOwner defines structure representing an account that owns or holds a
-particular denominated token. It contains the account address and account
-balance of the denominated token.
+DenomOwnerは、特定の金種のトークンを所有または保持するアカウントを表す構造を定義します。 これには、金種トークンの口座住所と口座残高が含まれています。
 
 
 | Field | Type | Label | Description |
@@ -1888,7 +1871,7 @@ balance of the denominated token.
 <a name="cosmos.bank.v1beta1.QueryAllBalancesRequest"></a>
 
 ### QueryAllBalancesRequest
-QueryBalanceRequest is the request type for the Query/AllBalances RPC method.
+QueryBalanceRequestは、Query / AllBalancesRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -1904,8 +1887,7 @@ QueryBalanceRequest is the request type for the Query/AllBalances RPC method.
 <a name="cosmos.bank.v1beta1.QueryAllBalancesResponse"></a>
 
 ### QueryAllBalancesResponse
-QueryAllBalancesResponse is the response type for the Query/AllBalances RPC
-method.
+QueryAllBalancesResponseは、Query / AllBalancesRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -1921,7 +1903,7 @@ method.
 <a name="cosmos.bank.v1beta1.QueryBalanceRequest"></a>
 
 ### QueryBalanceRequest
-QueryBalanceRequest is the request type for the Query/Balance RPC method.
+QueryBalanceRequestは、Query / BalanceRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -1937,7 +1919,7 @@ QueryBalanceRequest is the request type for the Query/Balance RPC method.
 <a name="cosmos.bank.v1beta1.QueryBalanceResponse"></a>
 
 ### QueryBalanceResponse
-QueryBalanceResponse is the response type for the Query/Balance RPC method.
+QueryBalanceResponseは、Query / BalanceRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -1952,7 +1934,7 @@ QueryBalanceResponse is the response type for the Query/Balance RPC method.
 <a name="cosmos.bank.v1beta1.QueryDenomMetadataRequest"></a>
 
 ### QueryDenomMetadataRequest
-QueryDenomMetadataRequest is the request type for the Query/DenomMetadata RPC method.
+QueryDenomMetadataRequestは、Query / DenomMetadataRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -1967,8 +1949,7 @@ QueryDenomMetadataRequest is the request type for the Query/DenomMetadata RPC me
 <a name="cosmos.bank.v1beta1.QueryDenomMetadataResponse"></a>
 
 ### QueryDenomMetadataResponse
-QueryDenomMetadataResponse is the response type for the Query/DenomMetadata RPC
-method.
+QueryDenomMetadataResponseは、Query / DenomMetadataRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -1983,10 +1964,7 @@ method.
 <a name="cosmos.bank.v1beta1.QueryDenomOwnersRequest"></a>
 
 ### QueryDenomOwnersRequest
-QueryDenomOwnersRequest defines the request type for the DenomOwners RPC query,
-which queries for a paginated set of all account holders of a particular
-denomination.
-
+QueryDenomOwnersRequestは、DenomOwners RPCクエリのリクエストタイプを定義します。これは、特定の金種のすべてのアカウント所有者のページ付けされたセットをクエリします。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -2001,7 +1979,7 @@ denomination.
 <a name="cosmos.bank.v1beta1.QueryDenomOwnersResponse"></a>
 
 ### QueryDenomOwnersResponse
-QueryDenomOwnersResponse defines the RPC response of a DenomOwners RPC query.
+QueryDenomOwnersResponseは、DenomOwnersRPCクエリのRPC応答を定義します。
 
 
 | Field | Type | Label | Description |
@@ -2017,7 +1995,7 @@ QueryDenomOwnersResponse defines the RPC response of a DenomOwners RPC query.
 <a name="cosmos.bank.v1beta1.QueryDenomsMetadataRequest"></a>
 
 ### QueryDenomsMetadataRequest
-QueryDenomsMetadataRequest is the request type for the Query/DenomsMetadata RPC method.
+QueryDenomsMetadataRequestは、Query / DenomsMetadataRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -2032,9 +2010,7 @@ QueryDenomsMetadataRequest is the request type for the Query/DenomsMetadata RPC 
 <a name="cosmos.bank.v1beta1.QueryDenomsMetadataResponse"></a>
 
 ### QueryDenomsMetadataResponse
-QueryDenomsMetadataResponse is the response type for the Query/DenomsMetadata RPC
-method.
-
+QueryDenomsMetadataResponseは、Query / DenomsMetadataRPCメソッドの応答タイプです。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -2049,7 +2025,7 @@ method.
 <a name="cosmos.bank.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest defines the request type for querying x/bank parameters.
+QueryParamsRequestは、x / bankパラメーターを照会するための要求タイプを定義します。
 
 
 
@@ -2059,7 +2035,7 @@ QueryParamsRequest defines the request type for querying x/bank parameters.
 <a name="cosmos.bank.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse defines the response type for querying x/bank parameters.
+QueryParamsResponseは、x / bankパラメーターを照会するための応答タイプを定義します。
 
 
 | Field | Type | Label | Description |
@@ -2074,7 +2050,7 @@ QueryParamsResponse defines the response type for querying x/bank parameters.
 <a name="cosmos.bank.v1beta1.QuerySupplyOfRequest"></a>
 
 ### QuerySupplyOfRequest
-QuerySupplyOfRequest is the request type for the Query/SupplyOf RPC method.
+QuerySupplyOfRequestは、Query / SupplyOfRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -2089,7 +2065,7 @@ QuerySupplyOfRequest is the request type for the Query/SupplyOf RPC method.
 <a name="cosmos.bank.v1beta1.QuerySupplyOfResponse"></a>
 
 ### QuerySupplyOfResponse
-QuerySupplyOfResponse is the response type for the Query/SupplyOf RPC method.
+QuerySupplyOfResponseは、Query / SupplyOfRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -2104,8 +2080,7 @@ QuerySupplyOfResponse is the response type for the Query/SupplyOf RPC method.
 <a name="cosmos.bank.v1beta1.QueryTotalSupplyRequest"></a>
 
 ### QueryTotalSupplyRequest
-QueryTotalSupplyRequest is the request type for the Query/TotalSupply RPC
-method.
+QueryTotalSupplyRequestは、Query / TotalSupplyRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -2122,8 +2097,7 @@ Since: cosmos-sdk 0.43 |
 <a name="cosmos.bank.v1beta1.QueryTotalSupplyResponse"></a>
 
 ### QueryTotalSupplyResponse
-QueryTotalSupplyResponse is the response type for the Query/TotalSupply RPC
-method
+QueryTotalSupplyResponseは、Query / TotalSupplyRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -2147,7 +2121,7 @@ Since: cosmos-sdk 0.43 |
 <a name="cosmos.bank.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+QueryはgRPCクエリアサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -2174,7 +2148,7 @@ Query defines the gRPC querier service.
 <a name="cosmos.bank.v1beta1.MsgMultiSend"></a>
 
 ### MsgMultiSend
-MsgMultiSend represents an arbitrary multi-in, multi-out send message.
+MsgMultiSendは、任意のマルチイン、マルチアウトの送信メッセージを表します。
 
 
 | Field | Type | Label | Description |
@@ -2190,7 +2164,7 @@ MsgMultiSend represents an arbitrary multi-in, multi-out send message.
 <a name="cosmos.bank.v1beta1.MsgMultiSendResponse"></a>
 
 ### MsgMultiSendResponse
-MsgMultiSendResponse defines the Msg/MultiSend response type.
+MsgMultiSendResponseは、Msg / MultiSend応答タイプを定義します。
 
 
 
@@ -2200,7 +2174,7 @@ MsgMultiSendResponse defines the Msg/MultiSend response type.
 <a name="cosmos.bank.v1beta1.MsgSend"></a>
 
 ### MsgSend
-MsgSend represents a message to send coins from one account to another.
+MsgSendは、あるアカウントから別のアカウントにコインを送信するためのメッセージを表します。
 
 
 | Field | Type | Label | Description |
@@ -2217,7 +2191,7 @@ MsgSend represents a message to send coins from one account to another.
 <a name="cosmos.bank.v1beta1.MsgSendResponse"></a>
 
 ### MsgSendResponse
-MsgSendResponse defines the Msg/Send response type.
+MsgSendResponseは、Msg / Send応答タイプを定義します。
 
 
 
@@ -2233,7 +2207,7 @@ MsgSendResponse defines the Msg/Send response type.
 <a name="cosmos.bank.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the bank Msg service.
+Msgは、銀行のMsgサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -2254,7 +2228,7 @@ Msg defines the bank Msg service.
 <a name="cosmos.base.abci.v1beta1.ABCIMessageLog"></a>
 
 ### ABCIMessageLog
-ABCIMessageLog defines a structure containing an indexed tx ABCI message log.
+ABCIMessageLogは、インデックス付きのtxABCIメッセージログを含む構造を定義します。
 
 
 | Field | Type | Label | Description |
@@ -2271,8 +2245,7 @@ ABCIMessageLog defines a structure containing an indexed tx ABCI message log.
 <a name="cosmos.base.abci.v1beta1.Attribute"></a>
 
 ### Attribute
-Attribute defines an attribute wrapper where the key and value are
-strings instead of raw bytes.
+属性は、キーと値が生のバイトではなく文字列である属性ラッパーを定義します。
 
 
 | Field | Type | Label | Description |
@@ -2288,7 +2261,7 @@ strings instead of raw bytes.
 <a name="cosmos.base.abci.v1beta1.GasInfo"></a>
 
 ### GasInfo
-GasInfo defines tx execution gas context.
+GasInfoは、tx実行ガスコンテキストを定義します。
 
 
 | Field | Type | Label | Description |
@@ -2304,8 +2277,7 @@ GasInfo defines tx execution gas context.
 <a name="cosmos.base.abci.v1beta1.MsgData"></a>
 
 ### MsgData
-MsgData defines the data returned in a Result object during message
-execution.
+MsgDataは、メッセージの実行中にResultオブジェクトで返されるデータを定義します。
 
 
 | Field | Type | Label | Description |
@@ -2321,7 +2293,7 @@ execution.
 <a name="cosmos.base.abci.v1beta1.Result"></a>
 
 ### Result
-Result is the union of ResponseFormat and ResponseCheckTx.
+結果は、ResponseFormatとResponseCheckTxの和集合です。
 
 
 | Field | Type | Label | Description |
@@ -2341,7 +2313,7 @@ Since: cosmos-sdk 0.45 |
 <a name="cosmos.base.abci.v1beta1.SearchTxsResult"></a>
 
 ### SearchTxsResult
-SearchTxsResult defines a structure for querying txs pageable
+SearchTxsResultは、ページング可能なtxsをクエリするための構造を定義します
 
 
 | Field | Type | Label | Description |
@@ -2361,9 +2333,7 @@ SearchTxsResult defines a structure for querying txs pageable
 <a name="cosmos.base.abci.v1beta1.SimulationResponse"></a>
 
 ### SimulationResponse
-SimulationResponse defines the response generated when a transaction is
-successfully simulated.
-
+SimulationResponseは、トランザクションが正常にシミュレートされたときに生成される応答を定義します。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -2378,8 +2348,7 @@ successfully simulated.
 <a name="cosmos.base.abci.v1beta1.StringEvent"></a>
 
 ### StringEvent
-StringEvent defines en Event object wrapper where all the attributes
-contain key/value pairs that are strings instead of raw bytes.
+StringEventは、すべての属性に生のバイトではなく文字列であるキーと値のペアが含まれるイベントオブジェクトラッパーを定義します。
 
 
 | Field | Type | Label | Description |
@@ -2395,8 +2364,7 @@ contain key/value pairs that are strings instead of raw bytes.
 <a name="cosmos.base.abci.v1beta1.TxMsgData"></a>
 
 ### TxMsgData
-TxMsgData defines a list of MsgData. A transaction will have a MsgData object
-for each message.
+TxMsgDataは、MsgDataのリストを定義します。 トランザクションには、メッセージごとにMsgDataオブジェクトがあります。
 
 
 | Field | Type | Label | Description |
@@ -2414,8 +2382,7 @@ Since: cosmos-sdk 0.45 |
 <a name="cosmos.base.abci.v1beta1.TxResponse"></a>
 
 ### TxResponse
-TxResponse defines a structure containing relevant tx data and metadata. The
-tags are stringified and the log is JSON decoded.
+TxResponseは、関連するtxデータとメタデータを含む構造を定義します。 タグは文字列化され、ログはJSONでデコードされます。
 
 
 | Field | Type | Label | Description |
@@ -2460,7 +2427,7 @@ Since: cosmos-sdk 0.42.11, 0.44.5, 0.45 |
 <a name="cosmos.base.kv.v1beta1.Pair"></a>
 
 ### Pair
-Pair defines a key/value bytes tuple.
+Pairは、キー/値バイトタプルを定義します。
 
 
 | Field | Type | Label | Description |
@@ -2476,7 +2443,7 @@ Pair defines a key/value bytes tuple.
 <a name="cosmos.base.kv.v1beta1.Pairs"></a>
 
 ### Pairs
-Pairs defines a repeated slice of Pair objects.
+Pairsは、ペアオブジェクトの繰り返しスライスを定義します。
 
 
 | Field | Type | Label | Description |
@@ -2507,7 +2474,7 @@ Pairs defines a repeated slice of Pair objects.
 <a name="cosmos.base.reflection.v1beta1.ListAllInterfacesRequest"></a>
 
 ### ListAllInterfacesRequest
-ListAllInterfacesRequest is the request type of the ListAllInterfaces RPC.
+ListAllInterfacesRequestは、ListAllInterfacesRPCの要求タイプです。
 
 
 
@@ -2517,7 +2484,7 @@ ListAllInterfacesRequest is the request type of the ListAllInterfaces RPC.
 <a name="cosmos.base.reflection.v1beta1.ListAllInterfacesResponse"></a>
 
 ### ListAllInterfacesResponse
-ListAllInterfacesResponse is the response type of the ListAllInterfaces RPC.
+ListAllInterfacesResponseは、ListAllInterfacesRPCの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -2532,8 +2499,7 @@ ListAllInterfacesResponse is the response type of the ListAllInterfaces RPC.
 <a name="cosmos.base.reflection.v1beta1.ListImplementationsRequest"></a>
 
 ### ListImplementationsRequest
-ListImplementationsRequest is the request type of the ListImplementations
-RPC.
+ListImplementationsRequestは、ListImplementationsRPCの要求タイプです。
 
 
 | Field | Type | Label | Description |
@@ -2548,8 +2514,7 @@ RPC.
 <a name="cosmos.base.reflection.v1beta1.ListImplementationsResponse"></a>
 
 ### ListImplementationsResponse
-ListImplementationsResponse is the response type of the ListImplementations
-RPC.
+ListImplementationsResponseは、ListImplementations RPCの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -2570,7 +2535,7 @@ RPC.
 <a name="cosmos.base.reflection.v1beta1.ReflectionService"></a>
 
 ### ReflectionService
-ReflectionService defines a service for interface reflection.
+ReflectionServiceは、インターフェースリフレクションのサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -2591,7 +2556,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.base.reflection.v2alpha1.AppDescriptor"></a>
 
 ### AppDescriptor
-AppDescriptor describes a cosmos-sdk based application
+AppDescriptorは、cosmos-sdkベースのアプリケーションについて説明しています
 
 
 | Field | Type | Label | Description |
@@ -2611,8 +2576,7 @@ AppDescriptor describes a cosmos-sdk based application
 <a name="cosmos.base.reflection.v2alpha1.AuthnDescriptor"></a>
 
 ### AuthnDescriptor
-AuthnDescriptor provides information on how to sign transactions without relying
-on the online RPCs GetTxMetadata and CombineUnsignedTxAndSignatures
+AuthnDescriptorは、オンラインRPCGetTxMetadataおよびCombineUnsignedTxAndSignaturesに依存せずにトランザクションに署名する方法に関する情報を提供します
 
 
 | Field | Type | Label | Description |
@@ -2627,7 +2591,7 @@ on the online RPCs GetTxMetadata and CombineUnsignedTxAndSignatures
 <a name="cosmos.base.reflection.v2alpha1.ChainDescriptor"></a>
 
 ### ChainDescriptor
-ChainDescriptor describes chain information of the application
+ChainDescriptorは、アプリケーションのチェーン情報を記述します
 
 
 | Field | Type | Label | Description |
@@ -2642,7 +2606,7 @@ ChainDescriptor describes chain information of the application
 <a name="cosmos.base.reflection.v2alpha1.CodecDescriptor"></a>
 
 ### CodecDescriptor
-CodecDescriptor describes the registered interfaces and provides metadata information on the types
+CodecDescriptorは、登録されたインターフェイスを記述し、タイプに関するメタデータ情報を提供します
 
 
 | Field | Type | Label | Description |
@@ -2657,7 +2621,7 @@ CodecDescriptor describes the registered interfaces and provides metadata inform
 <a name="cosmos.base.reflection.v2alpha1.ConfigurationDescriptor"></a>
 
 ### ConfigurationDescriptor
-ConfigurationDescriptor contains metadata information on the sdk.Config
+ConfigurationDescriptorには、sdk.Configのメタデータ情報が含まれています
 
 
 | Field | Type | Label | Description |
@@ -2672,7 +2636,7 @@ ConfigurationDescriptor contains metadata information on the sdk.Config
 <a name="cosmos.base.reflection.v2alpha1.GetAuthnDescriptorRequest"></a>
 
 ### GetAuthnDescriptorRequest
-GetAuthnDescriptorRequest is the request used for the GetAuthnDescriptor RPC
+GetAuthnDescriptorRequestは、GetAuthnDescriptor RPCに使用されるリクエストです。
 
 
 
@@ -2682,7 +2646,7 @@ GetAuthnDescriptorRequest is the request used for the GetAuthnDescriptor RPC
 <a name="cosmos.base.reflection.v2alpha1.GetAuthnDescriptorResponse"></a>
 
 ### GetAuthnDescriptorResponse
-GetAuthnDescriptorResponse is the response returned by the GetAuthnDescriptor RPC
+GetAuthnDescriptorResponseは、GetAuthnDescriptor RPCによって返される応答です。
 
 
 | Field | Type | Label | Description |
@@ -2697,7 +2661,7 @@ GetAuthnDescriptorResponse is the response returned by the GetAuthnDescriptor RP
 <a name="cosmos.base.reflection.v2alpha1.GetChainDescriptorRequest"></a>
 
 ### GetChainDescriptorRequest
-GetChainDescriptorRequest is the request used for the GetChainDescriptor RPC
+GetChainDescriptorRequestは、GetChainDescriptorRPCに使用されるリクエストです。
 
 
 
@@ -2707,7 +2671,7 @@ GetChainDescriptorRequest is the request used for the GetChainDescriptor RPC
 <a name="cosmos.base.reflection.v2alpha1.GetChainDescriptorResponse"></a>
 
 ### GetChainDescriptorResponse
-GetChainDescriptorResponse is the response returned by the GetChainDescriptor RPC
+GetChainDescriptorResponseは、GetChainDescriptorRPCによって返される応答です。
 
 
 | Field | Type | Label | Description |
@@ -2722,7 +2686,7 @@ GetChainDescriptorResponse is the response returned by the GetChainDescriptor RP
 <a name="cosmos.base.reflection.v2alpha1.GetCodecDescriptorRequest"></a>
 
 ### GetCodecDescriptorRequest
-GetCodecDescriptorRequest is the request used for the GetCodecDescriptor RPC
+GetCodecDescriptorRequestは、GetCodecDescriptorRPCに使用されるリクエストです。
 
 
 
@@ -2732,7 +2696,7 @@ GetCodecDescriptorRequest is the request used for the GetCodecDescriptor RPC
 <a name="cosmos.base.reflection.v2alpha1.GetCodecDescriptorResponse"></a>
 
 ### GetCodecDescriptorResponse
-GetCodecDescriptorResponse is the response returned by the GetCodecDescriptor RPC
+GetCodecDescriptorResponseは、GetCodecDescriptorRPCによって返される応答です。
 
 
 | Field | Type | Label | Description |
@@ -2747,7 +2711,7 @@ GetCodecDescriptorResponse is the response returned by the GetCodecDescriptor RP
 <a name="cosmos.base.reflection.v2alpha1.GetConfigurationDescriptorRequest"></a>
 
 ### GetConfigurationDescriptorRequest
-GetConfigurationDescriptorRequest is the request used for the GetConfigurationDescriptor RPC
+GetConfigurationDescriptorRequestは、GetConfigurationDescriptorRPCに使用されるリクエストです。
 
 
 
@@ -2757,7 +2721,7 @@ GetConfigurationDescriptorRequest is the request used for the GetConfigurationDe
 <a name="cosmos.base.reflection.v2alpha1.GetConfigurationDescriptorResponse"></a>
 
 ### GetConfigurationDescriptorResponse
-GetConfigurationDescriptorResponse is the response returned by the GetConfigurationDescriptor RPC
+GetConfigurationDescriptorResponseは、GetConfigurationDescriptorRPCによって返される応答です。
 
 
 | Field | Type | Label | Description |
@@ -2772,7 +2736,7 @@ GetConfigurationDescriptorResponse is the response returned by the GetConfigurat
 <a name="cosmos.base.reflection.v2alpha1.GetQueryServicesDescriptorRequest"></a>
 
 ### GetQueryServicesDescriptorRequest
-GetQueryServicesDescriptorRequest is the request used for the GetQueryServicesDescriptor RPC
+GetQueryServicesDescriptorRequestは、GetQueryServicesDescriptorRPCに使用されるリクエストです。
 
 
 
@@ -2782,7 +2746,7 @@ GetQueryServicesDescriptorRequest is the request used for the GetQueryServicesDe
 <a name="cosmos.base.reflection.v2alpha1.GetQueryServicesDescriptorResponse"></a>
 
 ### GetQueryServicesDescriptorResponse
-GetQueryServicesDescriptorResponse is the response returned by the GetQueryServicesDescriptor RPC
+GetQueryServicesDescriptorResponseは、GetQueryServicesDescriptorRPCによって返される応答です。
 
 
 | Field | Type | Label | Description |
@@ -2797,7 +2761,7 @@ GetQueryServicesDescriptorResponse is the response returned by the GetQueryServi
 <a name="cosmos.base.reflection.v2alpha1.GetTxDescriptorRequest"></a>
 
 ### GetTxDescriptorRequest
-GetTxDescriptorRequest is the request used for the GetTxDescriptor RPC
+GetTxDescriptorRequestは、GetTxDescriptorRPCに使用されるリクエストです。
 
 
 
@@ -2807,7 +2771,7 @@ GetTxDescriptorRequest is the request used for the GetTxDescriptor RPC
 <a name="cosmos.base.reflection.v2alpha1.GetTxDescriptorResponse"></a>
 
 ### GetTxDescriptorResponse
-GetTxDescriptorResponse is the response returned by the GetTxDescriptor RPC
+GetTxDescriptorResponseは、GetTxDescriptorRPCによって返される応答です。
 
 
 | Field | Type | Label | Description |
@@ -2822,8 +2786,7 @@ GetTxDescriptorResponse is the response returned by the GetTxDescriptor RPC
 <a name="cosmos.base.reflection.v2alpha1.InterfaceAcceptingMessageDescriptor"></a>
 
 ### InterfaceAcceptingMessageDescriptor
-InterfaceAcceptingMessageDescriptor describes a protobuf message which contains
-an interface represented as a google.protobuf.Any
+InterfaceAcceptingMessageDescriptorは、google.protobuf.Anyとして表されるインターフェースを含むprotobufメッセージを記述します
 
 
 | Field | Type | Label | Description |
@@ -2839,7 +2802,7 @@ an interface represented as a google.protobuf.Any
 <a name="cosmos.base.reflection.v2alpha1.InterfaceDescriptor"></a>
 
 ### InterfaceDescriptor
-InterfaceDescriptor describes the implementation of an interface
+InterfaceDescriptorは、インターフェイスの実装について説明します
 
 
 | Field | Type | Label | Description |
@@ -2856,7 +2819,7 @@ InterfaceDescriptor describes the implementation of an interface
 <a name="cosmos.base.reflection.v2alpha1.InterfaceImplementerDescriptor"></a>
 
 ### InterfaceImplementerDescriptor
-InterfaceImplementerDescriptor describes an interface implementer
+InterfaceImplementerDescriptorは、インターフェース実装者を記述します
 
 
 | Field | Type | Label | Description |
@@ -2872,7 +2835,7 @@ InterfaceImplementerDescriptor describes an interface implementer
 <a name="cosmos.base.reflection.v2alpha1.MsgDescriptor"></a>
 
 ### MsgDescriptor
-MsgDescriptor describes a cosmos-sdk message that can be delivered with a transaction
+MsgDescriptorは、トランザクションで配信できるcosmos-sdkメッセージについて説明します。
 
 
 | Field | Type | Label | Description |
@@ -2887,9 +2850,7 @@ MsgDescriptor describes a cosmos-sdk message that can be delivered with a transa
 <a name="cosmos.base.reflection.v2alpha1.QueryMethodDescriptor"></a>
 
 ### QueryMethodDescriptor
-QueryMethodDescriptor describes a queryable method of a query service
-no other info is provided beside method name and tendermint queryable path
-because it would be redundant with the grpc reflection service
+QueryMethodDescriptorは、クエリサービスのクエリ可能なメソッドを記述します。これは、grpcリフレクションサービスと重複するため、メソッド名とテンダーミントのクエリ可能なパス以外の情報は提供されません。
 
 
 | Field | Type | Label | Description |
@@ -2905,7 +2866,7 @@ because it would be redundant with the grpc reflection service
 <a name="cosmos.base.reflection.v2alpha1.QueryServiceDescriptor"></a>
 
 ### QueryServiceDescriptor
-QueryServiceDescriptor describes a cosmos-sdk queryable service
+QueryServiceDescriptorは、cosmos-sdkクエリ可能サービスについて説明しています
 
 
 | Field | Type | Label | Description |
@@ -2922,7 +2883,7 @@ QueryServiceDescriptor describes a cosmos-sdk queryable service
 <a name="cosmos.base.reflection.v2alpha1.QueryServicesDescriptor"></a>
 
 ### QueryServicesDescriptor
-QueryServicesDescriptor contains the list of cosmos-sdk queriable services
+QueryServicesDescriptorには、cosmos-sdkクエリ可能サービスのリストが含まれています
 
 
 | Field | Type | Label | Description |
@@ -2937,10 +2898,7 @@ QueryServicesDescriptor contains the list of cosmos-sdk queriable services
 <a name="cosmos.base.reflection.v2alpha1.SigningModeDescriptor"></a>
 
 ### SigningModeDescriptor
-SigningModeDescriptor provides information on a signing flow of the application
-NOTE(fdymylja): here we could go as far as providing an entire flow on how
-to sign a message given a SigningModeDescriptor, but it's better to think about
-this another time
+SigningModeDescriptorは、アプリケーションの署名フローに関する情報を提供します注（fdymylja）：ここでは、SigningModeDescriptorを指定してメッセージに署名する方法のフロー全体を提供することもできますが、これについては別の機会に検討することをお勧めします。
 
 
 | Field | Type | Label | Description |
@@ -2957,7 +2915,7 @@ this another time
 <a name="cosmos.base.reflection.v2alpha1.TxDescriptor"></a>
 
 ### TxDescriptor
-TxDescriptor describes the accepted transaction type
+TxDescriptorは、受け入れられたトランザクションタイプを記述します
 
 
 | Field | Type | Label | Description |
@@ -2979,7 +2937,7 @@ TxDescriptor describes the accepted transaction type
 <a name="cosmos.base.reflection.v2alpha1.ReflectionService"></a>
 
 ### ReflectionService
-ReflectionService defines a service for application reflection.
+ReflectionServiceは、アプリケーションリフレクションのサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -3004,7 +2962,7 @@ ReflectionService defines a service for application reflection.
 <a name="cosmos.base.snapshots.v1beta1.Metadata"></a>
 
 ### Metadata
-Metadata contains SDK-specific snapshot metadata.
+メタデータには、SDK固有のスナップショットメタデータが含まれています。
 
 
 | Field | Type | Label | Description |
@@ -3019,7 +2977,7 @@ Metadata contains SDK-specific snapshot metadata.
 <a name="cosmos.base.snapshots.v1beta1.Snapshot"></a>
 
 ### Snapshot
-Snapshot contains Tendermint state sync snapshot info.
+Snapshotには、Tendermint状態の同期スナップショット情報が含まれています。
 
 
 | Field | Type | Label | Description |
@@ -3054,8 +3012,7 @@ Snapshot contains Tendermint state sync snapshot info.
 <a name="cosmos.base.store.v1beta1.CommitID"></a>
 
 ### CommitID
-CommitID defines the committment information when a specific store is
-committed.
+コミットIDは、特定のストアがコミットされたときのコミット情報を定義します。
 
 
 | Field | Type | Label | Description |
@@ -3071,8 +3028,7 @@ committed.
 <a name="cosmos.base.store.v1beta1.CommitInfo"></a>
 
 ### CommitInfo
-CommitInfo defines commit information used by the multi-store when committing
-a version/height.
+CommitInfoは、バージョン/高さをコミットするときにマルチストアによって使用されるコミット情報を定義します。
 
 
 | Field | Type | Label | Description |
@@ -3088,8 +3044,7 @@ a version/height.
 <a name="cosmos.base.store.v1beta1.StoreInfo"></a>
 
 ### StoreInfo
-StoreInfo defines store-specific commit information. It contains a reference
-between a store name and the commit ID.
+StoreInfoは、ストア固有のコミット情報を定義します。 これには、ストア名とコミットIDの間の参照が含まれています。
 
 
 | Field | Type | Label | Description |
@@ -3121,10 +3076,7 @@ between a store name and the commit ID.
 <a name="cosmos.base.store.v1beta1.StoreKVPair"></a>
 
 ### StoreKVPair
-StoreKVPair is a KVStore KVPair used for listening to state changes (Sets and Deletes)
-It optionally includes the StoreKey for the originating KVStore and a Boolean flag to distinguish between Sets and
-Deletes
-
+StoreKVPairは、状態の変化（セットと削除）をリッスンするために使用されるKVStore KVPairです。オプションで、元のKVStoreのStoreKeyと、セットと削除を区別するブールフラグが含まれます。
 Since: cosmos-sdk 0.43
 
 
@@ -3159,7 +3111,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.base.store.v1beta1.SnapshotIAVLItem"></a>
 
 ### SnapshotIAVLItem
-SnapshotIAVLItem is an exported IAVL node.
+SnapshotIAVLItemは、エクスポートされたIAVLノードです。
 
 
 | Field | Type | Label | Description |
@@ -3177,7 +3129,7 @@ SnapshotIAVLItem is an exported IAVL node.
 <a name="cosmos.base.store.v1beta1.SnapshotItem"></a>
 
 ### SnapshotItem
-SnapshotItem is an item contained in a rootmulti.Store snapshot.
+SnapshotItemは、rootmulti.Storeスナップショットに含まれるアイテムです。
 
 
 | Field | Type | Label | Description |
@@ -3193,7 +3145,7 @@ SnapshotItem is an item contained in a rootmulti.Store snapshot.
 <a name="cosmos.base.store.v1beta1.SnapshotStoreItem"></a>
 
 ### SnapshotStoreItem
-SnapshotStoreItem contains metadata about a snapshotted store.
+SnapshotStoreItemには、スナップショットストアに関するメタデータが含まれています。
 
 
 | Field | Type | Label | Description |
@@ -3224,7 +3176,7 @@ SnapshotStoreItem contains metadata about a snapshotted store.
 <a name="cosmos.base.tendermint.v1beta1.GetBlockByHeightRequest"></a>
 
 ### GetBlockByHeightRequest
-GetBlockByHeightRequest is the request type for the Query/GetBlockByHeight RPC method.
+GetBlockByHeightRequestは、Query / GetBlockByHeightRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -3239,7 +3191,7 @@ GetBlockByHeightRequest is the request type for the Query/GetBlockByHeight RPC m
 <a name="cosmos.base.tendermint.v1beta1.GetBlockByHeightResponse"></a>
 
 ### GetBlockByHeightResponse
-GetBlockByHeightResponse is the response type for the Query/GetBlockByHeight RPC method.
+GetBlockByHeightResponseは、Query / GetBlockByHeightRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -3255,7 +3207,7 @@ GetBlockByHeightResponse is the response type for the Query/GetBlockByHeight RPC
 <a name="cosmos.base.tendermint.v1beta1.GetLatestBlockRequest"></a>
 
 ### GetLatestBlockRequest
-GetLatestBlockRequest is the request type for the Query/GetLatestBlock RPC method.
+GetLatestBlockRequestは、Query / GetLatestBlockRPCメソッドのリクエストタイプです。
 
 
 
@@ -3265,7 +3217,7 @@ GetLatestBlockRequest is the request type for the Query/GetLatestBlock RPC metho
 <a name="cosmos.base.tendermint.v1beta1.GetLatestBlockResponse"></a>
 
 ### GetLatestBlockResponse
-GetLatestBlockResponse is the response type for the Query/GetLatestBlock RPC method.
+GetLatestBlockResponseは、Query / GetLatestBlockRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -3281,7 +3233,7 @@ GetLatestBlockResponse is the response type for the Query/GetLatestBlock RPC met
 <a name="cosmos.base.tendermint.v1beta1.GetLatestValidatorSetRequest"></a>
 
 ### GetLatestValidatorSetRequest
-GetLatestValidatorSetRequest is the request type for the Query/GetValidatorSetByHeight RPC method.
+GetLatestValidatorSetRequestは、Query / GetValidatorSetByHeightRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -3296,7 +3248,7 @@ GetLatestValidatorSetRequest is the request type for the Query/GetValidatorSetBy
 <a name="cosmos.base.tendermint.v1beta1.GetLatestValidatorSetResponse"></a>
 
 ### GetLatestValidatorSetResponse
-GetLatestValidatorSetResponse is the response type for the Query/GetValidatorSetByHeight RPC method.
+GetLatestValidatorSetResponseは、Query / GetValidatorSetByHeightRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -3313,7 +3265,7 @@ GetLatestValidatorSetResponse is the response type for the Query/GetValidatorSet
 <a name="cosmos.base.tendermint.v1beta1.GetNodeInfoRequest"></a>
 
 ### GetNodeInfoRequest
-GetNodeInfoRequest is the request type for the Query/GetNodeInfo RPC method.
+GetNodeInfoRequestは、Query / GetNodeInfoRPCメソッドのリクエストタイプです。
 
 
 
@@ -3323,7 +3275,7 @@ GetNodeInfoRequest is the request type for the Query/GetNodeInfo RPC method.
 <a name="cosmos.base.tendermint.v1beta1.GetNodeInfoResponse"></a>
 
 ### GetNodeInfoResponse
-GetNodeInfoResponse is the response type for the Query/GetNodeInfo RPC method.
+GetNodeInfoResponseは、Query / GetNodeInfoRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -3339,7 +3291,7 @@ GetNodeInfoResponse is the response type for the Query/GetNodeInfo RPC method.
 <a name="cosmos.base.tendermint.v1beta1.GetSyncingRequest"></a>
 
 ### GetSyncingRequest
-GetSyncingRequest is the request type for the Query/GetSyncing RPC method.
+GetSyncingRequestは、Query / GetSyncingRPCメソッドのリクエストタイプです。
 
 
 
@@ -3349,7 +3301,7 @@ GetSyncingRequest is the request type for the Query/GetSyncing RPC method.
 <a name="cosmos.base.tendermint.v1beta1.GetSyncingResponse"></a>
 
 ### GetSyncingResponse
-GetSyncingResponse is the response type for the Query/GetSyncing RPC method.
+GetSyncingResponseは、Query / GetSyncingRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -3364,7 +3316,7 @@ GetSyncingResponse is the response type for the Query/GetSyncing RPC method.
 <a name="cosmos.base.tendermint.v1beta1.GetValidatorSetByHeightRequest"></a>
 
 ### GetValidatorSetByHeightRequest
-GetValidatorSetByHeightRequest is the request type for the Query/GetValidatorSetByHeight RPC method.
+GetValidatorSetByHeightRequestは、Query / GetValidatorSetByHeightRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -3380,7 +3332,7 @@ GetValidatorSetByHeightRequest is the request type for the Query/GetValidatorSet
 <a name="cosmos.base.tendermint.v1beta1.GetValidatorSetByHeightResponse"></a>
 
 ### GetValidatorSetByHeightResponse
-GetValidatorSetByHeightResponse is the response type for the Query/GetValidatorSetByHeight RPC method.
+GetValidatorSetByHeightResponseは、Query / GetValidatorSetByHeightRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -3397,7 +3349,7 @@ GetValidatorSetByHeightResponse is the response type for the Query/GetValidatorS
 <a name="cosmos.base.tendermint.v1beta1.Module"></a>
 
 ### Module
-Module is the type for VersionInfo
+ModuleはVersionInfoのタイプです
 
 
 | Field | Type | Label | Description |
@@ -3414,7 +3366,7 @@ Module is the type for VersionInfo
 <a name="cosmos.base.tendermint.v1beta1.Validator"></a>
 
 ### Validator
-Validator is the type for the validator-set.
+Validatorはvalidator-setのタイプです。
 
 
 | Field | Type | Label | Description |
@@ -3432,7 +3384,7 @@ Validator is the type for the validator-set.
 <a name="cosmos.base.tendermint.v1beta1.VersionInfo"></a>
 
 ### VersionInfo
-VersionInfo is the type for the GetNodeInfoResponse message.
+VersionInfoは、GetNodeInfoResponseメッセージのタイプです。
 
 
 | Field | Type | Label | Description |
@@ -3460,7 +3412,7 @@ VersionInfo is the type for the GetNodeInfoResponse message.
 <a name="cosmos.base.tendermint.v1beta1.Service"></a>
 
 ### Service
-Service defines the gRPC querier service for tendermint queries.
+サービスは、テンダーミントクエリのgRPCクエリアサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -3485,8 +3437,7 @@ Service defines the gRPC querier service for tendermint queries.
 <a name="cosmos.capability.v1beta1.Capability"></a>
 
 ### Capability
-Capability defines an implementation of an object capability. The index
-provided to a Capability must be globally unique.
+機能は、オブジェクト機能の実装を定義します。 機能に提供されるインデックスは、グローバルに一意である必要があります。
 
 
 | Field | Type | Label | Description |
@@ -3501,8 +3452,7 @@ provided to a Capability must be globally unique.
 <a name="cosmos.capability.v1beta1.CapabilityOwners"></a>
 
 ### CapabilityOwners
-CapabilityOwners defines a set of owners of a single Capability. The set of
-owners must be unique.
+CapabilityOwnersは、単一のCapabilityの所有者のセットを定義します。 所有者のセットは一意である必要があります。
 
 
 | Field | Type | Label | Description |
@@ -3517,8 +3467,7 @@ owners must be unique.
 <a name="cosmos.capability.v1beta1.Owner"></a>
 
 ### Owner
-Owner defines a single capability owner. An owner is defined by the name of
-capability and the module name.
+所有者は、単一の機能所有者を定義します。 所有者は、機能の名前とモジュール名によって定義されます。
 
 
 | Field | Type | Label | Description |
@@ -3550,7 +3499,7 @@ capability and the module name.
 <a name="cosmos.capability.v1beta1.GenesisOwners"></a>
 
 ### GenesisOwners
-GenesisOwners defines the capability owners with their corresponding index.
+GenesisOwnersは、対応するインデックスを使用して機能の所有者を定義します。
 
 
 | Field | Type | Label | Description |
@@ -3566,7 +3515,7 @@ GenesisOwners defines the capability owners with their corresponding index.
 <a name="cosmos.capability.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the capability module's genesis state.
+GenesisStateは、機能モジュールのジェネシス状態を定義します。
 
 
 | Field | Type | Label | Description |
@@ -3598,7 +3547,7 @@ GenesisState defines the capability module's genesis state.
 <a name="cosmos.crisis.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the crisis module's genesis state.
+GenesisStateは、危機モジュールの発生状態を定義します。
 
 
 | Field | Type | Label | Description |
@@ -3629,7 +3578,7 @@ GenesisState defines the crisis module's genesis state.
 <a name="cosmos.crisis.v1beta1.MsgVerifyInvariant"></a>
 
 ### MsgVerifyInvariant
-MsgVerifyInvariant represents a message to verify a particular invariance.
+MsgVerifyInvariantは、特定の不変性を検証するためのメッセージを表します。
 
 
 | Field | Type | Label | Description |
@@ -3646,7 +3595,7 @@ MsgVerifyInvariant represents a message to verify a particular invariance.
 <a name="cosmos.crisis.v1beta1.MsgVerifyInvariantResponse"></a>
 
 ### MsgVerifyInvariantResponse
-MsgVerifyInvariantResponse defines the Msg/VerifyInvariant response type.
+MsgVerifyInvariantResponseは、Msg / VerifyInvariant応答タイプを定義します。
 
 
 
@@ -3662,7 +3611,7 @@ MsgVerifyInvariantResponse defines the Msg/VerifyInvariant response type.
 <a name="cosmos.crisis.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the bank Msg service.
+Msgは、銀行のMsgサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -3682,8 +3631,8 @@ Msg defines the bank Msg service.
 <a name="cosmos.crypto.ed25519.PrivKey"></a>
 
 ### PrivKey
-Deprecated: PrivKey defines a ed25519 private key.
-NOTE: ed25519 keys must not be used in SDK apps except in a tendermint validator context.
+非推奨：PrivKeyはed25519秘密鍵を定義します。
+注：ed25519キーは、テンダーミントバリデーターのコンテキストを除いて、SDKアプリで使用しないでください。
 
 
 | Field | Type | Label | Description |
@@ -3698,12 +3647,9 @@ NOTE: ed25519 keys must not be used in SDK apps except in a tendermint validator
 <a name="cosmos.crypto.ed25519.PubKey"></a>
 
 ### PubKey
-PubKey is an ed25519 public key for handling Tendermint keys in SDK.
-It's needed for Any serialization and SDK compatibility.
-It must not be used in a non Tendermint key context because it doesn't implement
-ADR-28. Nevertheless, you will like to use ed25519 in app user level
-then you must create a new proto message and follow ADR-28 for Address construction.
-
+PubKeyは、SDKでTendermintキーを処理するためのed25519公開キーです。
+シリアル化とSDKの互換性のために必要です。
+ADR-28を実装していないため、Tendermintキー以外のコンテキストで使用しないでください。 それでも、アプリユーザーレベルでed25519を使用する場合は、新しいプロトメッセージを作成し、アドレスの作成についてADR-28に従う必要があります。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -3733,7 +3679,7 @@ then you must create a new proto message and follow ADR-28 for Address construct
 <a name="cosmos.crypto.hd.v1.BIP44Params"></a>
 
 ### BIP44Params
-BIP44Params is used as path field in ledger item in Record.
+BIP44Paramsは、レコードの元帳アイテムのパスフィールドとして使用されます。
 
 
 | Field | Type | Label | Description |
@@ -3768,7 +3714,7 @@ BIP44Params is used as path field in ledger item in Record.
 <a name="cosmos.crypto.keyring.v1.Record"></a>
 
 ### Record
-Record is used for representing a key in the keyring.
+Recordは、キーリングのキーを表すために使用されます。
 
 
 | Field | Type | Label | Description |
@@ -3788,7 +3734,7 @@ Record is used for representing a key in the keyring.
 <a name="cosmos.crypto.keyring.v1.Record.Ledger"></a>
 
 ### Record.Ledger
-Ledger item
+元帳アイテム
 
 
 | Field | Type | Label | Description |
@@ -3803,8 +3749,8 @@ Ledger item
 <a name="cosmos.crypto.keyring.v1.Record.Local"></a>
 
 ### Record.Local
-Item is a keyring item stored in a keyring backend.
-Local item
+アイテムは、キーリングバックエンドに保存されているキーリングアイテムです。
+ローカルアイテム
 
 
 | Field | Type | Label | Description |
@@ -3820,7 +3766,7 @@ Local item
 <a name="cosmos.crypto.keyring.v1.Record.Multi"></a>
 
 ### Record.Multi
-Multi item
+複数項目
 
 
 
@@ -3830,7 +3776,7 @@ Multi item
 <a name="cosmos.crypto.keyring.v1.Record.Offline"></a>
 
 ### Record.Offline
-Offline item
+オフライン項目
 
 
 
@@ -3856,9 +3802,7 @@ Offline item
 <a name="cosmos.crypto.multisig.LegacyAminoPubKey"></a>
 
 ### LegacyAminoPubKey
-LegacyAminoPubKey specifies a public key type
-which nests multiple public keys and a threshold,
-it uses legacy amino address rules.
+LegacyAminoPubKeyは、複数の公開鍵としきい値をネストする公開鍵タイプを指定し、レガシーアミノアドレスルールを使用します。
 
 
 | Field | Type | Label | Description |
@@ -3890,10 +3834,9 @@ it uses legacy amino address rules.
 <a name="cosmos.crypto.multisig.v1beta1.CompactBitArray"></a>
 
 ### CompactBitArray
-CompactBitArray is an implementation of a space efficient bit array.
-This is used to ensure that the encoded data takes up a minimal amount of
-space after proto encoding.
-This is not thread safe, and is not intended for concurrent usage.
+CompactBitArrayは、スペース効率の高いビット配列の実装です。
+これは、エンコードされたデータがプロトエンコード後に最小限のスペースを占めるようにするために使用されます。
+これはスレッドセーフではなく、同時使用を目的としたものではありません。
 
 
 | Field | Type | Label | Description |
@@ -3909,9 +3852,8 @@ This is not thread safe, and is not intended for concurrent usage.
 <a name="cosmos.crypto.multisig.v1beta1.MultiSignature"></a>
 
 ### MultiSignature
-MultiSignature wraps the signatures from a multisig.LegacyAminoPubKey.
-See cosmos.tx.v1betata1.ModeInfo.Multi for how to specify which signers
-signed and with which modes.
+MultiSignatureは、multisig.LegacyAminoPubKeyからの署名をラップします。
+どの署名者がどのモードで署名したかを指定する方法については、cosmos.tx.v1betata1.ModeInfo.Multiを参照してください。
 
 
 | Field | Type | Label | Description |
@@ -3942,7 +3884,7 @@ signed and with which modes.
 <a name="cosmos.crypto.secp256k1.PrivKey"></a>
 
 ### PrivKey
-PrivKey defines a secp256k1 private key.
+PrivKeyは、secp256k1秘密鍵を定義します。
 
 
 | Field | Type | Label | Description |
@@ -3957,11 +3899,7 @@ PrivKey defines a secp256k1 private key.
 <a name="cosmos.crypto.secp256k1.PubKey"></a>
 
 ### PubKey
-PubKey defines a secp256k1 public key
-Key is the compressed form of the pubkey. The first byte depends is a 0x02 byte
-if the y-coordinate is the lexicographically largest of the two associated with
-the x-coordinate. Otherwise the first byte is a 0x03.
-This prefix is followed with the x-coordinate.
+PubKeyは、secp256k1公開鍵を定義します。Keyは、pubkeyの圧縮形式です。 y座標がx座標に関連付けられた2つの辞書式順序で最大の場合、最初のバイトは0x02バイトに依存します。 それ以外の場合、最初のバイトは0x03です。 この接頭辞の後にx座標が続きます。
 
 
 | Field | Type | Label | Description |
@@ -3992,7 +3930,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.crypto.secp256r1.PrivKey"></a>
 
 ### PrivKey
-PrivKey defines a secp256r1 ECDSA private key.
+PrivKeyは、secp256r1ECDSA秘密鍵を定義します。
 
 
 | Field | Type | Label | Description |
@@ -4007,7 +3945,7 @@ PrivKey defines a secp256r1 ECDSA private key.
 <a name="cosmos.crypto.secp256r1.PubKey"></a>
 
 ### PubKey
-PubKey defines a secp256r1 ECDSA public key.
+PubKeyは、secp256r1ECDSA公開鍵を定義します。
 
 
 | Field | Type | Label | Description |
@@ -4038,9 +3976,7 @@ PubKey defines a secp256r1 ECDSA public key.
 <a name="cosmos.distribution.v1beta1.CommunityPoolSpendProposal"></a>
 
 ### CommunityPoolSpendProposal
-CommunityPoolSpendProposal details a proposal for use of community funds,
-together with how many coins are proposed to be spent, and to which
-recipient account.
+CommunityPoolSpendProposalは、コミュニティ資金の使用に関する提案、使用が提案されているコインの数、およびどの受信者アカウントに詳細を示します。
 
 
 | Field | Type | Label | Description |
@@ -4058,8 +3994,7 @@ recipient account.
 <a name="cosmos.distribution.v1beta1.CommunityPoolSpendProposalWithDeposit"></a>
 
 ### CommunityPoolSpendProposalWithDeposit
-CommunityPoolSpendProposalWithDeposit defines a CommunityPoolSpendProposal
-with a deposit
+CommunityPoolSpendProposalWithDepositは、デポジット付きのCommunityPoolSpendProposalを定義します
 
 
 | Field | Type | Label | Description |
@@ -4078,8 +4013,8 @@ with a deposit
 <a name="cosmos.distribution.v1beta1.DelegationDelegatorReward"></a>
 
 ### DelegationDelegatorReward
-DelegationDelegatorReward represents the properties
-of a delegator's delegation reward.
+DelegationDelegatorRewardはプロパティを表します
+委任者の委任報酬の。
 
 
 | Field | Type | Label | Description |
@@ -4095,12 +4030,7 @@ of a delegator's delegation reward.
 <a name="cosmos.distribution.v1beta1.DelegatorStartingInfo"></a>
 
 ### DelegatorStartingInfo
-DelegatorStartingInfo represents the starting info for a delegator reward
-period. It tracks the previous validator period, the delegation's amount of
-staking token, and the creation height (to check later on if any slashes have
-occurred). NOTE: Even though validators are slashed to whole staking tokens,
-the delegators within the validator may be left with less than a full token,
-thus sdk.Dec is used.
+DelegatorStartingInfoは、委任者報酬期間の開始情報を表します。 これは、前のバリデーター期間、委任のステーキングトークンの量、および作成の高さを追跡します（スラッシュが発生したかどうかを後で確認するため）。 注：バリデーターはステーキングトークン全体にスラッシュされますが、バリデーター内のデリゲーターには完全なトークンが残されていない可能性があるため、sdk.Decが使用されます。
 
 
 | Field | Type | Label | Description |
@@ -4117,7 +4047,7 @@ thus sdk.Dec is used.
 <a name="cosmos.distribution.v1beta1.FeePool"></a>
 
 ### FeePool
-FeePool is the global fee pool for distribution.
+FeePoolは、配布用のグローバルな料金プールです。
 
 
 | Field | Type | Label | Description |
@@ -4132,7 +4062,7 @@ FeePool is the global fee pool for distribution.
 <a name="cosmos.distribution.v1beta1.Params"></a>
 
 ### Params
-Params defines the set of params for the distribution module.
+パラメータは、配布モジュールのパラメータのセットを定義します。
 
 
 | Field | Type | Label | Description |
@@ -4150,8 +4080,7 @@ Params defines the set of params for the distribution module.
 <a name="cosmos.distribution.v1beta1.ValidatorAccumulatedCommission"></a>
 
 ### ValidatorAccumulatedCommission
-ValidatorAccumulatedCommission represents accumulated commission
-for a validator kept as a running counter, can be withdrawn at any time.
+ValidatorAccumulatedCommissionは、実行中のカウンターとして保持されているバリデーターの累積コミッションを表し、いつでも引き出すことができます。
 
 
 | Field | Type | Label | Description |
@@ -4166,9 +4095,7 @@ for a validator kept as a running counter, can be withdrawn at any time.
 <a name="cosmos.distribution.v1beta1.ValidatorCurrentRewards"></a>
 
 ### ValidatorCurrentRewards
-ValidatorCurrentRewards represents current rewards and current
-period for a validator kept as a running counter and incremented
-each block as long as the validator's tokens remain constant.
+ValidatorCurrentRewardsは、実行中のカウンターとして保持され、バリデーターのトークンが一定である限り、各ブロックをインクリメントするバリデーターの現在の報酬と現在の期間を表します。
 
 
 | Field | Type | Label | Description |
@@ -4184,18 +4111,10 @@ each block as long as the validator's tokens remain constant.
 <a name="cosmos.distribution.v1beta1.ValidatorHistoricalRewards"></a>
 
 ### ValidatorHistoricalRewards
-ValidatorHistoricalRewards represents historical rewards for a validator.
-Height is implicit within the store key.
-Cumulative reward ratio is the sum from the zeroeth period
-until this period of rewards / tokens, per the spec.
-The reference count indicates the number of objects
-which might need to reference this historical entry at any point.
-ReferenceCount =
-   number of outstanding delegations which ended the associated period (and
-   might need to read that record)
- + number of slashes which ended the associated period (and might need to
- read that record)
- + one per validator for the zeroeth period, set on initialization
+ValidatorHistoricalRewardsは、バリデーターの過去の報酬を表します。 高さはストアキー内で暗黙的に示されます。 累積報酬比率は、仕様に従って、ゼロ番目の期間からこの報酬/トークンの期間までの合計です。 参照カウントは、任意の時点でこの履歴エントリを参照する必要がある可能性のあるオブジェクトの数を示します。
+ReferenceCount =関連する期間を終了した（そしてそのレコードを読み取る必要があるかもしれない）未処理の委任の数
+  + 関連する期間を終了した（そしてそのレコードを読み取る必要があるかもしれない）スラッシュの数
+  + 初期化時に設定されたゼロ番目の期間のバリデーターごとに1つ
 
 
 | Field | Type | Label | Description |
@@ -4211,8 +4130,7 @@ ReferenceCount =
 <a name="cosmos.distribution.v1beta1.ValidatorOutstandingRewards"></a>
 
 ### ValidatorOutstandingRewards
-ValidatorOutstandingRewards represents outstanding (un-withdrawn) rewards
-for a validator inexpensive to track, allows simple sanity checks.
+ValidatorOutstandingRewardsは、追跡が安価なバリデーターの未処理の（撤回されていない）報酬を表し、簡単な健全性チェックを可能にします。
 
 
 | Field | Type | Label | Description |
@@ -4227,10 +4145,10 @@ for a validator inexpensive to track, allows simple sanity checks.
 <a name="cosmos.distribution.v1beta1.ValidatorSlashEvent"></a>
 
 ### ValidatorSlashEvent
-ValidatorSlashEvent represents a validator slash event.
-Height is implicit within the store key.
-This is needed to calculate appropriate amount of staking tokens
-for delegations which are withdrawn after a slash has occurred.
+ValidatorSlashEventは、バリデータースラッシュイベントを表します。
+高さはストアキー内で暗黙的に示されます。
+これは、適切な量のステーキングトークンを計算するために必要です
+スラッシュが発生した後に撤回された委任の場合。
 
 
 | Field | Type | Label | Description |
@@ -4246,7 +4164,7 @@ for delegations which are withdrawn after a slash has occurred.
 <a name="cosmos.distribution.v1beta1.ValidatorSlashEvents"></a>
 
 ### ValidatorSlashEvents
-ValidatorSlashEvents is a collection of ValidatorSlashEvent messages.
+ValidatorSlashEventsは、ValidatorSlashEventメッセージのコレクションです。
 
 
 | Field | Type | Label | Description |
@@ -4277,7 +4195,7 @@ ValidatorSlashEvents is a collection of ValidatorSlashEvent messages.
 <a name="cosmos.distribution.v1beta1.DelegatorStartingInfoRecord"></a>
 
 ### DelegatorStartingInfoRecord
-DelegatorStartingInfoRecord used for import / export via genesis json.
+Genesisjsonを介したインポート/エクスポートに使用されるDelegatorStartingInfoRecord。
 
 
 | Field | Type | Label | Description |
@@ -4294,9 +4212,7 @@ DelegatorStartingInfoRecord used for import / export via genesis json.
 <a name="cosmos.distribution.v1beta1.DelegatorWithdrawInfo"></a>
 
 ### DelegatorWithdrawInfo
-DelegatorWithdrawInfo is the address for where distributions rewards are
-withdrawn to by default this struct is only used at genesis to feed in
-default withdraw addresses.
+DelegatorWithdrawInfoは、配布報酬がデフォルトで撤回される場所のアドレスです。この構造体は、デフォルトの撤回アドレスをフィードするためにジェネシスでのみ使用されます。
 
 
 | Field | Type | Label | Description |
@@ -4312,7 +4228,7 @@ default withdraw addresses.
 <a name="cosmos.distribution.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the distribution module's genesis state.
+GenesisStateは、配布モジュールの生成状態を定義します。
 
 
 | Field | Type | Label | Description |
@@ -4336,9 +4252,7 @@ GenesisState defines the distribution module's genesis state.
 <a name="cosmos.distribution.v1beta1.ValidatorAccumulatedCommissionRecord"></a>
 
 ### ValidatorAccumulatedCommissionRecord
-ValidatorAccumulatedCommissionRecord is used for import / export via genesis
-json.
-
+ValidatorAccumulatedCommissionRecordは、ジェネシスjsonを介したインポート/エクスポートに使用されます。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -4353,7 +4267,7 @@ json.
 <a name="cosmos.distribution.v1beta1.ValidatorCurrentRewardsRecord"></a>
 
 ### ValidatorCurrentRewardsRecord
-ValidatorCurrentRewardsRecord is used for import / export via genesis json.
+ValidatorCurrentRewardsRecordは、ジェネシスjsonを介したインポート/エクスポートに使用されます。
 
 
 | Field | Type | Label | Description |
@@ -4369,8 +4283,7 @@ ValidatorCurrentRewardsRecord is used for import / export via genesis json.
 <a name="cosmos.distribution.v1beta1.ValidatorHistoricalRewardsRecord"></a>
 
 ### ValidatorHistoricalRewardsRecord
-ValidatorHistoricalRewardsRecord is used for import / export via genesis
-json.
+ValidatorHistoricalRewardsRecordは、ジェネシスjsonを介したインポート/エクスポートに使用されます。
 
 
 | Field | Type | Label | Description |
@@ -4387,7 +4300,7 @@ json.
 <a name="cosmos.distribution.v1beta1.ValidatorOutstandingRewardsRecord"></a>
 
 ### ValidatorOutstandingRewardsRecord
-ValidatorOutstandingRewardsRecord is used for import/export via genesis json.
+ValidatorOutstandingRewardsRecordは、ジェネシスjsonを介したインポート/エクスポートに使用されます。
 
 
 | Field | Type | Label | Description |
@@ -4403,7 +4316,7 @@ ValidatorOutstandingRewardsRecord is used for import/export via genesis json.
 <a name="cosmos.distribution.v1beta1.ValidatorSlashEventRecord"></a>
 
 ### ValidatorSlashEventRecord
-ValidatorSlashEventRecord is used for import / export via genesis json.
+ValidatorSlashEventRecordは、ジェネシスjsonを介したインポート/エクスポートに使用されます。
 
 
 | Field | Type | Label | Description |
@@ -4437,8 +4350,7 @@ ValidatorSlashEventRecord is used for import / export via genesis json.
 <a name="cosmos.distribution.v1beta1.QueryCommunityPoolRequest"></a>
 
 ### QueryCommunityPoolRequest
-QueryCommunityPoolRequest is the request type for the Query/CommunityPool RPC
-method.
+QueryCommunityPoolRequestは、Query / CommunityPoolRPCメソッドのリクエストタイプです。
 
 
 
@@ -4448,8 +4360,7 @@ method.
 <a name="cosmos.distribution.v1beta1.QueryCommunityPoolResponse"></a>
 
 ### QueryCommunityPoolResponse
-QueryCommunityPoolResponse is the response type for the Query/CommunityPool
-RPC method.
+QueryCommunityPoolResponseは、Query / CommunityPoolRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -4464,9 +4375,7 @@ RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegationRewardsRequest"></a>
 
 ### QueryDelegationRewardsRequest
-QueryDelegationRewardsRequest is the request type for the
-Query/DelegationRewards RPC method.
-
+QueryDelegationRewardsRequestは、Query / DelegationRewardsRPCメソッドのリクエストタイプです。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -4481,9 +4390,7 @@ Query/DelegationRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegationRewardsResponse"></a>
 
 ### QueryDelegationRewardsResponse
-QueryDelegationRewardsResponse is the response type for the
-Query/DelegationRewards RPC method.
-
+QueryDelegationRewardsResponseは、Query / DelegationRewardsRPCメソッドの応答タイプです。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -4497,8 +4404,8 @@ Query/DelegationRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegationTotalRewardsRequest"></a>
 
 ### QueryDelegationTotalRewardsRequest
-QueryDelegationTotalRewardsRequest is the request type for the
-Query/DelegationTotalRewards RPC method.
+QueryDelegationTotalRewardsRequestは、
+Query / DelegationTotalRewards RPCメソッド。
 
 
 | Field | Type | Label | Description |
@@ -4513,8 +4420,7 @@ Query/DelegationTotalRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegationTotalRewardsResponse"></a>
 
 ### QueryDelegationTotalRewardsResponse
-QueryDelegationTotalRewardsResponse is the response type for the
-Query/DelegationTotalRewards RPC method.
+QueryDelegationTotalRewardsResponseは、Query / DelegationTotalRewardsRPCメソッド。
 
 
 | Field | Type | Label | Description |
@@ -4530,8 +4436,7 @@ Query/DelegationTotalRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegatorValidatorsRequest"></a>
 
 ### QueryDelegatorValidatorsRequest
-QueryDelegatorValidatorsRequest is the request type for the
-Query/DelegatorValidators RPC method.
+QueryDelegatorValidatorsRequestは、Query / DelegatorValidatorsRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -4546,8 +4451,7 @@ Query/DelegatorValidators RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegatorValidatorsResponse"></a>
 
 ### QueryDelegatorValidatorsResponse
-QueryDelegatorValidatorsResponse is the response type for the
-Query/DelegatorValidators RPC method.
+QueryDelegatorValidatorsResponseは、Query / DelegatorValidatorsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -4562,8 +4466,7 @@ Query/DelegatorValidators RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegatorWithdrawAddressRequest"></a>
 
 ### QueryDelegatorWithdrawAddressRequest
-QueryDelegatorWithdrawAddressRequest is the request type for the
-Query/DelegatorWithdrawAddress RPC method.
+QueryDelegatorWithdrawAddressRequestは、Query / DelegatorWithdrawAddressRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -4578,8 +4481,7 @@ Query/DelegatorWithdrawAddress RPC method.
 <a name="cosmos.distribution.v1beta1.QueryDelegatorWithdrawAddressResponse"></a>
 
 ### QueryDelegatorWithdrawAddressResponse
-QueryDelegatorWithdrawAddressResponse is the response type for the
-Query/DelegatorWithdrawAddress RPC method.
+QueryDelegatorWithdrawAddressResponseは、Query / DelegatorWithdrawAddressRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -4594,7 +4496,7 @@ Query/DelegatorWithdrawAddress RPC method.
 <a name="cosmos.distribution.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method.
+QueryParamsRequestは、Query / ParamsRPCメソッドのリクエストタイプです。
 
 
 
@@ -4604,7 +4506,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method.
 <a name="cosmos.distribution.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method.
+QueryParamsResponseは、Query / ParamsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -4619,9 +4521,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method.
 <a name="cosmos.distribution.v1beta1.QueryValidatorCommissionRequest"></a>
 
 ### QueryValidatorCommissionRequest
-QueryValidatorCommissionRequest is the request type for the
-Query/ValidatorCommission RPC method
-
+QueryValidatorCommissionRequestは、Query / ValidatorCommissionRPCメソッドのリクエストタイプです。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -4635,8 +4535,7 @@ Query/ValidatorCommission RPC method
 <a name="cosmos.distribution.v1beta1.QueryValidatorCommissionResponse"></a>
 
 ### QueryValidatorCommissionResponse
-QueryValidatorCommissionResponse is the response type for the
-Query/ValidatorCommission RPC method
+QueryValidatorCommissionResponseは、Query / ValidatorCommissionRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -4651,8 +4550,7 @@ Query/ValidatorCommission RPC method
 <a name="cosmos.distribution.v1beta1.QueryValidatorOutstandingRewardsRequest"></a>
 
 ### QueryValidatorOutstandingRewardsRequest
-QueryValidatorOutstandingRewardsRequest is the request type for the
-Query/ValidatorOutstandingRewards RPC method.
+QueryValidatorCommissionResponseは、Query / ValidatorCommissionRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -4667,8 +4565,7 @@ Query/ValidatorOutstandingRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryValidatorOutstandingRewardsResponse"></a>
 
 ### QueryValidatorOutstandingRewardsResponse
-QueryValidatorOutstandingRewardsResponse is the response type for the
-Query/ValidatorOutstandingRewards RPC method.
+QueryValidatorOutstandingRewardsResponseは、Query / ValidatorOutstandingRewardsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -4683,8 +4580,8 @@ Query/ValidatorOutstandingRewards RPC method.
 <a name="cosmos.distribution.v1beta1.QueryValidatorSlashesRequest"></a>
 
 ### QueryValidatorSlashesRequest
-QueryValidatorSlashesRequest is the request type for the
-Query/ValidatorSlashes RPC method
+QueryValidatorSlashesRequestは、
+Query / ValidatorSlashesRPCメソッド
 
 
 | Field | Type | Label | Description |
@@ -4702,8 +4599,8 @@ Query/ValidatorSlashes RPC method
 <a name="cosmos.distribution.v1beta1.QueryValidatorSlashesResponse"></a>
 
 ### QueryValidatorSlashesResponse
-QueryValidatorSlashesResponse is the response type for the
-Query/ValidatorSlashes RPC method.
+QueryValidatorSlashesResponseは、
+Query / ValidatorSlashesRPCメソッド。
 
 
 | Field | Type | Label | Description |
@@ -4725,7 +4622,7 @@ Query/ValidatorSlashes RPC method.
 <a name="cosmos.distribution.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service for distribution module.
+Queryは、配布モジュールのgRPCクエリアサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -4753,8 +4650,8 @@ Query defines the gRPC querier service for distribution module.
 <a name="cosmos.distribution.v1beta1.MsgFundCommunityPool"></a>
 
 ### MsgFundCommunityPool
-MsgFundCommunityPool allows an account to directly
-fund the community pool.
+MsgFundCommunityPoolを使用すると、アカウントで直接
+コミュニティプールに資金を提供します。
 
 
 | Field | Type | Label | Description |
@@ -4770,7 +4667,7 @@ fund the community pool.
 <a name="cosmos.distribution.v1beta1.MsgFundCommunityPoolResponse"></a>
 
 ### MsgFundCommunityPoolResponse
-MsgFundCommunityPoolResponse defines the Msg/FundCommunityPool response type.
+MsgFundCommunityPoolResponseは、Msg / FundCommunityPool応答タイプを定義します。
 
 
 
@@ -4780,8 +4677,8 @@ MsgFundCommunityPoolResponse defines the Msg/FundCommunityPool response type.
 <a name="cosmos.distribution.v1beta1.MsgSetWithdrawAddress"></a>
 
 ### MsgSetWithdrawAddress
-MsgSetWithdrawAddress sets the withdraw address for
-a delegator (or validator self-delegation).
+MsgSetWithdrawAddressは、の引き出しアドレスを設定します
+委任者（またはバリデーターの自己委任）。
 
 
 | Field | Type | Label | Description |
@@ -4797,7 +4694,7 @@ a delegator (or validator self-delegation).
 <a name="cosmos.distribution.v1beta1.MsgSetWithdrawAddressResponse"></a>
 
 ### MsgSetWithdrawAddressResponse
-MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type.
+Msg tWithdrawAddress Responseは、Message / SetWithdrawAddress応答タイプを定義します。
 
 
 
@@ -4807,8 +4704,7 @@ MsgSetWithdrawAddressResponse defines the Msg/SetWithdrawAddress response type.
 <a name="cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward"></a>
 
 ### MsgWithdrawDelegatorReward
-MsgWithdrawDelegatorReward represents delegation withdrawal to a delegator
-from a single validator.
+MsgWithdrawDelegatorRewardは、単一のバリデーターから委任者への委任の撤回を表します。
 
 
 | Field | Type | Label | Description |
@@ -4824,7 +4720,7 @@ from a single validator.
 <a name="cosmos.distribution.v1beta1.MsgWithdrawDelegatorRewardResponse"></a>
 
 ### MsgWithdrawDelegatorRewardResponse
-MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward response type.
+MsgWithdrawDelegatorRewardResponseは、Msg / WithdrawDelegatorReward応答タイプを定義します。
 
 
 
@@ -4834,8 +4730,7 @@ MsgWithdrawDelegatorRewardResponse defines the Msg/WithdrawDelegatorReward respo
 <a name="cosmos.distribution.v1beta1.MsgWithdrawValidatorCommission"></a>
 
 ### MsgWithdrawValidatorCommission
-MsgWithdrawValidatorCommission withdraws the full commission to the validator
-address.
+MsgWithdrawValidatorCommissionは、コミッション全体をバリデーターアドレスに引き出します。
 
 
 | Field | Type | Label | Description |
@@ -4850,7 +4745,7 @@ address.
 <a name="cosmos.distribution.v1beta1.MsgWithdrawValidatorCommissionResponse"></a>
 
 ### MsgWithdrawValidatorCommissionResponse
-MsgWithdrawValidatorCommissionResponse defines the Msg/WithdrawValidatorCommission response type.
+MsgWithdrawValidatorCommissionResponseは、Msg / WithdrawValidatorCommission応答タイプを定義します。
 
 
 
@@ -4866,7 +4761,7 @@ MsgWithdrawValidatorCommissionResponse defines the Msg/WithdrawValidatorCommissi
 <a name="cosmos.distribution.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the distribution Msg service.
+Msgは、配布Msgサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -4889,8 +4784,7 @@ Msg defines the distribution Msg service.
 <a name="cosmos.evidence.v1beta1.Equivocation"></a>
 
 ### Equivocation
-Equivocation implements the Evidence interface and defines evidence of double
-signing misbehavior.
+Equivocationは、証拠インターフェースを実装し、二重署名の不正行為の証拠を定義します。
 
 
 | Field | Type | Label | Description |
@@ -4924,8 +4818,7 @@ signing misbehavior.
 <a name="cosmos.evidence.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the evidence module's genesis state.
-
+GenesisStateは、証拠モジュールの生成状態を定義します。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -4955,8 +4848,7 @@ GenesisState defines the evidence module's genesis state.
 <a name="cosmos.evidence.v1beta1.QueryAllEvidenceRequest"></a>
 
 ### QueryAllEvidenceRequest
-QueryEvidenceRequest is the request type for the Query/AllEvidence RPC
-method.
+QueryEvidenceRequestは、Query / AllEvidenceRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -4971,8 +4863,7 @@ method.
 <a name="cosmos.evidence.v1beta1.QueryAllEvidenceResponse"></a>
 
 ### QueryAllEvidenceResponse
-QueryAllEvidenceResponse is the response type for the Query/AllEvidence RPC
-method.
+QueryAllEvidenceResponseは、Query / AllEvidenceRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -4988,7 +4879,7 @@ method.
 <a name="cosmos.evidence.v1beta1.QueryEvidenceRequest"></a>
 
 ### QueryEvidenceRequest
-QueryEvidenceRequest is the request type for the Query/Evidence RPC method.
+QueryEvidenceRequestは、Query / EvidenceRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -5003,8 +4894,7 @@ QueryEvidenceRequest is the request type for the Query/Evidence RPC method.
 <a name="cosmos.evidence.v1beta1.QueryEvidenceResponse"></a>
 
 ### QueryEvidenceResponse
-QueryEvidenceResponse is the response type for the Query/Evidence RPC method.
-
+QueryEvidenceResponseは、Query / EvidenceRPCメソッドの応答タイプです。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -5024,7 +4914,7 @@ QueryEvidenceResponse is the response type for the Query/Evidence RPC method.
 <a name="cosmos.evidence.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+クエリはgRPCクエリアサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -5045,8 +4935,7 @@ Query defines the gRPC querier service.
 <a name="cosmos.evidence.v1beta1.MsgSubmitEvidence"></a>
 
 ### MsgSubmitEvidence
-MsgSubmitEvidence represents a message that supports submitting arbitrary
-Evidence of misbehavior such as equivocation or counterfactual signing.
+MsgSubmitEvidenceは、誤謬や事実に反する署名などの不正行為の任意の証拠の送信をサポートするメッセージを表します。
 
 
 | Field | Type | Label | Description |
@@ -5062,7 +4951,7 @@ Evidence of misbehavior such as equivocation or counterfactual signing.
 <a name="cosmos.evidence.v1beta1.MsgSubmitEvidenceResponse"></a>
 
 ### MsgSubmitEvidenceResponse
-MsgSubmitEvidenceResponse defines the Msg/SubmitEvidence response type.
+MsgSubmitEvidenceResponseは、Msg / SubmitEvidence応答タイプを定義します。
 
 
 | Field | Type | Label | Description |
@@ -5083,7 +4972,7 @@ MsgSubmitEvidenceResponse defines the Msg/SubmitEvidence response type.
 <a name="cosmos.evidence.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the evidence Msg service.
+Msgは、証拠Msgサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -5103,7 +4992,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.feegrant.v1beta1.AllowedMsgAllowance"></a>
 
 ### AllowedMsgAllowance
-AllowedMsgAllowance creates allowance only for specified message types.
+AllowedMsgAllowanceは、指定されたメッセージタイプに対してのみアローワンスを作成します。
 
 
 | Field | Type | Label | Description |
@@ -5119,8 +5008,7 @@ AllowedMsgAllowance creates allowance only for specified message types.
 <a name="cosmos.feegrant.v1beta1.BasicAllowance"></a>
 
 ### BasicAllowance
-BasicAllowance implements Allowance with a one-time grant of tokens
-that optionally expires. The grantee can use up to SpendLimit to cover fees.
+BasicAllowanceは、オプションで有効期限が切れるトークンの1回限りの付与でAllowanceを実装します。 被付与者は、最大SpendLimitを使用して料金をカバーできます。
 
 
 | Field | Type | Label | Description |
@@ -5136,7 +5024,7 @@ that optionally expires. The grantee can use up to SpendLimit to cover fees.
 <a name="cosmos.feegrant.v1beta1.Grant"></a>
 
 ### Grant
-Grant is stored in the KVStore to record a grant with full context
+助成金はKVStoreに保存され、完全なコンテキストで助成金を記録します
 
 
 | Field | Type | Label | Description |
@@ -5153,8 +5041,7 @@ Grant is stored in the KVStore to record a grant with full context
 <a name="cosmos.feegrant.v1beta1.PeriodicAllowance"></a>
 
 ### PeriodicAllowance
-PeriodicAllowance extends Allowance to allow for both a maximum cap,
-as well as a limit per time period.
+PeriodicAllowanceは、Allowanceを拡張して、最大上限と期間ごとの制限の両方を許可します。
 
 
 | Field | Type | Label | Description |
@@ -5189,7 +5076,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.feegrant.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState contains a set of fee allowances, persisted from the store
+GenesisStateには、ストアから保持される一連の手数料手当が含まれています
 
 
 | Field | Type | Label | Description |
@@ -5220,7 +5107,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.feegrant.v1beta1.QueryAllowanceRequest"></a>
 
 ### QueryAllowanceRequest
-QueryAllowanceRequest is the request type for the Query/Allowance RPC method.
+QueryAllowanceRequestは、Query / AllowanceRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -5236,7 +5123,7 @@ QueryAllowanceRequest is the request type for the Query/Allowance RPC method.
 <a name="cosmos.feegrant.v1beta1.QueryAllowanceResponse"></a>
 
 ### QueryAllowanceResponse
-QueryAllowanceResponse is the response type for the Query/Allowance RPC method.
+QueryAllowanceResponseは、Query / AllowanceRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -5251,7 +5138,7 @@ QueryAllowanceResponse is the response type for the Query/Allowance RPC method.
 <a name="cosmos.feegrant.v1beta1.QueryAllowancesRequest"></a>
 
 ### QueryAllowancesRequest
-QueryAllowancesRequest is the request type for the Query/Allowances RPC method.
+QueryAllowancesRequestは、Query / AllowancesRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -5267,7 +5154,7 @@ QueryAllowancesRequest is the request type for the Query/Allowances RPC method.
 <a name="cosmos.feegrant.v1beta1.QueryAllowancesResponse"></a>
 
 ### QueryAllowancesResponse
-QueryAllowancesResponse is the response type for the Query/Allowances RPC method.
+QueryAllowancesResponseは、Query / AllowancesRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -5289,7 +5176,7 @@ QueryAllowancesResponse is the response type for the Query/Allowances RPC method
 <a name="cosmos.feegrant.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+QueryはgRPCクエリアサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -5310,8 +5197,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.feegrant.v1beta1.MsgGrantAllowance"></a>
 
 ### MsgGrantAllowance
-MsgGrantAllowance adds permission for Grantee to spend up to Allowance
-of fees from the account of Granter.
+MsgGrantAllowanceは、GranteeがGranterのアカウントから最大の手数料を支払うための許可を追加します。
 
 
 | Field | Type | Label | Description |
@@ -5328,7 +5214,7 @@ of fees from the account of Granter.
 <a name="cosmos.feegrant.v1beta1.MsgGrantAllowanceResponse"></a>
 
 ### MsgGrantAllowanceResponse
-MsgGrantAllowanceResponse defines the Msg/GrantAllowanceResponse response type.
+MsgGrantAllowanceResponseは、Msg / GrantAllowanceResponse応答タイプを定義します。
 
 
 
@@ -5338,7 +5224,7 @@ MsgGrantAllowanceResponse defines the Msg/GrantAllowanceResponse response type.
 <a name="cosmos.feegrant.v1beta1.MsgRevokeAllowance"></a>
 
 ### MsgRevokeAllowance
-MsgRevokeAllowance removes any existing Allowance from Granter to Grantee.
+MsgRevokeAllowanceは、GranterからGranteeへの既存のAllowanceを削除します。
 
 
 | Field | Type | Label | Description |
@@ -5354,7 +5240,7 @@ MsgRevokeAllowance removes any existing Allowance from Granter to Grantee.
 <a name="cosmos.feegrant.v1beta1.MsgRevokeAllowanceResponse"></a>
 
 ### MsgRevokeAllowanceResponse
-MsgRevokeAllowanceResponse defines the Msg/RevokeAllowanceResponse response type.
+MsgRevokeAllowanceResponseは、Msg / RevokeAllowanceResponse応答タイプを定義します。
 
 
 
@@ -5370,7 +5256,7 @@ MsgRevokeAllowanceResponse defines the Msg/RevokeAllowanceResponse response type
 <a name="cosmos.feegrant.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the feegrant msg service.
+Msgはfeegrantmsgサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -5391,7 +5277,7 @@ Msg defines the feegrant msg service.
 <a name="cosmos.genutil.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the raw genesis transaction in JSON.
+GenesisStateは、JSONで生のジェネシストランザクションを定義します。
 
 
 | Field | Type | Label | Description |
@@ -5422,8 +5308,7 @@ GenesisState defines the raw genesis transaction in JSON.
 <a name="cosmos.gov.v1beta1.Deposit"></a>
 
 ### Deposit
-Deposit defines an amount deposited by an account address to an active
-proposal.
+預金は、アカウントアドレスによってアクティブなプロポーザルに預金される金額を定義します。
 
 
 | Field | Type | Label | Description |
@@ -5440,7 +5325,7 @@ proposal.
 <a name="cosmos.gov.v1beta1.DepositParams"></a>
 
 ### DepositParams
-DepositParams defines the params for deposits on governance proposals.
+DepositParamsは、ガバナンス提案の預金のパラメーターを定義します。
 
 
 | Field | Type | Label | Description |
@@ -5456,7 +5341,8 @@ DepositParams defines the params for deposits on governance proposals.
 <a name="cosmos.gov.v1beta1.Proposal"></a>
 
 ### Proposal
-Proposal defines the core field members of a governance proposal.
+提案は、ガバナンス提案のコアフィールドメンバーを定義します。
+
 
 
 | Field | Type | Label | Description |
@@ -5479,7 +5365,7 @@ Proposal defines the core field members of a governance proposal.
 <a name="cosmos.gov.v1beta1.TallyParams"></a>
 
 ### TallyParams
-TallyParams defines the params for tallying votes on governance proposals.
+TallyParamsは、ガバナンス提案に対する投票を集計するためのパラメーターを定義します。
 
 
 | Field | Type | Label | Description |
@@ -5496,7 +5382,7 @@ TallyParams defines the params for tallying votes on governance proposals.
 <a name="cosmos.gov.v1beta1.TallyResult"></a>
 
 ### TallyResult
-TallyResult defines a standard tally for a governance proposal.
+TallyResultは、ガバナンス提案の標準集計を定義します。
 
 
 | Field | Type | Label | Description |
@@ -5514,8 +5400,7 @@ TallyResult defines a standard tally for a governance proposal.
 <a name="cosmos.gov.v1beta1.TextProposal"></a>
 
 ### TextProposal
-TextProposal defines a standard text proposal whose changes need to be
-manually updated in case of approval.
+TextProposalは、承認の場合に変更を手動で更新する必要がある標準のテキスト提案を定義します。
 
 
 | Field | Type | Label | Description |
@@ -5531,8 +5416,8 @@ manually updated in case of approval.
 <a name="cosmos.gov.v1beta1.Vote"></a>
 
 ### Vote
-Vote defines a vote on a governance proposal.
-A Vote consists of a proposal ID, the voter, and the vote option.
+投票は、ガバナンス提案への投票を定義します。
+投票は、提案ID、投票者、および投票オプションで構成されます。
 
 
 | Field | Type | Label | Description |
@@ -5550,7 +5435,7 @@ A Vote consists of a proposal ID, the voter, and the vote option.
 <a name="cosmos.gov.v1beta1.VotingParams"></a>
 
 ### VotingParams
-VotingParams defines the params for voting on governance proposals.
+VotingParamsは、ガバナンス提案に投票するためのパラメーターを定義します。
 
 
 | Field | Type | Label | Description |
@@ -5565,7 +5450,7 @@ VotingParams defines the params for voting on governance proposals.
 <a name="cosmos.gov.v1beta1.WeightedVoteOption"></a>
 
 ### WeightedVoteOption
-WeightedVoteOption defines a unit of vote for vote split.
+WeightedVoteOptionは、投票分割の投票単位を定義します。
 
 Since: cosmos-sdk 0.43
 
@@ -5585,7 +5470,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.gov.v1beta1.ProposalStatus"></a>
 
 ### ProposalStatus
-ProposalStatus enumerates the valid statuses of a proposal.
+ProposalStatusは、プロポーザルの有効なステータスを列挙します。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -5601,7 +5486,7 @@ ProposalStatus enumerates the valid statuses of a proposal.
 <a name="cosmos.gov.v1beta1.VoteOption"></a>
 
 ### VoteOption
-VoteOption enumerates the valid vote options for a given governance proposal.
+VoteOptionは、特定のガバナンス提案の有効な投票オプションを列挙します。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -5630,7 +5515,7 @@ VoteOption enumerates the valid vote options for a given governance proposal.
 <a name="cosmos.gov.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the gov module's genesis state.
+GenesisStateは、govモジュールのジェネシス状態を定義します。
 
 
 | Field | Type | Label | Description |
@@ -5667,7 +5552,7 @@ GenesisState defines the gov module's genesis state.
 <a name="cosmos.gov.v1beta1.QueryDepositRequest"></a>
 
 ### QueryDepositRequest
-QueryDepositRequest is the request type for the Query/Deposit RPC method.
+QueryDepositRequestは、Query / DepositRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -5683,7 +5568,7 @@ QueryDepositRequest is the request type for the Query/Deposit RPC method.
 <a name="cosmos.gov.v1beta1.QueryDepositResponse"></a>
 
 ### QueryDepositResponse
-QueryDepositResponse is the response type for the Query/Deposit RPC method.
+QueryDepositResponseは、Query / DepositRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -5698,7 +5583,7 @@ QueryDepositResponse is the response type for the Query/Deposit RPC method.
 <a name="cosmos.gov.v1beta1.QueryDepositsRequest"></a>
 
 ### QueryDepositsRequest
-QueryDepositsRequest is the request type for the Query/Deposits RPC method.
+QueryDepositsRequestは、Query / DepositsRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -5714,7 +5599,7 @@ QueryDepositsRequest is the request type for the Query/Deposits RPC method.
 <a name="cosmos.gov.v1beta1.QueryDepositsResponse"></a>
 
 ### QueryDepositsResponse
-QueryDepositsResponse is the response type for the Query/Deposits RPC method.
+QueryDepositsResponseは、Query / DepositsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -5730,7 +5615,7 @@ QueryDepositsResponse is the response type for the Query/Deposits RPC method.
 <a name="cosmos.gov.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method.
+QueryParamsRequestは、Query / ParamsRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -5745,7 +5630,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method.
 <a name="cosmos.gov.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method.
+QueryParamsResponseは、Query / ParamsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -5762,7 +5647,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method.
 <a name="cosmos.gov.v1beta1.QueryProposalRequest"></a>
 
 ### QueryProposalRequest
-QueryProposalRequest is the request type for the Query/Proposal RPC method.
+QueryProposalRequestは、Query / ProposalRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -5777,7 +5662,7 @@ QueryProposalRequest is the request type for the Query/Proposal RPC method.
 <a name="cosmos.gov.v1beta1.QueryProposalResponse"></a>
 
 ### QueryProposalResponse
-QueryProposalResponse is the response type for the Query/Proposal RPC method.
+QueryProposalResponseは、Query / ProposalRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -5792,7 +5677,7 @@ QueryProposalResponse is the response type for the Query/Proposal RPC method.
 <a name="cosmos.gov.v1beta1.QueryProposalsRequest"></a>
 
 ### QueryProposalsRequest
-QueryProposalsRequest is the request type for the Query/Proposals RPC method.
+QueryProposalsRequestは、Query / ProposalsRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -5810,8 +5695,7 @@ QueryProposalsRequest is the request type for the Query/Proposals RPC method.
 <a name="cosmos.gov.v1beta1.QueryProposalsResponse"></a>
 
 ### QueryProposalsResponse
-QueryProposalsResponse is the response type for the Query/Proposals RPC
-method.
+QueryProposalsResponseは、Query / ProposalsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -5827,7 +5711,7 @@ method.
 <a name="cosmos.gov.v1beta1.QueryTallyResultRequest"></a>
 
 ### QueryTallyResultRequest
-QueryTallyResultRequest is the request type for the Query/Tally RPC method.
+QueryTallyResultRequestは、Query / TallyRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -5842,7 +5726,7 @@ QueryTallyResultRequest is the request type for the Query/Tally RPC method.
 <a name="cosmos.gov.v1beta1.QueryTallyResultResponse"></a>
 
 ### QueryTallyResultResponse
-QueryTallyResultResponse is the response type for the Query/Tally RPC method.
+QueryTallyResultResponseは、Query / TallyRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -5857,7 +5741,7 @@ QueryTallyResultResponse is the response type for the Query/Tally RPC method.
 <a name="cosmos.gov.v1beta1.QueryVoteRequest"></a>
 
 ### QueryVoteRequest
-QueryVoteRequest is the request type for the Query/Vote RPC method.
+QueryVoteRequestは、Query / VoteRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -5873,7 +5757,7 @@ QueryVoteRequest is the request type for the Query/Vote RPC method.
 <a name="cosmos.gov.v1beta1.QueryVoteResponse"></a>
 
 ### QueryVoteResponse
-QueryVoteResponse is the response type for the Query/Vote RPC method.
+QueryVoteResponseは、Query / VoteRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -5888,7 +5772,7 @@ QueryVoteResponse is the response type for the Query/Vote RPC method.
 <a name="cosmos.gov.v1beta1.QueryVotesRequest"></a>
 
 ### QueryVotesRequest
-QueryVotesRequest is the request type for the Query/Votes RPC method.
+QueryVotesRequestは、Query / VotesRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -5904,7 +5788,7 @@ QueryVotesRequest is the request type for the Query/Votes RPC method.
 <a name="cosmos.gov.v1beta1.QueryVotesResponse"></a>
 
 ### QueryVotesResponse
-QueryVotesResponse is the response type for the Query/Votes RPC method.
+QueryVotesResponseは、Query / VotesRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -5926,7 +5810,7 @@ QueryVotesResponse is the response type for the Query/Votes RPC method.
 <a name="cosmos.gov.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service for gov module
+Queryは、govモジュールのgRPCクエリアサービスを定義します
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -5953,7 +5837,7 @@ Query defines the gRPC querier service for gov module
 <a name="cosmos.gov.v1beta1.MsgDeposit"></a>
 
 ### MsgDeposit
-MsgDeposit defines a message to submit a deposit to an existing proposal.
+MsgDepositは、既存のプロポーザルにデポジットを送信するためのメッセージを定義します。
 
 
 | Field | Type | Label | Description |
@@ -5970,8 +5854,7 @@ MsgDeposit defines a message to submit a deposit to an existing proposal.
 <a name="cosmos.gov.v1beta1.MsgDepositResponse"></a>
 
 ### MsgDepositResponse
-MsgDepositResponse defines the Msg/Deposit response type.
-
+MsgDepositResponseは、Msg / Deposit応答タイプを定義します。
 
 
 
@@ -5980,8 +5863,7 @@ MsgDepositResponse defines the Msg/Deposit response type.
 <a name="cosmos.gov.v1beta1.MsgSubmitProposal"></a>
 
 ### MsgSubmitProposal
-MsgSubmitProposal defines an sdk.Msg type that supports submitting arbitrary
-proposal Content.
+MsgSubmitProposalは、任意のプロポーザルコンテンツの送信をサポートするsdk.Msgタイプを定義します。
 
 
 | Field | Type | Label | Description |
@@ -5998,7 +5880,7 @@ proposal Content.
 <a name="cosmos.gov.v1beta1.MsgSubmitProposalResponse"></a>
 
 ### MsgSubmitProposalResponse
-MsgSubmitProposalResponse defines the Msg/SubmitProposal response type.
+MsgSubmitProposalResponseは、Msg / SubmitProposal応答タイプを定義します。
 
 
 | Field | Type | Label | Description |
@@ -6013,7 +5895,7 @@ MsgSubmitProposalResponse defines the Msg/SubmitProposal response type.
 <a name="cosmos.gov.v1beta1.MsgVote"></a>
 
 ### MsgVote
-MsgVote defines a message to cast a vote.
+MsgVoteは、投票するメッセージを定義します。
 
 
 | Field | Type | Label | Description |
@@ -6030,7 +5912,7 @@ MsgVote defines a message to cast a vote.
 <a name="cosmos.gov.v1beta1.MsgVoteResponse"></a>
 
 ### MsgVoteResponse
-MsgVoteResponse defines the Msg/Vote response type.
+MsgVoteResponseは、Msg / Vote応答タイプを定義します。
 
 
 
@@ -6040,7 +5922,7 @@ MsgVoteResponse defines the Msg/Vote response type.
 <a name="cosmos.gov.v1beta1.MsgVoteWeighted"></a>
 
 ### MsgVoteWeighted
-MsgVoteWeighted defines a message to cast a vote.
+MsgVoteWeightedは、投票するメッセージを定義します。
 
 Since: cosmos-sdk 0.43
 
@@ -6059,7 +5941,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.gov.v1beta1.MsgVoteWeightedResponse"></a>
 
 ### MsgVoteWeightedResponse
-MsgVoteWeightedResponse defines the Msg/VoteWeighted response type.
+MsgVoteWeightedResponseは、Msg / VoteWeighted応答タイプを定義します。
 
 Since: cosmos-sdk 0.43
 
@@ -6077,7 +5959,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.gov.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the bank Msg service.
+Msgは、銀行のMsgサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -6102,8 +5984,7 @@ Since: cosmos-sdk 0.43 | |
 <a name="cosmos.gov.v1beta2.Deposit"></a>
 
 ### Deposit
-Deposit defines an amount deposited by an account address to an active
-proposal.
+デポジットは、アカウントアドレスによってアクティブなプロポーザルにデポジットされる金額を定義します。
 
 
 | Field | Type | Label | Description |
@@ -6120,7 +6001,7 @@ proposal.
 <a name="cosmos.gov.v1beta2.DepositParams"></a>
 
 ### DepositParams
-DepositParams defines the params for deposits on governance proposals.
+DepositParamsは、ガバナンス提案の預金のパラメーターを定義します。
 
 
 | Field | Type | Label | Description |
@@ -6136,7 +6017,7 @@ DepositParams defines the params for deposits on governance proposals.
 <a name="cosmos.gov.v1beta2.Proposal"></a>
 
 ### Proposal
-Proposal defines the core field members of a governance proposal.
+提案は、ガバナンス提案のコアフィールドメンバーを定義します。
 
 
 | Field | Type | Label | Description |
@@ -6159,7 +6040,7 @@ Proposal defines the core field members of a governance proposal.
 <a name="cosmos.gov.v1beta2.TallyParams"></a>
 
 ### TallyParams
-TallyParams defines the params for tallying votes on governance proposals.
+TallyParamsは、ガバナンス提案に対する投票を集計するためのパラメーターを定義します。
 
 
 | Field | Type | Label | Description |
@@ -6176,7 +6057,7 @@ TallyParams defines the params for tallying votes on governance proposals.
 <a name="cosmos.gov.v1beta2.TallyResult"></a>
 
 ### TallyResult
-TallyResult defines a standard tally for a governance proposal.
+TallyResultは、ガバナンス提案の標準集計を定義します。
 
 
 | Field | Type | Label | Description |
@@ -6194,8 +6075,7 @@ TallyResult defines a standard tally for a governance proposal.
 <a name="cosmos.gov.v1beta2.Vote"></a>
 
 ### Vote
-Vote defines a vote on a governance proposal.
-A Vote consists of a proposal ID, the voter, and the vote option.
+投票は、ガバナンス提案に対する投票を定義します。投票は、提案ID、投票者、および投票オプションで構成されます。
 
 
 | Field | Type | Label | Description |
@@ -6213,7 +6093,7 @@ A Vote consists of a proposal ID, the voter, and the vote option.
 <a name="cosmos.gov.v1beta2.VotingParams"></a>
 
 ### VotingParams
-VotingParams defines the params for voting on governance proposals.
+VotingParamsは、ガバナンス提案に投票するためのパラメーターを定義します。
 
 
 | Field | Type | Label | Description |
@@ -6228,7 +6108,7 @@ VotingParams defines the params for voting on governance proposals.
 <a name="cosmos.gov.v1beta2.WeightedVoteOption"></a>
 
 ### WeightedVoteOption
-WeightedVoteOption defines a unit of vote for vote split.
+WeightedVoteOptionは、投票分割の投票単位を定義します。
 
 
 | Field | Type | Label | Description |
@@ -6246,7 +6126,7 @@ WeightedVoteOption defines a unit of vote for vote split.
 <a name="cosmos.gov.v1beta2.ProposalStatus"></a>
 
 ### ProposalStatus
-ProposalStatus enumerates the valid statuses of a proposal.
+ProposalStatusは、プロポーザルの有効なステータスを列挙します。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -6262,7 +6142,7 @@ ProposalStatus enumerates the valid statuses of a proposal.
 <a name="cosmos.gov.v1beta2.VoteOption"></a>
 
 ### VoteOption
-VoteOption enumerates the valid vote options for a given governance proposal.
+VoteOptionは、特定のガバナンス提案の有効な投票オプションを列挙します。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -6291,7 +6171,7 @@ VoteOption enumerates the valid vote options for a given governance proposal.
 <a name="cosmos.gov.v1beta2.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the gov module's genesis state.
+GenesisStateは、govモジュールのジェネシス状態を定義します。
 
 
 | Field | Type | Label | Description |
@@ -6328,7 +6208,7 @@ GenesisState defines the gov module's genesis state.
 <a name="cosmos.gov.v1beta2.QueryDepositRequest"></a>
 
 ### QueryDepositRequest
-QueryDepositRequest is the request type for the Query/Deposit RPC method.
+QueryDepositRequestは、Query / DepositRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -6344,7 +6224,7 @@ QueryDepositRequest is the request type for the Query/Deposit RPC method.
 <a name="cosmos.gov.v1beta2.QueryDepositResponse"></a>
 
 ### QueryDepositResponse
-QueryDepositResponse is the response type for the Query/Deposit RPC method.
+QueryDepositResponseは、Query / DepositRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -6359,7 +6239,7 @@ QueryDepositResponse is the response type for the Query/Deposit RPC method.
 <a name="cosmos.gov.v1beta2.QueryDepositsRequest"></a>
 
 ### QueryDepositsRequest
-QueryDepositsRequest is the request type for the Query/Deposits RPC method.
+QueryDepositsRequestは、Query / DepositsRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -6375,7 +6255,7 @@ QueryDepositsRequest is the request type for the Query/Deposits RPC method.
 <a name="cosmos.gov.v1beta2.QueryDepositsResponse"></a>
 
 ### QueryDepositsResponse
-QueryDepositsResponse is the response type for the Query/Deposits RPC method.
+QueryDepositsResponseは、Query / DepositsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -6391,7 +6271,7 @@ QueryDepositsResponse is the response type for the Query/Deposits RPC method.
 <a name="cosmos.gov.v1beta2.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method.
+QueryParamsRequestは、Query / ParamsRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -6406,7 +6286,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method.
 <a name="cosmos.gov.v1beta2.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method.
+QueryParamsResponseは、Query / ParamsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -6423,7 +6303,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method.
 <a name="cosmos.gov.v1beta2.QueryProposalRequest"></a>
 
 ### QueryProposalRequest
-QueryProposalRequest is the request type for the Query/Proposal RPC method.
+QueryProposalRequestは、Query / ProposalRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -6438,7 +6318,7 @@ QueryProposalRequest is the request type for the Query/Proposal RPC method.
 <a name="cosmos.gov.v1beta2.QueryProposalResponse"></a>
 
 ### QueryProposalResponse
-QueryProposalResponse is the response type for the Query/Proposal RPC method.
+QueryProposalResponseは、Query / ProposalRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -6453,7 +6333,7 @@ QueryProposalResponse is the response type for the Query/Proposal RPC method.
 <a name="cosmos.gov.v1beta2.QueryProposalsRequest"></a>
 
 ### QueryProposalsRequest
-QueryProposalsRequest is the request type for the Query/Proposals RPC method.
+QueryProposalsRequestは、Query / ProposalsRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -6471,8 +6351,7 @@ QueryProposalsRequest is the request type for the Query/Proposals RPC method.
 <a name="cosmos.gov.v1beta2.QueryProposalsResponse"></a>
 
 ### QueryProposalsResponse
-QueryProposalsResponse is the response type for the Query/Proposals RPC
-method.
+QueryProposalsResponseは、Query / ProposalsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -6488,7 +6367,7 @@ method.
 <a name="cosmos.gov.v1beta2.QueryTallyResultRequest"></a>
 
 ### QueryTallyResultRequest
-QueryTallyResultRequest is the request type for the Query/Tally RPC method.
+QueryTallyResultRequestは、Query / TallyRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -6503,7 +6382,7 @@ QueryTallyResultRequest is the request type for the Query/Tally RPC method.
 <a name="cosmos.gov.v1beta2.QueryTallyResultResponse"></a>
 
 ### QueryTallyResultResponse
-QueryTallyResultResponse is the response type for the Query/Tally RPC method.
+QueryTallyResultResponseは、Query / TallyRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -6518,7 +6397,7 @@ QueryTallyResultResponse is the response type for the Query/Tally RPC method.
 <a name="cosmos.gov.v1beta2.QueryVoteRequest"></a>
 
 ### QueryVoteRequest
-QueryVoteRequest is the request type for the Query/Vote RPC method.
+QueryVoteRequestは、Query / VoteRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -6534,7 +6413,7 @@ QueryVoteRequest is the request type for the Query/Vote RPC method.
 <a name="cosmos.gov.v1beta2.QueryVoteResponse"></a>
 
 ### QueryVoteResponse
-QueryVoteResponse is the response type for the Query/Vote RPC method.
+QueryVoteResponseは、Query / VoteRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -6549,7 +6428,7 @@ QueryVoteResponse is the response type for the Query/Vote RPC method.
 <a name="cosmos.gov.v1beta2.QueryVotesRequest"></a>
 
 ### QueryVotesRequest
-QueryVotesRequest is the request type for the Query/Votes RPC method.
+QueryVotesRequestは、Query / VotesRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -6565,7 +6444,7 @@ QueryVotesRequest is the request type for the Query/Votes RPC method.
 <a name="cosmos.gov.v1beta2.QueryVotesResponse"></a>
 
 ### QueryVotesResponse
-QueryVotesResponse is the response type for the Query/Votes RPC method.
+QueryVotesResponseは、Query / VotesRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -6587,7 +6466,7 @@ QueryVotesResponse is the response type for the Query/Votes RPC method.
 <a name="cosmos.gov.v1beta2.Query"></a>
 
 ### Query
-Query defines the gRPC querier service for gov module
+Queryは、govモジュールのgRPCクエリアサービスを定義します
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -6614,7 +6493,7 @@ Query defines the gRPC querier service for gov module
 <a name="cosmos.gov.v1beta2.MsgDeposit"></a>
 
 ### MsgDeposit
-MsgDeposit defines a message to submit a deposit to an existing proposal.
+MsgDepositは、既存のプロポーザルにデポジットを送信するためのメッセージを定義します。
 
 
 | Field | Type | Label | Description |
@@ -6631,7 +6510,7 @@ MsgDeposit defines a message to submit a deposit to an existing proposal.
 <a name="cosmos.gov.v1beta2.MsgDepositResponse"></a>
 
 ### MsgDepositResponse
-MsgDepositResponse defines the Msg/Deposit response type.
+MsgDepositResponseは、Msg / Deposit応答タイプを定義します。
 
 
 
@@ -6641,8 +6520,7 @@ MsgDepositResponse defines the Msg/Deposit response type.
 <a name="cosmos.gov.v1beta2.MsgSubmitProposal"></a>
 
 ### MsgSubmitProposal
-MsgSubmitProposal defines an sdk.Msg type that supports submitting arbitrary
-proposal Content.
+MsgSubmitProposalは、任意のプロポーザルコンテンツの送信をサポートするsdk.Msgタイプを定義します。
 
 
 | Field | Type | Label | Description |
@@ -6659,7 +6537,7 @@ proposal Content.
 <a name="cosmos.gov.v1beta2.MsgSubmitProposalResponse"></a>
 
 ### MsgSubmitProposalResponse
-MsgSubmitProposalResponse defines the Msg/SubmitProposal response type.
+MsgSubmitProposalResponseは、Msg / SubmitProposal応答タイプを定義します。
 
 
 | Field | Type | Label | Description |
@@ -6674,7 +6552,7 @@ MsgSubmitProposalResponse defines the Msg/SubmitProposal response type.
 <a name="cosmos.gov.v1beta2.MsgVote"></a>
 
 ### MsgVote
-MsgVote defines a message to cast a vote.
+MsgVoteは、投票するメッセージを定義します。
 
 
 | Field | Type | Label | Description |
@@ -6691,7 +6569,7 @@ MsgVote defines a message to cast a vote.
 <a name="cosmos.gov.v1beta2.MsgVoteResponse"></a>
 
 ### MsgVoteResponse
-MsgVoteResponse defines the Msg/Vote response type.
+MsgVoteResponseは、Msg / Vote応答タイプを定義します。
 
 
 
@@ -6701,7 +6579,7 @@ MsgVoteResponse defines the Msg/Vote response type.
 <a name="cosmos.gov.v1beta2.MsgVoteWeighted"></a>
 
 ### MsgVoteWeighted
-MsgVoteWeighted defines a message to cast a vote.
+MsgVoteWeightedは、投票するメッセージを定義します。
 
 Since: cosmos-sdk 0.43
 
@@ -6720,7 +6598,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.gov.v1beta2.MsgVoteWeightedResponse"></a>
 
 ### MsgVoteWeightedResponse
-MsgVoteWeightedResponse defines the Msg/VoteWeighted response type.
+MsgVoteWeightedResponseは、Msg / VoteWeighted応答タイプを定義します。
 
 Since: cosmos-sdk 0.43
 
@@ -6738,7 +6616,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.gov.v1beta2.Msg"></a>
 
 ### Msg
-Msg defines the gov Msg service.
+Msgは、govMsgサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -6763,7 +6641,7 @@ Since: cosmos-sdk 0.43 | |
 <a name="cosmos.group.v1beta1.EventCreateGroup"></a>
 
 ### EventCreateGroup
-EventCreateGroup is an event emitted when a group is created.
+EventCreateGroupは、グループが作成されたときに発行されるイベントです。
 
 
 | Field | Type | Label | Description |
@@ -6778,7 +6656,7 @@ EventCreateGroup is an event emitted when a group is created.
 <a name="cosmos.group.v1beta1.EventCreateGroupAccount"></a>
 
 ### EventCreateGroupAccount
-EventCreateGroupAccount is an event emitted when a group account is created.
+EventCreateGroupAccountは、グループアカウントが作成されたときに発行されるイベントです。
 
 
 | Field | Type | Label | Description |
@@ -6793,7 +6671,7 @@ EventCreateGroupAccount is an event emitted when a group account is created.
 <a name="cosmos.group.v1beta1.EventCreateProposal"></a>
 
 ### EventCreateProposal
-EventCreateProposal is an event emitted when a proposal is created.
+EventCreateProposalは、プロポーザルが作成されたときに発行されるイベントです。
 
 
 | Field | Type | Label | Description |
@@ -6808,7 +6686,7 @@ EventCreateProposal is an event emitted when a proposal is created.
 <a name="cosmos.group.v1beta1.EventExec"></a>
 
 ### EventExec
-EventExec is an event emitted when a proposal is executed.
+EventExecは、プロポーザルが実行されたときに発行されるイベントです。
 
 
 | Field | Type | Label | Description |
@@ -6823,7 +6701,7 @@ EventExec is an event emitted when a proposal is executed.
 <a name="cosmos.group.v1beta1.EventUpdateGroup"></a>
 
 ### EventUpdateGroup
-EventUpdateGroup is an event emitted when a group is updated.
+EventUpdateGroupは、グループが更新されたときに発行されるイベントです。
 
 
 | Field | Type | Label | Description |
@@ -6838,7 +6716,7 @@ EventUpdateGroup is an event emitted when a group is updated.
 <a name="cosmos.group.v1beta1.EventUpdateGroupAccount"></a>
 
 ### EventUpdateGroupAccount
-EventUpdateGroupAccount is an event emitted when a group account is updated.
+EventUpdateGroupAccountは、グループアカウントが更新されたときに発行されるイベントです。
 
 
 | Field | Type | Label | Description |
@@ -6853,7 +6731,7 @@ EventUpdateGroupAccount is an event emitted when a group account is updated.
 <a name="cosmos.group.v1beta1.EventVote"></a>
 
 ### EventVote
-EventVote is an event emitted when a voter votes on a proposal.
+EventVoteは、投票者が提案に投票したときに発行されるイベントです。
 
 
 | Field | Type | Label | Description |
@@ -6884,7 +6762,7 @@ EventVote is an event emitted when a voter votes on a proposal.
 <a name="cosmos.group.v1beta1.GroupAccountInfo"></a>
 
 ### GroupAccountInfo
-GroupAccountInfo represents the high-level on-chain information for a group account.
+GroupAccountInfoは、グループアカウントの高レベルのオンチェーン情報を表します。
 
 
 | Field | Type | Label | Description |
@@ -6904,7 +6782,7 @@ GroupAccountInfo represents the high-level on-chain information for a group acco
 <a name="cosmos.group.v1beta1.GroupInfo"></a>
 
 ### GroupInfo
-GroupInfo represents the high-level on-chain information for a group.
+GroupInfoは、グループの高レベルのオンチェーン情報を表します。
 
 
 | Field | Type | Label | Description |
@@ -6923,7 +6801,7 @@ GroupInfo represents the high-level on-chain information for a group.
 <a name="cosmos.group.v1beta1.GroupMember"></a>
 
 ### GroupMember
-GroupMember represents the relationship between a group and a member.
+GroupMemberは、グループとメンバーの間の関係を表します。
 
 
 | Field | Type | Label | Description |
@@ -6939,8 +6817,8 @@ GroupMember represents the relationship between a group and a member.
 <a name="cosmos.group.v1beta1.Member"></a>
 
 ### Member
-Member represents a group member with an account address,
-non-zero weight and metadata.
+メンバーは、アカウントアドレスを持つグループメンバーを表します。
+ゼロ以外の重みとメタデータ。
 
 
 | Field | Type | Label | Description |
@@ -6957,7 +6835,7 @@ non-zero weight and metadata.
 <a name="cosmos.group.v1beta1.Members"></a>
 
 ### Members
-Members defines a repeated slice of Member objects.
+メンバーは、メンバーオブジェクトの繰り返しスライスを定義します。
 
 
 | Field | Type | Label | Description |
@@ -6972,10 +6850,8 @@ Members defines a repeated slice of Member objects.
 <a name="cosmos.group.v1beta1.Proposal"></a>
 
 ### Proposal
-Proposal defines a group proposal. Any member of a group can submit a proposal
-for a group account to decide upon.
-A proposal consists of a set of `sdk.Msg`s that will be executed if the proposal
-passes as well as some optional metadata associated with the proposal.
+提案は、グループ提案を定義します。 グループのメンバーは誰でも、グループアカウントの提案を送信して決定できます。
+プロポーザルは、プロポーザルが合格した場合に実行される一連の `sdk.Msg`と、プロポーザルに関連付けられたオプションのメタデータで構成されます。
 
 
 | Field | Type | Label | Description |
@@ -7002,7 +6878,7 @@ passes as well as some optional metadata associated with the proposal.
 <a name="cosmos.group.v1beta1.Tally"></a>
 
 ### Tally
-Tally represents the sum of weighted votes.
+Tallyは、加重投票の合計を表します。
 
 
 | Field | Type | Label | Description |
@@ -7020,7 +6896,7 @@ Tally represents the sum of weighted votes.
 <a name="cosmos.group.v1beta1.ThresholdDecisionPolicy"></a>
 
 ### ThresholdDecisionPolicy
-ThresholdDecisionPolicy implements the DecisionPolicy interface
+ThresholdDecisionPolicyは、DecisionPolicyインターフェイスを実装します
 
 
 | Field | Type | Label | Description |
@@ -7036,7 +6912,7 @@ ThresholdDecisionPolicy implements the DecisionPolicy interface
 <a name="cosmos.group.v1beta1.Vote"></a>
 
 ### Vote
-Vote represents a vote for a proposal.
+投票は、提案への投票を表します。
 
 
 | Field | Type | Label | Description |
@@ -7057,7 +6933,7 @@ Vote represents a vote for a proposal.
 <a name="cosmos.group.v1beta1.Choice"></a>
 
 ### Choice
-Choice defines available types of choices for voting.
+選択肢は、投票に利用できる選択肢の種類を定義します。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -7072,7 +6948,7 @@ Choice defines available types of choices for voting.
 <a name="cosmos.group.v1beta1.Proposal.ExecutorResult"></a>
 
 ### Proposal.ExecutorResult
-ExecutorResult defines types of proposal executor results.
+ExecutorResultは、プロポーザルエグゼキュータ結果のタイプを定義します。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -7086,7 +6962,7 @@ ExecutorResult defines types of proposal executor results.
 <a name="cosmos.group.v1beta1.Proposal.Result"></a>
 
 ### Proposal.Result
-Result defines types of proposal results.
+結果は、提案結果のタイプを定義します。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -7100,7 +6976,7 @@ Result defines types of proposal results.
 <a name="cosmos.group.v1beta1.Proposal.Status"></a>
 
 ### Proposal.Status
-Status defines proposal statuses.
+ステータスは、プロポーザルのステータスを定義します。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -7128,7 +7004,7 @@ Status defines proposal statuses.
 <a name="cosmos.group.v1beta1.QueryGroupAccountInfoRequest"></a>
 
 ### QueryGroupAccountInfoRequest
-QueryGroupAccountInfoRequest is the Query/GroupAccountInfo request type.
+QueryGroupAccountInfoRequestは、Query / GroupAccountInfoリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7143,7 +7019,7 @@ QueryGroupAccountInfoRequest is the Query/GroupAccountInfo request type.
 <a name="cosmos.group.v1beta1.QueryGroupAccountInfoResponse"></a>
 
 ### QueryGroupAccountInfoResponse
-QueryGroupAccountInfoResponse is the Query/GroupAccountInfo response type.
+QueryGroupAccountInfoResponseは、Query / GroupAccountInfo応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7158,7 +7034,7 @@ QueryGroupAccountInfoResponse is the Query/GroupAccountInfo response type.
 <a name="cosmos.group.v1beta1.QueryGroupAccountsByAdminRequest"></a>
 
 ### QueryGroupAccountsByAdminRequest
-QueryGroupAccountsByAdminRequest is the Query/GroupAccountsByAdmin request type.
+QueryGroupAccountsByAdminRequestは、Query / GroupAccountsByAdminリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7174,7 +7050,7 @@ QueryGroupAccountsByAdminRequest is the Query/GroupAccountsByAdmin request type.
 <a name="cosmos.group.v1beta1.QueryGroupAccountsByAdminResponse"></a>
 
 ### QueryGroupAccountsByAdminResponse
-QueryGroupAccountsByAdminResponse is the Query/GroupAccountsByAdmin response type.
+QueryGroupAccountsByAdminResponseは、Query / GroupAccountsByAdmin応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7190,7 +7066,7 @@ QueryGroupAccountsByAdminResponse is the Query/GroupAccountsByAdmin response typ
 <a name="cosmos.group.v1beta1.QueryGroupAccountsByGroupRequest"></a>
 
 ### QueryGroupAccountsByGroupRequest
-QueryGroupAccountsByGroupRequest is the Query/GroupAccountsByGroup request type.
+QueryGroupAccountsByGroupRequestは、Query / GroupAccountsByGroupリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7206,7 +7082,7 @@ QueryGroupAccountsByGroupRequest is the Query/GroupAccountsByGroup request type.
 <a name="cosmos.group.v1beta1.QueryGroupAccountsByGroupResponse"></a>
 
 ### QueryGroupAccountsByGroupResponse
-QueryGroupAccountsByGroupResponse is the Query/GroupAccountsByGroup response type.
+QueryGroupAccountsByGroupResponseは、Query / GroupAccountsByGroup応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7222,7 +7098,7 @@ QueryGroupAccountsByGroupResponse is the Query/GroupAccountsByGroup response typ
 <a name="cosmos.group.v1beta1.QueryGroupInfoRequest"></a>
 
 ### QueryGroupInfoRequest
-QueryGroupInfoRequest is the Query/GroupInfo request type.
+QueryGroupInfoRequestは、Query / GroupInfoリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7237,7 +7113,7 @@ QueryGroupInfoRequest is the Query/GroupInfo request type.
 <a name="cosmos.group.v1beta1.QueryGroupInfoResponse"></a>
 
 ### QueryGroupInfoResponse
-QueryGroupInfoResponse is the Query/GroupInfo response type.
+QueryGroupInfoResponseは、Query / GroupInfo応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7252,7 +7128,7 @@ QueryGroupInfoResponse is the Query/GroupInfo response type.
 <a name="cosmos.group.v1beta1.QueryGroupMembersRequest"></a>
 
 ### QueryGroupMembersRequest
-QueryGroupMembersRequest is the Query/GroupMembers request type.
+QueryGroupMembersRequestは、Query / GroupMembersリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7268,7 +7144,7 @@ QueryGroupMembersRequest is the Query/GroupMembers request type.
 <a name="cosmos.group.v1beta1.QueryGroupMembersResponse"></a>
 
 ### QueryGroupMembersResponse
-QueryGroupMembersResponse is the Query/GroupMembersResponse response type.
+QueryGroupMembersResponseは、Query / GroupMembersResponse応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7284,7 +7160,7 @@ QueryGroupMembersResponse is the Query/GroupMembersResponse response type.
 <a name="cosmos.group.v1beta1.QueryGroupsByAdminRequest"></a>
 
 ### QueryGroupsByAdminRequest
-QueryGroupsByAdminRequest is the Query/GroupsByAdmin request type.
+QueryGroupsByAdminRequestは、Query / GroupsByAdminリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7300,7 +7176,7 @@ QueryGroupsByAdminRequest is the Query/GroupsByAdmin request type.
 <a name="cosmos.group.v1beta1.QueryGroupsByAdminResponse"></a>
 
 ### QueryGroupsByAdminResponse
-QueryGroupsByAdminResponse is the Query/GroupsByAdminResponse response type.
+QueryGroupsByAdminResponseは、Query / GroupsByAdminResponse応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7316,7 +7192,7 @@ QueryGroupsByAdminResponse is the Query/GroupsByAdminResponse response type.
 <a name="cosmos.group.v1beta1.QueryProposalRequest"></a>
 
 ### QueryProposalRequest
-QueryProposalRequest is the Query/Proposal request type.
+QueryProposalRequestは、クエリ/提案依頼書のタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7331,7 +7207,7 @@ QueryProposalRequest is the Query/Proposal request type.
 <a name="cosmos.group.v1beta1.QueryProposalResponse"></a>
 
 ### QueryProposalResponse
-QueryProposalResponse is the Query/Proposal response type.
+QueryProposalResponseは、クエリ/提案の応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7346,7 +7222,7 @@ QueryProposalResponse is the Query/Proposal response type.
 <a name="cosmos.group.v1beta1.QueryProposalsByGroupAccountRequest"></a>
 
 ### QueryProposalsByGroupAccountRequest
-QueryProposalsByGroupAccountRequest is the Query/ProposalByGroupAccount request type.
+QueryProposalsByGroupAccountRequestは、Query / ProposalByGroupAccountリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7362,7 +7238,7 @@ QueryProposalsByGroupAccountRequest is the Query/ProposalByGroupAccount request 
 <a name="cosmos.group.v1beta1.QueryProposalsByGroupAccountResponse"></a>
 
 ### QueryProposalsByGroupAccountResponse
-QueryProposalsByGroupAccountResponse is the Query/ProposalByGroupAccount response type.
+QueryProposalsByGroupAccountResponseは、Query / ProposalByGroupAccount応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7378,7 +7254,7 @@ QueryProposalsByGroupAccountResponse is the Query/ProposalByGroupAccount respons
 <a name="cosmos.group.v1beta1.QueryVoteByProposalVoterRequest"></a>
 
 ### QueryVoteByProposalVoterRequest
-QueryVoteByProposalVoterRequest is the Query/VoteByProposalVoter request type.
+QueryVoteByProposalVoterRequestは、Query / VoteByProposalVoterリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7394,7 +7270,7 @@ QueryVoteByProposalVoterRequest is the Query/VoteByProposalVoter request type.
 <a name="cosmos.group.v1beta1.QueryVoteByProposalVoterResponse"></a>
 
 ### QueryVoteByProposalVoterResponse
-QueryVoteByProposalVoterResponse is the Query/VoteByProposalVoter response type.
+QueryVoteByProposalVoterResponseは、Query / VoteByProposalVoter応答タイプです
 
 
 | Field | Type | Label | Description |
@@ -7409,7 +7285,7 @@ QueryVoteByProposalVoterResponse is the Query/VoteByProposalVoter response type.
 <a name="cosmos.group.v1beta1.QueryVotesByProposalRequest"></a>
 
 ### QueryVotesByProposalRequest
-QueryVotesByProposalRequest is the Query/VotesByProposal request type.
+QueryVotesByProposalRequestは、Query / VotesByProposalリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7425,7 +7301,7 @@ QueryVotesByProposalRequest is the Query/VotesByProposal request type.
 <a name="cosmos.group.v1beta1.QueryVotesByProposalResponse"></a>
 
 ### QueryVotesByProposalResponse
-QueryVotesByProposalResponse is the Query/VotesByProposal response type.
+QueryVotesByProposalResponseは、Query / VotesByProposal応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7441,7 +7317,7 @@ QueryVotesByProposalResponse is the Query/VotesByProposal response type.
 <a name="cosmos.group.v1beta1.QueryVotesByVoterRequest"></a>
 
 ### QueryVotesByVoterRequest
-QueryVotesByVoterRequest is the Query/VotesByVoter request type.
+QueryVotesByVoterRequestは、Query / VotesByVoterリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7457,7 +7333,7 @@ QueryVotesByVoterRequest is the Query/VotesByVoter request type.
 <a name="cosmos.group.v1beta1.QueryVotesByVoterResponse"></a>
 
 ### QueryVotesByVoterResponse
-QueryVotesByVoterResponse is the Query/VotesByVoter response type.
+QueryVotesByVoterResponseは、Query / VotesByVoter応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7479,7 +7355,7 @@ QueryVotesByVoterResponse is the Query/VotesByVoter response type.
 <a name="cosmos.group.v1beta1.Query"></a>
 
 ### Query
-Query is the cosmos.group.v1beta1 Query service.
+Queryはcosmos.group.v1beta1クエリサービスです。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -7509,7 +7385,7 @@ Query is the cosmos.group.v1beta1 Query service.
 <a name="cosmos.group.v1beta1.MsgCreateGroup"></a>
 
 ### MsgCreateGroup
-MsgCreateGroup is the Msg/CreateGroup request type.
+MsgCreateGroupは、Msg / CreateGroupリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7526,7 +7402,7 @@ MsgCreateGroup is the Msg/CreateGroup request type.
 <a name="cosmos.group.v1beta1.MsgCreateGroupAccount"></a>
 
 ### MsgCreateGroupAccount
-MsgCreateGroupAccount is the Msg/CreateGroupAccount request type.
+MsgCreateGroupAccountは、Msg / CreateGroupAccountリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7544,7 +7420,7 @@ MsgCreateGroupAccount is the Msg/CreateGroupAccount request type.
 <a name="cosmos.group.v1beta1.MsgCreateGroupAccountResponse"></a>
 
 ### MsgCreateGroupAccountResponse
-MsgCreateGroupAccountResponse is the Msg/CreateGroupAccount response type.
+MsgCreateGroupAccountResponseは、Msg / CreateGroupAccount応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7559,7 +7435,7 @@ MsgCreateGroupAccountResponse is the Msg/CreateGroupAccount response type.
 <a name="cosmos.group.v1beta1.MsgCreateGroupResponse"></a>
 
 ### MsgCreateGroupResponse
-MsgCreateGroupResponse is the Msg/CreateGroup response type.
+MsgCreateGroupResponseは、Msg / CreateGroup応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7574,7 +7450,7 @@ MsgCreateGroupResponse is the Msg/CreateGroup response type.
 <a name="cosmos.group.v1beta1.MsgCreateProposal"></a>
 
 ### MsgCreateProposal
-MsgCreateProposal is the Msg/CreateProposal request type.
+MsgCreateProposalは、Msg / CreateProposalリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7593,7 +7469,7 @@ MsgCreateProposal is the Msg/CreateProposal request type.
 <a name="cosmos.group.v1beta1.MsgCreateProposalResponse"></a>
 
 ### MsgCreateProposalResponse
-MsgCreateProposalResponse is the Msg/CreateProposal response type.
+MsgCreateProposalResponseは、Msg / CreateProposal応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7608,7 +7484,7 @@ MsgCreateProposalResponse is the Msg/CreateProposal response type.
 <a name="cosmos.group.v1beta1.MsgExec"></a>
 
 ### MsgExec
-MsgExec is the Msg/Exec request type.
+MsgExecは、Msg / Exec要求タイプです。
 
 
 | Field | Type | Label | Description |
@@ -7624,7 +7500,7 @@ MsgExec is the Msg/Exec request type.
 <a name="cosmos.group.v1beta1.MsgExecResponse"></a>
 
 ### MsgExecResponse
-MsgExecResponse is the Msg/Exec request type.
+Msg Exec Responseは、メッセージ/ Exec要求タイプです。
 
 
 
@@ -7634,7 +7510,7 @@ MsgExecResponse is the Msg/Exec request type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountAdmin"></a>
 
 ### MsgUpdateGroupAccountAdmin
-MsgUpdateGroupAccountAdmin is the Msg/UpdateGroupAccountAdmin request type.
+MsgUpdateGroupAccountAdminは、Msg / UpdateGroupAccountAdminリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7651,7 +7527,7 @@ MsgUpdateGroupAccountAdmin is the Msg/UpdateGroupAccountAdmin request type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountAdminResponse"></a>
 
 ### MsgUpdateGroupAccountAdminResponse
-MsgUpdateGroupAccountAdminResponse is the Msg/UpdateGroupAccountAdmin response type.
+MsgUpdateGroupAccountAdminResponseは、Msg / UpdateGroupAccountAdmin応答タイプです。
 
 
 
@@ -7661,7 +7537,7 @@ MsgUpdateGroupAccountAdminResponse is the Msg/UpdateGroupAccountAdmin response t
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountDecisionPolicy"></a>
 
 ### MsgUpdateGroupAccountDecisionPolicy
-MsgUpdateGroupAccountDecisionPolicy is the Msg/UpdateGroupAccountDecisionPolicy request type.
+MsgUpdateGroupAccountDecisionPolicyは、Msg / UpdateGroupAccountDecisionPolicyリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7678,7 +7554,7 @@ MsgUpdateGroupAccountDecisionPolicy is the Msg/UpdateGroupAccountDecisionPolicy 
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountDecisionPolicyResponse"></a>
 
 ### MsgUpdateGroupAccountDecisionPolicyResponse
-MsgUpdateGroupAccountDecisionPolicyResponse is the Msg/UpdateGroupAccountDecisionPolicy response type.
+MsgUpdateGroupAccountDecisionPolicyResponseは、Msg / UpdateGroupAccountDecisionPolicy応答タイプです。
 
 
 
@@ -7688,7 +7564,7 @@ MsgUpdateGroupAccountDecisionPolicyResponse is the Msg/UpdateGroupAccountDecisio
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountMetadata"></a>
 
 ### MsgUpdateGroupAccountMetadata
-MsgUpdateGroupAccountMetadata is the Msg/UpdateGroupAccountMetadata request type.
+MsgUpdateGroupAccountMetadataは、Msg / UpdateGroupAccountMetadataリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7705,7 +7581,7 @@ MsgUpdateGroupAccountMetadata is the Msg/UpdateGroupAccountMetadata request type
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAccountMetadataResponse"></a>
 
 ### MsgUpdateGroupAccountMetadataResponse
-MsgUpdateGroupAccountMetadataResponse is the Msg/UpdateGroupAccountMetadata response type.
+MsgUpdateGroupAccountMetadataResponseは、Msg / UpdateGroupAccountMetadata応答タイプです。
 
 
 
@@ -7715,7 +7591,7 @@ MsgUpdateGroupAccountMetadataResponse is the Msg/UpdateGroupAccountMetadata resp
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAdmin"></a>
 
 ### MsgUpdateGroupAdmin
-MsgUpdateGroupAdmin is the Msg/UpdateGroupAdmin request type.
+MsgUpdateGroupAdminは、Msg / UpdateGroupAdminリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7732,7 +7608,7 @@ MsgUpdateGroupAdmin is the Msg/UpdateGroupAdmin request type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupAdminResponse"></a>
 
 ### MsgUpdateGroupAdminResponse
-MsgUpdateGroupAdminResponse is the Msg/UpdateGroupAdmin response type.
+MsgUpdateGroupAdminResponseは、Msg / UpdateGroupAdmin応答タイプです。
 
 
 
@@ -7742,7 +7618,7 @@ MsgUpdateGroupAdminResponse is the Msg/UpdateGroupAdmin response type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupMembers"></a>
 
 ### MsgUpdateGroupMembers
-MsgUpdateGroupMembers is the Msg/UpdateGroupMembers request type.
+Msg Update Group Membersは、Message / UpdateGroupMembersリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7759,7 +7635,7 @@ MsgUpdateGroupMembers is the Msg/UpdateGroupMembers request type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupMembersResponse"></a>
 
 ### MsgUpdateGroupMembersResponse
-MsgUpdateGroupMembersResponse is the Msg/UpdateGroupMembers response type.
+MsgUpdateGroupMembersResponseは、Msg / UpdateGroupMembers応答タイプです。
 
 
 
@@ -7769,7 +7645,7 @@ MsgUpdateGroupMembersResponse is the Msg/UpdateGroupMembers response type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupMetadata"></a>
 
 ### MsgUpdateGroupMetadata
-MsgUpdateGroupMetadata is the Msg/UpdateGroupMetadata request type.
+MsgUpdateGroupMetadataは、Msg / UpdateGroupMetadataリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7786,7 +7662,7 @@ MsgUpdateGroupMetadata is the Msg/UpdateGroupMetadata request type.
 <a name="cosmos.group.v1beta1.MsgUpdateGroupMetadataResponse"></a>
 
 ### MsgUpdateGroupMetadataResponse
-MsgUpdateGroupMetadataResponse is the Msg/UpdateGroupMetadata response type.
+MsgUpdateGroupMetadataResponseは、Msg / UpdateGroupMetadata応答タイプです。
 
 
 
@@ -7796,7 +7672,7 @@ MsgUpdateGroupMetadataResponse is the Msg/UpdateGroupMetadata response type.
 <a name="cosmos.group.v1beta1.MsgVote"></a>
 
 ### MsgVote
-MsgVote is the Msg/Vote request type.
+MsgVoteは、Msg / Voteリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -7815,7 +7691,7 @@ MsgVote is the Msg/Vote request type.
 <a name="cosmos.group.v1beta1.MsgVoteResponse"></a>
 
 ### MsgVoteResponse
-MsgVoteResponse is the Msg/Vote response type.
+MsgVoteResponseは、Msg / Vote応答タイプです。
 
 
 
@@ -7827,7 +7703,7 @@ MsgVoteResponse is the Msg/Vote response type.
 <a name="cosmos.group.v1beta1.Exec"></a>
 
 ### Exec
-Exec defines modes of execution of a proposal on creation or on new vote.
+Execは、作成時または新規投票時の提案の実行モードを定義します。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -7843,7 +7719,7 @@ Exec defines modes of execution of a proposal on creation or on new vote.
 <a name="cosmos.group.v1beta1.Msg"></a>
 
 ### Msg
-Msg is the cosmos.group.v1beta1 Msg service.
+Msgはcosmos.group.v1beta1Msgサービスです。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -7873,7 +7749,7 @@ Msg is the cosmos.group.v1beta1 Msg service.
 <a name="cosmos.mint.v1beta1.Minter"></a>
 
 ### Minter
-Minter represents the minting state.
+ミンターはミント状態を表します。
 
 
 | Field | Type | Label | Description |
@@ -7889,7 +7765,7 @@ Minter represents the minting state.
 <a name="cosmos.mint.v1beta1.Params"></a>
 
 ### Params
-Params holds parameters for the mint module.
+Paramsは、mintモジュールのパラメーターを保持します。
 
 
 | Field | Type | Label | Description |
@@ -7925,7 +7801,7 @@ Params holds parameters for the mint module.
 <a name="cosmos.mint.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the mint module's genesis state.
+GenesisStateは、ミントモジュールのジェネシス状態を定義します。
 
 
 | Field | Type | Label | Description |
@@ -7957,8 +7833,7 @@ GenesisState defines the mint module's genesis state.
 <a name="cosmos.mint.v1beta1.QueryAnnualProvisionsRequest"></a>
 
 ### QueryAnnualProvisionsRequest
-QueryAnnualProvisionsRequest is the request type for the
-Query/AnnualProvisions RPC method.
+QueryAnnualProvisionsRequestは、Query / AnnualProvisionsRPCメソッドのリクエストタイプです。
 
 
 
@@ -7968,8 +7843,7 @@ Query/AnnualProvisions RPC method.
 <a name="cosmos.mint.v1beta1.QueryAnnualProvisionsResponse"></a>
 
 ### QueryAnnualProvisionsResponse
-QueryAnnualProvisionsResponse is the response type for the
-Query/AnnualProvisions RPC method.
+QueryAnnualProvisionsResponse 是 Query/AnnualProvisions RPC 方法的响应类型。
 
 
 | Field | Type | Label | Description |
@@ -7984,7 +7858,7 @@ Query/AnnualProvisions RPC method.
 <a name="cosmos.mint.v1beta1.QueryInflationRequest"></a>
 
 ### QueryInflationRequest
-QueryInflationRequest is the request type for the Query/Inflation RPC method.
+QueryInflationRequestは、Query / InflationRPCメソッドのリクエストタイプです。
 
 
 
@@ -7994,8 +7868,7 @@ QueryInflationRequest is the request type for the Query/Inflation RPC method.
 <a name="cosmos.mint.v1beta1.QueryInflationResponse"></a>
 
 ### QueryInflationResponse
-QueryInflationResponse is the response type for the Query/Inflation RPC
-method.
+QueryInflationResponseは、Query / InflationRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -8010,7 +7883,7 @@ method.
 <a name="cosmos.mint.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method.
+QueryParamsRequestは、Query / ParamsRPCメソッドのリクエストタイプです。
 
 
 
@@ -8020,7 +7893,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method.
 <a name="cosmos.mint.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method.
+QueryParamsResponseは、Query / ParamsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -8041,7 +7914,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method.
 <a name="cosmos.mint.v1beta1.Query"></a>
 
 ### Query
-Query provides defines the gRPC querier service.
+Queryは、gRPCクエリアサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8063,7 +7936,7 @@ Query provides defines the gRPC querier service.
 <a name="cosmos.nft.v1beta1.EventBurn"></a>
 
 ### EventBurn
-EventBurn is emitted on Burn
+EventBurnはBurnで発行されます
 
 
 | Field | Type | Label | Description |
@@ -8080,7 +7953,7 @@ EventBurn is emitted on Burn
 <a name="cosmos.nft.v1beta1.EventMint"></a>
 
 ### EventMint
-EventMint is emitted on Mint
+EventMintはMintで発行されます
 
 
 | Field | Type | Label | Description |
@@ -8097,7 +7970,7 @@ EventMint is emitted on Mint
 <a name="cosmos.nft.v1beta1.EventSend"></a>
 
 ### EventSend
-EventSend is emitted on Msg/Send
+EventSendはMsg / Sendで発行されます
 
 
 | Field | Type | Label | Description |
@@ -8131,7 +8004,7 @@ EventSend is emitted on Msg/Send
 <a name="cosmos.nft.v1beta1.Class"></a>
 
 ### Class
-Class defines the class of the nft type.
+Classは、nftタイプのクラスを定義します。
 
 
 | Field | Type | Label | Description |
@@ -8152,7 +8025,7 @@ Class defines the class of the nft type.
 <a name="cosmos.nft.v1beta1.NFT"></a>
 
 ### NFT
-NFT defines the NFT.
+NFTはNFTを定義します。
 
 
 | Field | Type | Label | Description |
@@ -8187,7 +8060,7 @@ NFT defines the NFT.
 <a name="cosmos.nft.v1beta1.Entry"></a>
 
 ### Entry
-Entry Defines all nft owned by a person
+エントリ人が所有するすべてのnftを定義します
 
 
 | Field | Type | Label | Description |
@@ -8203,7 +8076,7 @@ Entry Defines all nft owned by a person
 <a name="cosmos.nft.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the nft module's genesis state.
+GenesisStateは、nftモジュールのジェネシス状態を定義します。
 
 
 | Field | Type | Label | Description |
@@ -8235,7 +8108,7 @@ GenesisState defines the nft module's genesis state.
 <a name="cosmos.nft.v1beta1.QueryBalanceRequest"></a>
 
 ### QueryBalanceRequest
-QueryBalanceRequest is the request type for the Query/Balance RPC method
+QueryBalanceRequestは、Query / BalanceRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -8251,7 +8124,7 @@ QueryBalanceRequest is the request type for the Query/Balance RPC method
 <a name="cosmos.nft.v1beta1.QueryBalanceResponse"></a>
 
 ### QueryBalanceResponse
-QueryBalanceResponse is the response type for the Query/Balance RPC method
+QueryBalanceResponseは、Query / BalanceRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -8266,7 +8139,7 @@ QueryBalanceResponse is the response type for the Query/Balance RPC method
 <a name="cosmos.nft.v1beta1.QueryClassRequest"></a>
 
 ### QueryClassRequest
-QueryClassRequest is the request type for the Query/Class RPC method
+QueryClassRequestは、Query / ClassRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -8281,8 +8154,7 @@ QueryClassRequest is the request type for the Query/Class RPC method
 <a name="cosmos.nft.v1beta1.QueryClassResponse"></a>
 
 ### QueryClassResponse
-QueryClassResponse is the response type for the Query/Class RPC method
-
+QueryClassResponseは、Query / ClassRPCメソッドの応答タイプです。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -8296,7 +8168,7 @@ QueryClassResponse is the response type for the Query/Class RPC method
 <a name="cosmos.nft.v1beta1.QueryClassesRequest"></a>
 
 ### QueryClassesRequest
-QueryClassesRequest is the request type for the Query/Classes RPC method
+QueryClassesRequestは、Query / ClassesRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -8311,7 +8183,7 @@ QueryClassesRequest is the request type for the Query/Classes RPC method
 <a name="cosmos.nft.v1beta1.QueryClassesResponse"></a>
 
 ### QueryClassesResponse
-QueryClassesResponse is the response type for the Query/Classes RPC method
+QueryClassesResponseは、Query / ClassesRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -8327,7 +8199,7 @@ QueryClassesResponse is the response type for the Query/Classes RPC method
 <a name="cosmos.nft.v1beta1.QueryNFTRequest"></a>
 
 ### QueryNFTRequest
-QueryNFTRequest is the request type for the Query/NFT RPC method
+QueryNFTRequestは、Query / NFTRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -8343,7 +8215,7 @@ QueryNFTRequest is the request type for the Query/NFT RPC method
 <a name="cosmos.nft.v1beta1.QueryNFTResponse"></a>
 
 ### QueryNFTResponse
-QueryNFTResponse is the response type for the Query/NFT RPC method
+QueryNFTResponseは、Query / NFTRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -8358,7 +8230,7 @@ QueryNFTResponse is the response type for the Query/NFT RPC method
 <a name="cosmos.nft.v1beta1.QueryNFTsOfClassRequest"></a>
 
 ### QueryNFTsOfClassRequest
-QueryNFTsOfClassRequest is the request type for the Query/NFTsOfClass RPC method
+QueryNFTsOfClassRequestは、Query / NFSOfClassRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -8375,7 +8247,7 @@ QueryNFTsOfClassRequest is the request type for the Query/NFTsOfClass RPC method
 <a name="cosmos.nft.v1beta1.QueryNFTsOfClassResponse"></a>
 
 ### QueryNFTsOfClassResponse
-QueryNFTsOfClassResponse is the response type for the Query/NFTsOfClass and Query/NFTsOfClassByOwner RPC methods
+QueryNFTsOfClassResponseは、Query / NFTsOfClassおよびQuery / NFSOfClassByOwnerRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -8391,7 +8263,7 @@ QueryNFTsOfClassResponse is the response type for the Query/NFTsOfClass and Quer
 <a name="cosmos.nft.v1beta1.QueryOwnerRequest"></a>
 
 ### QueryOwnerRequest
-QueryOwnerRequest is the request type for the Query/Owner RPC method
+QueryOwnerRequestは、Query / OwnerRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -8407,7 +8279,7 @@ QueryOwnerRequest is the request type for the Query/Owner RPC method
 <a name="cosmos.nft.v1beta1.QueryOwnerResponse"></a>
 
 ### QueryOwnerResponse
-QueryOwnerResponse is the response type for the Query/Owner RPC method
+QueryOwnerResponseは、Query / OwnerRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -8422,7 +8294,7 @@ QueryOwnerResponse is the response type for the Query/Owner RPC method
 <a name="cosmos.nft.v1beta1.QuerySupplyRequest"></a>
 
 ### QuerySupplyRequest
-QuerySupplyRequest is the request type for the Query/Supply RPC method
+QuerySupplyRequestは、Query / SupplyRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -8437,7 +8309,7 @@ QuerySupplyRequest is the request type for the Query/Supply RPC method
 <a name="cosmos.nft.v1beta1.QuerySupplyResponse"></a>
 
 ### QuerySupplyResponse
-QuerySupplyResponse is the response type for the Query/Supply RPC method
+QuerySupplyResponseは、Query / SupplyRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -8458,7 +8330,7 @@ QuerySupplyResponse is the response type for the Query/Supply RPC method
 <a name="cosmos.nft.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+QueryはgRPCクエリアサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8484,7 +8356,7 @@ Query defines the gRPC querier service.
 <a name="cosmos.nft.v1beta1.MsgSend"></a>
 
 ### MsgSend
-MsgSend represents a message to send a nft from one account to another account.
+MsgSendは、あるアカウントから別のアカウントにnftを送信するためのメッセージを表します。
 
 
 | Field | Type | Label | Description |
@@ -8502,7 +8374,7 @@ MsgSend represents a message to send a nft from one account to another account.
 <a name="cosmos.nft.v1beta1.MsgSendResponse"></a>
 
 ### MsgSendResponse
-MsgSendResponse defines the Msg/Send response type.
+MsgSendResponseは、Msg / Send応答タイプを定義します。
 
 
 
@@ -8518,7 +8390,7 @@ MsgSendResponse defines the Msg/Send response type.
 <a name="cosmos.nft.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the nft Msg service.
+Msgは、nftMsgサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8538,8 +8410,7 @@ Msg defines the nft Msg service.
 <a name="cosmos.params.v1beta1.ParamChange"></a>
 
 ### ParamChange
-ParamChange defines an individual parameter change, for use in
-ParameterChangeProposal.
+ParamChangeは、ParameterChangeProposalで使用するために、個々のパラメーターの変更を定義します。
 
 
 | Field | Type | Label | Description |
@@ -8556,7 +8427,7 @@ ParameterChangeProposal.
 <a name="cosmos.params.v1beta1.ParameterChangeProposal"></a>
 
 ### ParameterChangeProposal
-ParameterChangeProposal defines a proposal to change one or more parameters.
+ParameterChangeProposalは、1つ以上のパラメーターを変更するための提案を定義します。
 
 
 | Field | Type | Label | Description |
@@ -8589,7 +8460,7 @@ ParameterChangeProposal defines a proposal to change one or more parameters.
 <a name="cosmos.params.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is request type for the Query/Params RPC method.
+QueryParamsRequestは、Query / ParamsRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -8605,7 +8476,7 @@ QueryParamsRequest is request type for the Query/Params RPC method.
 <a name="cosmos.params.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is response type for the Query/Params RPC method.
+QueryParamsResponseは、Query / ParamsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -8620,8 +8491,8 @@ QueryParamsResponse is response type for the Query/Params RPC method.
 <a name="cosmos.params.v1beta1.QuerySubspacesRequest"></a>
 
 ### QuerySubspacesRequest
-QuerySubspacesRequest defines a request type for querying for all registered
-subspaces and all keys for a subspace.
+QuerySubspacesRequestは、登録されているすべてのユーザーをクエリするためのリクエストタイプを定義します
+サブスペースとサブスペースのすべてのキー。
 
 
 
@@ -8631,8 +8502,8 @@ subspaces and all keys for a subspace.
 <a name="cosmos.params.v1beta1.QuerySubspacesResponse"></a>
 
 ### QuerySubspacesResponse
-QuerySubspacesResponse defines the response types for querying for all
-registered subspaces and all keys for a subspace.
+QuerySubspacesResponseは、すべてのクエリの応答タイプを定義します
+登録されたサブスペースとサブスペースのすべてのキー。
 
 
 | Field | Type | Label | Description |
@@ -8647,8 +8518,8 @@ registered subspaces and all keys for a subspace.
 <a name="cosmos.params.v1beta1.Subspace"></a>
 
 ### Subspace
-Subspace defines a parameter subspace name and all the keys that exist for
-the subspace.
+サブスペースは、パラメーターサブスペース名とに存在するすべてのキーを定義します。
+部分空間。
 
 
 | Field | Type | Label | Description |
@@ -8670,7 +8541,7 @@ the subspace.
 <a name="cosmos.params.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+QueryはgRPCクエリアサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8691,7 +8562,7 @@ Query defines the gRPC querier service.
 <a name="cosmos.slashing.v1beta1.Params"></a>
 
 ### Params
-Params represents the parameters used for by the slashing module.
+パラメータは、スラッシュモジュールで使用されるパラメータを表します。
 
 
 | Field | Type | Label | Description |
@@ -8710,8 +8581,7 @@ Params represents the parameters used for by the slashing module.
 <a name="cosmos.slashing.v1beta1.ValidatorSigningInfo"></a>
 
 ### ValidatorSigningInfo
-ValidatorSigningInfo defines a validator's signing info for monitoring their
-liveness activity.
+ValidatorSigningInfoは、バリデーターの活性活動を監視するためのバリデーターの署名情報を定義します。
 
 
 | Field | Type | Label | Description |
@@ -8747,7 +8617,7 @@ liveness activity.
 <a name="cosmos.slashing.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the slashing module's genesis state.
+GenesisStateは、スラッシュモジュールのジェネシス状態を定義します。
 
 
 | Field | Type | Label | Description |
@@ -8764,7 +8634,7 @@ GenesisState defines the slashing module's genesis state.
 <a name="cosmos.slashing.v1beta1.MissedBlock"></a>
 
 ### MissedBlock
-MissedBlock contains height and missed status as boolean.
+MissedBlockには、高さとブール値としての欠落ステータスが含まれています。
 
 
 | Field | Type | Label | Description |
@@ -8780,7 +8650,7 @@ MissedBlock contains height and missed status as boolean.
 <a name="cosmos.slashing.v1beta1.SigningInfo"></a>
 
 ### SigningInfo
-SigningInfo stores validator signing info of corresponding address.
+SigningInfoは、対応するアドレスのバリデーター署名情報を格納します。
 
 
 | Field | Type | Label | Description |
@@ -8796,8 +8666,8 @@ SigningInfo stores validator signing info of corresponding address.
 <a name="cosmos.slashing.v1beta1.ValidatorMissedBlocks"></a>
 
 ### ValidatorMissedBlocks
-ValidatorMissedBlocks contains array of missed blocks of corresponding
-address.
+ValidatorMissedBlocksには、対応する欠落したブロックの配列が含まれています
+住所。
 
 
 | Field | Type | Label | Description |
@@ -8829,7 +8699,7 @@ address.
 <a name="cosmos.slashing.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is the request type for the Query/Params RPC method
+QueryParamsRequestは、Query / ParamsRPCメソッドのリクエストタイプです。
 
 
 
@@ -8839,7 +8709,7 @@ QueryParamsRequest is the request type for the Query/Params RPC method
 <a name="cosmos.slashing.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is the response type for the Query/Params RPC method
+QueryParamsResponseは、Query / ParamsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -8854,8 +8724,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method
 <a name="cosmos.slashing.v1beta1.QuerySigningInfoRequest"></a>
 
 ### QuerySigningInfoRequest
-QuerySigningInfoRequest is the request type for the Query/SigningInfo RPC
-method
+QuerySigningInfoRequestは、Query / SignatureInfoRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -8870,8 +8739,8 @@ method
 <a name="cosmos.slashing.v1beta1.QuerySigningInfoResponse"></a>
 
 ### QuerySigningInfoResponse
-QuerySigningInfoResponse is the response type for the Query/SigningInfo RPC
-method
+QuerySigningInfoResponseは、Query / SignatureInfoRPCの応答タイプです。
+方法
 
 
 | Field | Type | Label | Description |
@@ -8886,8 +8755,8 @@ method
 <a name="cosmos.slashing.v1beta1.QuerySigningInfosRequest"></a>
 
 ### QuerySigningInfosRequest
-QuerySigningInfosRequest is the request type for the Query/SigningInfos RPC
-method
+QuerySigningInfosRequestは、Query / SignatureInfosRPCのリクエストタイプです。
+方法
 
 
 | Field | Type | Label | Description |
@@ -8902,8 +8771,8 @@ method
 <a name="cosmos.slashing.v1beta1.QuerySigningInfosResponse"></a>
 
 ### QuerySigningInfosResponse
-QuerySigningInfosResponse is the response type for the Query/SigningInfos RPC
-method
+QuerySigningInfosResponseは、Query / SignatureInfosRPCの応答タイプです。
+方法
 
 
 | Field | Type | Label | Description |
@@ -8925,7 +8794,7 @@ method
 <a name="cosmos.slashing.v1beta1.Query"></a>
 
 ### Query
-Query provides defines the gRPC querier service
+QueryはgRPCクエリアサービスを定義します
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8947,7 +8816,7 @@ Query provides defines the gRPC querier service
 <a name="cosmos.slashing.v1beta1.MsgUnjail"></a>
 
 ### MsgUnjail
-MsgUnjail defines the Msg/Unjail request type
+MsgUnjailは、Msg / Unjailリクエストタイプを定義します
 
 
 | Field | Type | Label | Description |
@@ -8962,7 +8831,7 @@ MsgUnjail defines the Msg/Unjail request type
 <a name="cosmos.slashing.v1beta1.MsgUnjailResponse"></a>
 
 ### MsgUnjailResponse
-MsgUnjailResponse defines the Msg/Unjail response type
+MsgUnjail Responseは、Message / Unjail応答タイプを定義します
 
 
 
@@ -8978,7 +8847,7 @@ MsgUnjailResponse defines the Msg/Unjail response type
 <a name="cosmos.slashing.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the slashing Msg service.
+Msgは、スラッシュMsgサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -8998,7 +8867,7 @@ Msg defines the slashing Msg service.
 <a name="cosmos.staking.v1beta1.StakeAuthorization"></a>
 
 ### StakeAuthorization
-StakeAuthorization defines authorization for delegate/undelegate/redelegate.
+StakeAuthorizationは、デリゲート/アンデリゲート/再デリゲートの承認を定義します。
 
 Since: cosmos-sdk 0.43
 
@@ -9018,7 +8887,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.staking.v1beta1.StakeAuthorization.Validators"></a>
 
 ### StakeAuthorization.Validators
-Validators defines list of validator addresses.
+バリデーターは、バリデーターアドレスのリストを定義します。
 
 
 | Field | Type | Label | Description |
@@ -9035,7 +8904,7 @@ Validators defines list of validator addresses.
 <a name="cosmos.staking.v1beta1.AuthorizationType"></a>
 
 ### AuthorizationType
-AuthorizationType defines the type of staking module authorization type
+AuthorizationTypeは、ステーキングモジュールの承認タイプのタイプを定義します
 
 Since: cosmos-sdk 0.43
 
@@ -9065,7 +8934,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.staking.v1beta1.Commission"></a>
 
 ### Commission
-Commission defines commission parameters for a given validator.
+コミッションは、特定のバリデーターのコミッションパラメーターを定義します。
 
 
 | Field | Type | Label | Description |
@@ -9081,8 +8950,8 @@ Commission defines commission parameters for a given validator.
 <a name="cosmos.staking.v1beta1.CommissionRates"></a>
 
 ### CommissionRates
-CommissionRates defines the initial commission rates to be used for creating
-a validator.
+CommissionRatesは、作成に使用される初期手数料率を定義します
+バリデーター。
 
 
 | Field | Type | Label | Description |
@@ -9099,9 +8968,8 @@ a validator.
 <a name="cosmos.staking.v1beta1.DVPair"></a>
 
 ### DVPair
-DVPair is struct that just has a delegator-validator pair with no other data.
-It is intended to be used as a marshalable pointer. For example, a DVPair can
-be used to construct the key to getting an UnbondingDelegation from state.
+DVPairは、他のデータがなく、委任者と検証者のペアがあるだけの構造体です。
+これは、マーシャラブルポインタとして使用することを目的としています。 たとえば、DVPairを使用して、状態からUnbondingDelegationを取得するためのキーを作成できます。
 
 
 | Field | Type | Label | Description |
@@ -9117,7 +8985,7 @@ be used to construct the key to getting an UnbondingDelegation from state.
 <a name="cosmos.staking.v1beta1.DVPairs"></a>
 
 ### DVPairs
-DVPairs defines an array of DVPair objects.
+DVPairsは、DVPairオブジェクトの配列を定義します。
 
 
 | Field | Type | Label | Description |
@@ -9132,10 +9000,10 @@ DVPairs defines an array of DVPair objects.
 <a name="cosmos.staking.v1beta1.DVVTriplet"></a>
 
 ### DVVTriplet
-DVVTriplet is struct that just has a delegator-validator-validator triplet
-with no other data. It is intended to be used as a marshalable pointer. For
-example, a DVVTriplet can be used to construct the key to getting a
-Redelegation from state.
+DVVTripletは、デリゲーター-バリデーター-バリデーターのトリプレットを持つ構造体です。
+他のデータはありません。 これは、マーシャラブルポインタとして使用することを目的としています。 にとって
+たとえば、DVVTripletを使用して、
+州からの再委任。
 
 
 | Field | Type | Label | Description |
@@ -9152,7 +9020,7 @@ Redelegation from state.
 <a name="cosmos.staking.v1beta1.DVVTriplets"></a>
 
 ### DVVTriplets
-DVVTriplets defines an array of DVVTriplet objects.
+DVVトリプレットは、DVVトリプレットオブジェクトの配列を定義します。
 
 
 | Field | Type | Label | Description |
@@ -9167,9 +9035,7 @@ DVVTriplets defines an array of DVVTriplet objects.
 <a name="cosmos.staking.v1beta1.Delegation"></a>
 
 ### Delegation
-Delegation represents the bond with tokens held by an account. It is
-owned by one delegator, and is associated with the voting power of one
-validator.
+委任は、アカウントが保持するトークンとの結合を表します。 これは1人の委任者によって所有され、1人の検証者の投票権に関連付けられています。
 
 
 | Field | Type | Label | Description |
@@ -9186,8 +9052,8 @@ validator.
 <a name="cosmos.staking.v1beta1.DelegationResponse"></a>
 
 ### DelegationResponse
-DelegationResponse is equivalent to Delegation except that it contains a
-balance in addition to shares which is more suitable for client responses.
+DelegationResponseは、Delegationと同等ですが、
+クライアントの応答により適したシェアに加えてバランス。
 
 
 | Field | Type | Label | Description |
@@ -9203,7 +9069,7 @@ balance in addition to shares which is more suitable for client responses.
 <a name="cosmos.staking.v1beta1.Description"></a>
 
 ### Description
-Description defines a validator description.
+Descriptionは、バリデーターの説明を定義します。
 
 
 | Field | Type | Label | Description |
@@ -9222,10 +9088,9 @@ Description defines a validator description.
 <a name="cosmos.staking.v1beta1.HistoricalInfo"></a>
 
 ### HistoricalInfo
-HistoricalInfo contains header and validator information for a given block.
-It is stored as part of staking module's state, which persists the `n` most
-recent HistoricalInfo
-(`n` is set by the staking module's `historical_entries` parameter).
+HistoricalInfoには、特定のブロックのヘッダーおよびバリデーター情報が含まれています。
+これはステーキングモジュールの状態の一部として保存され、 `n`最新のHistoricalInfoを保持します 
+(`n`はスタッキングモジュールの` historicalentries`パラメータによって設定されます ).
 
 
 | Field | Type | Label | Description |
@@ -9241,7 +9106,7 @@ recent HistoricalInfo
 <a name="cosmos.staking.v1beta1.Params"></a>
 
 ### Params
-Params defines the parameters for the staking module.
+パラメータは、ステーキングモジュールのパラメータを定義します .
 
 
 | Field | Type | Label | Description |
@@ -9261,8 +9126,8 @@ Params defines the parameters for the staking module.
 <a name="cosmos.staking.v1beta1.Pool"></a>
 
 ### Pool
-Pool is used for tracking bonded and not-bonded token supply of the bond
-denomination.
+プールは、結合されたトークンと結合されていないトークンの結合の供給を追跡するために使用されます
+宗派 .
 
 
 | Field | Type | Label | Description |
@@ -9278,8 +9143,8 @@ denomination.
 <a name="cosmos.staking.v1beta1.Redelegation"></a>
 
 ### Redelegation
-Redelegation contains the list of a particular delegator's redelegating bonds
-from a particular source validator to a particular destination validator.
+再委任には、特定の委任者の再委任債のリストが含まれています
+特定のソースバリデーターから特定の宛先バリデーターへ。 
 
 
 | Field | Type | Label | Description |
@@ -9299,7 +9164,7 @@ redelegation entries |
 <a name="cosmos.staking.v1beta1.RedelegationEntry"></a>
 
 ### RedelegationEntry
-RedelegationEntry defines a redelegation object with relevant metadata.
+RedelegationEntryは、関連するメタデータを使用して再委任オブジェクトを定義します。 
 
 
 | Field | Type | Label | Description |
@@ -9317,9 +9182,7 @@ RedelegationEntry defines a redelegation object with relevant metadata.
 <a name="cosmos.staking.v1beta1.RedelegationEntryResponse"></a>
 
 ### RedelegationEntryResponse
-RedelegationEntryResponse is equivalent to a RedelegationEntry except that it
-contains a balance in addition to shares which is more suitable for client
-responses.
+RedelegationEntryResponseは、クライアントの応答により適した共有に加えて残高が含まれていることを除いて、RedelegationEntryと同等です。 
 
 
 | Field | Type | Label | Description |
@@ -9335,9 +9198,7 @@ responses.
 <a name="cosmos.staking.v1beta1.RedelegationResponse"></a>
 
 ### RedelegationResponse
-RedelegationResponse is equivalent to a Redelegation except that its entries
-contain a balance in addition to shares which is more suitable for client
-responses.
+RedelegationResponseは、エントリにクライアントの応答により適した共有に加えて残高が含まれていることを除いて、Redelegationと同等です。 
 
 
 | Field | Type | Label | Description |
@@ -9353,8 +9214,7 @@ responses.
 <a name="cosmos.staking.v1beta1.UnbondingDelegation"></a>
 
 ### UnbondingDelegation
-UnbondingDelegation stores all of a single delegator's unbonding bonds
-for a single validator in an time-ordered list.
+UnbondingDelegationは、単一のバリデーターに対する単一の委任者の非結合結合のすべてを時系列リストに格納します。 
 
 
 | Field | Type | Label | Description |
@@ -9373,7 +9233,7 @@ unbonding delegation entries |
 <a name="cosmos.staking.v1beta1.UnbondingDelegationEntry"></a>
 
 ### UnbondingDelegationEntry
-UnbondingDelegationEntry defines an unbonding object with relevant metadata.
+UnbondingDelegationEntryは、関連するメタデータを使用して非結合オブジェクトを定義します。 
 
 
 | Field | Type | Label | Description |
@@ -9391,7 +9251,7 @@ UnbondingDelegationEntry defines an unbonding object with relevant metadata.
 <a name="cosmos.staking.v1beta1.ValAddresses"></a>
 
 ### ValAddresses
-ValAddresses defines a repeated set of validator addresses.
+ValAddressesは、バリデーターアドレスの繰り返しセットを定義します。 
 
 
 | Field | Type | Label | Description |
@@ -9406,14 +9266,7 @@ ValAddresses defines a repeated set of validator addresses.
 <a name="cosmos.staking.v1beta1.Validator"></a>
 
 ### Validator
-Validator defines a validator, together with the total amount of the
-Validator's bond shares and their exchange rate to coins. Slashing results in
-a decrease in the exchange rate, allowing correct calculation of future
-undelegations without iterating over delegators. When coins are delegated to
-this validator, the validator is credited with a delegation whose number of
-bond shares is based on the amount of coins delegated divided by the current
-exchange rate. Voting power can be calculated as total bonded shares
-multiplied by exchange rate.
+バリデーターは、バリデーターの債券シェアの合計額とコインへの為替レートとともに、バリデーターを定義します。 スラッシュを使用すると、為替レートが低下し、委任者を繰り返すことなく、将来の委任解除を正しく計算できます。 コインがこのバリデーターに委任されると、バリデーターには委任がクレジットされます。委任の数は、委任されたコインの量を現在の為替レートで割ったものに基づいています。 議決権は、総結合株式数に為替レートを掛けたものとして計算できます。 
 
 
 | Field | Type | Label | Description |
@@ -9440,7 +9293,7 @@ multiplied by exchange rate.
 <a name="cosmos.staking.v1beta1.BondStatus"></a>
 
 ### BondStatus
-BondStatus is the status of a validator.
+BondStatusは、バリデーターのステータスです。 
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -9468,7 +9321,7 @@ BondStatus is the status of a validator.
 <a name="cosmos.staking.v1beta1.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the staking module's genesis state.
+GenesisStateは、ステーキングモジュールのジェネシス状態を定義します。 
 
 
 | Field | Type | Label | Description |
@@ -9490,7 +9343,7 @@ GenesisState defines the staking module's genesis state.
 <a name="cosmos.staking.v1beta1.LastValidatorPower"></a>
 
 ### LastValidatorPower
-LastValidatorPower required for validator set update logic.
+バリデーターセットの更新ロジックに必要なLastValidatorPower。 
 
 
 | Field | Type | Label | Description |
@@ -9522,7 +9375,7 @@ LastValidatorPower required for validator set update logic.
 <a name="cosmos.staking.v1beta1.QueryDelegationRequest"></a>
 
 ### QueryDelegationRequest
-QueryDelegationRequest is request type for the Query/Delegation RPC method.
+QueryDelegationRequestは、Query / DelegationRPCメソッドのリクエストタイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9538,7 +9391,7 @@ QueryDelegationRequest is request type for the Query/Delegation RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegationResponse"></a>
 
 ### QueryDelegationResponse
-QueryDelegationResponse is response type for the Query/Delegation RPC method.
+QueryDelegationResponseは、Query / DelegationRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9553,8 +9406,7 @@ QueryDelegationResponse is response type for the Query/Delegation RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorDelegationsRequest"></a>
 
 ### QueryDelegatorDelegationsRequest
-QueryDelegatorDelegationsRequest is request type for the
-Query/DelegatorDelegations RPC method.
+QueryDelegatorDelegationsRequestは、Query / DelegatorDelegationsRPCメソッドのリクエストタイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9570,8 +9422,7 @@ Query/DelegatorDelegations RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorDelegationsResponse"></a>
 
 ### QueryDelegatorDelegationsResponse
-QueryDelegatorDelegationsResponse is response type for the
-Query/DelegatorDelegations RPC method.
+QueryDelegatorDelegationsResponseは、Query / DelegatorDelegationsRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9587,8 +9438,7 @@ Query/DelegatorDelegations RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorUnbondingDelegationsRequest"></a>
 
 ### QueryDelegatorUnbondingDelegationsRequest
-QueryDelegatorUnbondingDelegationsRequest is request type for the
-Query/DelegatorUnbondingDelegations RPC method.
+QueryDelegatorUnbondingDelegationsRequestは、Query / DelegatorUnbondingDelegationsRPCメソッドのリクエストタイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9604,8 +9454,7 @@ Query/DelegatorUnbondingDelegations RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorUnbondingDelegationsResponse"></a>
 
 ### QueryDelegatorUnbondingDelegationsResponse
-QueryUnbondingDelegatorDelegationsResponse is response type for the
-Query/UnbondingDelegatorDelegations RPC method.
+QueryUnbondingDelegatorDelegationsResponseは、Query / UnbondingDelegatorDelegationsRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9621,8 +9470,7 @@ Query/UnbondingDelegatorDelegations RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorValidatorRequest"></a>
 
 ### QueryDelegatorValidatorRequest
-QueryDelegatorValidatorRequest is request type for the
-Query/DelegatorValidator RPC method.
+QueryDelegatorValidatorRequestは、Query / DelegatorValidatorRPCメソッドのリクエストタイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9638,8 +9486,7 @@ Query/DelegatorValidator RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorValidatorResponse"></a>
 
 ### QueryDelegatorValidatorResponse
-QueryDelegatorValidatorResponse response type for the
-Query/DelegatorValidator RPC method.
+Query / DelegatorValidatorRPCメソッドのQueryDelegatorValidatorResponse応答タイプ。 
 
 
 | Field | Type | Label | Description |
@@ -9654,8 +9501,7 @@ Query/DelegatorValidator RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorValidatorsRequest"></a>
 
 ### QueryDelegatorValidatorsRequest
-QueryDelegatorValidatorsRequest is request type for the
-Query/DelegatorValidators RPC method.
+QueryDelegatorValidatorsRequestは、Query / DelegatorValidatorsRPCメソッドのリクエストタイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9671,8 +9517,7 @@ Query/DelegatorValidators RPC method.
 <a name="cosmos.staking.v1beta1.QueryDelegatorValidatorsResponse"></a>
 
 ### QueryDelegatorValidatorsResponse
-QueryDelegatorValidatorsResponse is response type for the
-Query/DelegatorValidators RPC method.
+QueryDelegatorValidatorsResponseは、Query / DelegatorValidatorsRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9688,8 +9533,7 @@ Query/DelegatorValidators RPC method.
 <a name="cosmos.staking.v1beta1.QueryHistoricalInfoRequest"></a>
 
 ### QueryHistoricalInfoRequest
-QueryHistoricalInfoRequest is request type for the Query/HistoricalInfo RPC
-method.
+QueryHistoricalInfoRequestは、Query / HistoricalInfoRPCメソッドのリクエストタイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9704,8 +9548,7 @@ method.
 <a name="cosmos.staking.v1beta1.QueryHistoricalInfoResponse"></a>
 
 ### QueryHistoricalInfoResponse
-QueryHistoricalInfoResponse is response type for the Query/HistoricalInfo RPC
-method.
+QueryHistoricalInfoResponseは、Query / HistoricalInfoRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9720,7 +9563,7 @@ method.
 <a name="cosmos.staking.v1beta1.QueryParamsRequest"></a>
 
 ### QueryParamsRequest
-QueryParamsRequest is request type for the Query/Params RPC method.
+QueryParamsRequestは、Query / ParamsRPCメソッドのリクエストタイプです。 
 
 
 
@@ -9730,7 +9573,7 @@ QueryParamsRequest is request type for the Query/Params RPC method.
 <a name="cosmos.staking.v1beta1.QueryParamsResponse"></a>
 
 ### QueryParamsResponse
-QueryParamsResponse is response type for the Query/Params RPC method.
+QueryParamsResponseは、Query / ParamsRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9745,7 +9588,7 @@ QueryParamsResponse is response type for the Query/Params RPC method.
 <a name="cosmos.staking.v1beta1.QueryPoolRequest"></a>
 
 ### QueryPoolRequest
-QueryPoolRequest is request type for the Query/Pool RPC method.
+QueryPoolRequestは、Query / PoolRPCメソッドのリクエストタイプです。 
 
 
 
@@ -9755,7 +9598,7 @@ QueryPoolRequest is request type for the Query/Pool RPC method.
 <a name="cosmos.staking.v1beta1.QueryPoolResponse"></a>
 
 ### QueryPoolResponse
-QueryPoolResponse is response type for the Query/Pool RPC method.
+QueryPoolResponseは、Query / PoolRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9770,8 +9613,7 @@ QueryPoolResponse is response type for the Query/Pool RPC method.
 <a name="cosmos.staking.v1beta1.QueryRedelegationsRequest"></a>
 
 ### QueryRedelegationsRequest
-QueryRedelegationsRequest is request type for the Query/Redelegations RPC
-method.
+QueryRedelegationsRequestは、Query / RedelegationsRPCメソッドのリクエストタイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9789,8 +9631,7 @@ method.
 <a name="cosmos.staking.v1beta1.QueryRedelegationsResponse"></a>
 
 ### QueryRedelegationsResponse
-QueryRedelegationsResponse is response type for the Query/Redelegations RPC
-method.
+QueryRedelegationsResponseは、Query / RedelegationsRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9806,8 +9647,7 @@ method.
 <a name="cosmos.staking.v1beta1.QueryUnbondingDelegationRequest"></a>
 
 ### QueryUnbondingDelegationRequest
-QueryUnbondingDelegationRequest is request type for the
-Query/UnbondingDelegation RPC method.
+QueryUnbondingDelegationRequestは、Query / UnbondingDelegationRPCメソッドのリクエストタイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9823,8 +9663,7 @@ Query/UnbondingDelegation RPC method.
 <a name="cosmos.staking.v1beta1.QueryUnbondingDelegationResponse"></a>
 
 ### QueryUnbondingDelegationResponse
-QueryDelegationResponse is response type for the Query/UnbondingDelegation
-RPC method.
+QueryDelegationResponseは、Query / UnbondingDelegationRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9839,8 +9678,7 @@ RPC method.
 <a name="cosmos.staking.v1beta1.QueryValidatorDelegationsRequest"></a>
 
 ### QueryValidatorDelegationsRequest
-QueryValidatorDelegationsRequest is request type for the
-Query/ValidatorDelegations RPC method
+QueryValidatorDelegationsRequestは、Query / ValidatorDelegationsRPCメソッドのリクエストタイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9856,8 +9694,7 @@ Query/ValidatorDelegations RPC method
 <a name="cosmos.staking.v1beta1.QueryValidatorDelegationsResponse"></a>
 
 ### QueryValidatorDelegationsResponse
-QueryValidatorDelegationsResponse is response type for the
-Query/ValidatorDelegations RPC method
+QueryValidatorDelegationsResponseは、Query / ValidatorDelegationsRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9873,7 +9710,7 @@ Query/ValidatorDelegations RPC method
 <a name="cosmos.staking.v1beta1.QueryValidatorRequest"></a>
 
 ### QueryValidatorRequest
-QueryValidatorRequest is response type for the Query/Validator RPC method
+QueryValidatorRequestは、Query / ValidatorRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9888,7 +9725,7 @@ QueryValidatorRequest is response type for the Query/Validator RPC method
 <a name="cosmos.staking.v1beta1.QueryValidatorResponse"></a>
 
 ### QueryValidatorResponse
-QueryValidatorResponse is response type for the Query/Validator RPC method
+QueryValidatorResponseは、Query / ValidatorRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9903,8 +9740,7 @@ QueryValidatorResponse is response type for the Query/Validator RPC method
 <a name="cosmos.staking.v1beta1.QueryValidatorUnbondingDelegationsRequest"></a>
 
 ### QueryValidatorUnbondingDelegationsRequest
-QueryValidatorUnbondingDelegationsRequest is required type for the
-Query/ValidatorUnbondingDelegations RPC method
+QueryValidatorUnbondingDelegationsRequestは、Query / ValidatorUnbondingDelegationsRPCメソッドに必要なタイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9920,8 +9756,7 @@ Query/ValidatorUnbondingDelegations RPC method
 <a name="cosmos.staking.v1beta1.QueryValidatorUnbondingDelegationsResponse"></a>
 
 ### QueryValidatorUnbondingDelegationsResponse
-QueryValidatorUnbondingDelegationsResponse is response type for the
-Query/ValidatorUnbondingDelegations RPC method.
+QueryValidatorUnbondingDelegationsResponseは、Query / ValidatorUnbondingDelegationsRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9937,7 +9772,7 @@ Query/ValidatorUnbondingDelegations RPC method.
 <a name="cosmos.staking.v1beta1.QueryValidatorsRequest"></a>
 
 ### QueryValidatorsRequest
-QueryValidatorsRequest is request type for Query/Validators RPC method.
+QueryValidatorsRequestは、Query / ValidatorsRPCメソッドのリクエストタイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9953,7 +9788,7 @@ QueryValidatorsRequest is request type for Query/Validators RPC method.
 <a name="cosmos.staking.v1beta1.QueryValidatorsResponse"></a>
 
 ### QueryValidatorsResponse
-QueryValidatorsResponse is response type for the Query/Validators RPC method
+QueryValidatorsResponseは、Query / ValidatorsRPCメソッドの応答タイプです。 
 
 
 | Field | Type | Label | Description |
@@ -9975,7 +9810,7 @@ QueryValidatorsResponse is response type for the Query/Validators RPC method
 <a name="cosmos.staking.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC querier service.
+クエリはgRPCクエリアサービスを定義します。 
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -10008,8 +9843,7 @@ Query defines the gRPC querier service.
 <a name="cosmos.staking.v1beta1.MsgBeginRedelegate"></a>
 
 ### MsgBeginRedelegate
-MsgBeginRedelegate defines a SDK message for performing a redelegation
-of coins from a delegator and source validator to a destination validator.
+MsgBeginRedelegateは、委任者およびソースバリデーターから宛先バリデーターへのコインの再委任を実行するためのSDKメッセージを定義します。 
 
 
 | Field | Type | Label | Description |
@@ -10027,7 +9861,7 @@ of coins from a delegator and source validator to a destination validator.
 <a name="cosmos.staking.v1beta1.MsgBeginRedelegateResponse"></a>
 
 ### MsgBeginRedelegateResponse
-MsgBeginRedelegateResponse defines the Msg/BeginRedelegate response type.
+MsgBeginRedelegateResponseは、Msg / BeginRedelegate応答タイプを定義します。 
 
 
 | Field | Type | Label | Description |
@@ -10042,7 +9876,7 @@ MsgBeginRedelegateResponse defines the Msg/BeginRedelegate response type.
 <a name="cosmos.staking.v1beta1.MsgCreateValidator"></a>
 
 ### MsgCreateValidator
-MsgCreateValidator defines a SDK message for creating a new validator.
+MsgCreateValidatorは、新しいバリデーターを作成するためのSDKメッセージを定義します。 
 
 
 | Field | Type | Label | Description |
@@ -10063,7 +9897,7 @@ MsgCreateValidator defines a SDK message for creating a new validator.
 <a name="cosmos.staking.v1beta1.MsgCreateValidatorResponse"></a>
 
 ### MsgCreateValidatorResponse
-MsgCreateValidatorResponse defines the Msg/CreateValidator response type.
+MsgCreateValidatorResponseは、Msg / CreateValidator応答タイプを定義します。 
 
 
 
@@ -10073,8 +9907,7 @@ MsgCreateValidatorResponse defines the Msg/CreateValidator response type.
 <a name="cosmos.staking.v1beta1.MsgDelegate"></a>
 
 ### MsgDelegate
-MsgDelegate defines a SDK message for performing a delegation of coins
-from a delegator to a validator.
+MsgDelegateは、委任者から検証者へのコインの委任を実行するためのSDKメッセージを定義します。 
 
 
 | Field | Type | Label | Description |
@@ -10091,7 +9924,7 @@ from a delegator to a validator.
 <a name="cosmos.staking.v1beta1.MsgDelegateResponse"></a>
 
 ### MsgDelegateResponse
-MsgDelegateResponse defines the Msg/Delegate response type.
+Msg Delegate Responseは、メッセージ/デリゲート応答タイプを定義します。 
 
 
 
@@ -10101,7 +9934,7 @@ MsgDelegateResponse defines the Msg/Delegate response type.
 <a name="cosmos.staking.v1beta1.MsgEditValidator"></a>
 
 ### MsgEditValidator
-MsgEditValidator defines a SDK message for editing an existing validator.
+MsgEditValidatorは、既存のバリデーターを編集するためのSDKメッセージを定義します。 
 
 
 | Field | Type | Label | Description |
@@ -10119,7 +9952,7 @@ MsgEditValidator defines a SDK message for editing an existing validator.
 <a name="cosmos.staking.v1beta1.MsgEditValidatorResponse"></a>
 
 ### MsgEditValidatorResponse
-MsgEditValidatorResponse defines the Msg/EditValidator response type.
+MsgEditValidatorResponseは、Msg / EditValidator応答タイプを定義します。 
 
 
 
@@ -10129,8 +9962,7 @@ MsgEditValidatorResponse defines the Msg/EditValidator response type.
 <a name="cosmos.staking.v1beta1.MsgUndelegate"></a>
 
 ### MsgUndelegate
-MsgUndelegate defines a SDK message for performing an undelegation from a
-delegate and a validator.
+MsgUndelegateは、デリゲートとバリデーターからの委任解除を実行するためのSDKメッセージを定義します。
 
 
 | Field | Type | Label | Description |
@@ -10147,7 +9979,7 @@ delegate and a validator.
 <a name="cosmos.staking.v1beta1.MsgUndelegateResponse"></a>
 
 ### MsgUndelegateResponse
-MsgUndelegateResponse defines the Msg/Undelegate response type.
+MsgUndelegateResponseは、Msg / Undelegate応答タイプを定義します。 
 
 
 | Field | Type | Label | Description |
@@ -10168,7 +10000,7 @@ MsgUndelegateResponse defines the Msg/Undelegate response type.
 <a name="cosmos.staking.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the staking Msg service.
+MsgはステーキングMsgサービスを定義します。 
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -10192,10 +10024,7 @@ Msg defines the staking Msg service.
 <a name="cosmos.tx.signing.v1beta1.SignatureDescriptor"></a>
 
 ### SignatureDescriptor
-SignatureDescriptor is a convenience type which represents the full data for
-a signature including the public key of the signer, signing modes and the
-signature itself. It is primarily used for coordinating signatures between
-clients.
+SignatureDescriptorは、署名者の公開鍵、署名モード、および署名自体を含む、署名の完全なデータを表す便利なタイプです。 これは主に、クライアント間の署名を調整するために使用されます。 
 
 
 | Field | Type | Label | Description |
@@ -10212,7 +10041,7 @@ clients.
 <a name="cosmos.tx.signing.v1beta1.SignatureDescriptor.Data"></a>
 
 ### SignatureDescriptor.Data
-Data represents signature data
+データは署名データを表します 
 
 
 | Field | Type | Label | Description |
@@ -10228,7 +10057,7 @@ Data represents signature data
 <a name="cosmos.tx.signing.v1beta1.SignatureDescriptor.Data.Multi"></a>
 
 ### SignatureDescriptor.Data.Multi
-Multi is the signature data for a multisig public key
+Multiは、マルチシグ公開鍵の署名データです 
 
 
 | Field | Type | Label | Description |
@@ -10244,7 +10073,7 @@ Multi is the signature data for a multisig public key
 <a name="cosmos.tx.signing.v1beta1.SignatureDescriptor.Data.Single"></a>
 
 ### SignatureDescriptor.Data.Single
-Single is the signature data for a single signer
+シングルは、単一の署名者の署名データです
 
 
 | Field | Type | Label | Description |
@@ -10260,7 +10089,7 @@ Single is the signature data for a single signer
 <a name="cosmos.tx.signing.v1beta1.SignatureDescriptors"></a>
 
 ### SignatureDescriptors
-SignatureDescriptors wraps multiple SignatureDescriptor's.
+SignatureDescriptorsは、複数のSignatureDescriptorをラップします。
 
 
 | Field | Type | Label | Description |
@@ -10277,7 +10106,7 @@ SignatureDescriptors wraps multiple SignatureDescriptor's.
 <a name="cosmos.tx.signing.v1beta1.SignMode"></a>
 
 ### SignMode
-SignMode represents a signing mode with its own security guarantees.
+SignModeは、独自のセキュリティ保証を備えた署名モードを表します。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -10306,8 +10135,7 @@ SignMode represents a signing mode with its own security guarantees.
 <a name="cosmos.tx.v1beta1.AuthInfo"></a>
 
 ### AuthInfo
-AuthInfo describes the fee and signer modes that are used to sign a
-transaction.
+AuthInfoは、トランザクションの署名に使用される料金モードと署名者モードを記述します。
 
 
 | Field | Type | Label | Description |
@@ -10326,10 +10154,7 @@ Since: cosmos-sdk 0.45 |
 <a name="cosmos.tx.v1beta1.AuxSignerData"></a>
 
 ### AuxSignerData
-AuxSignerData is the intermediary format that an auxiliary signer (e.g. a
-tipper) builds and sends to the fee payer (who will build and broadcast the
-actual tx). AuxSignerData is not a valid tx in itself, and will be rejected
-by the node if sent directly as-is.
+AuxSignerDataは、補助署名者（ティッパーなど）が作成し、料金支払い者（実際の送信を作成してブロードキャストする）に送信する中間形式です。 AuxSignerDataは、それ自体は有効なtxではないため、そのまま送信するとノードによって拒否されます。
 
 Since: cosmos-sdk 0.45
 
@@ -10349,9 +10174,7 @@ Since: cosmos-sdk 0.45
 <a name="cosmos.tx.v1beta1.Fee"></a>
 
 ### Fee
-Fee includes the amount of coins paid in fees and the maximum
-gas to be used by the transaction. The ratio yields an effective "gasprice",
-which must be above some miminum to be accepted into the mempool.
+料金には、料金で支払われたコインの量と、トランザクションで使用される最大ガスが含まれます。 この比率により、有効な「ガス価格」が得られます。これは、mempoolに受け入れられるために最小値を上回っている必要があります。 
 
 
 | Field | Type | Label | Description |
@@ -10369,7 +10192,7 @@ which must be above some miminum to be accepted into the mempool.
 <a name="cosmos.tx.v1beta1.ModeInfo"></a>
 
 ### ModeInfo
-ModeInfo describes the signing mode of a single or nested multisig signer.
+ModeInfoは、単一またはネストされたマルチシグ署名者の署名モードを記述します。
 
 
 | Field | Type | Label | Description |
@@ -10385,7 +10208,7 @@ ModeInfo describes the signing mode of a single or nested multisig signer.
 <a name="cosmos.tx.v1beta1.ModeInfo.Multi"></a>
 
 ### ModeInfo.Multi
-Multi is the mode info for a multisig public key
+Multiは、マルチシグ公開鍵のモード情報です。
 
 
 | Field | Type | Label | Description |
@@ -10401,9 +10224,7 @@ Multi is the mode info for a multisig public key
 <a name="cosmos.tx.v1beta1.ModeInfo.Single"></a>
 
 ### ModeInfo.Single
-Single is the mode info for a single signer. It is structured as a message
-to allow for additional fields such as locale for SIGN_MODE_TEXTUAL in the
-future
+シングルは、単一の署名者のモード情報です。 将来的にSIGN_MODE_TEXTUALのロケールなどの追加フィールドを許可するメッセージとして構造化されます
 
 
 | Field | Type | Label | Description |
@@ -10418,7 +10239,7 @@ future
 <a name="cosmos.tx.v1beta1.SignDoc"></a>
 
 ### SignDoc
-SignDoc is the type used for generating sign bytes for SIGN_MODE_DIRECT.
+SignDocは、SIGN_MODE_DIRECTの符号バイトを生成するために使用されるタイプです。
 
 
 | Field | Type | Label | Description |
@@ -10436,8 +10257,7 @@ SignDoc is the type used for generating sign bytes for SIGN_MODE_DIRECT.
 <a name="cosmos.tx.v1beta1.SignDocDirectAux"></a>
 
 ### SignDocDirectAux
-SignDocDirectAux is the type used for generating sign bytes for
-SIGN_MODE_DIRECT_AUX.
+SignDocDirectAuxは、SIGN_MODE_DIRECT_AUXの符号バイトを生成するために使用されるタイプです。
 
 
 | Field | Type | Label | Description |
@@ -10457,8 +10277,7 @@ SIGN_MODE_DIRECT_AUX.
 <a name="cosmos.tx.v1beta1.SignerInfo"></a>
 
 ### SignerInfo
-SignerInfo describes the public key and signing mode of a single top-level
-signer.
+SignerInfoは、単一のトップレベル署名者の公開鍵と署名モードを記述します。
 
 
 | Field | Type | Label | Description |
@@ -10475,7 +10294,7 @@ signer.
 <a name="cosmos.tx.v1beta1.Tip"></a>
 
 ### Tip
-Tip is the tip used for meta-transactions.
+ヒントは、メタトランザクションに使用されるヒントです。
 
 
 | Field | Type | Label | Description |
@@ -10491,7 +10310,7 @@ Tip is the tip used for meta-transactions.
 <a name="cosmos.tx.v1beta1.Tx"></a>
 
 ### Tx
-Tx is the standard type used for broadcasting transactions.
+Txは、ブロードキャストトランザクションに使用される標準タイプです。
 
 
 | Field | Type | Label | Description |
@@ -10508,7 +10327,7 @@ Tx is the standard type used for broadcasting transactions.
 <a name="cosmos.tx.v1beta1.TxBody"></a>
 
 ### TxBody
-TxBody is the body of a transaction that all signers sign over.
+TxBodyは、すべての署名者がサインオーバーするトランザクションの本体です。
 
 
 | Field | Type | Label | Description |
@@ -10527,11 +10346,7 @@ TxBody is the body of a transaction that all signers sign over.
 <a name="cosmos.tx.v1beta1.TxRaw"></a>
 
 ### TxRaw
-TxRaw is a variant of Tx that pins the signer's exact binary representation
-of body and auth_info. This is used for signing, broadcasting and
-verification. The binary `serialize(tx: TxRaw)` is stored in Tendermint and
-the hash `sha256(serialize(tx: TxRaw))` becomes the "txhash", commonly used
-as the transaction ID.
+TxRawは、署名者のbodyとauth_infoの正確なバイナリ表現を固定するTxのバリアントです。 これは、署名、ブロードキャスト、および検証に使用されます。 バイナリの`serialize(tx: TxRaw)` はTendermintに格納され、ハッシュ `sha256(serialize(tx: TxRaw))` はトランザクションIDとして一般的に使用される "txhash"になります。 
 
 
 | Field | Type | Label | Description |
@@ -10564,8 +10379,7 @@ as the transaction ID.
 <a name="cosmos.tx.v1beta1.BroadcastTxRequest"></a>
 
 ### BroadcastTxRequest
-BroadcastTxRequest is the request type for the Service.BroadcastTxRequest
-RPC method.
+BroadcastTxRequestは、Service.BroadcastTxRequestRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -10581,8 +10395,7 @@ RPC method.
 <a name="cosmos.tx.v1beta1.BroadcastTxResponse"></a>
 
 ### BroadcastTxResponse
-BroadcastTxResponse is the response type for the
-Service.BroadcastTx method.
+BroadcastTxResponseは、Service.BroadcastTxメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -10597,8 +10410,7 @@ Service.BroadcastTx method.
 <a name="cosmos.tx.v1beta1.GetTxRequest"></a>
 
 ### GetTxRequest
-GetTxRequest is the request type for the Service.GetTx
-RPC method.
+GetTxRequestは、Service.GetTxRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -10613,7 +10425,7 @@ RPC method.
 <a name="cosmos.tx.v1beta1.GetTxResponse"></a>
 
 ### GetTxResponse
-GetTxResponse is the response type for the Service.GetTx method.
+GetTxResponseは、Service.GetTxメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -10629,8 +10441,7 @@ GetTxResponse is the response type for the Service.GetTx method.
 <a name="cosmos.tx.v1beta1.GetTxsEventRequest"></a>
 
 ### GetTxsEventRequest
-GetTxsEventRequest is the request type for the Service.TxsByEvents
-RPC method.
+GetTxsEventRequestは、Service.TxsByEventsRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -10647,8 +10458,7 @@ RPC method.
 <a name="cosmos.tx.v1beta1.GetTxsEventResponse"></a>
 
 ### GetTxsEventResponse
-GetTxsEventResponse is the response type for the Service.TxsByEvents
-RPC method.
+GetTxsEventResponseは、Service.TxsByEventsRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -10665,8 +10475,7 @@ RPC method.
 <a name="cosmos.tx.v1beta1.SimulateRequest"></a>
 
 ### SimulateRequest
-SimulateRequest is the request type for the Service.Simulate
-RPC method.
+SimulateRequestは、Service.SimulateRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -10684,8 +10493,7 @@ Since: cosmos-sdk 0.43 |
 <a name="cosmos.tx.v1beta1.SimulateResponse"></a>
 
 ### SimulateResponse
-SimulateResponse is the response type for the
-Service.SimulateRPC method.
+SimulateResponseは、Service.SimulateRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -10703,7 +10511,7 @@ Service.SimulateRPC method.
 <a name="cosmos.tx.v1beta1.BroadcastMode"></a>
 
 ### BroadcastMode
-BroadcastMode specifies the broadcast mode for the TxService.Broadcast RPC method.
+BroadcastModeは、TxService.BroadcastRPCメソッドのブロードキャストモードを指定します。
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -10717,7 +10525,7 @@ BroadcastMode specifies the broadcast mode for the TxService.Broadcast RPC metho
 <a name="cosmos.tx.v1beta1.OrderBy"></a>
 
 ### OrderBy
-OrderBy defines the sorting order
+OrderByは、並べ替え順序を定義します
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -10734,7 +10542,7 @@ OrderBy defines the sorting order
 <a name="cosmos.tx.v1beta1.Service"></a>
 
 ### Service
-Service defines a gRPC service for interacting with transactions.
+サービスは、トランザクションと対話するためのgRPCサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -10757,9 +10565,7 @@ Service defines a gRPC service for interacting with transactions.
 <a name="cosmos.upgrade.v1beta1.CancelSoftwareUpgradeProposal"></a>
 
 ### CancelSoftwareUpgradeProposal
-CancelSoftwareUpgradeProposal is a gov Content type for cancelling a software
-upgrade.
-
+CancelSoftwareUpgradeProposalは、ソフトウェアのアップグレードをキャンセルするための政府のコンテンツタイプです。
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -10774,7 +10580,7 @@ upgrade.
 <a name="cosmos.upgrade.v1beta1.ModuleVersion"></a>
 
 ### ModuleVersion
-ModuleVersion specifies a module and its consensus version.
+ModuleVersionは、モジュールとそのコンセンサスバージョンを指定します。
 
 Since: cosmos-sdk 0.43
 
@@ -10792,7 +10598,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.upgrade.v1beta1.Plan"></a>
 
 ### Plan
-Plan specifies information about a planned upgrade and when it should occur.
+計画は、計画されたアップグレードとそれがいつ発生するかについての情報を指定します。
 
 
 | Field | Type | Label | Description |
@@ -10811,8 +10617,7 @@ Plan specifies information about a planned upgrade and when it should occur.
 <a name="cosmos.upgrade.v1beta1.SoftwareUpgradeProposal"></a>
 
 ### SoftwareUpgradeProposal
-SoftwareUpgradeProposal is a gov Content type for initiating a software
-upgrade.
+SoftwareUpgradeProposalは、ソフトウェアのアップグレードを開始するための政府のコンテンツタイプです。
 
 
 | Field | Type | Label | Description |
@@ -10845,8 +10650,7 @@ upgrade.
 <a name="cosmos.upgrade.v1beta1.QueryAppliedPlanRequest"></a>
 
 ### QueryAppliedPlanRequest
-QueryCurrentPlanRequest is the request type for the Query/AppliedPlan RPC
-method.
+QueryCurrentPlanRequestは、Query / AppliedPlanRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -10861,8 +10665,7 @@ method.
 <a name="cosmos.upgrade.v1beta1.QueryAppliedPlanResponse"></a>
 
 ### QueryAppliedPlanResponse
-QueryAppliedPlanResponse is the response type for the Query/AppliedPlan RPC
-method.
+QueryAppliedPlanResponseは、Query / AppliedPlanRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -10877,8 +10680,7 @@ method.
 <a name="cosmos.upgrade.v1beta1.QueryCurrentPlanRequest"></a>
 
 ### QueryCurrentPlanRequest
-QueryCurrentPlanRequest is the request type for the Query/CurrentPlan RPC
-method.
+QueryCurrentPlanRequestは、Query / CurrentPlanRPCメソッドのリクエストタイプです。
 
 
 
@@ -10888,8 +10690,7 @@ method.
 <a name="cosmos.upgrade.v1beta1.QueryCurrentPlanResponse"></a>
 
 ### QueryCurrentPlanResponse
-QueryCurrentPlanResponse is the response type for the Query/CurrentPlan RPC
-method.
+QueryCurrentPlanResponseは、Query / CurrentPlanRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -10904,8 +10705,7 @@ method.
 <a name="cosmos.upgrade.v1beta1.QueryModuleVersionsRequest"></a>
 
 ### QueryModuleVersionsRequest
-QueryModuleVersionsRequest is the request type for the Query/ModuleVersions
-RPC method.
+QueryModuleVersionsRequestは、Query / ModuleVersionsRPCメソッドのリクエストタイプです。
 
 Since: cosmos-sdk 0.43
 
@@ -10922,8 +10722,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.upgrade.v1beta1.QueryModuleVersionsResponse"></a>
 
 ### QueryModuleVersionsResponse
-QueryModuleVersionsResponse is the response type for the Query/ModuleVersions
-RPC method.
+QueryModuleVersionsResponseは、Query / ModuleVersionsRPCメソッドの応答タイプです。
 
 Since: cosmos-sdk 0.43
 
@@ -10940,8 +10739,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.upgrade.v1beta1.QueryUpgradedConsensusStateRequest"></a>
 
 ### QueryUpgradedConsensusStateRequest
-QueryUpgradedConsensusStateRequest is the request type for the Query/UpgradedConsensusState
-RPC method.
+QueryUpgradedConsensusStateRequestは、Query / UpgradedConsensusStateRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -10956,8 +10754,7 @@ RPC method.
 <a name="cosmos.upgrade.v1beta1.QueryUpgradedConsensusStateResponse"></a>
 
 ### QueryUpgradedConsensusStateResponse
-QueryUpgradedConsensusStateResponse is the response type for the Query/UpgradedConsensusState
-RPC method.
+QueryUpgradedConsensusStateResponseは、Query / UpgradedConsensusStateRPCメソッドの応答タイプです。
 
 
 | Field | Type | Label | Description |
@@ -10978,7 +10775,7 @@ RPC method.
 <a name="cosmos.upgrade.v1beta1.Query"></a>
 
 ### Query
-Query defines the gRPC upgrade querier service.
+クエリはgRPCアップグレードクエリアサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -11003,8 +10800,7 @@ Since: cosmos-sdk 0.43 | GET|/cosmos/upgrade/v1beta1/module_versions|
 <a name="cosmos.vesting.v1beta1.BaseVestingAccount"></a>
 
 ### BaseVestingAccount
-BaseVestingAccount implements the VestingAccount interface. It contains all
-the necessary fields needed for any vesting account implementation.
+BaseVestingAccountは、VestingAccountインターフェイスを実装します。 これには、権利確定アカウントの実装に必要なすべてのフィールドが含まれています。
 
 
 | Field | Type | Label | Description |
@@ -11023,8 +10819,7 @@ the necessary fields needed for any vesting account implementation.
 <a name="cosmos.vesting.v1beta1.ContinuousVestingAccount"></a>
 
 ### ContinuousVestingAccount
-ContinuousVestingAccount implements the VestingAccount interface. It
-continuously vests by unlocking coins linearly with respect to time.
+ContinuousVestingAccountは、VestingAccountインターフェイスを実装します。 それは、時間に対して直線的にコインのロックを解除することによって継続的に権利を確定します。
 
 
 | Field | Type | Label | Description |
@@ -11040,9 +10835,7 @@ continuously vests by unlocking coins linearly with respect to time.
 <a name="cosmos.vesting.v1beta1.DelayedVestingAccount"></a>
 
 ### DelayedVestingAccount
-DelayedVestingAccount implements the VestingAccount interface. It vests all
-coins after a specific time, but non prior. In other words, it keeps them
-locked until a specified time.
+DelayedVestingAccountは、VestingAccountインターフェイスを実装します。 それは特定の時間の後にすべてのコインを権利確定しますが、それ以前ではありません。 つまり、指定された時間までロックされたままになります。
 
 
 | Field | Type | Label | Description |
@@ -11057,7 +10850,7 @@ locked until a specified time.
 <a name="cosmos.vesting.v1beta1.Period"></a>
 
 ### Period
-Period defines a length of time and amount of coins that will vest.
+期間は、権利が確定するコインの時間と量を定義します。
 
 
 | Field | Type | Label | Description |
@@ -11073,8 +10866,7 @@ Period defines a length of time and amount of coins that will vest.
 <a name="cosmos.vesting.v1beta1.PeriodicVestingAccount"></a>
 
 ### PeriodicVestingAccount
-PeriodicVestingAccount implements the VestingAccount interface. It
-periodically vests by unlocking coins during each specified period.
+PeriodicVestingAccountは、VestingAccountインターフェイスを実装します。 指定された期間ごとにコインのロックを解除して定期的に権利を確定します。
 
 
 | Field | Type | Label | Description |
@@ -11091,9 +10883,7 @@ periodically vests by unlocking coins during each specified period.
 <a name="cosmos.vesting.v1beta1.PermanentLockedAccount"></a>
 
 ### PermanentLockedAccount
-PermanentLockedAccount implements the VestingAccount interface. It does
-not ever release coins, locking them indefinitely. Coins in this account can
-still be used for delegating and for governance votes even while locked.
+PermanentLockedAccountは、VestingAccountインターフェイスを実装します。 コインを解放することはなく、無期限にロックします。 このアカウントのコインは、ロックされている場合でも、委任やガバナンスの投票に使用できます。
 
 Since: cosmos-sdk 0.43
 
@@ -11126,8 +10916,7 @@ Since: cosmos-sdk 0.43
 <a name="cosmos.vesting.v1beta1.MsgCreatePeriodicVestingAccount"></a>
 
 ### MsgCreatePeriodicVestingAccount
-MsgCreateVestingAccount defines a message that enables creating a vesting
-account.
+MsgCreateVestingAccountは、権利確定アカウントの作成を可能にするメッセージを定義します。
 
 
 | Field | Type | Label | Description |
@@ -11145,8 +10934,7 @@ account.
 <a name="cosmos.vesting.v1beta1.MsgCreatePeriodicVestingAccountResponse"></a>
 
 ### MsgCreatePeriodicVestingAccountResponse
-MsgCreateVestingAccountResponse defines the Msg/CreatePeriodicVestingAccount
-response type.
+MsgCreateVestingAccountResponseは、Msg / CreatePeriodicVestingAccount応答タイプを定義します。
 
 
 
@@ -11156,8 +10944,7 @@ response type.
 <a name="cosmos.vesting.v1beta1.MsgCreateVestingAccount"></a>
 
 ### MsgCreateVestingAccount
-MsgCreateVestingAccount defines a message that enables creating a vesting
-account.
+MsgCreateVestingAccountは、権利確定アカウントの作成を可能にするメッセージを定義します。
 
 
 | Field | Type | Label | Description |
@@ -11176,7 +10963,7 @@ account.
 <a name="cosmos.vesting.v1beta1.MsgCreateVestingAccountResponse"></a>
 
 ### MsgCreateVestingAccountResponse
-MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount response type.
+MsgCreateVestingAccountResponseは、Msg / CreateVestingAccount応答タイプを定義します。
 
 
 
@@ -11192,7 +10979,7 @@ MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount response ty
 <a name="cosmos.vesting.v1beta1.Msg"></a>
 
 ### Msg
-Msg defines the bank Msg service.
+Msgは、銀行のMsgサービスを定義します。
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
@@ -11222,4 +11009,6 @@ Msg defines the bank Msg service.
 | <a name="bool" /> bool |  | bool | boolean | boolean | bool | bool | boolean | TrueClass/FalseClass |
 | <a name="string" /> string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | string | String | str/unicode | string | string | string | String (UTF-8) |
 | <a name="bytes" /> bytes | May contain any arbitrary sequence of bytes. | string | ByteString | str | []byte | ByteString | string | String (ASCII-8BIT) |
+
+
 

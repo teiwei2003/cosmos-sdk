@@ -2,11 +2,11 @@
 
 ## CLI
 
-ユーザーは、CLIを使用して `feegrant`モジュールを照会および操作できます。
+ユーザーは、CLIを使用して`feegrant`モジュールを照会および操作できます。
 
 ### query
 
-`query`コマンドを使用すると、ユーザーは` feegrant`状態を照会できます。
+`query`コマンドを使用すると、ユーザーは`feegrant`状態を照会できます。
 
 ```
 simd query feegrant --help
@@ -72,7 +72,7 @@ pagination:
 
 ### Transactions
 
-`tx`コマンドを使用すると、ユーザーは` feegrant`モジュールを操作できます。
+`tx`コマンドを使用すると、ユーザーは`feegrant`モジュールを操作できます。
 
 ```
 simd tx feegrant --help
@@ -114,7 +114,7 @@ simd tx feegrant revoke cosmos1.. cosmos1..
 
 ## gRPC
 
-ユーザーは、gRPCエンドポイントを使用して `feegrant`モジュールをクエリできます。
+ユーザーは、gRPCエンドポイントを使用して`feegrant`モジュールをクエリできます。
 
 ### Allowance
 

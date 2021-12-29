@@ -1,26 +1,26 @@
-# 罗塞塔
+# Rosetta
 
-`rosetta` 包实现了 Coinbase 的 [Rosetta API](https://www.rosetta-api.org)。 本文档提供有关如何使用 Rosetta API 集成的说明。 有关动机和设计选择的信息，请参阅 [ADR 035](../architecture/adr-035-rosetta-api-support.md)。
+`rosetta`パッケージは、Coinbaseの[Rosetta API](https://www.rosetta-api.org)を実装します。 このドキュメントでは、RosettaAPI統合の使用方法について説明します。 動機と設計の選択については、[ADR 035](../architecture/adr-035-rosetta-api-support.md)を参照してください。
 
-## 添加 Rosetta 命令
+## Rosettaコマンドを追加
 
-Rosetta API 服务器是一个独立的服务器，连接到使用 Cosmos SDK 开发的链的节点。
+Rosetta APIサーバーは、CosmosSDKで開発されたチェーンのノードに接続するスタンドアロンサーバーです。
 
-要启用 Rosetta API 支持，需要将 `RosettaCommand` 添加到应用程序的根命令文件(例如 `appd/cmd/root.go`)。
+Rosetta APIサポートを有効にするには、アプリケーションのルートコマンドファイル(例：`appd/cmd/root.go`)に`RosettaCommand`を追加する必要があります。
 
-导入 `server` 包: 
+`server`パッケージをインポートします。 
 
 ```go
     "github.com/cosmos/cosmos-sdk/server"
 ```
 
-Find the following line:
+次の行を見つけます。
 
 ```go
 initRootCmd(rootCmd, encodingConfig)
 ```
 
-After that line, add the following:
+その行の後に、以下を追加します。
 
 ```go
 rootCmd.AddCommand(
@@ -28,21 +28,21 @@ rootCmd.AddCommand(
 )
 ```
 
-`RosettaCommand` 函数构建 `rosetta` 根命令，并在 Cosmos SDK 的 `server` 包中定义。
+`RosettaCommand`関数は`rosetta`ルートコマンドを構築し、CosmosSDKの`server`パッケージで定義されます。
 
-由于我们已更新 Cosmos SDK 以与 Rosetta API 配合使用，因此您只需更新应用程序的根命令文件即可。
+RosettaAPIで動作するようにCosmosSDKを更新したため、アプリケーションのルートコマンドファイルを更新するだけで済みます。
 
-一个实现示例可以在 `simapp` 包中找到。
+実装例は`simapp`パッケージにあります。
 
-## 使用 Rosetta 命令
+## Rosettaコマンドを使用する
 
-要在应用程序 CLI 中运行 Rosetta，请使用以下命令: 
+アプリケーションCLIでRosettaを実行するには、次のコマンドを使用します。
 
 ```
 appd rosetta --help
 ```
 
-To test and run Rosetta API endpoints for applications that are running and exposed, use the following command:
+実行および公開されているアプリケーションのRosettaAPIエンドポイントをテストおよび実行するには、次のコマンドを使用します。
 
 ```
 appd rosetta
@@ -53,19 +53,19 @@ appd rosetta
      --addr "rosetta binding address (ex: :8080)"
 ```
 
-## 扩展
+## 拡張機能
 
-您可以通过两种方式使用自定义设置自定义和扩展实现。
+カスタム設定を使用して実装をカスタマイズおよび拡張する方法は2つあります。
 
-### 消息扩展
+### メッセージ拡張
 
-为了使 rosetta 可以理解 `sdk.Msg`，唯一需要的是将方法添加到满足 `rosetta.Msg` 接口的消息中。 有关如何执行此操作的示例可以在诸如“MsgDelegate”之类的抵押类型或诸如“MsgSend”之类的银行类型中找到。
+ロゼッタが`sdk.Msg`を理解できるようにするために必要なのは、`rosetta.Msg`インターフェースを満たすメソッドをメッセージに追加することだけです。 その方法の例は、`MsgDelegate`などのステーキングタイプまたは`MsgSend`などのバンクタイプにあります。
 
-### 客户端界面覆盖
+### クライアントインターフェイスのオーバーライド
 
-如果需要更多自定义，可以嵌入 Client 类型并覆盖需要自定义的方法。 
+さらにカスタマイズが必要な場合は、クライアントタイプを埋め込み、カスタマイズが必要なメソッドをオーバーライドすることができます。 
 
-Example:
+例:
 
 ```go
 package custom_client
@@ -76,26 +76,26 @@ import (
 "github.com/cosmos/cosmos-sdk/server/rosetta/lib"
 )
 
-// CustomClient embeds the standard cosmos client
-// which means that it implements the cosmos-rosetta-gateway Client
-// interface while at the same time allowing to customize certain methods
+//CustomClient embeds the standard cosmos client
+//which means that it implements the cosmos-rosetta-gateway Client
+//interface while at the same time allowing to customize certain methods
 type CustomClient struct {
     *rosetta.Client
 }
 
 func (c *CustomClient) ConstructionPayload(_ context.Context, request *types.ConstructionPayloadsRequest) (resp *types.ConstructionPayloadsResponse, err error) {
-    // provide custom signature bytes
+   //provide custom signature bytes
     panic("implement me")
 }
 ```
 
-注意:当使用自定义客户端时，该命令不能使用，因为所需的构造函数**可能**不同，因此需要创建一个新的构造函数。 我们打算在未来提供一种无需编写额外代码即可初始化自定义客户端的方法。
+注：カスタマイズされたクライアントを使用する場合、必要なコンストラクターは**異なる**可能性があるため、コマンドは使用できません。そのため、新しいコンストラクターを作成する必要があります。 将来的には、余分なコードを記述せずに、カスタマイズされたクライアントを初期化する方法を提供する予定です。
 
-### 错误扩展
+### エラー拡張
 
-由于 rosetta 需要向网络选项提供“返回”错误。 为了声明一个新的 rosetta 错误，我们在 cosmos-rosetta-gateway 中使用了 `errors` 包。 
+ロゼッタはネットワークオプションに「返された」エラーを提供する必要があるため。 新しいロゼッタエラーを宣言するために、cosmos-rosetta-gatewayの`errors`パッケージを使用します。 
 
-Example:
+例:
 
 ```go
 package custom_errors
@@ -105,4 +105,4 @@ var customErrRetriable = true
 var CustomError = crgerrs.RegisterError(100, "custom message", customErrRetriable, "description")
 ```
 
-注意:必须在调用 cosmos-rosetta-gateway 的 `Server`.`Start` 方法之前注册错误。 否则注册将被忽略。 具有相同代码的错误也将被忽略。
+注：cosmos-rosetta-gatewayの`Server`.`Start`メソッドを呼び出す前に、エラーを登録する必要があります。 それ以外の場合、登録は無視されます。 同じコードのエラーも無視されます。

@@ -3,16 +3,16 @@
 ## 証拠の処理
 
 テンダーミントブロックには次のものが含まれます
-[Evidence](https://github.com/tendermint/tendermint/blob/master/docs/spec/blockchain/blockchain.md#evidence)は、バリデーターが悪意のある動作を行ったかどうかを示します。 関連情報は、 `abci.RequestBeginBlock`のABCIEvidenceとしてアプリケーションに転送されるため、バリデーターはそれに応じて罰せられます。
+[Evidence](https://github.com/tendermint/tendermint/blob/master/docs/spec/blockchain/blockchain.md#evidence)は、バリデーターが悪意のある動作を行ったかどうかを示します。 関連情報は、`abci.RequestBeginBlock`のABCIEvidenceとしてアプリケーションに転送されるため、バリデーターはそれに応じて罰せられます。
 
 ### 多義語の誤謬
 
 現在、SDKはABCI`BeginBlock`内で2種類の証拠を処理します。
 
-- `DuplicateVoteEvidence`，
-- `LightClientAttackEvidence`。
+-`DuplicateVoteEvidence`，
+-`LightClientAttackEvidence`。
 
-エビデンスモジュールは、これら2つのエビデンスタイプを同じ方法で処理します。 まず、SDKは、具体的なタイプとして `Equivocation`を使用して、Tendermintの具体的な証拠タイプをSDKの` Evidence`インターフェイスに変換します。
+エビデンスモジュールは、これら2つのエビデンスタイプを同じ方法で処理します。 まず、SDKは、具体的なタイプとして`Equivocation`を使用して、Tendermintの具体的な証拠タイプをSDKの`Evidence`インターフェイスに変換します。
 
 ```proto
 // Equivocation implements the Evidence interface.
@@ -24,17 +24,17 @@ message Equivocation {
 }
 ```
 
-`block`で送信された一部の` Equivocation`が有効であるためには、次の条件を満たす必要があります。
+`block`で送信された一部の`Equivocation`が有効であるためには、次の条件を満たす必要があります。
 
 `Evidence.Timestamp >= block.Timestamp --MaxEvidenceAge`
 
 どこ：
 
--`Evidence.Timestamp`は、高さ `Evidence.Height`のブロック内のタイムスタンプです。
---`block.Timestamp`は現在のブロックタイムスタンプです。
+- `Evidence.Timestamp`は、高さ`Evidence.Height`のブロック内のタイムスタンプです。
+- `block.Timestamp`は現在のブロックタイムスタンプです。
 
 有効な「Equivocation」証拠がブロックに含まれている場合、バリデーターの利害関係は
-`x/slashing`モジュールで定義されているように` SlashFractionDoubleSign`によって削減(スラッシュ)されます
+`x/slashing`モジュールで定義されているように`SlashFractionDoubleSign`によって削減(スラッシュ)されます
 証拠が発見されたときではなく、違反が発生したときの彼らの利害関係について。
 「賭け金をたどる」、つまり違反の原因となった賭け金を追跡したい
 その後、再委任されたり、結合が解除されたりした場合でも、スラッシュする必要があります。
@@ -53,7 +53,7 @@ func (k Keeper) HandleEquivocationEvidence(ctx sdk.Context, evidence *types.Equi
 		// Ignore evidence that cannot be handled.
 		//
 		// NOTE: We used to panic with:
-		// `panic(fmt.Sprintf("Validator consensus-address %v not found", consAddr))`,
+		//`panic(fmt.Sprintf("Validator consensus-address %v not found", consAddr))`,
 		// but this couples the expectations of the app to both Tendermint and
 		// the simulator.  Both are expected to provide the full range of
 		// allowable but none of the disallowed evidence types.  Instead of
@@ -123,7 +123,7 @@ func (k Keeper) HandleEquivocationEvidence(ctx sdk.Context, evidence *types.Equi
 	// That's fine since this is just used to filter unbonding delegations & redelegations.
 	distributionHeight := infractionHeight - sdk.ValidatorUpdateDelay
 
-	// Slash validator. The `power` is the int64 power of the validator as provided
+	// Slash validator. The`power`is the int64 power of the validator as provided
 	// to/by Tendermint. This value is validator.Tokens as sent to Tendermint via
 	// ABCI, and now received as evidence. The fraction is passed in to separately
 	// to slash unbonding and rebonding delegations.
@@ -146,5 +146,5 @@ func (k Keeper) HandleEquivocationEvidence(ctx sdk.Context, evidence *types.Equi
 ```
 
 スラッシュ、ジェイル、およびトゥームストーニングの呼び出しは、`x/slashing`モジュールを介して委任されることに注意してください
-これは有益なイベントを発行し、最後に呼び出しを `x/staking`モジュールに委任します。 ドキュメントを参照してください
+これは有益なイベントを発行し、最後に呼び出しを`x/staking`モジュールに委任します。 ドキュメントを参照してください
 [x/staking spec](/.././cosmos-sdk/x/staking/spec/02_state_transitions.md)でのスラッシュとジェイルについて。
