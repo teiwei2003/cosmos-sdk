@@ -10,4 +10,4 @@
 
 ConstantFeeパラメータは、グローバルパラメータストレージに保存されます。
 
-- パラメータ： `mint / params-> legend_amino（sdk.Coin）`
+- パラメータ：`mint / params-> legend_amino（sdk.Coin`

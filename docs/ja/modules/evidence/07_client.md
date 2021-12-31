@@ -2,7 +2,7 @@
 
 ## CLI
 
-ユーザーは、CLIを使用して `evidence`モジュールを照会および操作できます。
+ユーザーは、CLIを使用して`evidence`モジュールを照会および操作できます。
 
 ### Query
 
@@ -126,7 +126,7 @@ curl -X GET "http://localhost:1317/cosmos/evidence/v1beta1/evidence"
 
 ## gRPC
 
-ユーザーは、gRPCエンドポイントを使用して `evidence`モジュールをクエリできます。
+ユーザーは、gRPCエンドポイントを使用して`evidence`モジュールをクエリできます。
 
 ### 証拠
 
@@ -138,7 +138,7 @@ cosmos.evidence.v1beta1.Query/Evidence
 例:
 
 ```bash
-grpcurl -plaintext -d '{"evidence_hash":"DF0C23E8634E480F84B9D5674A7CDC9816466DEC28A3358F73260F68D28D7660"}' localhost:9090 cosmos.evidence.v1beta1.Query/Evidence
+grpcurl -plaintext -d'{"evidence_hash":"DF0C23E8634E480F84B9D5674A7CDC9816466DEC28A3358F73260F68D28D7660"}'localhost:9090 cosmos.evidence.v1beta1.Query/Evidence
 ```
 
 出力例:

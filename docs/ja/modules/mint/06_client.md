@@ -6,7 +6,7 @@
 
 ### Query
 
-`query`コマンドを使用すると、ユーザーは` mint`状態を照会できます。
+`query`コマンドを使用すると、ユーザーは`mint`状態を照会できます。
 
 ```
 simd query mint --help
