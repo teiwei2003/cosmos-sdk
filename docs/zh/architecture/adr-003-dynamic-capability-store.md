@@ -5,7 +5,7 @@
 - 2019 年 12 月 12 日:初始版本
 - 2020 年 4 月 2 日:内存存储修订
 
-## 语境
+##  上下文
 
 [IBC 规范](https://github.com/cosmos/ibs) 的完整实现需要能够在运行时(即在事务执行期间)创建和验证对象能力密钥，
 如 [ICS 5](https://github.com/cosmos/ibc/tree/master/spec/core/ics-005-port-allocation#technical-specification) 中所述。在 IBC 规范中，为每个新初始化的

@@ -57,7 +57,7 @@
 
 正在讨论其他符号模式，最著名的是“SIGN_MODE_TEXTUAL”。如果您想了解更多关于它们的信息，请参阅 [ADR-020](../architecture/adr-020-protobuf-transaction-encoding.md)。
 
-##交易流程
+## 交易流程
 
 最终用户发送交易的过程是:
 

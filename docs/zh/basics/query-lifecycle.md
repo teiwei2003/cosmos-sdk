@@ -74,7 +74,7 @@ wget http://localhost:1317/cosmos/staking/v1beta1/delegators/{delegatorAddr}/del
 
 上面的例子展示了外部用户如何通过查询节点的状态来与节点交互。要详细了解查询的确切生命周期，让我们深入研究 CLI 如何准备查询，以及节点如何处理它。从用户的角度来看，交互有点不同，但底层功能几乎相同，因为它们是由模块开发人员定义的相同命令的实现。这一步处理发生在 CLI、gRPC 或 REST 服务器中，并且大量涉及“client.Context”。
 
-::: 语境
+:::  上下文
 
 在执行 CLI 命令时创建的第一件事是 `client.Context`。 `client.Context` 是一个对象，它存储在用户端处理请求所需的所有数据。特别是，`client.Context` 存储以下内容:
 

@@ -50,7 +50,7 @@ Cosmos SDK 附带了大量存储来持久化应用程序的状态。 默认情�
                    Application's State
 ```
 
-###存储界面
+### 存储界面
 
 在其核心，Cosmos SDK `store` 是一个对象，它包含一个 `CacheWrapper` 并具有一个 `GetStoreType()` 方法:
 
@@ -196,7 +196,7 @@ Cosmos SDK 应用程序使用 [`gas`](../basics/gas-fees.md) 来跟踪资源使�
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/types/context.go#L227-L230
 
-在这种情况下，使用默认气体配置:
+在这种情况下，使用默认GAS费配置:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/gas.go#L164-L175
 

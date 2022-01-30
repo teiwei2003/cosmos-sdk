@@ -1,4 +1,4 @@
-# 语境
+#  上下文
 
 `context` 是一种数据结构，旨在从一个函数传递到另一个函数，它携带有关应用程序当前状态的信息。它提供了对分支存储(整个状态的安全分支)以及有用的对象和信息的访问，如“gasMeter”、“块高度”、“共识参数”等。 {概要}
 
@@ -9,7 +9,7 @@
 
 ## 上下文定义
 
-Cosmos SDK `Context` 是一个自定义数据结构，它包含 Go 的 stdlib [`context`](https://golang.org/pkg/context) 作为其基础，并且在其定义中具有许多特定于宇宙 SDK。 `Context` 是事务处理不可或缺的一部分，因为它允许模块轻松访问 [`multistore`](./store.md#multistore) 中各自的 [store](./store.md#base-layer-kvstores) ) 并检索交易上下文，例如区块头和燃气表。
+Cosmos SDK `Context` 是一个自定义数据结构，它包含 Go 的 stdlib [`context`](https://golang.org/pkg/context) 作为其基础，并且在其定义中具有许多特定于Cosmos SDK。 `Context` 是事务处理不可或缺的一部分，因为它允许模块轻松访问 [`multistore`](./store.md#multistore) 中各自的 [store](./store.md#base-layer-kvstores) ) 并检索交易上下文，例如区块头和燃气表。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/types/context.go#L16-L39
 
@@ -23,7 +23,7 @@ Cosmos SDK `Context` 是一个自定义数据结构，它包含 Go 的 stdlib [`
 - **Gas Meters:** 具体来说，一个 [`gasMeter`](../basics/gas-fees.md#main-gas-meter) 用于当前正在使用上下文处理的交易和一个 [`blockGasMeter`](../basics/gas-fees.md#block-gas-meter) 用于它所属的整个块。用户指定他们希望为执行交易支付多少费用；这些燃气表跟踪到目前为止在交易或区块中使用了多少 [gas](../basics/gas-fees.md)。如果燃气表用完，则执行停止。
 - **CheckTx 模式:** 一个布尔值，指示交易应在“CheckTx”还是“DeliverTx”模式下处理。
 - **Min Gas Price:** 节点为了在其区块中包含交易而愿意接受的最低 [gas](../basics/gas-fees.md) 价格。此价格是由每个节点单独配置的本地值，因此**不应在导致状态转换的序列中使用的任何函数中使用**。
-- **Consensus Params:** ABCI 类型 [Consensus Parameters](https://tendermint.com/docs/spec/abci/apps.html#consensus-parameters)，指定区块链的某些限制，例如最大值一个块的气体。
+- **Consensus Params:** ABCI 类型 [Consensus Parameters](https://tendermint.com/docs/spec/abci/apps.html#consensus-parameters)，指定区块链的某些限制，例如最大值一个块的GAS费。
 - **事件管理器:** 事件管理器允许任何有权访问 `Context` 的调用者发出 [`Events`](./events.md)。模块可以定义特定于模块的
   `Events` 通过定义各种 `Types` 和 `Attributes` 或使用在 `types/` 中找到的通用定义。客户可以订阅或查询这些“事件”。这些“事件”在整个“DeliverTx”、“BeginBlock”和“EndBlock”中收集，并返回给 Tendermint 进行索引。例如: 
 

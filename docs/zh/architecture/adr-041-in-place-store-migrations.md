@@ -12,7 +12,7 @@
 
 此 ADR 引入了一种机制，可在链软件升级期间执行就地状态存储迁移。
 
-## 语境
+##  上下文
 
 当链升级在模块内引入状态破坏性更改时，当前过程包括将整个状态导出到 JSON 文件(通过 `simd export` 命令)，在 JSON 文件上运行迁移脚本(`simd migrate` 命令)，清除存储(`simd unsafe-reset-all` 命令)，并使用迁移的 JSON 文件作为新的创世(可以选择使用自定义初始块高度)开始一个新链。 [在 Cosmos Hub 3->4 迁移指南中](https://github.com/cosmos/gaia/blob/v4.0.3/docs/migration/cosmoshub-3.md#升级程序)。
 

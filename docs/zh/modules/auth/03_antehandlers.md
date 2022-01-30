@@ -9,7 +9,7 @@
 
 auth 模块提供了 `AnteDecorator`s，它们按以下顺序递归地链接到单个 `AnteHandler` 中:
 
-- `SetUpContextDecorator`:在 `Context` 中设置 `GasMeter`，并用 defer 子句包装下一个 `AnteHandler`，以从 `AnteHandler` 链中的任何下游 `OutOfGas` 恐慌中恢复，并返回有关所提供气体的信息的错误和使用的气体。
+- `SetUpContextDecorator`:在 `Context` 中设置 `GasMeter`，并用 defer 子句包装下一个 `AnteHandler`，以从 `AnteHandler` 链中的任何下游 `OutOfGas` 恐慌中恢复，并返回有关所提供GAS费的信息的错误和使用的GAS费。
 
 - `RejectExtensionOptionsDecorator`:拒绝所有可以选择包含在 protobuf 事务中的扩展选项。
 
@@ -29,7 +29,7 @@ auth 模块提供了 `AnteDecorator`s，它们按以下顺序递归地链接到�
 
 - `ValidateSigCountDecorator`:根据应用参数验证 `tx` 中的签名数量。
 
-- `SigGasConsumeDecorator`:为每个签名消耗参数定义的气体量。这需要在上下文中为所有签名者设置公钥作为“SetPubKeyDecorator”的一部分。
+- `SigGasConsumeDecorator`:为每个签名消耗参数定义的GAS费量。这需要在上下文中为所有签名者设置公钥作为“SetPubKeyDecorator”的一部分。
 
 - `SigVerificationDecorator`:验证所有签名是否有效。这需要在上下文中为所有签名者设置公钥作为“SetPubKeyDecorator”的一部分。
 

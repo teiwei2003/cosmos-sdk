@@ -4,7 +4,7 @@
 
 - 2019-08-30:初稿
 
-## 语境
+##  上下文
 
 目前，Cosmos SDK 允许自定义帐户类型； `auth` keeper 存储满足其 `Account` 接口的任何类型。然而，`auth` 不处理从创世文件导出或加载帐户，这是由 `genaccounts` 完成的，它只处理 4 种具体帐户类型(`BaseAccount`、`ContinuousVestingAccount`、`DelayedVestingAccount` 和`ModuleAccount)中的一种`)。
 

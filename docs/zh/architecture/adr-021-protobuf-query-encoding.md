@@ -8,7 +8,7 @@
 
 公认
 
-## 语境
+##  上下文
 
 该 ADR 是在
 [ADR 019](./adr-019-protobuf-state-encoding.md) 和

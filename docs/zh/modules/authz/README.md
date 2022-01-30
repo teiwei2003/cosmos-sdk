@@ -10,7 +10,7 @@
 1. **[概念](01_concepts.md)**
      - [授权和授予](01_concepts.md#Authorization-and-Grant)
      - [内置授权](01_concepts.md#Built-in-Authorizations)
-     - [气体](01_concepts.md#gas)
+     - [GAS费](01_concepts.md#gas)
 2. **[状态](02_state.md)**
 3. **[消息](03_messages.md)**
      - [MsgGrant](03_messages.md#MsgGrant)

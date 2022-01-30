@@ -13,7 +13,7 @@
 
 公认
 
-## 语境
+##  上下文
 
 目前，Cosmos SDK 使用 [go-amino](https://github.com/tendermint/go-amino/) 进行二进制
 和 JSON 对象编码通过线路在逻辑对象和持久性对象之间带来奇偶校验。

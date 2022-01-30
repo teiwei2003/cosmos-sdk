@@ -9,7 +9,7 @@
 
 由 ADR-045 取代
 
-## 语境
+##  上下文
 
 当前的 AnteHandler 设计允许用户使用 `x/auth` 中提供的默认 AnteHandler 或从头开始构建自己的 AnteHandler。理想情况下，AnteHandler 功能被拆分为多个模块化函数，这些函数可以与自定义 ante-functions 一起链接在一起，以便用户在想要实现自定义行为时不必重写常见的 antehandler 逻辑。
 

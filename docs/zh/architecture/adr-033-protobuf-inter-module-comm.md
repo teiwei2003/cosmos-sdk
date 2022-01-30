@@ -18,7 +18,7 @@
 - 更强的模块间对象能力(OCAPs)保证
 - 模块账号和子账号授权
 
-## 语境
+##  上下文
 
 在当前的 Cosmos SDK 文档中关于 [Object-Capability Model](../core/ocap.md)，它指出:
 

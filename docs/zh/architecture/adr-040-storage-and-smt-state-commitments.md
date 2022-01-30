@@ -12,7 +12,7 @@
 
 稀疏默克尔树 ([SMT](https://osf.io/8mcnh/)) 是具有各种存储和性能优化的默克尔树的一个版本。此 ADR 定义了状态承诺与数据存储的分离以及 Cosmos SDK 从 IAVL 到 SMT 的转换。
 
-## 语境
+##  上下文
 
 目前，Cosmos SDK 将 IAVL 用于状态 [承诺](https://cryptography.fandom.com/wiki/Commitment_scheme) 和数据存储。
 

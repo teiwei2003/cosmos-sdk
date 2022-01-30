@@ -13,7 +13,7 @@
 
 此 ADR 定义了所有可寻址 Cosmos SDK 帐户的地址格式。这包括:新的公钥算法、多重签名公钥和模块帐户。
 
-## 语境
+##  上下文
 
 问题 [\#3685](https://github.com/cosmos/cosmos-sdk/issues/3685) 确定了公钥
 地址空间目前正在重叠。我们确认它显着降低了 Cosmos SDK 的安全性。
@@ -31,7 +31,7 @@
 
 @ethanfrey 解释了最初在 https://github.com/iov-one/weave 中使用的替代方法:
 
-> 我在构建 weave 时花了很多时间思考这个问题……另一个宇宙 Sdk。
+> 我在构建 weave 时花了很多时间思考这个问题……另一个Cosmos Sdk。
 > 基本上我将一个条件定义为一种类型和格式，作为人类可读的字符串，并附加一些二进制数据。这个条件被散列成一个地址(同样是 20 个字节)。使用此前缀使得无法找到具有不同条件的给定地址的原像(例如 ed25519 与 secp256k1)。
 > 这里有详细解释 https://weave.readthedocs.io/en/latest/design/permissions.html
 > 而代码就在这里，主要看我们处理条件的顶部。 https://github.com/iov-one/weave/blob/master/conditions.go
