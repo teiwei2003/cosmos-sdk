@@ -20,6 +20,6 @@
 
 要了解有关构建模块过程的更多信息，请访问 [构建模块参考文档](/building-modules/intro.html)。
 
-## 国际商业银行
+## IBC 模块
 
 SDK 的 IBC 模块已移至其[自己的存储库](https://github.com/cosmos/ibc-go)。 
