@@ -473,7 +473,7 @@ requestAnimationFrame(function() {
                     "/zh/intro/": [
                         "/zh/intro/",
                         "/zh/intro/overview",
-                        "/intro/sdk-app-architecture",
+                        "/zh/intro/sdk-app-architecture",
                         "/zh/intro/sdk-design",
                         "/zh/intro/why-app-specific",
                     ],
@@ -827,7 +827,7 @@ requestAnimationFrame(function() {
                     "/ja/intro/": [
                         "/ja/intro/",
                         "/ja/intro/overview",
-                        "/intro/sdk-app-architecture",
+                        "/ja/intro/sdk-app-architecture",
                         "/ja/intro/sdk-design",
                         "/ja/intro/why-app-specific",
                     ],
