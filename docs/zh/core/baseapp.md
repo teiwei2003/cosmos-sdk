@@ -176,7 +176,7 @@ AnteHandler 被持久化。
 ## 参数存储
 
 在 `InitChain` 期间，`RequestInitChain` 提供包含参数的 `ConsensusParams`
-除了证据参数之外，还与块执行相关，例如最大气体和大小。如果这些
+除了证据参数之外，还与块执行相关，例如最大GAS费和大小。如果这些
 参数非 nil，它们在 BaseApp 的 `ParamStore` 中设置。在幕后，`ParamStore`
 实际上由一个 `x/params` 模块 `Subspace` 管理。这允许通过调整参数
 链上治理。
@@ -231,7 +231,7 @@ AnteHandler 被持久化。
    `sdk.Msg` 签名有效，提供足够的费用并且发送帐户
    有足够的资金支付上述费用。请注意，这里没有精确的 [`gas`](../basics/gas-fees.md) 计数，
    因为不处理 `sdk.Msg`。通常，[`AnteHandler`](../basics/gas-fees.md#antehandler) 会检查 `gas` 是否提供
-   交易优于基于原始交易规模的最小参考气体量，
+   交易优于基于原始交易规模的最小参考GAS费量，
    为了避免垃圾邮件提供 0 gas 的交易。
 4.确保每个`sdk.Msg`的完全限定服务方法匹配`msgServiceRouter`内的路由，但实际上**不**
    处理`sdk.Msg`s。 `sdk.Msg`s 只在规范状态需要更新时才需要处理，
@@ -257,7 +257,7 @@ AnteHandler 被持久化。
 - `Log (string):` 应用程序记录器的输出。可能是不确定的。
 - `信息(字符串):` 附加信息。可能是不确定的。
 - `GasWanted (int64)`:交易请求的燃料量。它由用户在生成交易时提供。
-- `GasUsed (int64)`:交易消耗的气体量。在“CheckTx”期间，该值是通过将交易字节的标准成本乘以原始交易的大小来计算的。接下来是一个例子:
+- `GasUsed (int64)`:交易消耗的GAS费量。在“CheckTx”期间，该值是通过将交易字节的标准成本乘以原始交易的大小来计算的。接下来是一个例子:
   +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/x/auth/ante/basic.go#L104-L105
 - `Events ([]cmn.KVPair)`:用于过滤和索引交易(例如按帐户)的键值标签。有关更多信息，请参阅 [`event`s](./events.md)。
 - `代码空间(字符串)`:代码的命名空间。
@@ -295,7 +295,7 @@ Tendermint v0.32.1，一个额外的 `Type` 参数可用于 `CheckTx` 函数
 - `Log (string):` 应用程序记录器的输出。可能是不确定的。
 - `信息(字符串):` 附加信息。可能是不确定的。
 - `GasWanted (int64)`:交易请求的燃料量。它由用户在生成交易时提供。
-- `GasUsed (int64)`:交易消耗的气体量。在“DeliverTx”期间，该值的计算方法是将交易字节的标准成本乘以原始交易的大小，并在每次对存储进行读/写时添加 gas。
+- `GasUsed (int64)`:交易消耗的GAS费量。在“DeliverTx”期间，该值的计算方法是将交易字节的标准成本乘以原始交易的大小，并在每次对存储进行读/写时添加 gas。
 - `Events ([]cmn.KVPair)`:用于过滤和索引交易(例如按帐户)的键值标签。有关更多信息，请参阅 [`event`s](./events.md)。
 - `代码空间(字符串)`:代码的命名空间。
 

@@ -2,7 +2,7 @@
 
 本文档概述了节点公开的所有端点:gRPC、REST 以及其他一些端点。 {概要}
 
-##所有端点的概述
+## 所有端点的概述
 
 每个节点公开以下端点供用户与节点交互，每个端点在不同的端口上提供服务。端点自己的部分提供了有关如何配置每个端点的详细信息。
 
@@ -11,7 +11,7 @@
 - Tendermint RPC 端点(默认端口:`26657`)。
 
 ::: 小费
-该节点还暴露了一些其他端点，例如 Tendermint P2P 端点，或 [Prometheus 端点](https://docs.tendermint.com/master/nodes/metrics.html#metrics)，这些端点与宇宙 SDK。有关这些端点的更多信息，请参阅 [Tendermint 文档](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#configuration)。
+该节点还暴露了一些其他端点，例如 Tendermint P2P 端点，或 [Prometheus 端点](https://docs.tendermint.com/master/nodes/metrics.html#metrics)，这些端点与Cosmos SDK。有关这些端点的更多信息，请参阅 [Tendermint 文档](https://docs.tendermint.com/master/tendermint-core/using-tendermint.html#configuration)。
 :::
 
 ## gRPC 服务器

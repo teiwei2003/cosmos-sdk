@@ -19,7 +19,7 @@
 - `BurnNFT` - 接收用户的烧录nft请求，调用`x/nft`模块的`BurnNFT`。
 - `UpdateNFT` - 接收用户更新 nft 的请求，并调用 `x/nft` 模块的 `UpdateNFT`。
 
-## 语境
+##  上下文
 
 NFT 不仅仅是加密艺术，这对于为 Cosmos 生态系统积累价值非常有帮助。因此，Cosmos Hub 应实现 NFT 功能并启用统一机制来存储和发送 NFT 的所有权代表，如 https://github.com/cosmos/cosmos-sdk/discussions/9065 中所述。
 

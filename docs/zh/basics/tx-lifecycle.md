@@ -91,7 +91,7 @@ state 以回答查询 - 他们不应该使用带有未提交更改的 state 进�
 
 ### Gas
 
-[`Context`](../core/context.md) 保存了一个 `GasMeter`，它将跟踪在 `Tx` 的执行过程中使用了多少气体，被初始化。用户为“Tx”提供的气体量称为“GasWanted”。如果`GasConsumed`，即执行期间消耗的gas 量超过`GasWanted`，则执行将停止并且不会提交对状态缓存副本所做的更改。否则，`CheckTx` 设置 `GasUsed` 等于 `GasConsumed` 并在结果中返回它。在计算 gas 和费用值后，验证器节点检查用户指定的“gas-prices”是否大于他们本地定义的“min-gas-prices”。
+[`Context`](../core/context.md) 保存了一个 `GasMeter`，它将跟踪在 `Tx` 的执行过程中使用了多少GAS费，被初始化。用户为“Tx”提供的GAS费量称为“GasWanted”。如果`GasConsumed`，即执行期间消耗的gas 量超过`GasWanted`，则执行将停止并且不会提交对状态缓存副本所做的更改。否则，`CheckTx` 设置 `GasUsed` 等于 `GasConsumed` 并在结果中返回它。在计算 gas 和费用值后，验证器节点检查用户指定的“gas-prices”是否大于他们本地定义的“min-gas-prices”。
 
 ### 丢弃或添加到内存池
 
@@ -202,7 +202,7 @@ state 以回答查询 - 他们不应该使用带有未提交更改的 state 进�
   `Tx` 中的消息并导致状态转换在 `deliverTxState` 中持续存在。
 
 - **Gas:** 在交付`Tx` 时，使用`GasMeter` 来跟踪有多少
-  正在使用气体；如果执行完成，`GasUsed` 被设置并在
+  正在使用GAS费；如果执行完成，`GasUsed` 被设置并在
   `abci.ResponseDeliverTx`。如果执行因 `BlockGasMeter` 或 `GasMeter` 已用完或其他原因而停止
   错误，最后的延迟函数适当地错误或恐慌。
 

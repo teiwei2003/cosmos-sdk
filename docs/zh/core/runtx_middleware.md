@@ -21,7 +21,7 @@ type RecoveryHandler func(recoveryObj interface{}) error
 - 如果 `recoveryObj` 没有被处理并且应该传递给下一个恢复中间件，RecoveryHandler 返回 `nil`；
 - 如果处理了 `recoveryObj`，RecoveryHandler 返回一个非零的 `error`；
 
-##自定义RecoveryHandler注册
+## 自定义RecoveryHandler注册
 
 `BaseApp.AddRunTxRecoveryHandler(handlers ...RecoveryHandler)`
 

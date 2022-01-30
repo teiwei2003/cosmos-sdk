@@ -11,7 +11,7 @@
 
 - 2021-05-12:外部库 [cosmos-rosetta-gateway](https://github.com/tendermint/cosmos-rosetta-gateway) 已移入 Cosmos SDK。
 
-## 语境
+##  上下文
 
 [Rosetta API](https://www.rosetta-api.org/) 是 Coinbase 开发的开源规范和工具集，用于
 标准化区块链交互。

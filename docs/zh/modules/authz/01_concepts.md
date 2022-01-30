@@ -36,6 +36,6 @@ Cosmos SDK `x/authz` 模块带有以下授权类型:
 
 - `msg` 存储消息类型的 URL。
 
-## 气体
+## GAS费
 
 为了防止 DoS 攻击，使用 `x/authz` 授予 `StakeAuthorization`s 会产生 gas。 `StakeAuthorization` 允许您授权另一个帐户委派、取消委派或重新委派给验证者。授权人可以定义他们允许或拒绝委托的验证器列表。 Cosmos SDK 迭代这些列表，并为两个列表中的每个验证器收取 10 gas。 

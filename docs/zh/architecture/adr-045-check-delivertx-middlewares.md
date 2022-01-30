@@ -13,7 +13,7 @@
 
 此 ADR 用基于中间件的设计替换了当前的 BaseApp `runTx` 和 antehandlers 设计。
 
-## 语境
+##  上下文
 
 BaseApp 的 ABCI `{Check,Deliver}Tx()` 的实现和它自己的 `Simulate()` 方法调用了底层的 `runTx` 方法，它首先运行 antehandlers，然后执行 `Msg`s。但是，[交易提示](https://github.com/cosmos/cosmos-sdk/issues/9406)和[退还未使用的gas](https://github.com/cosmos/cosmos-sdk/issues/2150 ) 用例要求在执行 `Msg` 后运行自定义逻辑。目前没有办法实现这一点。
 

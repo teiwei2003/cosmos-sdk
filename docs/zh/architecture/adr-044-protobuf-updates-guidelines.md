@@ -13,7 +13,7 @@
 
 此 ADR 提供更新 Protobuf 定义时的指南和推荐做法。这些指南针对模块开发人员。
 
-## 语境
+##  上下文
 
 Cosmos SDK 维护了一套[Protobuf 定义](https://github.com/cosmos/cosmos-sdk/tree/master/proto/cosmos)。正确设计 Protobuf 定义以避免在同一版本中发生任何破坏性更改非常重要。原因是不要破坏工具(包括索引器和资源管理器)、钱包和其他第三方集成。
 

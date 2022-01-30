@@ -12,7 +12,7 @@
 
 此 ADR 定义了一组更改，以启用侦听各个 KVStore 的状态更改并将这些数据公开给消费者。
 
-## 语境
+##  上下文
 
 目前，KVStore数据可以通过[查询]远程访问(https://github.com/cosmos/cosmos-sdk/blob/master/docs/building-modules/messages-and-queries.md#queries)
 通过 Tendermint 和 ABCI，或通过 gRPC 服务器进行。

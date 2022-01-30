@@ -8,7 +8,7 @@
 
 建议的
 
-## 语境
+##  上下文
 
 Cosmos SDK 中的资产通过“Coins”类型表示，该类型由“amount”和“denom”组成，
 其中“金额”可以是任意大或小值。此外，Cosmos SDK 使用

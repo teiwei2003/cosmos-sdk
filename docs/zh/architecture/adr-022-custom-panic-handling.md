@@ -9,7 +9,7 @@
 
 由 ADR-045 取代
 
-## 语境
+##  上下文
 
 BaseApp 的当前实现不允许开发人员在恐慌恢复期间编写自定义错误处理程序
 [runTx()](https://github.com/cosmos/cosmos-sdk/blob/bad4ca75f58b182f600396ca350ad844c18fc80b/baseapp/baseapp.go#L539)

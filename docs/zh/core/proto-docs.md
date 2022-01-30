@@ -2256,7 +2256,7 @@ Attribute 定义了一个属性包装器，其中键和值是字符串而不是�
 <a name="cosmos.base.abci.v1beta1.GasInfo"></a>
 
 ### GasInfo
-GasInfo 定义了 tx 执行气体上下文。
+GasInfo 定义了 tx 执行GAS费上下文。
 
 
 | Field | Type | Label | Description |

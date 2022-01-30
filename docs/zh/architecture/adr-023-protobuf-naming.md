@@ -9,7 +9,7 @@
 
 公认
 
-## 语境
+##  上下文
 
 Protocol Buffers 提供了一个基本的[风格指南](https://developers.google.com/protocol-buffers/docs/style)
 [Buf](https://buf.build/docs/style-guide) 以此为基础。到
