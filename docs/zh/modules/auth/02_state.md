@@ -20,19 +20,19 @@
 接口 - 为了将帐户写入存储，帐户管理员将
 需要使用。 
 ```go
-// AccountI is an interface used to store coins at a given address within state.
-// It presumes a notion of sequence numbers for replay protection,
-// a notion of account numbers for replay protection for previously pruned accounts,
-// and a pubkey for authentication purposes.
+//AccountI is an interface used to store coins at a given address within state.
+//It presumes a notion of sequence numbers for replay protection,
+//a notion of account numbers for replay protection for previously pruned accounts,
+//and a pubkey for authentication purposes.
 //
-// Many complex conditions can be used in the concrete struct which implements AccountI.
+//Many complex conditions can be used in the concrete struct which implements AccountI.
 type AccountI interface {
 	proto.Message
 
 	GetAddress() sdk.AccAddress
-	SetAddress(sdk.AccAddress) error // errors if already set.
+	SetAddress(sdk.AccAddress) error//errors if already set.
 
-	GetPubKey() crypto.PubKey // can return nil.
+	GetPubKey() crypto.PubKey//can return nil.
 	SetPubKey(crypto.PubKey) error
 
 	GetAccountNumber() uint64
@@ -41,7 +41,7 @@ type AccountI interface {
 	GetSequence() uint64
 	SetSequence(uint64) error
 
-	// Ensure that account implements stringer
+	//Ensure that account implements stringer
 	String() string
 }
 ```
@@ -52,9 +52,9 @@ type AccountI interface {
 字段直接在结构中。
 
 ```protobuf
-// BaseAccount defines a base account type. It contains all the necessary fields
-// for basic account functionality. Any custom account type should extend this
-// type for additional functionality (e.g. vesting).
+//BaseAccount defines a base account type. It contains all the necessary fields
+//for basic account functionality. Any custom account type should extend this
+//type for additional functionality (e.g. vesting).
 message BaseAccount {
   string address = 1;
   google.protobuf.Any pub_key = 2;

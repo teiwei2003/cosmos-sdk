@@ -121,14 +121,14 @@ func queryState() error {
         return err
     }
 
-    // Create a connection to the gRPC server.
+   //Create a connection to the gRPC server.
     grpcConn := grpc.Dial(
-        "127.0.0.1:9090", // your gRPC server address.
-        grpc.WithInsecure(), // The Cosmos SDK doesn't support any transport security mechanism.
+        "127.0.0.1:9090",//your gRPC server address.
+        grpc.WithInsecure(),//The Cosmos SDK doesn't support any transport security mechanism.
     )
     defer grpcConn.Close()
 
-    // This creates a gRPC client to query the x/bank service.
+   //This creates a gRPC client to query the x/bank service.
     bankClient := banktypes.NewQueryClient(grpcConn)
     bankRes, err := bankClient.Balance(
         context.Background(),
@@ -138,7 +138,7 @@ func queryState() error {
         return err
     }
 
-    fmt.Println(bankRes.GetBalance()) // Prints the account balance
+    fmt.Println(bankRes.GetBalance())//Prints the account balance
 
     return nil
 }
@@ -163,20 +163,20 @@ import (
 )
 
 func queryState() error {
-    // --snip--
+   //--snip--
 
     var header metadata.MD
     bankRes, err = bankClient.Balance(
-        metadata.AppendToOutgoingContext(context.Background(), grpctypes.GRPCBlockHeightHeader, "12"), // Add metadata to request
+        metadata.AppendToOutgoingContext(context.Background(), grpctypes.GRPCBlockHeightHeader, "12"),//Add metadata to request
         &banktypes.QueryBalanceRequest{Address: myAddress, Denom: denom},
-        grpc.Header(&header), // Retrieve header from response
+        grpc.Header(&header),//Retrieve header from response
     )
     if err != nil {
         return err
     }
     blockHeight = header.Get(grpctypes.GRPCBlockHeightHeader)
 
-    fmt.Println(blockHeight) // Prints the block height (12)
+    fmt.Println(blockHeight)//Prints the block height (12)
 
     return nil
 }

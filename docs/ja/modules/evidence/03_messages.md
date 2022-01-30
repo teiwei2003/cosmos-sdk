@@ -2,7 +2,7 @@
 
 ## MsgSubmitEvidence
 
-証拠は、「MsgSubmitEvidence」メッセージを介して送信されます。
+証拠は、[MsgSubmitEvidence]メッセージを介して送信されます。
 
 ```protobuf
 //MsgSubmitEvidence represents a message that supports submitting arbitrary
@@ -18,7 +18,7 @@ message MsgSubmitEvidence {
 正しくルーティングされます。
 
 `Evidence`が対応する`Handler`に登録されている場合、それは処理されます
-次のように：
+次のように:
 
 ```go
 func SubmitEvidence(ctx Context, evidence Evidence) error {

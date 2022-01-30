@@ -59,16 +59,16 @@ type Evidence interface {
   Hash() HexBytes
   ValidateBasic() error
 
-  // The consensus address of the malicious validator at time of infraction
+ //The consensus address of the malicious validator at time of infraction
   GetConsensusAddress() ConsAddress
 
-  // Height at which the infraction occurred
+ //Height at which the infraction occurred
   GetHeight() int64
 
-  // The total power of the malicious validator at time of infraction
+ //The total power of the malicious validator at time of infraction
   GetValidatorPower() int64
 
-  // The total validator set power at time of infraction
+ //The total validator set power at time of infraction
   GetTotalPower() int64
 }
 ```
@@ -117,10 +117,10 @@ func handleMsgSubmitEvidence(ctx Context, keeper Keeper, msg MsgSubmitEvidence) 
     return err.Result()
   }
 
-  // emit events...
+ //emit events...
 
   return Result{
-    // ...
+   //...
   }
 }
 ```

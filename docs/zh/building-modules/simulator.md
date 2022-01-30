@@ -104,7 +104,7 @@ type CustomApp struct {
 
 ```go
 func NewCustomApp(...) {
-  // create the simulation manager and define the order of the modules for deterministic simulations
+ //create the simulation manager and define the order of the modules for deterministic simulations
   app.sm = module.NewSimulationManager(
     auth.NewAppModule(app.accountKeeper),
     bank.NewAppModule(app.bankKeeper, app.accountKeeper),
@@ -116,7 +116,7 @@ func NewCustomApp(...) {
     slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
   )
 
-  // register the store decoders for simulation tests
+ //register the store decoders for simulation tests
   app.sm.RegisterStoreDecoders()
   ...
 }

@@ -58,4 +58,4 @@ func BeginBlock(ctx sdk.Context, keeper HistoricalHeaderKeeper, req abci.Request
 
 ## 参照
 
--[ICS 2:「コンセンサス状態のイントロスペクション」](https://github.com/cosmos/ibc/tree/master/spec/core/ics-002-client-semantics#consensus-state-introspection) 
+-[ICS 2:[コンセンサス状態のイントロスペクション]](https://github.com/cosmos/ibc/tree/master/spec/core/ics-002-client-semantics#consensus-state-introspection) 

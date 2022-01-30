@@ -32,7 +32,7 @@ ADRと仕様の違いに注意してください。 ADRは、コンテキスト�
 
 #### RFC2119キーワードを使用する
 
-ADRを作成するときは、RFCを作成するときと同じベストプラクティスに従ってください。 RFCを作成するとき、キーワードは仕様の要件を表すために使用されます。これらの単語は通常大文字で表記されます:「MUST」、「MUST NOT」、「REQUIRED」、「SHALL」、「SHALL NOT」、「SHOULD」、「SHOULD NOT」、「RECOMMENDED」、「MAY」、「OPTIONAL」。それらは[RFC2119](https://datatracker.ietf.org/doc/html/rfc2119)で説明されているように説明されます。
+ADRを作成するときは、RFCを作成するときと同じベストプラクティスに従ってください。 RFCを作成するとき、キーワードは仕様の要件を表すために使用されます。これらの単語は通常大文字で表記されます:[MUST]、[MUST NOT]、[REQUIRED]、[SHALL]、[SHALL NOT]、[SHOULD]、[SHOULD NOT]、[RECOMMENDED]、[MAY]、[OPTIONAL]。それらは[RFC2119](https://datatracker.ietf.org/doc/html/rfc2119)で説明されているように説明されます。
 
 ## ADRディレクトリ
 

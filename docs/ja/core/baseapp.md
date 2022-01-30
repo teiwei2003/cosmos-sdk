@@ -1,6 +1,6 @@
 # 基本的なアプリケーション
 
-このドキュメントでは、CosmosSDKアプリケーションのコア機能を実装する抽象化である「BaseApp」について説明します。 {まとめ}
+このドキュメントでは、CosmosSDKアプリケーションのコア機能を実装する抽象化である[BaseApp]について説明します。 {まとめ}
 
 ## 読むための前提条件
 
@@ -21,25 +21,25 @@ BaseAppの目標は、CosmosSDKアプリケーションのベースレイヤー�
 
 ```go
 type App struct {
- //reference to a BaseApp
+//reference to a BaseApp
   *baseapp.BaseApp
 
- //list of application store keys
+//list of application store keys
 
- //list of application keepers
+//list of application keepers
 
- //module manager
+//module manager
 }
 ```
 
-「BaseApp」拡張アプリケーションを使用すると、前者は「BaseApp」のすべてのメソッドにアクセスできます。
+[BaseApp]拡張アプリケーションを使用すると、前者は[BaseApp]のすべてのメソッドにアクセスできます。
 これにより、開発者は、カスタムアプリケーションを、代わりに必要なモジュールでアセンブルできます。
 ABCI、サービスルーター、および状態を実装するためのハードワークについて心配する必要があります
 管理ロジック。
 
 ## タイプ定義
 
-「BaseApp」タイプは、CosmosSDKベースのアプリケーションの多くの重要なパラメーターを保存します。
+[BaseApp]タイプは、CosmosSDKベースのアプリケーションの多くの重要なパラメーターを保存します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/baseapp/baseapp.go#L46-L131
 
@@ -92,7 +92,7 @@ ABCI、サービスルーター、および状態を実装するためのハー�
   [mempool](https://tendermint.com/docs/tendermint-core/mempool.html#transaction-ordering)と入力します
   取引のガス価格が最低ガス価格の1つよりも高い場合のみ
   `minGasPrices`(たとえば、` minGasPrices == 1uatom、1photon`の場合、トランザクションのガス価格は次のようになります。
-  「1uatom」または「1photon」より大きい)。
+  [1uatom]または[1photon]より大きい)。
 -`appVersion`:アプリケーションのバージョン。に設定されています
   [アプリケーションコンストラクター](../basics/app-anatomy.md#constructor-function)。
 
@@ -103,7 +103,7 @@ func NewBaseApp(
   name string, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecoder, options ...func(*BaseApp),
 ) *BaseApp {
 
- //...
+//...
 }
 ```
 
@@ -113,7 +113,7 @@ func NewBaseApp(
 プルーニングオプションを設定するための `SetPruning()`や設定するための `SetMinGasPrices()`などの重要なパラメータの場合
 ノードの `min-gas-prices`。
 
-もちろん、開発者はアプリケーションのニーズに応じて「オプション」を追加できます。
+もちろん、開発者はアプリケーションのニーズに応じて[オプション]を追加できます。
 
 ## 状況更新
 
@@ -156,8 +156,8 @@ InitChainの実行中、2つの揮発性状態がブランチを介して設定�
 
 ### DeliverTxステータスの更新
 
-「DeliverTx」の状態フローは、状態遷移がで発生することを除いて、「CheckTx」の状態フローとほぼ同じです。
-トランザクションで `deliverState`とメッセージを実行します。 「CheckTx」と同様に、状態遷移
+[DeliverTx]の状態フローは、状態遷移がで発生することを除いて、[CheckTx]の状態フローとほぼ同じです。
+トランザクションで `deliverState`とメッセージを実行します。 [CheckTx]と同様に、状態遷移
 デュアルブランチ状態-`deliverState`で発生します。成功したメッセージ実行結果
 `deliverState`専用に書き込みます。メッセージの実行に失敗した場合、ステータスは次のように変化することに注意してください。
 AnteHandlerは永続化されます。
@@ -183,7 +183,7 @@ AnteHandlerは永続化されます。
 
 ## サービスルーター
 
-アプリケーションがメッセージとクエリを受信すると、それらを適切なモジュールにルーティングして処理する必要があります。 ルーティングは、メッセージ用の「msgServiceRouter」とクエリ用の「grpcQueryRouter」を含む「BaseApp」を介して行われます。
+アプリケーションがメッセージとクエリを受信すると、それらを適切なモジュールにルーティングして処理する必要があります。 ルーティングは、メッセージ用の[msgServiceRouter]とクエリ用の[grpcQueryRouter]を含む[BaseApp]を介して行われます。
 
 ### `Msg`サービスルーター
 
@@ -208,7 +208,7 @@ AnteHandlerは永続化されます。
 -主にゴシップブロック、トランザクション、コンセンサス投票を含むネットワークロジック。
 -コンセンサスロジック。ブロックの形式で決定されるトランザクションの順序につながります。
 
-**ない**トランザクションのステータスまたは有効性を定義するためのコンセンサスエンジンの役割。通常、トランザクションは「[] bytes」の形式でコンセンサスエンジンによって処理され、デコードと処理のためにABCIを介してアプリケーションに中継されます。ネットワークとコンセンサスプロセスの重要な瞬間(たとえば、ブロックの開始、ブロックの送信、未確認のトランザクションの受信など)で、コンセンサスエンジンは、ステートマシンが実行するABCIメッセージを送信します。 。
+**ない**トランザクションのステータスまたは有効性を定義するためのコンセンサスエンジンの役割。通常、トランザクションは[[] bytes]の形式でコンセンサスエンジンによって処理され、デコードと処理のためにABCIを介してアプリケーションに中継されます。ネットワークとコンセンサスプロセスの重要な瞬間(たとえば、ブロックの開始、ブロックの送信、未確認のトランザクションの受信など)で、コンセンサスエンジンは、ステートマシンが実行するABCIメッセージを送信します。 。
 
 BaseAppにはインターフェースの実装が組み込まれているため、Cosmos SDKに基づいて構築する開発者は、ABCI自体を実装する必要はありません。 `BaseApp`によって実装された主なABCIメッセージを見てみましょう:[` CheckTx`](#checktx)と[`DeliverTx`](#delivertx) 
 
@@ -217,7 +217,7 @@ BaseAppにはインターフェースの実装が組み込まれているため�
 新しいものが確認されない場合(つまり、有効なブロックに含まれていない場合)、基盤となるコンセンサスエンジンは `CheckTx`を送信します
 トランザクションはフルノードによって受信されます。 `CheckTx`の役割は、フルノードのmempoolを保護することです
 (未確認のトランザクションがブロックに含まれるまで保存される場合)スパムトランザクションから。
-未確認のトランザクションは、「CheckTx」を介してのみピアに転送されます。
+未確認のトランザクションは、[CheckTx]を介してのみピアに転送されます。
 
 `CheckTx()`は_stateful_および_stateless_チェックを実行できますが、開発者は一生懸命働く必要があります
 それらを軽くします。 Cosmos SDKでは、[Decoding Transaction](./encoding.md)の後に、 `CheckTx()`が実装されています
@@ -242,7 +242,7 @@ BaseAppにはインターフェースの実装が組み込まれているため�
 `checkState`と呼ばれる特別な[volatilestate](#volatile-states)が更新されます。この状態は維持するために使用されます
 各トランザクションの `CheckTx()`呼び出しによってトリガーされた一時的な変更を変更せずに追跡します
 [主な仕様状態](#main-state)。たとえば、トランザクションが `CheckTx()`を通過すると、
-取引手数料は、「checkState」の送信者のアカウントから差し引かれます。 2番目のトランザクションが
+取引手数料は、[checkState]の送信者のアカウントから差し引かれます。 2番目のトランザクションが
 最初のアカウントを処理する前に同じアカウントから受信し、そのアカウントはすべてを消費しました
 最初のトランザクション、 `checkState`の資金、2番目のトランザクションは` CheckTx`()に失敗し、
 拒否されます。いずれの場合も、送信者のアカウントは実際に取引前に料金を支払うことはありません
@@ -257,7 +257,7 @@ BaseAppにはインターフェースの実装が組み込まれているため�
 -`ログ(文字列): `アプリケーションロガーの出力。不確かかもしれません。
 -`情報(文字列): `追加情報。不確かかもしれません。
 -`GasWanted(int64) `:トランザクションによって要求されたガスの量。これは、トランザクションが生成されるときにユーザーによって提供されます。
--`GasUsed(int64) `:トランザクションによって消費されたガスの量。 「CheckTx」では、この値は、トランザクションバイトの標準コストに元のトランザクションのサイズを掛けて計算されます。次は例です:
+-`GasUsed(int64) `:トランザクションによって消費されたガスの量。 [CheckTx]では、この値は、トランザクションバイトの標準コストに元のトランザクションのサイズを掛けて計算されます。次は例です:
   +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/x/auth/ante/basic.go#L104-L105
 -`Events([] cmn.KVPair) `:トランザクションのフィルタリングとインデックス作成に使用されるKey-Valueタグ(アカウントなど)。詳細については、[`event`s](./events.md)を参照してください。
 -`コードスペース(文字列) `:コードの名前空間。
@@ -269,20 +269,20 @@ BaseAppにはインターフェースの実装が組み込まれているため�
 ブロックが送信されるたびに、構成オプション `mempool.recheck = false`を設定できます。 として
 Tendermint v0.32.1、追加の `Type`パラメータを` CheckTx`関数で使用できます
 着信トランザクションが新規( `CheckTxType_New`)か再チェック(` CheckTxType_Recheck`)かを示します。
-これにより、「CheckTxType_Recheck」中に署名検証などの特定のチェックをスキップできます。 
+これにより、[CheckTxType_Recheck]中に署名検証などの特定のチェックをスキップできます。 
 
 ### DeliverTx
 
-基盤となるコンセンサスエンジンがブロックプロポーザルを受信すると、ブロック内のすべてのトランザクションをアプリケーションで処理する必要があります。この目的のために、基盤となるコンセンサスエンジンは、「DeliverTx」メッセージを各トランザクションアプリケーションに順番に送信します。
+基盤となるコンセンサスエンジンがブロックプロポーザルを受信すると、ブロック内のすべてのトランザクションをアプリケーションで処理する必要があります。この目的のために、基盤となるコンセンサスエンジンは、[DeliverTx]メッセージを各トランザクションアプリケーションに順番に送信します。
 
-特定のブロックの最初のトランザクションを処理する前に、[`BeginBlock`](#beginblock)中に` deliverState`という名前の[volatilestate](#volatile-states)を初期化します。この状態は、トランザクションが `DeliverTx`で処理されるたびに更新され、ブロックが[commit](#commit)の場合、「nil」に設定した後、[main state](#main-state)に送信されます。
+特定のブロックの最初のトランザクションを処理する前に、[`BeginBlock`](#beginblock)中に` deliverState`という名前の[volatilestate](#volatile-states)を初期化します。この状態は、トランザクションが `DeliverTx`で処理されるたびに更新され、ブロックが[commit](#commit)の場合、[nil]に設定した後、[main state](#main-state)に送信されます。
 
 `DeliverTx`は**` CheckTx` **とまったく同じステップを実行します。ステップ3には注意すべき点が1つあり、5番目のステップが追加されています。
 
 1. `AnteHandler` **いいえ**トランザクションの` gas-prices`が十分であるかどうかを確認します。これは、gas-pricesのチェックされたmin-gas-prices値がノードに対してローカルであるため、1つの完全なノードに十分な値が別のノードに適用されない場合があるためです。つまり、提案者は、提案するブロックの総コストからボーナスを受け取るため、インセンティブはありませんが、無料でトランザクションを含めることができます。
 2.トランザクション内の `sdk.Msg`ごとに、対応するモジュールのProtobuf [` Msg`サービス](../building-modules/msg-services.md)にルーティングします。追加の_stateful_チェックを実行すると、 `deliverState`の` context`に格納されているブランチがモジュールの `keeper`によって更新されます。 `Msg`サービスが正常に戻ると、` context`に格納されているブランチマルチストアが `deliverState`と` CacheMultiStore`に書き込まれます。
 
-(2)で概説した追加の5番目のステップでは、ストレージの読み取り/書き込みごとに「GasConsumed」の値が増加します。各操作のデフォルトのコストを見つけることができます:
+(2)で概説した追加の5番目のステップでは、ストレージの読み取り/書き込みごとに[GasConsumed]の値が増加します。各操作のデフォルトのコストを見つけることができます:
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/store/types/gas.go#L164-L175
 
@@ -295,7 +295,7 @@ Tendermint v0.32.1、追加の `Type`パラメータを` CheckTx`関数で使用
 -`ログ(文字列): `アプリケーションロガーの出力。不確かかもしれません。
 -`情報(文字列): `追加情報。不確かかもしれません。
 -`GasWanted(int64) `:トランザクションによって要求されたガスの量。これは、トランザクションが生成されるときにユーザーによって提供されます。
--`GasUsed(int64) `:トランザクションによって消費されたガスの量。 「DeliverTx」では、この値は、トランザクションバイトの標準コストに元のトランザクションのサイズを掛け、ストレージが読み取り/書き込みされるたびにガスを追加することによって計算されます。
+-`GasUsed(int64) `:トランザクションによって消費されたガスの量。 [DeliverTx]では、この値は、トランザクションバイトの標準コストに元のトランザクションのサイズを掛け、ストレージが読み取り/書き込みされるたびにガスを追加することによって計算されます。
 -`Events([] cmn.KVPair) `:トランザクションのフィルタリングとインデックス作成に使用されるKey-Valueタグ(アカウントなど)。詳細については、[`event`s](./events.md)を参照してください。
 -`コードスペース(文字列) `:コードの名前空間。
 
@@ -349,7 +349,7 @@ Tendermint v0.32.1、追加の `Type`パラメータを` CheckTx`関数で使用
 -[`checkState`および` deliverState`](#volatile-states)から `setCheckState`および` setDeliverState`まで。
 -[ブロックガスメーター](../basics/gas-fees.md#block-gas-meter)、無制限のガスを使用して作成トランザクションを処理します。
 
-最後に、 `BaseApp`の` InitChain(req abci.RequestInitChain) `メソッドは、アプリケーションの[` initChainer() `](../basics/app-anatomy.md#initchainer)を呼び出して、「Genesisファイル ""アプリケーションの名前を取得するには、アプリケーションが定義されている場合は、各アプリケーションモジュールの[`InitGenesis`](../building-modules/genesis.md#initgenesis)関数を呼び出します。
+最後に、 `BaseApp`の` InitChain(req abci.RequestInitChain) `メソッドは、アプリケーションの[` initChainer() `](../basics/app-anatomy.md#initchainer)を呼び出して、[Genesisファイル ""アプリケーションの名前を取得するには、アプリケーションが定義されている場合は、各アプリケーションモジュールの[`InitGenesis`](../building-modules/genesis.md#initgenesis)関数を呼び出します。
 
 ### スターティングブロック
 
@@ -358,7 +358,7 @@ Tendermint v0.32.1、追加の `Type`パラメータを` CheckTx`関数で使用
 -`setDeliverState`関数を介してパラメーターとして渡された `reqabci.RequestBeginBlock`を使用して、[` deliverState`](#volatile-states)を最新のヘッダーで初期化します。
   +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/baseapp/baseapp.go#L387-L397
   この機能は、[メインガスメーター](../basics/gas-fees.md#main-gas-meter)もリセットします。
--`maxGas`を使用して、初期化を制限します[ブロックガスメーター](../basics/gas-fees.md#block-gas-meter)。ブロックで消費される「ガス」は「maxGas」を超えることはできません。このパラメーターは、アプリケーションのコンセンサスパラメーターで定義されます。
+-`maxGas`を使用して、初期化を制限します[ブロックガスメーター](../basics/gas-fees.md#block-gas-meter)。ブロックで消費される[ガス]は[maxGas]を超えることはできません。このパラメーターは、アプリケーションのコンセンサスパラメーターで定義されます。
 -[`beginBlocker()`](../basics/app-anatomy.md#beginblocker-and-endblock)は、主に[`BeginBlocker()`](../building-modules/beginblock)を実行します。 -endblock.md#beginblock)各アプリケーションモジュールのメソッド。
 -アプリケーションの[`VoteInfos`](https://tendermint.com/docs/app-dev/abci-spec.html#voteinfo)を設定します。つまり、前のブロックの_precommit_が現在の提案に含まれますブロックする。この情報は[`Context`](./context.md)に取り込まれるため、` DeliverTx`および `EndBlock`で使用できます。 
 
@@ -386,9 +386,9 @@ Tendermint v0.32.1、追加の `Type`パラメータを` CheckTx`関数で使用
 
 -アプリケーションのバージョンのクエリなど、アプリケーションに関連するクエリは、 `handleQueryApp`メソッドを介して提供されます。
 -マルチストアへの直接クエリは、 `handlerQueryStore`メソッドによって提供されます。これらの直接クエリは、 `app.queryRouter`を介したカスタムクエリとは異なり、主にブロックエクスプローラーなどのサードパーティのサービスプロバイダーによって使用されます。
--サービスを提供するための `handleQueryP2P`メソッドを介したP2Pクエリ。これらのクエリは「app.addrPeerFilter」または「app.ipPeerFilter」を返します。これには、それぞれアドレスまたはIPでフィルタリングされたピアのリストが含まれています。これらのリストは、最初に `BaseApp`の[constructor](#constructor)の` options`によって初期化されます。
+-サービスを提供するための `handleQueryP2P`メソッドを介したP2Pクエリ。これらのクエリは[app.addrPeerFilter]または[app.ipPeerFilter]を返します。これには、それぞれアドレスまたはIPでフィルタリングされたピアのリストが含まれています。これらのリストは、最初に `BaseApp`の[constructor](#constructor)の` options`によって初期化されます。
 -レガシークエリ(gRPCクエリの導入前)を含むカスタムクエリは、 `handleQueryCustom`メソッドを介して提供されます。 `handleQueryCustom`は、` app.queryRouter`から取得した `queryRoute`を使用して、クエリを対応するモジュールの[legacy` querier`](../building-modules/query-services.md#legacy-querier)にマッピングしています。
 
-## 次へ{非表示}
+## 次へ{hide}
 
 [transactions](./transactions.md){hide}の詳細

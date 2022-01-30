@@ -28,6 +28,6 @@ Cosmos SDKは、今日のカスタムアプリケーション固有のブロッ�
 -[Cosmos SDKアプリケーションアーキテクチャ](./sdk-app-architecture.md)の詳細
 -[Cosmos SDKチュートリアル](https://cosmos.network/docs/tutorial)を使用して、アプリケーション固有のブロックチェーンを最初から構築する方法を学びます。
 
-## 次へ{非表示}
+## 次へ{hide}
 
-[アプリケーション固有のブロックチェーン](./why-app-specific.md){非表示}を理解する
+[アプリケーション固有のブロックチェーン](./why-app-specific.md){hide}を理解する

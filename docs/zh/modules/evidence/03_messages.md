@@ -5,8 +5,8 @@
 证据是通过“MsgSubmitEvidence”消息提交的: 
 
 ```protobuf
-// MsgSubmitEvidence represents a message that supports submitting arbitrary
-// Evidence of misbehavior such as equivocation or counterfactual signing.
+//MsgSubmitEvidence represents a message that supports submitting arbitrary
+//Evidence of misbehavior such as equivocation or counterfactual signing.
 message MsgSubmitEvidence {
   string              submitter = 1;
   google.protobuf.Any evidence  = 2;

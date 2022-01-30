@@ -795,7 +795,7 @@
 ### BaseAccount
 BaseAccount 定义了基本帐户类型。 它包含所有必要的字段
 用于基本帐户功能。 任何自定义帐户类型都应扩展此
-附加功能的类型（例如归属）。
+附加功能的类型(例如归属)。
 
 
 | Field | Type | Label | Description |
@@ -1549,7 +1549,7 @@ Msg定义了authz Msg服务。
 ### Coin
 Coin 定义了一个带有面额和数量的代币。
 
-注意：amount 字段是一个 Int，它实现了 gogoproto 所需的自定义方法签名。
+注意:amount 字段是一个 Int，它实现了 gogoproto 所需的自定义方法签名。
 
 
 | Field | Type | Label | Description |
@@ -1567,7 +1567,7 @@ Coin 定义了一个带有面额和数量的代币。
 ### DecCoin
 DecCoin 定义了一个带有面额和十进制金额的代币。
 
-注意：amount 字段是一个 Dec，它实现了 gogoproto 所需的自定义方法签名。
+注意:amount 字段是一个 Dec，它实现了 gogoproto 所需的自定义方法签名。
 
 
 | Field | Type | Label | Description |
@@ -1755,7 +1755,7 @@ Params 定义了银行模块的参数。
 <a name="cosmos.bank.v1beta1.SendEnabled"></a>
 
 ### SendEnabled
-SendEnabled 将硬币 denom 映射到 send_enabled 状态（denom 是否可发送）。
+SendEnabled 将硬币 denom 映射到 send_enabled 状态(denom 是否可发送)。
 
 
 | Field | Type | Label | Description |
@@ -2892,7 +2892,7 @@ QueryServicesDescriptor 包含 cosmos-sdk 可查询服务列表
 <a name="cosmos.base.reflection.v2alpha1.SigningModeDescriptor"></a>
 
 ### SigningModeDescriptor
-SigningModeDescriptor 提供有关应用程序签名流程的信息 NOTE(fdymylja)：这里我们可以提供有关如何在给定 SigningModeDescriptor 的情况下签署消息的完整流程，但最好再考虑一下
+SigningModeDescriptor 提供有关应用程序签名流程的信息 NOTE(fdymylja):这里我们可以提供有关如何在给定 SigningModeDescriptor 的情况下签署消息的完整流程，但最好再考虑一下
 
 
 | Field | Type | Label | Description |
@@ -3069,7 +3069,7 @@ StoreInfo 定义特定于商店的提交信息。 它包含存储名称和提交
 <a name="cosmos.base.store.v1beta1.StoreKVPair"></a>
 
 ### StoreKVPair
-StoreKVPair 是一个 KVStore KVPair，用于监听状态变化（Sets 和 Deletes），它可选地包含用于原始 KVStore 的 StoreKey 和一个用于区分 Sets 和 Deletes 的布尔标志
+StoreKVPair 是一个 KVStore KVPair，用于监听状态变化(Sets 和 Deletes)，它可选地包含用于原始 KVStore 的 StoreKey 和一个用于区分 Sets 和 Deletes 的布尔标志
 
 Since: cosmos-sdk 0.43
 
@@ -3625,8 +3625,8 @@ Msg 定义了银行消息服务。
 <a name="cosmos.crypto.ed25519.PrivKey"></a>
 
 ### PrivKey
-已弃用：PrivKey 定义了 ed25519 私钥。
-注意：ed25519 密钥不得在 SDK 应用程序中使用，除非在tendermint 验证器上下文中。
+已弃用:PrivKey 定义了 ed25519 私钥。
+注意:ed25519 密钥不得在 SDK 应用程序中使用，除非在tendermint 验证器上下文中。
 
 
 | Field | Type | Label | Description |
@@ -4024,7 +4024,7 @@ DelegationDelegatorReward 代表的属性
 <a name="cosmos.distribution.v1beta1.DelegatorStartingInfo"></a>
 
 ### DelegatorStartingInfo
-DelegatorStartingInfo 表示委托人奖励期的开始信息。 它跟踪前一个验证器周期、委托的质押令牌数量和创建高度（稍后检查是否发生了任何斜线）。 注意：即使验证器被削减到整个 staking 代币，验证器中的委托人可能会剩下少于一个完整的代币，因此使用 sdk.Dec。
+DelegatorStartingInfo 表示委托人奖励期的开始信息。 它跟踪前一个验证器周期、委托的质押令牌数量和创建高度(稍后检查是否发生了任何斜线)。 注意:即使验证器被削减到整个 staking 代币，验证器中的委托人可能会剩下少于一个完整的代币，因此使用 sdk.Dec。
 
 
 | Field | Type | Label | Description |
@@ -4105,8 +4105,8 @@ ValidatorCurrentRewards 代表验证者的当前奖励和当前周期，作为�
 
 ### ValidatorHistoricalRewards
 ValidatorHistoricalRewards 代表验证者的历史奖励。 高度在存储键中是隐含的。 根据规范，累积奖励率是从第零期到此期奖励/代币的总和。 引用计数指示可能需要在任何时候引用此历史条目的对象数。
-ReferenceCount = 结束相关期间的未完成授权的数量（并且可能需要读取该记录）
-  + 结束相关期间的斜线数（并且可能需要读取该记录）
+ReferenceCount = 结束相关期间的未完成授权的数量(并且可能需要读取该记录)
+  + 结束相关期间的斜线数(并且可能需要读取该记录)
   + 第零时期每个验证器一个，在初始化时设置
 
 
@@ -4123,7 +4123,7 @@ ReferenceCount = 结束相关期间的未完成授权的数量（并且可能需
 <a name="cosmos.distribution.v1beta1.ValidatorOutstandingRewards"></a>
 
 ### ValidatorOutstandingRewards
-ValidatorOutstandingRewards 代表一个验证者的优秀（未撤回）奖励，跟踪成本低，允许简单的健全性检查。
+ValidatorOutstandingRewards 代表一个验证者的优秀(未撤回)奖励，跟踪成本低，允许简单的健全性检查。
 
 
 | Field | Type | Label | Description |
@@ -4672,7 +4672,7 @@ MsgFundCommunityPoolResponse 定义了 Msg/FundCommunityPool 响应类型。
 <a name="cosmos.distribution.v1beta1.MsgSetWithdrawAddress"></a>
 
 ### MsgSetWithdrawAddress
-MsgSetWithdrawAddress 设置提款地址委托人（或验证人自我委托）。
+MsgSetWithdrawAddress 设置提款地址委托人(或验证人自我委托)。
 
 
 | Field | Type | Label | Description |
@@ -6423,7 +6423,7 @@ QueryVoteResponse 是 Query/Vote RPC 方法的响应类型。
 <a name="cosmos.gov.v1beta2.QueryVotesRequest"></a>
 
 ### QueryVotesRequest
-QueryVotesRequestは、Query / VotesRPCメソッドのリクエストタイプです。
+QueryVotesRequestは、Query/VotesRPCメソッドのリクエストタイプです。
 
 
 | Field | Type | Label | Description |
@@ -10149,7 +10149,7 @@ Since: cosmos-sdk 0.45 |
 <a name="cosmos.tx.v1beta1.AuxSignerData"></a>
 
 ### AuxSignerData
-AuxSignerData 是辅助签名者（例如倾销者）构建并发送给费用支付者（谁将构建和广播实际 tx）的中间格式。 AuxSignerData 本身不是有效的 tx，如果直接按原样发送，将被节点拒绝。
+AuxSignerData 是辅助签名者(例如倾销者)构建并发送给费用支付者(谁将构建和广播实际 tx)的中间格式。 AuxSignerData 本身不是有效的 tx，如果直接按原样发送，将被节点拒绝。
 
 Since: cosmos-sdk 0.45
 
@@ -10990,20 +10990,20 @@ Msg 定义了银行消息服务。
 
 | .proto Type | Notes | C++ | Java | Python | Go | C# | PHP | Ruby |
 | ----------- | ----- | --- | ---- | ------ | -- | -- | --- | ---- |
-| <a name="double" /> double |  | double | double | float | float64 | double | float | Float |
-| <a name="float" /> float |  | float | float | float | float32 | float | float | Float |
-| <a name="int32" /> int32 | Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead. | int32 | int | int | int32 | int | integer | Bignum or Fixnum (as required) |
-| <a name="int64" /> int64 | Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead. | int64 | long | int/long | int64 | long | integer/string | Bignum |
-| <a name="uint32" /> uint32 | Uses variable-length encoding. | uint32 | int | int/long | uint32 | uint | integer | Bignum or Fixnum (as required) |
-| <a name="uint64" /> uint64 | Uses variable-length encoding. | uint64 | long | int/long | uint64 | ulong | integer/string | Bignum or Fixnum (as required) |
-| <a name="sint32" /> sint32 | Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s. | int32 | int | int | int32 | int | integer | Bignum or Fixnum (as required) |
-| <a name="sint64" /> sint64 | Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s. | int64 | long | int/long | int64 | long | integer/string | Bignum |
-| <a name="fixed32" /> fixed32 | Always four bytes. More efficient than uint32 if values are often greater than 2^28. | uint32 | int | int | uint32 | uint | integer | Bignum or Fixnum (as required) |
-| <a name="fixed64" /> fixed64 | Always eight bytes. More efficient than uint64 if values are often greater than 2^56. | uint64 | long | int/long | uint64 | ulong | integer/string | Bignum |
-| <a name="sfixed32" /> sfixed32 | Always four bytes. | int32 | int | int | int32 | int | integer | Bignum or Fixnum (as required) |
-| <a name="sfixed64" /> sfixed64 | Always eight bytes. | int64 | long | int/long | int64 | long | integer/string | Bignum |
-| <a name="bool" /> bool |  | bool | boolean | boolean | bool | bool | boolean | TrueClass/FalseClass |
-| <a name="string" /> string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | string | String | str/unicode | string | string | string | String (UTF-8) |
-| <a name="bytes" /> bytes | May contain any arbitrary sequence of bytes. | string | ByteString | str | []byte | ByteString | string | String (ASCII-8BIT) |
+| <a name="double"/> double |  | double | double | float | float64 | double | float | Float |
+| <a name="float"/> float |  | float | float | float | float32 | float | float | Float |
+| <a name="int32"/> int32 | Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint32 instead. | int32 | int | int | int32 | int | integer | Bignum or Fixnum (as required) |
+| <a name="int64"/> int64 | Uses variable-length encoding. Inefficient for encoding negative numbers – if your field is likely to have negative values, use sint64 instead. | int64 | long | int/long | int64 | long | integer/string | Bignum |
+| <a name="uint32"/> uint32 | Uses variable-length encoding. | uint32 | int | int/long | uint32 | uint | integer | Bignum or Fixnum (as required) |
+| <a name="uint64"/> uint64 | Uses variable-length encoding. | uint64 | long | int/long | uint64 | ulong | integer/string | Bignum or Fixnum (as required) |
+| <a name="sint32"/> sint32 | Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int32s. | int32 | int | int | int32 | int | integer | Bignum or Fixnum (as required) |
+| <a name="sint64"/> sint64 | Uses variable-length encoding. Signed int value. These more efficiently encode negative numbers than regular int64s. | int64 | long | int/long | int64 | long | integer/string | Bignum |
+| <a name="fixed32"/> fixed32 | Always four bytes. More efficient than uint32 if values are often greater than 2^28. | uint32 | int | int | uint32 | uint | integer | Bignum or Fixnum (as required) |
+| <a name="fixed64"/> fixed64 | Always eight bytes. More efficient than uint64 if values are often greater than 2^56. | uint64 | long | int/long | uint64 | ulong | integer/string | Bignum |
+| <a name="sfixed32"/> sfixed32 | Always four bytes. | int32 | int | int | int32 | int | integer | Bignum or Fixnum (as required) |
+| <a name="sfixed64"/> sfixed64 | Always eight bytes. | int64 | long | int/long | int64 | long | integer/string | Bignum |
+| <a name="bool"/> bool |  | bool | boolean | boolean | bool | bool | boolean | TrueClass/FalseClass |
+| <a name="string"/> string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | string | String | str/unicode | string | string | string | String (UTF-8) |
+| <a name="bytes"/> bytes | May contain any arbitrary sequence of bytes. | string | ByteString | str | []byte | ByteString | string | String (ASCII-8BIT) |
 
 

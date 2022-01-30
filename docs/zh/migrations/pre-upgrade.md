@@ -48,8 +48,8 @@ func preUpgradeCommand() *cobra.Command {
 
 ```go
 rootCmd.AddCommand(
-		// ..
+		//..
 		preUpgradeCommand(),
-		// ..
+		//..
 	)
 ```

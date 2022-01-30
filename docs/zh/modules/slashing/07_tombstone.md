@@ -73,7 +73,7 @@
 > 了解更多详情。对于剩下的部分，我将假设我们只开始
 > 当验证者被释放时，一个新的削减期。
 
-slashing period 的最大数量是`len(UnbondingPeriod) / len(JailPeriod)`。
+slashing period 的最大数量是`len(UnbondingPeriod)/len(JailPeriod)`。
 当前 Gaia 中 `UnbondingPeriod` 和 `JailPeriod` 的默认值为 3 周
 和 2 天，分别。这意味着可能会有多达 11 次削减
 每个验证器同时跟踪的时间段。如果我们设置`JailPeriod >= UnbondingPeriod`，

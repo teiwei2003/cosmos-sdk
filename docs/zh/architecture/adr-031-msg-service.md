@@ -64,8 +64,8 @@ service Msg {
   rpc SubmitProposal(MsgSubmitProposal) returns (MsgSubmitProposalResponse);
 }
 
-// Note that for backwards compatibility this uses MsgSubmitProposal as the request
-// type instead of the more canonical MsgSubmitProposalRequest
+//Note that for backwards compatibility this uses MsgSubmitProposal as the request
+//type instead of the more canonical MsgSubmitProposalRequest
 message MsgSubmitProposal {
   google.protobuf.Any content = 1;
   string proposer = 2;
@@ -99,7 +99,7 @@ type MsgServer interface {
 
 每个 `Msg` 服务方法都应该有一个请求参数:它对应的 `Msg` 类型。例如，上面的`Msg`服务方法`/cosmos.gov.v1beta1.Msg/SubmitProposal`只有一个请求参数，即`Msg`类型`/cosmos.gov.v1beta1.MsgSubmitProposal`。重要的是读者必须清楚地理解 `Msg` 服务(Protobuf 服务)和 `Msg` 类型(Protobuf 消息)之间的命名差异，以及它们的完全限定名称的差异。
 
-这个约定已经决定在更规范的 `Msg...Request` 名称上主要是为了向后兼容，但也为了更好的可读性在 `TxBody.messages`(见下面的 [编码部分](#encoding)):包含 `/ cosmos.gov.MsgSubmitProposal` 比那些包含 `/cosmos.gov.v1beta1.MsgSubmitProposalRequest` 的读起来更好。
+这个约定已经决定在更规范的 `Msg...Request` 名称上主要是为了向后兼容，但也为了更好的可读性在 `TxBody.messages`(见下面的 [编码部分](#encoding)):包含 `/cosmos.gov.MsgSubmitProposal` 比那些包含 `/cosmos.gov.v1beta1.MsgSubmitProposalRequest` 的读起来更好。
 
 这种约定的一个后果是每个 `Msg` 类型只能是一个 `Msg` 服务方法的请求参数。但是，我们认为这种限制是明确的一种很好的做法。
 
@@ -139,7 +139,7 @@ type Configurator interface {
   MsgServer() grpc.Server
 }
 
-// example module:
+//example module:
 func (am AppModule) RegisterServices(cfg Configurator) {
 	types.RegisterQueryServer(cfg.QueryServer(), keeper)
 	types.RegisterMsgServer(cfg.MsgServer(), keeper)

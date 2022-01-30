@@ -44,16 +44,16 @@ func (k Keeper) OnChanOpenInit(ctx sdk.Context,
     counterparty channeltypes.Counterparty,
     version string,
 ) error {
-   //OpenInit must claim the channelCapability that IBC passes into the callback
+  //OpenInit must claim the channelCapability that IBC passes into the callback
     if err := k.ClaimCapability(ctx, chanCap, host.ChannelCapabilityPath(portID, channelID)); err != nil {
 			return err
 	}
 
-   //... do custom initialization logic
+  //... do custom initialization logic
 
-   //Use above arguments to determine if we want to abort handshake
-   //Examples: Abort if order == UNORDERED,
-   //Abort if version is unsupported
+  //Use above arguments to determine if we want to abort handshake
+  //Examples: Abort if order == UNORDERED,
+  //Abort if version is unsupported
     err := checkArguments(args)
     return err
 }
@@ -70,20 +70,20 @@ OnChanOpenTry(
     version,
     counterpartyVersion string,
 ) error {
-   //Module may have already claimed capability in OnChanOpenInit in the case of crossing hellos
-   //(ie chainA and chainB both call ChanOpenInit before one of them calls ChanOpenTry)
-   //If the module can already authenticate the capability then the module already owns it so we don't need to claim
-   //Otherwise, module does not have channel capability and we must claim it from IBC
+  //Module may have already claimed capability in OnChanOpenInit in the case of crossing hellos
+  //(ie chainA and chainB both call ChanOpenInit before one of them calls ChanOpenTry)
+  //If the module can already authenticate the capability then the module already owns it so we don't need to claim
+  //Otherwise, module does not have channel capability and we must claim it from IBC
     if !k.AuthenticateCapability(ctx, chanCap, host.ChannelCapabilityPath(portID, channelID)) {
-       //Only claim channel capability passed back by IBC module if we do not already own it
+      //Only claim channel capability passed back by IBC module if we do not already own it
         if err := k.scopedKeeper.ClaimCapability(ctx, chanCap, host.ChannelCapabilityPath(portID, channelID)); err != nil {
             return err
         }
     }
 
-   //... do custom initialization logic
+  //... do custom initialization logic
 
-   //Use above arguments to determine if we want to abort handshake
+  //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
@@ -95,9 +95,9 @@ OnChanOpenAck(
     channelID string,
     counterpartyVersion string,
 ) error {
-   //... do custom initialization logic
+  //... do custom initialization logic
 
-   //Use above arguments to determine if we want to abort handshake
+  //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
@@ -108,9 +108,9 @@ OnChanOpenConfirm(
     portID,
     channelID string,
 ) error {
-   //... do custom initialization logic
+  //... do custom initialization logic
 
-   //Use above arguments to determine if we want to abort handshake
+  //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
@@ -127,9 +127,9 @@ OnChanCloseInit(
     portID,
     channelID string,
 ) error {
-   //... do custom finalization logic
+  //... do custom finalization logic
 
-   //Use above arguments to determine if we want to abort handshake
+  //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
@@ -140,9 +140,9 @@ OnChanCloseConfirm(
     portID,
     channelID string,
 ) error {
-   //... do custom finalization logic
+  //... do custom finalization logic
 
-   //Use above arguments to determine if we want to abort handshake
+  //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
@@ -162,7 +162,7 @@ OnChanCloseConfirm(
 IBCとして。 このバージョン管理スキームは、バージョン識別子と互換性のある機能セットを指定します
 その識別子。 有効なバージョンの選択には、互換性のあるバージョン識別子の選択が含まれます
 アプリケーションがこのバージョンでサポートする機能のサブセット。 この構造はこれに使用されます
-解決策は「03-connection/types」にあります。
+解決策は[03-connection/types]にあります。
 
 バージョンタイプは文字列であるため、アプリケーションは簡単なバージョン検証を行うことができます
 文字列照合を介して、またはすでに実装されているバージョン管理システムを使用してプロトタイプを渡すことができます
@@ -177,24 +177,24 @@ ICS20は現在、サポートされている単一のバージョンを使用し
 
 ```go
 func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, state types.GenesisState) {
-   //... other initialization logic
+  //... other initialization logic
 
-   //Only try to bind to port if it is not already bound, since we may already own
-   //port capability from capability InitGenesis
+  //Only try to bind to port if it is not already bound, since we may already own
+  //port capability from capability InitGenesis
     if !isBound(ctx, state.PortID) {
-       //module binds to desired ports on InitChain
-       //and claims returned capabilities
+      //module binds to desired ports on InitChain
+      //and claims returned capabilities
         cap1 := keeper.IBCPortKeeper.BindPort(ctx, port1)
         cap2 := keeper.IBCPortKeeper.BindPort(ctx, port2)
         cap3 := keeper.IBCPortKeeper.BindPort(ctx, port3)
 
-       //NOTE: The module's scoped capability keeper must be private
+      //NOTE: The module's scoped capability keeper must be private
         keeper.scopedKeeper.ClaimCapability(cap1)
         keeper.scopedKeeper.ClaimCapability(cap2)
         keeper.scopedKeeper.ClaimCapability(cap3)
     }
 
-   //... more initialization logic
+  //... more initialization logic
 }
 ```
 
@@ -213,15 +213,15 @@ func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, state types.GenesisState
 ```go
 //Custom packet data defined in application module
 type CustomPacketData struct {
-   //Custom fields ...
+  //Custom fields ...
 }
 
 EncodePacketData(packetData CustomPacketData) []byte {
-   //encode packetData to bytes
+  //encode packetData to bytes
 }
 
 DecodePacketData(encoded []byte) (CustomPacketData) {
-   //decode from bytes to packet data
+  //decode from bytes to packet data
 }
 ```
 
@@ -234,7 +234,7 @@ packet.Data = data
 IBCChannelKeeper.SendPacket(ctx, packet)
 ```
 
-パケットを受信するモジュールは、「PacketData」を期待する構造にデコードして、次のことができるようにする必要があります。
+パケットを受信するモジュールは、[PacketData]を期待する構造にデコードして、次のことができるようにする必要があります。
 行動を起こす。 
 
 ```go
@@ -267,7 +267,7 @@ IBCがモジュールがチャネルハンドシェイクコールバックを�
 モジュールは送信アクションを開始するため、モジュールはコールバックを介してデータパケットを送信しません
 パケットは、IBCのパケットフローの他の部分にメッセージを送信する代わりに、IBCモジュールに送信されます。
 モジュールは、コールバックを使用してポートバインディングモジュールの実行をトリガーする必要があります。 したがって、送信するには
-モジュールは、「IBCChannelKeeper」で「SendPacket」を呼び出すだけで済みます。 
+モジュールは、[IBCChannelKeeper]で[SendPacket]を呼び出すだけで済みます。 
 
 ```go
 //retrieve the dynamic capability for this channel
@@ -300,22 +300,22 @@ OnRecvPacket(
     ctx sdk.Context,
     packet channeltypes.Packet,
 ) (res *sdk.Result, ack []byte, abort error) {
-   //Decode the packet data
+  //Decode the packet data
     packetData := DecodePacketData(packet.Data)
 
-   //do application state changes based on packet data
-   //and return result, acknowledgement and abortErr
-   //Note: abortErr is only not nil if we need to abort the entire receive packet, and allow a replay of the receive.
-   //If the application state change failed but we do not want to replay the packet,
-   //simply encode this failure with relevant information in ack and return nil error
+  //do application state changes based on packet data
+  //and return result, acknowledgement and abortErr
+  //Note: abortErr is only not nil if we need to abort the entire receive packet, and allow a replay of the receive.
+  //If the application state change failed but we do not want to replay the packet,
+  //simply encode this failure with relevant information in ack and return nil error
     res, ack, abortErr := processPacket(ctx, packet, packetData)
 
-   //if we need to abort the entire receive packet, return error
+  //if we need to abort the entire receive packet, return error
     if abortErr != nil {
         return nil, nil, abortErr
     }
 
-   //Encode the ack since IBC expects acknowledgement bytes
+  //Encode the ack since IBC expects acknowledgement bytes
     ackBytes := EncodeAcknowledgement(ack)
 
     return res, ackBytes, nil
@@ -367,7 +367,7 @@ IBCモジュールで確認応答をバイト文字列として受信します�
 //`0xaa` (result) or `0xb2` (error). Implemented as defined by ICS:
 //https://github.com/cosmos/ics/tree/master/spec/ics-004-channel-and-packet-semantics#acknowledgement-envelope
 message Acknowledgement {
- //response contains either a result or an error and must be non-empty
+//response contains either a result or an error and must be non-empty
   oneof response {
     bytes  result = 21;
     string error  = 22;
@@ -393,10 +393,10 @@ OnAcknowledgementPacket(
     packet channeltypes.Packet,
     acknowledgement []byte,
 ) (*sdk.Result, error) {
-   //Decode acknowledgement
+  //Decode acknowledgement
     ack := DecodeAcknowledgement(acknowledgement)
 
-   //process ack
+  //process ack
     res, err := processAck(ack)
     return res, err
 }
@@ -416,7 +416,7 @@ OnTimeoutPacket(
     ctx sdk.Context,
     packet channeltypes.Packet,
 ) (*sdk.Result, error) {
-   //do custom timeout logic
+  //do custom timeout logic
 }
 ```
 
@@ -445,7 +445,7 @@ app.IBCKeeper.SetRouter(ibcRouter)
 
 ## 実例
 
-IBCアプリケーションの実際の動作例については、「ibc-transfer」モジュールを確認できます。
+IBCアプリケーションの実際の動作例については、[ibc-transfer]モジュールを確認できます。
 上記のすべてを実装します。
 
 モジュールの便利な部分は次のとおりです。
@@ -459,6 +459,6 @@ IBCアプリケーションの実際の動作例については、「ibc-transfe
 [IBCを実装する
 コールバック](https://github.com/cosmos/ibc-go/blob/main/modules/apps/transfer/module.go)
 
-## 次へ{非表示}
+## 次へ{hide}
 
-[モジュールの構築](https://github.com/cosmos/cosmos-sdk/blob/master/docs/building-modules/intro.md)を理解する{非表示}
+[モジュールの構築](https://github.com/cosmos/cosmos-sdk/blob/master/docs/building-modules/intro.md)を理解する{hide}

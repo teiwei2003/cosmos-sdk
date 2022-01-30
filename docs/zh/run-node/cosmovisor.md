@@ -144,7 +144,7 @@ cp cosmovisor ~/go/bin/cosmovisor
 
 **注意:我们不建议使用自动下载**，因为它不会提前验证二进制文件是否可用。如果下载二进制文件有任何问题，cosmovisor 将停止并且不会重新启动应用程序(这可能导致链停止)。 
 
-如果 `DAEMON_ALLOW_DOWNLOAD_BINARIES` 设置为 `true`，并且在触发升级时找不到本地二进制文件，`cosmovisor` 将尝试根据 `data` 中的 `info` 属性中的说明下载并安装二进制文件本身 /upgrade-info.json` 文件。 这些文件由 x/upgrade 模块构建，并包含来自升级“计划”对象的数据。 `Plan` 有一个信息字段，它应该具有以下两种有效格式之一来指定下载:
+如果 `DAEMON_ALLOW_DOWNLOAD_BINARIES` 设置为 `true`，并且在触发升级时找不到本地二进制文件，`cosmovisor` 将尝试根据 `data` 中的 `info` 属性中的说明下载并安装二进制文件本身/upgrade-info.json` 文件。 这些文件由 x/upgrade 模块构建，并包含来自升级“计划”对象的数据。 `Plan` 有一个信息字段，它应该具有以下两种有效格式之一来指定下载:
 
 1. 将 os/architecture -> 二进制 URI 映射存储在升级计划信息字段中作为“二进制”键下的 JSON。 例如: 
 
@@ -297,7 +297,7 @@ After that line, add the following:
 
 ```go
 app.UpgradeKeeper.SetUpgradeHandler("test1", func(ctx sdk.Context, plan upgradetypes.Plan) {
-	// Add some coins to a random account
+	//Add some coins to a random account
 	addr, err := sdk.AccAddressFromBech32("cosmos18cgkqduwuh253twzmhedesw3l7v3fm37sppt58")
 	if err != nil {
 		panic(err)

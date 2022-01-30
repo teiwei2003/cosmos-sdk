@@ -25,12 +25,12 @@
 
 ```golang
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-    // --snip--
+   //--snip--
     cfg.RegisterMigration(types.ModuleName, 1, func(ctx sdk.Context) error {
-        // Perform in-place store migrations from ConsensusVersion 1 to 2.
+       //Perform in-place store migrations from ConsensusVersion 1 to 2.
     })
      cfg.RegisterMigration(types.ModuleName, 2, func(ctx sdk.Context) error {
-        // Perform in-place store migrations from ConsensusVersion 2 to 3.
+       //Perform in-place store migrations from ConsensusVersion 2 to 3.
     })
 }
 ```
@@ -44,9 +44,9 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 要定义在升级期间发生的功能，请编写迁移脚本并将这些功能放在 `migrations/` 目录中。 例如，要为 bank 模块编写迁移脚本，请将函数放在 `x/bank/migrations/` 中。 对这些函数使用推荐的命名约定。 例如，`v043bank` 是迁移包`x/bank/migrations/v043` 的脚本: 
 
 ```golang
-// Migrating bank module from version 1 to 2
+//Migrating bank module from version 1 to 2
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-	return v043bank.MigrateStore(ctx, m.keeper.storeKey) // v043bank is package `x/bank/migrations/v043`.
+	return v043bank.MigrateStore(ctx, m.keeper.storeKey)//v043bank is package `x/bank/migrations/v043`.
 }
 ```
 

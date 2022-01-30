@@ -66,20 +66,20 @@
 用于构建新服务器的“设置”如下: 
 
 ```go
-// Settings define the rosetta server settings
+//Settings define the rosetta server settings
 type Settings struct {
-	// Network contains the information regarding the network
+	//Network contains the information regarding the network
 	Network *types.NetworkIdentifier
-	// Client is the online API handler
+	//Client is the online API handler
 	Client crgtypes.Client
-	// Listen is the address the handler will listen at
+	//Listen is the address the handler will listen at
 	Listen string
-	// Offline defines if the rosetta service should be exposed in offline mode
+	//Offline defines if the rosetta service should be exposed in offline mode
 	Offline bool
-	// Retries is the number of readiness checks that will be attempted when instantiating the handler
-	// valid only for online API
+	//Retries is the number of readiness checks that will be attempted when instantiating the handler
+	//valid only for online API
 	Retries int
-	// RetryWait is the time that will be waited between retries
+	//RetryWait is the time that will be waited between retries
 	RetryWait time.Duration
 }
 ```
@@ -97,67 +97,67 @@ type Settings struct {
 开发者可以根据需要实现自己的自定义`Client`。 
 
 ```go
-// Client defines the API the client implementation should provide.
+//Client defines the API the client implementation should provide.
 type Client interface {
-	// Needed if the client needs to perform some action before connecting.
+	//Needed if the client needs to perform some action before connecting.
 	Bootstrap() error
-	// Ready checks if the servicer constraints for queries are satisfied
-	// for example the node might still not be ready, it's useful in process
-	// when the rosetta instance might come up before the node itself
-	// the servicer must return nil if the node is ready
+	//Ready checks if the servicer constraints for queries are satisfied
+	//for example the node might still not be ready, it's useful in process
+	//when the rosetta instance might come up before the node itself
+	//the servicer must return nil if the node is ready
 	Ready() error
 
-	// Data API
+	//Data API
 
-	// Balances fetches the balance of the given address
-	// if height is not nil, then the balance will be displayed
-	// at the provided height, otherwise last block balance will be returned
+	//Balances fetches the balance of the given address
+	//if height is not nil, then the balance will be displayed
+	//at the provided height, otherwise last block balance will be returned
 	Balances(ctx context.Context, addr string, height *int64) ([]*types.Amount, error)
-	// BlockByHashAlt gets a block and its transaction at the provided height
+	//BlockByHashAlt gets a block and its transaction at the provided height
 	BlockByHash(ctx context.Context, hash string) (BlockResponse, error)
-	// BlockByHeightAlt gets a block given its height, if height is nil then last block is returned
+	//BlockByHeightAlt gets a block given its height, if height is nil then last block is returned
 	BlockByHeight(ctx context.Context, height *int64) (BlockResponse, error)
-	// BlockTransactionsByHash gets the block, parent block and transactions
-	// given the block hash.
+	//BlockTransactionsByHash gets the block, parent block and transactions
+	//given the block hash.
 	BlockTransactionsByHash(ctx context.Context, hash string) (BlockTransactionsResponse, error)
-	// BlockTransactionsByHash gets the block, parent block and transactions
-	// given the block hash.
+	//BlockTransactionsByHash gets the block, parent block and transactions
+	//given the block hash.
 	BlockTransactionsByHeight(ctx context.Context, height *int64) (BlockTransactionsResponse, error)
-	// GetTx gets a transaction given its hash
+	//GetTx gets a transaction given its hash
 	GetTx(ctx context.Context, hash string) (*types.Transaction, error)
-	// GetUnconfirmedTx gets an unconfirmed Tx given its hash
-	// NOTE(fdymylja): NOT IMPLEMENTED YET!
+	//GetUnconfirmedTx gets an unconfirmed Tx given its hash
+	//NOTE(fdymylja): NOT IMPLEMENTED YET!
 	GetUnconfirmedTx(ctx context.Context, hash string) (*types.Transaction, error)
-	// Mempool returns the list of the current non confirmed transactions
+	//Mempool returns the list of the current non confirmed transactions
 	Mempool(ctx context.Context) ([]*types.TransactionIdentifier, error)
-	// Peers gets the peers currently connected to the node
+	//Peers gets the peers currently connected to the node
 	Peers(ctx context.Context) ([]*types.Peer, error)
-	// Status returns the node status, such as sync data, version etc
+	//Status returns the node status, such as sync data, version etc
 	Status(ctx context.Context) (*types.SyncStatus, error)
 
-	// Construction API
+	//Construction API
 
-	// PostTx posts txBytes to the node and returns the transaction identifier plus metadata related
-	// to the transaction itself.
+	//PostTx posts txBytes to the node and returns the transaction identifier plus metadata related
+	//to the transaction itself.
 	PostTx(txBytes []byte) (res *types.TransactionIdentifier, meta map[string]interface{}, err error)
-	// ConstructionMetadataFromOptions
+	//ConstructionMetadataFromOptions
 	ConstructionMetadataFromOptions(ctx context.Context, options map[string]interface{}) (meta map[string]interface{}, err error)
 	OfflineClient
 }
 
-// OfflineClient defines the functionalities supported without having access to the node
+//OfflineClient defines the functionalities supported without having access to the node
 type OfflineClient interface {
 	NetworkInformationProvider
-	// SignedTx returns the signed transaction given the tx bytes (msgs) plus the signatures
+	//SignedTx returns the signed transaction given the tx bytes (msgs) plus the signatures
 	SignedTx(ctx context.Context, txBytes []byte, sigs []*types.Signature) (signedTxBytes []byte, err error)
-	// TxOperationsAndSignersAccountIdentifiers returns the operations related to a transaction and the account
-	// identifiers if the transaction is signed
+	//TxOperationsAndSignersAccountIdentifiers returns the operations related to a transaction and the account
+	//identifiers if the transaction is signed
 	TxOperationsAndSignersAccountIdentifiers(signed bool, hexBytes []byte) (ops []*types.Operation, signers []*types.AccountIdentifier, err error)
-	// ConstructionPayload returns the construction payload given the request
+	//ConstructionPayload returns the construction payload given the request
 	ConstructionPayload(ctx context.Context, req *types.ConstructionPayloadsRequest) (resp *types.ConstructionPayloadsResponse, err error)
-	// PreprocessOperationsToOptions returns the options given the preprocess operations
+	//PreprocessOperationsToOptions returns the options given the preprocess operations
 	PreprocessOperationsToOptions(ctx context.Context, req *types.ConstructionPreprocessRequest) (options map[string]interface{}, err error)
-	// AccountIdentifierFromPublicKey returns the account identifier given the public key
+	//AccountIdentifierFromPublicKey returns the account identifier given the public key
 	AccountIdentifierFromPublicKey(pubKey *types.PublicKey) (*types.AccountIdentifier, error)
 }
 ```
@@ -170,7 +170,7 @@ type OfflineClient interface {
 rosetta.Msg 界面如下: 
 
 ```go
-// Msg represents a cosmos-sdk message that can be converted from and to a rosetta operation.
+//Msg represents a cosmos-sdk message that can be converted from and to a rosetta operation.
 type Msg interface {
 	sdk.Msg
 	ToOperations(withStatus, hasError bool) []*types.Operation

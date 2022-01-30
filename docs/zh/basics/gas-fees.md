@@ -48,7 +48,7 @@ Gas 消耗可以手动完成，通常由模块开发人员在 [`BeginBlocker`, `
 
 +++ https://github.com/tendermint/tendermint/blob/v0.34.0-rc6/types/params.go#L34-L41
 
-当一个新的 [transaction](../core/transactions.md) 正在通过 `DeliverTx` 处理时，会检查 `BlockGasMeter` 的当前值是否超过限制。如果是，`DeliverTx` 立即返回。即使是区块中的第一笔交易，这种情况也可能发生，因为“BeginBlock”本身可以消耗 gas。如果不是，则交易正常处理。在`DeliverTx`结束时，`ctx.BlockGasMeter()`跟踪的gas增加了处理交易消耗的数量/ 
+当一个新的 [transaction](../core/transactions.md) 正在通过 `DeliverTx` 处理时，会检查 `BlockGasMeter` 的当前值是否超过限制。如果是，`DeliverTx` 立即返回。即使是区块中的第一笔交易，这种情况也可能发生，因为“BeginBlock”本身可以消耗 gas。如果不是，则交易正常处理。在`DeliverTx`结束时，`ctx.BlockGasMeter()`跟踪的gas增加了处理交易消耗的数量/
 
 ```go
 ctx.BlockGasMeter().ConsumeGas(
@@ -59,11 +59,11 @@ ctx.BlockGasMeter().ConsumeGas(
 
 ## AnteHandler
 
-在“CheckTx”和“DeliverTx”期间为每个事务运行“AnteHandler”，在事务中每个“sdk.Msg”的 Protobuf“Msg”服务方法之前运行。 `AnteHandler`s 具有以下签名/ 
+在“CheckTx”和“DeliverTx”期间为每个事务运行“AnteHandler”，在事务中每个“sdk.Msg”的 Protobuf“Msg”服务方法之前运行。 `AnteHandler`s 具有以下签名/
 
 ```go
-// AnteHandler authenticates transactions, before their internal messages are handled.
-// If newCtx.IsZero(), ctx is used instead.
+//AnteHandler authenticates transactions, before their internal messages are handled.
+//If newCtx.IsZero(), ctx is used instead.
 type AnteHandler func(ctx Context, tx Tx, simulate bool) (newCtx Context, result Result, abort bool)
 ```
 

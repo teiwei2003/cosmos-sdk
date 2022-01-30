@@ -112,7 +112,7 @@ func makeABCIData(txRes tx.Response) ([]byte, error) {
 }
 ```
 
-「BaseApp.CheckTx」と「BaseApp.Simulate」の実装は似ています。
+[BaseApp.CheckTx]と[BaseApp.Simulate]の実装は似ています。
 
 `baseapp.txHandler`の3つのメソッドの実装は明らかに単一の関数ですが、モジュール化のために、ミドルウェアが単なる関数であるミドルウェアの組み合わせ設計を提案します。ミドルウェアは` tx.Handler`を受け入れ、別の `txを返します。 .Handler``は前のものにラップされています。
 
@@ -194,13 +194,13 @@ A.pre
 A.post
 ```
 
-ミドルウェアをアセンブルするための `ComposeMiddlewares`関数を定義します。 基本的な処理プログラムを最初のパラメータとし、「外部から内部へ」の順にミドルウェアを使用します。 上記のスタックの場合、最終的な `tx.Handler`は次のとおりです。 
+ミドルウェアをアセンブルするための `ComposeMiddlewares`関数を定義します。 基本的な処理プログラムを最初のパラメータとし、[外部から内部へ]の順にミドルウェアを使用します。 上記のスタックの場合、最終的な `tx.Handler`は次のとおりです。 
 
 ```go
 txHandler := middleware.ComposeMiddlewares(H, A, B, C)
 ```
 
-ミドルウェアは、「SetTxHandler」セッターを介してBaseAppに設定されます。 
+ミドルウェアは、[SetTxHandler]セッターを介してBaseAppに設定されます。 
 
 ```go
 /.simapp/app.go
@@ -226,7 +226,7 @@ app.SetTxHandler(txHandler)
 
 ### アンティハンドラーとミドルウェアの類似点と相違点
 
-ミドルウェアベースの設計は、[ADR-010](..adr-010-modular-antehandler.md)で説明されている既存のハンドラー設計に基づいています。 ADR-010の最終決定は「シンプルデコレータ」方式を採用することですが、ミドルウェアの設計は実際には他の[デコレータパターン](..adr-010-modular-antehandler.md#decorator-pattern)の提案と一致しています。 In [weave](https://github.com/iov-one/weave)も使用します。
+ミドルウェアベースの設計は、[ADR-010](..adr-010-modular-antehandler.md)で説明されている既存のハンドラー設計に基づいています。 ADR-010の最終決定は[シンプルデコレータ]方式を採用することですが、ミドルウェアの設計は実際には他の[デコレータパターン](..adr-010-modular-antehandler.md#decorator-pattern)の提案と一致しています。 In [weave](https://github.com/iov-one/weave)も使用します。
 
 #### アンティハンドラーとの類似点
 
@@ -279,7 +279,7 @@ CHANGELOGは、他の小さなAPIの重大な変更も提供します。いつ�
 
 ### ポジティブ
 
--「メッセージ」の実行後にカスタムロジックを実行できるようにします。これにより、[ヒント](https://github.com/cosmos/cosmos-sdk/issues/9406)と[ガスの払い戻し](https://github.com/cosmos/cosmos-sdk/issues/2150)のユースケースが作成されます、他の場合もあります。
+-[メッセージ]の実行後にカスタムロジックを実行できるようにします。これにより、[ヒント](https://github.com/cosmos/cosmos-sdk/issues/9406)と[ガスの払い戻し](https://github.com/cosmos/cosmos-sdk/issues/2150)のユースケースが作成されます、他の場合もあります。
 -BaseAppをより軽量にし、複雑なロジックを小さなモジュラーコンポーネントに渡します。
 -異なるリターンタイプの `{Check、Deliver、Simulate} Tx`の個別のパス。これにより、読みやすさが向上し( `if sdkCtx.IsRecheckTx()&&！simulate {...}`を別のメソッドに置き換えます)、柔軟性が向上します(たとえば、 `ResponseCheckTx`で` priority`を返します)。
 ### ネガティブ

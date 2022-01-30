@@ -126,17 +126,17 @@ package foo
 
 
 type FooMsgServer {
-  // ...
+ //...
 
   bankQuery bank.QueryClient
   bankMsg   bank.MsgClient
 }
 
 func NewFooMsgServer(moduleKey RootModuleKey, ...) FooMsgServer {
-  // ...
+ //...
 
   return FooMsgServer {
-    // ...
+   //...
     modouleKey: moduleKey,
     bankQuery: bank.NewQueryClient(moduleKey),
     bankMsg: bank.NewMsgClient(moduleKey),
@@ -201,7 +201,7 @@ type RootModuleKey struct {
   invoker Invoker
 }
 
-func (rm RootModuleKey) Derive(path []byte) DerivedModuleKey { /* ... */}
+func (rm RootModuleKey) Derive(path []byte) DerivedModuleKey {/* ... */}
 
 type DerivedModuleKey struct {
   moduleName string

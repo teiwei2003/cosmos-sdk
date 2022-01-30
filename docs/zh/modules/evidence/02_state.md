@@ -4,9 +4,9 @@
 证据状态也存储和导出在 `x/evidence` 模块的 `GenesisState` 中。
 
 ```protobuf
-// GenesisState defines the evidence module's genesis state.
+//GenesisState defines the evidence module's genesis state.
 message GenesisState {
-  // evidence defines all the evidence at genesis.
+ //evidence defines all the evidence at genesis.
   repeated google.protobuf.Any evidence = 1;
 }
 

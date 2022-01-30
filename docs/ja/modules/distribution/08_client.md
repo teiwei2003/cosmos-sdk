@@ -2,7 +2,7 @@
 
 ## コマンドラインインターフェイス
 
-ユーザーはCLIを使用して、「配布」モジュールを照会および操作できます。
+ユーザーはCLIを使用して、[配布]モジュールを照会および操作できます。
 
 ### query
 
@@ -133,7 +133,7 @@ slashes:
 
 #### validator-outstanding-rewards
 
-`validator-outstanding-rewards`コマンドを使用すると、ユーザーは、バリデーターとそのすべての委任について、すべての未処理の（取り消されていない）報酬を照会できます。
+`validator-outstanding-rewards`コマンドを使用すると、ユーザーは、バリデーターとそのすべての委任について、すべての未処理の(取り消されていない)報酬を照会できます。
 
 ```
 simd query distribution validator-outstanding-rewards [validator] [flags]

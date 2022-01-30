@@ -16,7 +16,7 @@
 
 Cosmos SDK `x/authz` 模块带有以下授权类型:
 
-###发送授权
+### 发送授权
 
 `SendAuthorization` 为 `cosmos.bank.v1beta1.MsgSend` 消息实现了 `Authorization` 接口。它需要一个 `SpendLimit` 来指定受赠者可以花费的最大代币数量。 `SpendLimit` 会随着代币的花费而更新。
 

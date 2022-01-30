@@ -75,7 +75,7 @@ message MsgSubmitProposalResponse {
 }
 ```
 
-これはgRPCで最も一般的に使用されますが、このようにprotobufの「サービス」定義をオーバーロードしても違反しません。
+これはgRPCで最も一般的に使用されますが、このようにprotobufの[サービス]定義をオーバーロードしても違反しません。
 [protobuf仕様](https://developers.google.com/protocol-buffers/docs/proto3#services)の目的は次のとおりです。
 > gRPCを使用したくない場合は、独自のRPC実装でプロトコルバッファを使用することもできます。
 このメソッドを使用すると、自動的に生成された `MsgServer`インターフェイスが得られます。
@@ -114,14 +114,14 @@ type MsgServer interface {
 
 BaseAppに `msg_service_router`を追加することをお勧めします。このルーターはキー/値マッピングであり、 `Msg`タイプの` type_url`を対応する `Msg`サービスメソッドハンドラーにマッピングします。 `Msg`タイプと` Msg`サービスメソッドの間には1対1のマッピングがあるため、 `msg_service_router`には` Msg`サービスメソッドごとに1つのエントリしかありません。
 
-BaseAppが(CheckTxまたはDeliverTxで)トランザクションを処理するとき、その「TxBody.messages」は「Msg」としてデコードされます。各 `Msg`の` type_url`は `msg_service_router`のエントリと一致し、対応する` Msg`サービスメソッドハンドラが呼び出されます。
+BaseAppが(CheckTxまたはDeliverTxで)トランザクションを処理するとき、その[TxBody.messages]は[Msg]としてデコードされます。各 `Msg`の` type_url`は `msg_service_router`のエントリと一致し、対応する` Msg`サービスメソッドハンドラが呼び出されます。
 
 下位互換性のために、古いハンドラーは削除されていません。 BaseAppが `msg_service_router`に対応するエントリがない古いバージョンの` Msg`を受信した場合、古いバージョンの `Route()`メソッドを介して古いバージョンのハンドラーにルーティングされます。
 
 ### モジュール構成
 
 [ADR 021](..adr-021-protobuf-query-encoding.md)で、メソッド `RegisterQueryService`を導入しました
-「AppModule」に移動します。これにより、モジュールはgRPCクエリアを登録できます。
+[AppModule]に移動します。これにより、モジュールはgRPCクエリアを登録できます。
 
 `Msg`サービスを登録するために、` RegisterQueryService`を変換することでより拡張可能なメソッドを試してみます
 より一般的な `RegisterServices`メソッドへ: 
@@ -177,7 +177,7 @@ func (k Keeper) SubmitProposal(goCtx context.Context, params *types.MsgSubmitPro
 
 これにより、機能テストの実行方法を変更することもできます。 AppModuleとルーターをシミュレートする代わりに、クライアントをシミュレートします(サーバーは非表示のままになります)。具体的には、 `moduleB`で` moduleA.MsgServer`をシミュレートすることはなく、代わりに `moduleA.MsgClient`をシミュレートします。外部サービス(データベースやオンラインサーバーなど)を使用していると考えてください。クライアントとサーバー間の送信は、生成されたプロトコルバッファによって正しく処理されると想定しています。
 
-最後に、クライアントAPIモジュールをオフにすると、ADR-033で説明されている理想的なOCAPモードがオンになります。サーバーの実装とインターフェースは隠されているため、誰も「管理者」/サーバーを保持できず、クライアントインターフェースで中継することを余儀なくされます。これにより、開発者にとって正しいパッケージングとソフトウェアエンジニアリングモデルが促進されます。
+最後に、クライアントAPIモジュールをオフにすると、ADR-033で説明されている理想的なOCAPモードがオンになります。サーバーの実装とインターフェースは隠されているため、誰も[管理者]/サーバーを保持できず、クライアントインターフェースで中継することを余儀なくされます。これにより、開発者にとって正しいパッケージングとソフトウェアエンジニアリングモデルが促進されます。
 
 ### アドバンテージ
 

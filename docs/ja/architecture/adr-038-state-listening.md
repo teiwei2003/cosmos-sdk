@@ -172,7 +172,7 @@ type CacheWrapper interface {
 ### MultiStore implementation updates
 
 これらの新しいインターフェースを満たすようにすべての `Store`と` MultiStore`の実装を変更し、 `rootmulti``GetKVStore`メソッドを調整します
-「Store」のリスニングがオンになっている場合、返される「KVStore」は「listenkv.Store」でラップされます。
+[Store]のリスニングがオンになっている場合、返される[KVStore]は[listenkv.Store]でラップされます。
 
 ```go
 func (rs *Store) GetKVStore(key types.StoreKey) types.KVStore {
@@ -211,7 +211,7 @@ func (rs *Store) CacheMultiStore() types.CacheMultiStore {
 BaseAppを入力し、ABCIの要求と応答を中継して、サービスがABCIで状態の変化をグループ化できるようにします。
 それらに影響を与える要求とそれらが影響を与えるABCI応答。 `ABCIListener`インターフェースも公開します
 `ListenSuccess`メソッド(オプション)は、メッセージの肯定的な確認を待つために` BaseApp`によって使用されます
-「StreamingService」からの領収書。  
+[StreamingService]からの領収書。  
 
 ```go
 /.ABCIListener interface used to hook into the ABCI message processing of the BaseApp
@@ -257,8 +257,8 @@ func (app *BaseApp) SetStreamingService(s StreamingService) {
 }
 ```
 
-「BaseApp」に新しいメソッドを追加して、肯定的な確認を受信するためのグローバル待機制限を構成します
-統合された「StreamingService」からのメッセージ受信。 
+[BaseApp]に新しいメソッドを追加して、肯定的な確認を受信するためのグローバル待機制限を構成します
+統合された[StreamingService]からのメッセージ受信。 
 
 ```go
 func (app *BaseApp) SetGlobalWaitLimit(t time.Duration) {
@@ -266,7 +266,7 @@ func (app *BaseApp) SetGlobalWaitLimit(t time.Duration) {
 }
 ```
 
-また、「BeginBlock」、「EndBlock」、「DeliverTx」メソッドを変更して、登録されているストリーミングサービスフックにABCIリクエストとレスポンスを渡します。
+また、[BeginBlock]、[EndBlock]、[DeliverTx]メソッドを変更して、登録されているストリーミングサービスフックにABCIリクエストとレスポンスを渡します。
 `BaseApp`を使用します。 
 
 ```go
@@ -331,9 +331,9 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 ```
 
 また、統合された `StreamingService`からの` success .failure`シグナルを処理するように `Commit`メソッドを変更します。
-`ABCIListener.ListenSuccess()`メソッド。 各「StreamingService」には内部待機しきい値があり、その後に送信されます
+`ABCIListener.ListenSuccess()`メソッド。 各[StreamingService]には内部待機しきい値があり、その後に送信されます
 `ListenSuccess()`チャネルは `false`であり、BaseAppは構成可能なグローバル待機制限も課します。
-`StreamingService`が「fireandforget」モードで実行されている場合、` ListenSuccess() `はすぐに` true`を返す必要があります
+`StreamingService`が[fireandforget]モードで実行されている場合、` ListenSuccess() `はすぐに` true`を返す必要があります
 サービスは正常な状態ですが、チャネルはまだ閉じています。 
 ```go
 func (app *BaseApp) Commit() (res abci.ResponseCommit) {

@@ -20,17 +20,17 @@ simd query feegrant --help
 simd query feegrant grant [granter] [grantee] [flags]
 ```
 
-例：
+例:
 
 ```
 simd query feegrant grant cosmos1.. cosmos1..
 ```
 
-出力例：
+出力例:
 
 ```
 allowance:
-  '@type': /cosmos.feegrant.v1beta1.BasicAllowance
+  '@type':/cosmos.feegrant.v1beta1.BasicAllowance
   expiration: null
   spend_limit:
   - amount: "100"
@@ -47,18 +47,18 @@ granter: cosmos1..
 simd query feegrant grants [grantee] [flags]
 ```
 
-例：
+例:
 
 ```
 simd query feegrant grants cosmos1..
 ```
 
-出力例：
+出力例:
 
 ```
 allowances:
 - allowance:
-    '@type': /cosmos.feegrant.v1beta1.BasicAllowance
+    '@type':/cosmos.feegrant.v1beta1.BasicAllowance
     expiration: null
     spend_limit:
     - amount: "100"
@@ -106,7 +106,7 @@ simd tx feegrant grant cosmos1.. cosmos1.. --period 3600 --period-limit 10stake
 simd tx feegrant revoke [granter] [grantee] [flags]
 ```
 
-例：
+例:
 
 ```
 simd tx feegrant revoke cosmos1.. cosmos1..
@@ -124,7 +124,7 @@ simd tx feegrant revoke cosmos1.. cosmos1..
 cosmos.feegrant.v1beta1.Query/Allowance
 ```
 
-例：
+例:
 
 ```
 grpcurl -plaintext \
@@ -133,7 +133,7 @@ grpcurl -plaintext \
     cosmos.feegrant.v1beta1.Query/Allowance
 ```
 
-出力例：
+出力例:
 
 ```
 {
@@ -153,7 +153,7 @@ grpcurl -plaintext \
 cosmos.feegrant.v1beta1.Query/Allowances
 ```
 
-例：
+例:
 
 ```
 grpcurl -plaintext \
@@ -162,7 +162,7 @@ grpcurl -plaintext \
     cosmos.feegrant.v1beta1.Query/Allowances
 ```
 
-出力例：
+出力例:
 
 ```
 {

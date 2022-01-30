@@ -1,33 +1,33 @@
 # 帰属
 
-- [帰属](＃vesting)
-    - [はじめにと要件](＃intro-and-requirements)
-    - [注](＃note)
-    - [アトリビューションアカウントタイプ](＃vesting-account-types)
-    - [権利確定アカウントの仕様](＃vesting-account-specification)
-        - [権利確定と権利確定額の決定](＃determining-vesting--vested-amounts)
-            - [継続的に権利が確定するアカウント](＃continuously-vesting-accounts)
-        - [定期的な権利確定アカウント](＃periodic-vesting-accounts)
-            - [遅延/個別の権利確定アカウント](＃delayeddiscrete-vesting-accounts)
-        - [転送/送信](＃transferringsending)
-            - [キーパー/ハンドラー](＃keepershandlers)
-        - [委任](＃delegating)
-            - [キーパー/ハンドラー](＃keepershandlers-1)
-        - [委任のキャンセル](＃委任のキャンセル)
-            - [キーパー/ハンドラー](＃keepershandlers-2)
-    - [キーパーとハンドラー](＃keepers--ハンドラー)
-    - [ジェネシス初期化](＃genesis-初期化)
-    - [例](＃examples)
-        - [シンプル](＃simple)
-        - [スラッシュ](＃slashing)
-        - [定期的な権利確定](＃定期的な権利確定)
-    - [用語集](＃glossary)
+- [帰属](#vesting)
+    - [はじめにと要件](#intro-and-requirements)
+    - [注](#note)
+    - [アトリビューションアカウントタイプ](#vesting-account-types)
+    - [権利確定アカウントの仕様](#vesting-account-specification)
+        - [権利確定と権利確定額の決定](#determining-vesting--vested-amounts)
+            - [継続的に権利が確定するアカウント](#continuously-vesting-accounts)
+        - [定期的な権利確定アカウント](#periodic-vesting-accounts)
+            - [遅延/個別の権利確定アカウント](#delayeddiscrete-vesting-accounts)
+        - [転送/送信](#transferringsending)
+            - [キーパー/ハンドラー](#keepershandlers)
+        - [委任](#delegating)
+            - [キーパー/ハンドラー](#keepershandlers-1)
+        - [委任のキャンセル](#委任のキャンセル)
+            - [キーパー/ハンドラー](#keepershandlers-2)
+    - [キーパーとハンドラー](#keepers--ハンドラー)
+    - [ジェネシス初期化](#genesis-初期化)
+    - [例](#examples)
+        - [シンプル](#simple)
+        - [スラッシュ](#slashing)
+        - [定期的な権利確定](#定期的な権利確定)
+    - [用語集](#glossary)
 
 ## はじめにと要件
 
 仕様は、によって使用される帰属アカウントの実現を定義します
 宇宙の中心。このアトリビューションアカウントの要件は、
-作成期間中に、開始残高「X」と帰属の終了を使用して初期化します
+作成期間中に、開始残高[X]と帰属の終了を使用して初期化します
 時間 `ET`。権利確定勘定は、権利確定開始時刻 `ST`で初期化できます。
 そして、いくつかの権利確定期間 `P`。アトリビューションの開始時刻が含まれている場合は、
 権利確定期間は開始時間まで開始されません。権利確定期間の場合
@@ -36,12 +36,12 @@
 すべての既得アカウントについて、既得アカウントの所有者は委任できます
 バリデーターからの委任をキャンセルしますが、コインを別のコインに転送することはできません
 これらのコインが確定するまで説明します。仕様は4つを許可します
-さまざまな種類の帰属：
+さまざまな種類の帰属:
 
-- 権利確定の遅延。「ET」に達すると、すべてのコインが権利確定します。
-- コインが「ST」に帰属し始め、線形に帰属する継続的な帰属
-「ET」に到達するまでの時間について
-- 定期的な権利確定、コインは「ST」に属し始め、定期的に権利が確定します
+- 権利確定の遅延。[ET]に達すると、すべてのコインが権利確定します。
+- コインが[ST]に帰属し始め、線形に帰属する継続的な帰属
+[ET]に到達するまでの時間について
+- 定期的な権利確定、コインは[ST]に属し始め、定期的に権利が確定します
 期間数と各期間の運動量に基づきます。
 期間の数、各期間の長さ、および各期間の量は次のとおりです。
 構成可能。定期的な権利確定勘定は継続的なものとは異なります
@@ -59,28 +59,28 @@
 作成後、通常のメッセージでContinuousVestingアカウントを作成できます。
 他のタイプのアトリビューションアカウントは、作成時に作成するか、次のように使用する必要があります。
 手動ネットワークアップグレードの一部。現在の仕様では、
-_無条件_属性の場合(つまり、「ET」に到達することは不可能であり、
+_無条件_属性の場合(つまり、[ET]に到達することは不可能であり、
 帰属できないコインがあります)。
 
 ## アトリビューションアカウントタイプ 
 
 ```go
-// VestingAccount defines an interface that any vesting account type must
-// implement.
+//VestingAccount defines an interface that any vesting account type must
+//implement.
 type VestingAccount interface {
   Account
 
   GetVestedCoins(Time)  Coins
   GetVestingCoins(Time) Coins
 
-  // TrackDelegation performs internal vesting accounting necessary when
-  // delegating from a vesting account. It accepts the current block time, the
-  // delegation amount and balance of all coins whose denomination exists in
-  // the account's original vesting balance.
+ //TrackDelegation performs internal vesting accounting necessary when
+ //delegating from a vesting account. It accepts the current block time, the
+ //delegation amount and balance of all coins whose denomination exists in
+ //the account's original vesting balance.
   TrackDelegation(Time, Coins, Coins)
 
-  // TrackUndelegation performs internal vesting accounting necessary when a
-  // vesting account performs an undelegation.
+ //TrackUndelegation performs internal vesting accounting necessary when a
+ //vesting account performs an undelegation.
   TrackUndelegation(Coins)
 
   GetStartTime() int64
@@ -105,7 +105,7 @@ type VestingAccount interface {
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/vesting/v1beta1/vesting.proto#L56-L62
 
 ```go
-// Stores all vesting periods passed as part of a PeriodicVestingAccount
+//Stores all vesting periods passed as part of a PeriodicVestingAccount
 type Periods []Period
 
 ```
@@ -115,17 +115,17 @@ type Periods []Period
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/vesting/v1beta1/vesting.proto#L64-L73
 
 一時的な型のチェックとアサーションおよびサポートを容易にするため
-アカウントの残高を使用する柔軟性、既存の `x / bank``ViewKeeper`インターフェース
+アカウントの残高を使用する柔軟性、既存の `x/bank``ViewKeeper`インターフェース
 以下を含むように更新します。
 
 ```go
 type ViewKeeper interface {
-  // ...
+ //...
 
-  // Calculates the total locked account balance.
+ //Calculates the total locked account balance.
   LockedCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 
-  // Calculates the total spendable balance that can be sent to other accounts.
+ //Calculates the total spendable balance that can be sent to other accounts.
   SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
 ```
@@ -138,17 +138,17 @@ type ViewKeeper interface {
 
 アトリビューションアカウントを指定すると、処理操作で次のように定義されます。
 
-- `OV`：元の帰属コインの数。定数値です。
-- `V`： `OV`トークンの数はまだ_権利確定_です。それはからです
+- `OV`:元の帰属コインの数。定数値です。
+- `V`: `OV`トークンの数はまだ_権利確定_です。それはからです
 `OV`、` StartTime`、 `EndTime`。この値は、に基づいてではなく、オンデマンドで計算されます
 基礎のすべての部分。
-- `V'`：_既得_(ロック解除)の `OV`コインの数。この値は
+- `V'`:_既得_(ロック解除)の `OV`コインの数。この値は
 ブロックごとではなく、オンデマンドで計算します。
-- `DV`：委託された_vesting_コインの数。可変値です。それは
+- `DV`:委託された_vesting_コインの数。可変値です。それは
 アトリビューションアカウントに直接保存して変更します。
-- `DF`：委託された_既得_(ロック解除)コインの数。変数です
+- `DF`:委託された_既得_(ロック解除)コインの数。変数です
 価値。アトリビューションアカウントに直接保存および変更されます。
-- `BC`： `OV`コインの数から転送されたコインを差し引いた数
+- `BC`: `OV`コインの数から転送されたコインを差し引いた数
 (否定的または委託することができます)。バランスが取れていると見なされます
 埋め込まれた基本アカウント。アトリビューションアカウントに直接保存および変更されます。
 
@@ -159,12 +159,12 @@ type ViewKeeper interface {
 
 #### アカウントを継続的に権利確定
 
-所与のブロック時間「Ｔ」に起因するトークンの数を決定するために、
-以下をせよ：
+所与のブロック時間[Ｔ]に起因するトークンの数を決定するために、
+以下をせよ:
 
 1. Compute `X := T - StartTime`
 2. Compute `Y := EndTime - StartTime`
-3. Compute `V' := OV * (X / Y)`
+3. Compute `V' := OV * (X/Y)`
 4. Compute `V := OV - V'`
 
 Thus, the total amount of _vested_ coins is `V'` and the remaining amount, `V`,
@@ -173,9 +173,9 @@ is _vesting_.
 ```go
 func (cva ContinuousVestingAccount) GetVestedCoins(t Time) Coins {
     if t <= cva.StartTime {
-        // We must handle the case where the start time for a vesting account has
-        // been set into the future or when the start of the chain is not exactly
-        // known.
+       //We must handle the case where the start time for a vesting account has
+       //been set into the future or when the start of the chain is not exactly
+       //known.
         return ZeroCoins
     } else if t >= cva.EndTime {
         return cva.OriginalVesting
@@ -184,7 +184,7 @@ func (cva ContinuousVestingAccount) GetVestedCoins(t Time) Coins {
     x := t - cva.StartTime
     y := cva.EndTime - cva.StartTime
 
-    return cva.OriginalVesting * (x / y)
+    return cva.OriginalVesting * (x/y)
 }
 
 func (cva ContinuousVestingAccount) GetVestingCoins(t Time) Coins {
@@ -195,14 +195,14 @@ func (cva ContinuousVestingAccount) GetVestingCoins(t Time) Coins {
 ### 定期的な権利確定アカウント
 
 通常の権利確定勘定は、各期間にリリースされたコインを計算する必要があります
-指定されたブロック時間「T」の期間。 複数の期間が経過している可能性があることに注意してください
+指定されたブロック時間[T]の期間。 複数の期間が経過している可能性があることに注意してください
 `GetVestedCoins`を呼び出すときは、各サイクルを次のように繰り返す必要があります。
-その期間の終わりは「T」の後です。 
+その期間の終わりは[T]の後です。 
 
 1. Set `CT := StartTime`
 2. Set `V' := 0`
 
-各期間Pについて：
+各期間Pについて:
 
   1. Compute `X := T - CT`
   2. IF `X >= P.Length`
@@ -216,7 +216,7 @@ func (pva PeriodicVestingAccount) GetVestedCoins(t Time) Coins {
   if t < pva.StartTime {
     return ZeroCoins
   }
-  ct := pva.StartTime // The start of the vesting schedule
+  ct := pva.StartTime//The start of the vesting schedule
   vested := 0
   periods = pva.GetPeriods()
   for _, period  := range periods {
@@ -224,7 +224,7 @@ func (pva PeriodicVestingAccount) GetVestedCoins(t Time) Coins {
       break
     }
     vested += period.Amount
-    ct += period.Length // increment ct to the start of the next vesting period
+    ct += period.Length//increment ct to the start of the next vesting period
   }
   return vested
 }
@@ -256,13 +256,13 @@ func (dva DelayedVestingAccount) GetVestingCoins(t Time) Coins {
 
 ### Transferring/Sending
 
-いつでも、帰属アカウントを転送できます： `min((BC + DV)-V、BC)`。
+いつでも、帰属アカウントを転送できます: `min((BC + DV)-V、BC)`。
 
 つまり、アトリビューションアカウントは、ベースアカウントの最小値を転送できます
 残高と基本口座残高に現在の注文数を加えたもの
 既得トークンは、これまでの既得トークンの数よりも少なくなっています。
 
-ただし、アカウントの残高は `x / bank`モジュールを介して追跡されるため、
+ただし、アカウントの残高は `x/bank`モジュールを介して追跡されるため、
 アカウントの残高全体が読み込まれないようにしたいので、OKに変更できます
 ロックされたバランスは `max(V-DV、0)`として定義され、推測されます
 使うことができるバランス。
@@ -285,14 +285,14 @@ func (k Keeper) LockedCoins(ctx Context, addr AccAddress) Coins {
         }
     }
 
-    // non-vesting accounts do not have any locked coins
+   //non-vesting accounts do not have any locked coins
     return NewCoins()
 }
 ```
 
 #### Keepers/Handlers
 
-対応する `x / bank`管理者はコインの送信を適切に処理する必要があります
+対応する `x/bank`管理者はコインの送信を適切に処理する必要があります
 アカウントが帰属アカウントであるかどうかによる。
 
 ```go
@@ -307,13 +307,13 @@ func (k Keeper) SendCoins(ctx Context, from Account, to Account, amount Coins) {
     from.SetBalance(newCoins)
     to.AddBalance(amount)
 
-    // save balances...
+   //save balances...
 }
 ```
 
 ### Delegating
 
-「D」通貨を委任しようとするアトリビューションアカウントの場合、次の操作を実行します:
+[D]通貨を委任しようとするアトリビューションアカウントの場合、次の操作を実行します:
 
 1. Verify `BC >= D > 0`
 2. Compute `X := min(max(V - DV, 0), D)` (portion of `D` that is vesting)
@@ -345,14 +345,14 @@ func DelegateCoins(t Time, from Account, amount Coins) {
         from.SetBalance(sc - amount)
     }
 
-    // save account...
+   //save account...
 }
 ```
 
 ### Undelegating
 
-「D」トークンの委任をキャンセルしようとするアトリビューションアカウントの場合、次の操作を実行します。
-注： `DV <D`および`(DV + DF)<D`は、丸めの癖が原因である可能性があります
+[D]トークンの委任をキャンセルしようとするアトリビューションアカウントの場合、次の操作を実行します。
+注: `DV <D`および`(DV + DF)<D`は、丸めの癖が原因である可能性があります
 委任ロジックを委任/キャンセルします。
 
 1. Verify `D > 0`
@@ -374,11 +374,11 @@ func (cva ContinuousVestingAccount) TrackUndelegation(amount Coins) {
 **注** `TrackUnDelegation`は` DelegatedVesting`と `DelegatedFree`のみを変更しました
 フィールド、アップストリームの呼び出し元は、 `amount`を追加して` Coins`フィールドを変更する必要があります。
 
-**注**：承認が減らされると、継続的な権利確定アカウントは終了します
-すべてのトークンが確定した後でも、「DV」が過剰になります。 それの訳は
+**注**:承認が減らされると、継続的な権利確定アカウントは終了します
+すべてのトークンが確定した後でも、[DV]が過剰になります。 それの訳は
 承認された無料コインのキャンセルが優先されます。
 
-**注**：委託のキャンセル(保証金の払い戻し)の金額は、委託を超える場合があります
+**注**:委託のキャンセル(保証金の払い戻し)の金額は、委託を超える場合があります
 承認の取り消しにより、社債の返済方法が打ち切られるため、既得(社債)額、
 もしも
 コミットされていないトークンは完全ではありません。
@@ -390,21 +390,21 @@ func UndelegateCoins(to Account, amount Coins) {
     if isVesting(to) {
         if to.DelegatedFree + to.DelegatedVesting >= amount {
             to.TrackUndelegation(amount)
-            // save account ...
+           //save account ...
         }
     } else {
         AddBalance(to, amount)
-        // save account...
+       //save account...
     }
 }
 ```
 
 ## Keepers & Handlers
 
-`VestingAccount`の実装は` x / auth`にあります。 ただし、ゴールキーパーは
-帰属するモジュールを使用する可能性があることを望んでいます(例： `x / staking`でのステーキング)
-コインの場合、明示的なメソッドを `x / bank`キーパーで呼び出す必要があります(たとえば、` DelegateCoins`)
-「SendCoins」および「SubtractCoins」とは異なります。
+`VestingAccount`の実装は` x/auth`にあります。 ただし、ゴールキーパーは
+帰属するモジュールを使用する可能性があることを望んでいます(例: `x/staking`でのステーキング)
+コインの場合、明示的なメソッドを `x/bank`キーパーで呼び出す必要があります(たとえば、` DelegateCoins`)
+[SendCoins]および[SubtractCoins]とは異なります。
 
 さらに、既得のアカウントは、任意の通貨を使用できる必要があります。
 他のユーザーから受け取ります。 したがって、バンキングモジュールの `MsgSend`ハンドラーは
@@ -414,17 +414,17 @@ func UndelegateCoins(to Account, amount Coins) {
 完全な実装の詳細については、上記の仕様を参照してください。
 ## ジェネシスの初期化
 
-属性付きアカウントと属性なしアカウントを初期化するには、「GenesisAccount」構造
-新しいフィールド「Vesting」、「StartTime」、「EndTime」を含めます。 アカウントは
-「BaseAccount」タイプまたは属性のないタイプには「Vesting = false」があります。 この
-ジェネシス初期化ロジック(例： `initFromGenesisState`)を解決する必要があります
+属性付きアカウントと属性なしアカウントを初期化するには、[GenesisAccount]構造
+新しいフィールド[Vesting]、[StartTime]、[EndTime]を含めます。 アカウントは
+[BaseAccount]タイプまたは属性のないタイプには[Vesting = false]があります。 この
+ジェネシス初期化ロジック(例: `initFromGenesisState`)を解決する必要があります
 そして、これらのフィールドに従って、正しいアカウントがそれに応じて返されます。
 
 ```go
 type GenesisAccount struct {
-    // ...
+   //...
 
-    // vesting account fields
+   //vesting account fields
     OriginalVesting  sdk.Coins `json:"original_vesting"`
     DelegatedFree    sdk.Coins `json:"delegated_free"`
     DelegatedVesting sdk.Coins `json:"delegated_vesting"`
@@ -437,11 +437,11 @@ func ToAccount(gacc GenesisAccount) Account {
 
     if gacc.OriginalVesting > 0 {
         if ga.StartTime != 0 && ga.EndTime != 0 {
-            // return a continuous vesting account
+           //return a continuous vesting account
         } else if ga.EndTime != 0 {
-            // return a delayed vesting account
+           //return a delayed vesting account
         } else {
-            // invalid genesis vesting account provided
+           //invalid genesis vesting account provided
             panic()
         }
     }
@@ -601,19 +601,19 @@ V' = 0
 
 ## 用語集
 
-- OriginalVesting：最初にあるコインの量(金種ごと)
+- OriginalVesting:最初にあるコインの量(金種ごと)
 権利確定口座の一部。これらのコインは創世​​記に設定されています。
-- StartTime：権利確定アカウントが権利確定を開始するBFT時間。
--EndTime：権利確定アカウントが完全に権利が確定するBFT時間。
-- DelegatedFree：追跡されたコインの量(金種ごと)
+- StartTime:権利確定アカウントが権利確定を開始するBFT時間。
+-EndTime:権利確定アカウントが完全に権利が確定するBFT時間。
+- DelegatedFree:追跡されたコインの量(金種ごと)
 委任時に完全に権利が確定した権利確定アカウントから委任された。
-- DelegatedVesting：追跡されたコインの量(金種ごと)
+- DelegatedVesting:追跡されたコインの量(金種ごと)
 委任時に権利が確定していた権利確定アカウントから委任されました。
-- ContinuousVestingAccount：コインを権利確定する権利確定アカウントの実装
+- ContinuousVestingAccount:コインを権利確定する権利確定アカウントの実装
 時間の経過とともに直線的に。
-- DelayedVestingAccount：完全に権利が確定するだけの権利確定アカウントの実装
+- DelayedVestingAccount:完全に権利が確定するだけの権利確定アカウントの実装
 与えられた時間にすべてのコイン。
-- PeriodicVestingAccount：コインを権利確定する権利確定アカウントの実装
+- PeriodicVestingAccount:コインを権利確定する権利確定アカウントの実装
 カスタムの権利確定スケジュールに従って。
-- PermanentLockedAccount：コインを解放することはなく、無期限にロックします。
+- PermanentLockedAccount:コインを解放することはなく、無期限にロックします。
 このアカウントのコインは、ロックされている場合でも、委任やガバナンスの投票に使用できます。

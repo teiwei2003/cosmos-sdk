@@ -133,7 +133,7 @@ simd query gov proposal 1
 ```bash
 messages: [
   {
-    '@type': /cosmos.bank.v1beta1.MsgSend
+    '@type':/cosmos.bank.v1beta1.MsgSend
     from_address: "cosmos1..",
     to_address: "cosmos1..",
     amount: "100atom"
@@ -177,7 +177,7 @@ pagination:
   total: "1"
 proposals:
 - content:
-    '@type': /cosmos.gov.v1beta1.TextProposal
+    '@type':/cosmos.gov.v1beta1.TextProposal
     description: testing, testing, 1, 2, 3
     title: Test Proposal
   deposit_end_time: "2021-09-17T23:36:18.254995423Z"

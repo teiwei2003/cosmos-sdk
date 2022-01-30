@@ -6,11 +6,11 @@
 
 -[Cosmos SDKアプリケーション分析](./app-anatomy.md){前提条件}
 
-##アカウント定義
+## アカウント定義
 
-Cosmos SDKでは、_account_は_public key_`PubKey`と_privatekey_`PrivKey`のペアを指定します。 「公開鍵」は、アプリケーション内のユーザー(およびその他の関係者)を識別するために使用されるさまざまな「アドレス」を生成するために導出できます。 `Addresses`は、` message`の送信者を識別するために[`message`s](../building-modules/messages-and-queries.md#messages)にも関連付けられています。 `PrivKey`は、[デジタル署名](#signatures)を生成して、指定された「メッセージ」の「PrivKey」に関連付けられた「アドレス」を証明するために使用されます。
+Cosmos SDKでは、_account_は_public key_`PubKey`と_privatekey_`PrivKey`のペアを指定します。 [公開鍵]は、アプリケーション内のユーザー(およびその他の関係者)を識別するために使用されるさまざまな[アドレス]を生成するために導出できます。 `Addresses`は、` message`の送信者を識別するために[`message`s](../building-modules/messages-and-queries.md#messages)にも関連付けられています。 `PrivKey`は、[デジタル署名](#signatures)を生成して、指定された[メッセージ]の[PrivKey]に関連付けられた[アドレス]を証明するために使用されます。
 
-HDキーの導出には、Cosmos SDKは[BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)と呼ばれる標準を使用します。 BIP32を使用すると、ユーザーはHDウォレットを作成できます([BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)で指定)-最初のシークレットから派生したアカウントシードのセット。シードは通常、12語または24語のニーモニックによって作成されます。単一のシードは、一方向の暗号化機能を使用して、任意の数の「PrivKey」を導出できます。次に、 `PubKey`を` PrivKey`から派生させることができます。当然のことながら、ニーモニックは最も機密性の高い情報です。ニーモニックを保持しておけば、秘密鍵をいつでも再生成できるからです。 
+HDキーの導出には、Cosmos SDKは[BIP32](https://github.com/bitcoin/bips/blob/master/bip-0032.mediawiki)と呼ばれる標準を使用します。 BIP32を使用すると、ユーザーはHDウォレットを作成できます([BIP44](https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki)で指定)-最初のシークレットから派生したアカウントシードのセット。シードは通常、12語または24語のニーモニックによって作成されます。単一のシードは、一方向の暗号化機能を使用して、任意の数の[PrivKey]を導出できます。次に、 `PubKey`を` PrivKey`から派生させることができます。当然のことながら、ニーモニックは最も機密性の高い情報です。ニーモニックを保持しておけば、秘密鍵をいつでも再生成できるからです。 
 ```
      Account 0                         Account 1                         Account 2
 
@@ -55,7 +55,7 @@ Cosmos SDKでは、キーは[`Keyring`](#keyring)という名前のオブジェ�
 
 ## キー、アカウント、アドレス、署名
 
-ユーザーを認証する主な方法は、[デジタル署名](https://en.wikipedia.org/wiki/Digital_signature)を使用することです。ユーザーは自分の秘密鍵を使用してトランザクションに署名します。署名の検証は、関連付けられた公開鍵を使用して行われます。チェーンでの署名検証の目的で、公開鍵を「Account」オブジェクト(および正しいトランザクション検証に必要なその他のデータ)に格納します。
+ユーザーを認証する主な方法は、[デジタル署名](https://en.wikipedia.org/wiki/Digital_signature)を使用することです。ユーザーは自分の秘密鍵を使用してトランザクションに署名します。署名の検証は、関連付けられた公開鍵を使用して行われます。チェーンでの署名検証の目的で、公開鍵を[Account]オブジェクト(および正しいトランザクション検証に必要なその他のデータ)に格納します。
 
 ノードでは、すべてのデータがシリアル化され、プロトコルバッファを使用して保存されます。
 
@@ -73,9 +73,9 @@ Cosmos SDKは、デジタル署名を作成するための次のデジタルキ�
 
 ## 住所
 
-`Addresses`と` PubKey`はどちらも、アプリケーションの参加者を識別する公開情報です。 `アカウント`は認証情報を保存するために使用されます。 基本的なアカウントの実装は、「BaseAccount」オブジェクトによって提供されます。
+`Addresses`と` PubKey`はどちらも、アプリケーションの参加者を識別する公開情報です。 `アカウント`は認証情報を保存するために使用されます。 基本的なアカウントの実装は、[BaseAccount]オブジェクトによって提供されます。
 
-各アカウントは、公開鍵から派生した一連のバイトである「アドレス」によって識別されます。 Cosmos SDKでは、アカウントを使用するコンテキストを指定するために3種類のアドレスを定義します。
+各アカウントは、公開鍵から派生した一連のバイトである[アドレス]によって識別されます。 Cosmos SDKでは、アカウントを使用するコンテキストを指定するために3種類のアドレスを定義します。
 
 -`AccAddress`は、ユーザー( `message`の送信者)を識別します。
 -`ValAddress`はバリデーター演算子を識別します。
@@ -86,7 +86,7 @@ Cosmos SDKは、デジタル署名を作成するための次のデジタルキ�
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/types/address.go#L71-L90
 
 アドレス構築アルゴリズムは[ADR-28](https://github.com/cosmos/cosmos-sdk/blob/master/docs/architecture/adr-028-public-key-addresses.md)で定義されています。
-以下は、「pub」公開鍵からアカウントアドレスを取得する標準的な方法です。 
+以下は、[pub]公開鍵からアカウントアドレスを取得する標準的な方法です。 
 
 ```go
 sdk.AccAddress(pub.Address().Bytes())
@@ -110,12 +110,12 @@ Cosmos SDKの公開鍵は、 `cryptotypes.PubKey`インターフェースによ�
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/crypto/types/types.go#L8-L17
 
-圧縮形式は、「secp256k1」および「secp256r1」のシリアル化に使用されます。
+圧縮形式は、[secp256k1]および[secp256r1]のシリアル化に使用されます。
 
 -`y`座標が `x`座標に関連する2バイトの辞書式順序で最大の場合、最初のバイトは0x02バイトです。
--それ以外の場合、最初のバイトは「0x03」です。
+-それ以外の場合、最初のバイトは[0x03]です。
 
-この接頭辞の後に「x」座標が続きます。
+この接頭辞の後に[x]座標が続きます。
 
 公開鍵はアカウント(またはユーザー)の参照には使用されず、通常、トランザクションメッセージの作成には使用されません(いくつかの例外: `MsgCreateValidator`、` Validator`、および `Multisig`メッセージを除く)。
 ユーザーとの対話には、 `PubKey`はProtobufsJSONを使用します([ProtoMarshalJSON](https://github.com/cosmos/cosmos-sdk/blob/release/v0.42.x/codec/json.go#L12)関数形式) 。例:
@@ -130,7 +130,7 @@ Cosmos SDKの公開鍵は、 `cryptotypes.PubKey`インターフェースによ�
 
 `Keyring`のデフォルトの実装は、サードパーティの[` 99designs/keyring`](https://github.com/99designs/keyring)ライブラリから取得されます。
 
-「キーリング」方式に関する注意事項:
+[キーリング]方式に関する注意事項:
 
 -`Sign(uid string、payload[] byte)([] byte、sdkcrypto.PubKey、error) `は、` payload`バイトの署名を厳密に処理します。トランザクションを準備し、それを正規の `[] byte`形式にエンコードする必要があります。 protobufは決定論的ではないため、[ADR-020](../architecture/adr-020-protobuf-transaction-encoding.md)で、署名される仕様 `payload`は` SignDoc`構造であると判断されています。 deterministic[ADR-027](adr-027-deterministic-protobuf-serialization.md)エンコーディングを使用します。署名の検証はCosmosSDKにデフォルトで実装されておらず、[`anteHandler`](../core/baseapp.md#antehandler)に延期されていることに注意してください。
   +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/proto/cosmos/tx/v1beta1/tx.proto#L47-L64

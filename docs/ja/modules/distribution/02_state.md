@@ -3,7 +3,7 @@
 ## 料金プール
 
 配布に使用されるすべてのグローバル追跡パラメータは、に保存されます
-「コストプール」。 報酬を収集し、報酬プールに追加します
+[コストプール]。 報酬を収集し、報酬プールに追加します
 ここから検証者/委任者に配布します。
 
 報酬プールには、許可するための小数コイン( `DecCoins`)が含まれていることに注意してください
@@ -11,10 +11,10 @@
 コインがプールから配布されると、切り捨てられます
 `sdk.Coins`は10進数ではありません。
 
-- 料金プール： `0x00-> ProtocolBuffer(FeePool)`
+- 料金プール: `0x00-> ProtocolBuffer(FeePool)`
 
 ```go
-// coins with decimal
+//coins with decimal
 type DecCoins []DecCoin
 
 type DecCoin struct {
@@ -34,7 +34,7 @@ type DecCoin struct {
 3. 委任者がバリデーターから撤退する、または
 4. 検証者はその手数料を撤回します。
 
-- ValidatorDistInfo： `0x02 | ValOperatorAddrLen(1バイト)| ValOperatorAddr-> ProtocolBuffer(validatorDistribution)`
+- ValidatorDistInfo: `0x02 | ValOperatorAddrLen(1バイト)| ValOperatorAddr-> ProtocolBuffer(validatorDistribution)`
 
 ```go
 type ValidatorDistInfo struct {
@@ -52,10 +52,10 @@ type ValidatorDistInfo struct {
 そして、クライアントの_蓄積_係数は受動的に計算することができます
 最後の引き出しの高さとその現在の属性のみ。
 
-- 委任された配布情報： `0x02 | DelegatorAddrLen(1バイト)|委任アドレス| ValOperatorAddrLen(1バイト)| ValOperatorAddr-> ProtocolBuffer(delegatorDist)`
+- 委任された配布情報: `0x02 | DelegatorAddrLen(1バイト)|委任アドレス| ValOperatorAddrLen(1バイト)| ValOperatorAddr-> ProtocolBuffer(delegatorDist)`
 
 ```go
 type DelegationDistInfo struct {
-    WithdrawalHeight int64    // last time this delegation withdrew rewards
+    WithdrawalHeight int64   //last time this delegation withdrew rewards
 }
 ```

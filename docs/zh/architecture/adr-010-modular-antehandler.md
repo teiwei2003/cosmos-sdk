@@ -36,8 +36,8 @@
 [weave 项目](https://github.com/iov-one/weave) 通过使用装饰器模式实现了 AnteHandler 模块化。界面设计如下: 
 
 ```go
-// Decorator wraps a Handler to provide common functionality
-// like authentication, or fee-handling, to many Handlers
+//Decorator wraps a Handler to provide common functionality
+//like authentication, or fee-handling, to many Handlers
 type Decorator interface {
 	Check(ctx Context, store KVStore, tx Tx, next Checker) (*CheckResult, error)
 	Deliver(ctx Context, store KVStore, tx Tx, next Deliverer) (*DeliverResult, error)
@@ -49,13 +49,13 @@ type Decorator interface {
 这种方法的一个主要好处是一个装饰器可以将其内部逻辑包装在下一个检查器/交付器周围。 编织装饰器可以执行以下操作:
 
 ```go
-// Example Decorator's Deliver function
+//Example Decorator's Deliver function
 func (example Decorator) Deliver(ctx Context, store KVStore, tx Tx, next Deliverer) {
-    // Do some pre-processing logic
+   //Do some pre-processing logic
 
     res, err := next.Deliver(ctx, store, tx)
 
-    // Do some post-processing logic given the result and error
+   //Do some post-processing logic given the result and error
 }
 ```
 
@@ -87,8 +87,8 @@ Weave 方法的好处是装饰器可以非常简洁，当链接在一起时可�
 ##### Cosmos SDK 代码 
 
 ```go
-// Chains together a list of AnteHandler micro-functions that get run one after the other.
-// Returned AnteHandler will abort on first error.
+//Chains together a list of AnteHandler micro-functions that get run one after the other.
+//Returned AnteHandler will abort on first error.
 func Chainer(order []AnteHandler) AnteHandler {
     return func(ctx Context, tx Tx, simulate bool) (newCtx Context, err error) {
         for _, ante := range order {
@@ -103,41 +103,41 @@ func Chainer(order []AnteHandler) AnteHandler {
 ```
 
 ```go
-// AnteHandler micro-function to verify signatures
+//AnteHandler micro-function to verify signatures
 func VerifySignatures(ctx Context, tx Tx, simulate bool) (newCtx Context, err error) {
-    // verify signatures
-    // Returns InvalidSignature Result and abort=true if sigs invalid
-    // Return OK result and abort=false if sigs are valid
+   //verify signatures
+   //Returns InvalidSignature Result and abort=true if sigs invalid
+   //Return OK result and abort=false if sigs are valid
 }
 
-// AnteHandler micro-function to validate memo
+//AnteHandler micro-function to validate memo
 func ValidateMemo(ctx Context, tx Tx, simulate bool) (newCtx Context, err error) {
-    // validate memo
+   //validate memo
 }
 
-// Auth defines its own default ante-handler by chaining its micro-functions in a recommended order
+//Auth defines its own default ante-handler by chaining its micro-functions in a recommended order
 AuthModuleAnteHandler := Chainer([]AnteHandler{VerifySignatures, ValidateMemo})
 ```
 
 ```go
-// Distribution micro-function to deduct fees from tx
+//Distribution micro-function to deduct fees from tx
 func DeductFees(ctx Context, tx Tx, simulate bool) (newCtx Context, err error) {
-    // Deduct fees from tx
-    // Abort if insufficient funds in account to pay for fees
+   //Deduct fees from tx
+   //Abort if insufficient funds in account to pay for fees
 }
 
-// Distribution micro-function to check if fees > mempool parameter
+//Distribution micro-function to check if fees > mempool parameter
 func CheckMempoolFees(ctx Context, tx Tx, simulate bool) (newCtx Context, err error) {
-    // If CheckTx: Abort if the fees are less than the mempool's minFee parameter
+   //If CheckTx: Abort if the fees are less than the mempool's minFee parameter
 }
 
-// Distribution defines its own default ante-handler by chaining its micro-functions in a recommended order
+//Distribution defines its own default ante-handler by chaining its micro-functions in a recommended order
 DistrModuleAnteHandler := Chainer([]AnteHandler{CheckMempoolFees, DeductFees})
 ```
 
 ```go
 type ModuleManager struct {
-    // other fields
+   //other fields
     AnteHandlerOrder []AnteHandler
 }
 
@@ -149,7 +149,7 @@ func (mm ModuleManager) GetAnteHandler() AnteHandler {
 ##### User Code
 
 ```go
-// Note: Since user is not making any custom modifications, we can just SetAnteHandlerOrder with the default AnteHandlers provided by each module in our preferred order
+//Note: Since user is not making any custom modifications, we can just SetAnteHandlerOrder with the default AnteHandlers provided by each module in our preferred order
 moduleManager.SetAnteHandlerOrder([]AnteHandler(AuthModuleAnteHandler, DistrModuleAnteHandler))
 
 app.SetAnteHandler(mm.GetAnteHandler())
@@ -162,15 +162,15 @@ app.SetAnteHandler(mm.GetAnteHandler())
 ##### 用户代码 
 
 ```go
-// User can implement their own custom signature verification antehandler micro-function
+//User can implement their own custom signature verification antehandler micro-function
 func CustomSigVerify(ctx Context, tx Tx, simulate bool) (newCtx Context, err error) {
-    // do some custom signature verification logic
+   //do some custom signature verification logic
 }
 ```
 
 ```go
-// Micro-functions allow users to change order of when they get executed, and swap out default ante-functionality with their own custom logic.
-// Note that users can still chain the default distribution module handler, and auth micro-function along with their custom ante function
+//Micro-functions allow users to change order of when they get executed, and swap out default ante-functionality with their own custom logic.
+//Note that users can still chain the default distribution module handler, and auth micro-function along with their custom ante function
 moduleManager.SetAnteHandlerOrder([]AnteHandler(ValidateMemo, CustomSigVerify, DistrModuleAnteHandler))
 ```
 
@@ -195,15 +195,15 @@ moduleManager.SetAnteHandlerOrder([]AnteHandler(ValidateMemo, CustomSigVerify, D
 这允许用户在自己实现 AnteHandler 和在基本应用程序中设置它之间进行选择，或者使用装饰器模式按照他们希望的顺序将他们的自定义装饰器与 Cosmos SDK 提供的装饰器链接起来。 
 
 ```go
-// An AnteDecorator wraps an AnteHandler, and can do pre- and post-processing on the next AnteHandler
+//An AnteDecorator wraps an AnteHandler, and can do pre- and post-processing on the next AnteHandler
 type AnteDecorator interface {
     AnteHandle(ctx Context, tx Tx, simulate bool, next AnteHandler) (newCtx Context, err error)
 }
 ```
 
 ```go
-// ChainAnteDecorators will recursively link all of the AnteDecorators in the chain and return a final AnteHandler function
-// This is done to preserve the ability to set a single AnteHandler function in the baseapp.
+//ChainAnteDecorators will recursively link all of the AnteDecorators in the chain and return a final AnteHandler function
+//This is done to preserve the ability to set a single AnteHandler function in the baseapp.
 func ChainAnteDecorators(chain ...AnteDecorator) AnteHandler {
     if len(chain) == 1 {
         return func(ctx Context, tx Tx, simulate bool) {
@@ -221,50 +221,50 @@ func ChainAnteDecorators(chain ...AnteDecorator) AnteHandler {
 定义 AnteDecorator 函数
 
 ```go
-// Setup GasMeter, catch OutOfGasPanic and handle appropriately
+//Setup GasMeter, catch OutOfGasPanic and handle appropriately
 type SetUpContextDecorator struct{}
 
 func (sud SetUpContextDecorator) AnteHandle(ctx Context, tx Tx, simulate bool, next AnteHandler) (newCtx Context, err error) {
     ctx.GasMeter = NewGasMeter(tx.Gas)
 
     defer func() {
-        // recover from OutOfGas panic and handle appropriately
+       //recover from OutOfGas panic and handle appropriately
     }
 
     return next(ctx, tx, simulate)
 }
 
-// Signature Verification decorator. Verify Signatures and move on
+//Signature Verification decorator. Verify Signatures and move on
 type SigVerifyDecorator struct{}
 
 func (svd SigVerifyDecorator) AnteHandle(ctx Context, tx Tx, simulate bool, next AnteHandler) (newCtx Context, err error) {
-    // verify sigs. Return error if invalid
+   //verify sigs. Return error if invalid
 
-    // call next antehandler if sigs ok
+   //call next antehandler if sigs ok
     return next(ctx, tx, simulate)
 }
 
-// User-defined Decorator. Can choose to pre- and post-process on AnteHandler
+//User-defined Decorator. Can choose to pre- and post-process on AnteHandler
 type UserDefinedDecorator struct{
-    // custom fields
+   //custom fields
 }
 
 func (udd UserDefinedDecorator) AnteHandle(ctx Context, tx Tx, simulate bool, next AnteHandler) (newCtx Context, err error) {
-    // pre-processing logic
+   //pre-processing logic
 
     ctx, err = next(ctx, tx, simulate)
 
-    // post-processing logic
+   //post-processing logic
 }
 ```
 
 链接 AnteDecorators 以创建最终的 AnteHandler。 在 baseapp 中设置这个 AnteHandler。
 
 ```go
-// Create final antehandler by chaining the decorators together
+//Create final antehandler by chaining the decorators together
 antehandler := ChainAnteDecorators(NewSetUpContextDecorator(), NewSigVerifyDecorator(), NewUserDefinedDecorator())
 
-// Set chained Antehandler in the baseapp
+//Set chained Antehandler in the baseapp
 bapp.SetAnteHandler(antehandler)
 ```
 

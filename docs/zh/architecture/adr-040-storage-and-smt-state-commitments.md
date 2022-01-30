@@ -126,14 +126,14 @@ Stargate `/store` 实现 (store/v1) 在 SDK存储构建中添加了一个额外�
 我们建议减少 SDK 中的多存储概念，并在“RootStore”对象中使用“SC”和“SS”的单个实例。为了避免混淆，我们应该将 `MultiStore` 接口重命名为 `RootStore`。 `RootStore` 将具有以下界面；为简洁起见，省略了配置跟踪和侦听器的方法。 
 
 ```go
-// Used where read-only access to versions is needed.
+//Used where read-only access to versions is needed.
 type BasicRootStore interface {
     Store
     GetKVStore(StoreKey) KVStore
     CacheRootStore() CacheRootStore
 }
 
-// Used as the main app state, replacing CommitMultiStore.
+//Used as the main app state, replacing CommitMultiStore.
 type CommitRootStore interface {
     BasicRootStore
     Committer
@@ -142,18 +142,18 @@ type CommitRootStore interface {
     GetVersion(uint64) (BasicRootStore, error)
     SetInitialVersion(uint64) error
 
-    ... // Trace and Listen methods
+    ...//Trace and Listen methods
 }
 
-// Replaces CacheMultiStore for branched state.
+//Replaces CacheMultiStore for branched state.
 type CacheRootStore interface {
     BasicRootStore
     Write()
 
-    ... // Trace and Listen methods
+    ...//Trace and Listen methods
 }
 
-// Example of constructor parameters for the concrete type.
+//Example of constructor parameters for the concrete type.
 type RootStoreConfig struct {
     Upgrades        *StoreUpgrades
     InitialVersion  uint64
@@ -258,7 +258,7 @@ TODO:完成此操作或移至另一个 ADR。
 + [状态承诺和存储报告](https://paper.dropbox.com/published/State-commitments-and-storage-review--BDvA1MLwRtOx55KRihJ5xxLbBw-KeEB7eOd11pNrZvVtqUgL3h)
 + [Celestia (LazyLedger) SMT](https://github.com/lazyledger/smt)
 + Facebook Diem (Libra) SMT [设计](https://developers.diem.com/papers/jellyfish-merkle-tree/2021-01-14.pdf)
-+ [Trillian 撤销透明度](https://github.com/google/trillian/blob/master/docs/papers/RevocationTransparency.pdf)、[Trillian 可验证数据结构](https://github.com/google/trillian /blob/master/docs/papers/VerifiableDataStructures.pdf)。
++ [Trillian 撤销透明度](https://github.com/google/trillian/blob/master/docs/papers/RevocationTransparency.pdf)、[Trillian 可验证数据结构](https://github.com/google/trillian/blob/master/docs/papers/VerifiableDataStructures.pdf)。
 + 设计和实现 [讨论](https://github.com/cosmos/cosmos-sdk/discussions/8297)。
 + [如何升级IBC链及其客户端](https://github.com/cosmos/ibc-go/blob/main/docs/ibc/upgrades/quick-guide.md)
 + [ADR-40 对 IBC 的影响](https://github.com/cosmos/ibc-go/discussions/256) 

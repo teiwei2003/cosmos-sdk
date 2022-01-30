@@ -6,15 +6,15 @@
 ## NextInflationRate
 
 目標年間インフレ率は、ブロックごとに再計算されます。
-インフレも金利変動の影響を受けます（プラスまたはマイナス）
-希望の比率（67％）からの距離に応じて。 可能な最大レート変更は年間13％と定義されていますが、年間インフレ率は7％から20％に制限されています。 
+インフレも金利変動の影響を受けます(プラスまたはマイナス)
+希望の比率(67％)からの距離に応じて。 可能な最大レート変更は年間13％と定義されていますが、年間インフレ率は7％から20％に制限されています。 
 
 ```
 NextInflationRate(params Params, bondedRatio sdk.Dec) (inflation sdk.Dec) {
 	inflationRateChangePerYear = (1 - bondedRatio/params.GoalBonded) * params.InflationRateChange
 	inflationRateChange = inflationRateChangePerYear/blocksPerYr
 
-	// increase the new annual inflation for this next cycle
+	//increase the new annual inflation for this next cycle
 	inflation += inflationRateChange
 	if inflation > params.InflationMax {
 		inflation = params.InflationMax
@@ -42,6 +42,6 @@ NextAnnualProvisions(params Params, totalSupply sdk.Dec) (provisions sdk.Dec) {
 
 ```
 BlockProvision(params Params) sdk.Coin {
-	provisionAmt = AnnualProvisions/ params.BlocksPerYear
+	provisionAmt = AnnualProvisions/params.BlocksPerYear
 	return sdk.NewCoin(params.MintDenom, provisionAmt.Truncate())
 ```

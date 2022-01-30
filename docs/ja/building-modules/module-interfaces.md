@@ -26,8 +26,8 @@
 
 -**構築コマンド:**コマンドの作成方法の詳細については、[Cobraドキュメント](https://godoc.org/github.com/spf13/cobra)をお読みください。
     -**使用:**コマンドを呼び出すために必要なユーザー入力の形式を指定します。上記の例では、 `send`はトランザクションコマンドの名前であり、`[from_key_or_address] `、`[to_address] `、および`[amount] `はパラメータです。
-    -**引数:**ユーザーが指定したパラメーターの数。この場合、「[from_key_or_address]」、「[to_address]」、「[amount]」の3つだけがあります。
-    -** Short and Long:**コマンドの説明。 「短い」説明が必要です。 「長い」説明は、ユーザーが「--help」フラグを追加したときに表示される追加情報を提供するために使用できます。
+    -**引数:**ユーザーが指定したパラメーターの数。この場合、[[from_key_or_address]]、[[to_address]]、[[amount]]の3つだけがあります。
+    -** Short and Long:**コマンドの説明。 [短い]説明が必要です。 [長い]説明は、ユーザーが[--help]フラグを追加したときに表示される追加情報を提供するために使用できます。
     -** RunE:**エラーを返す可能性のある関数を定義します。これは、コマンドの実行時に呼び出される関数です。この関数は、新しいトランザクションを作成するためのすべてのロジックをカプセル化します。
         -この関数は通常、 `client.GetClientTxContext(cmd)`で実行できる `clientCtx`の取得から始まります。 `clientCtx`には、ユーザーに関する情報など、トランザクション処理に関連する情報が含まれています。この例では、 `clientCtx`を使用して、` clientCtx.GetFromAddress() `を呼び出して送信者のアドレスを取得します。
         -該当する場合、コマンドのパラメーターが解析されます。この例では、パラメータ `[to_address]`と `[amount]`の両方が解決されます。
@@ -56,7 +56,7 @@
 -**構築コマンド:**コマンドの作成方法の詳細については、[Cobraドキュメント](https://godoc.org/github.com/spf13/cobra)をお読みください。
     -**使用:**コマンドを呼び出すために必要なユーザー入力の形式を指定します。上記の例では、 `account`はクエリコマンドの名前であり、`[address] `はパラメータです。
     -**引数:**ユーザーが指定したパラメーターの数。この場合、 `[address]`は1つだけです。
-    -** Short and Long:**コマンドの説明。 「短い」説明が必要です。 「長い」説明は、ユーザーが「--help」フラグを追加したときに表示される追加情報を提供するために使用できます。
+    -** Short and Long:**コマンドの説明。 [短い]説明が必要です。 [長い]説明は、ユーザーが[--help]フラグを追加したときに表示される追加情報を提供するために使用できます。
     -** RunE:**エラーを返す可能性のある関数を定義します。これは、コマンドの実行時に呼び出される関数です。この関数は、新しいクエリを作成するためのすべてのロジックをカプセル化します。
         -この関数は通常、 `client.GetClientQueryContext(cmd)`で実行できる `clientCtx`の取得から始まります。 `clientCtx`には、クエリ処理に関連する情報が含まれています。
         -該当する場合、コマンドのパラメーターが解析されます。この例では、パラメータ `[address]`が解析されます。
@@ -85,7 +85,7 @@
 cmd.Flags().String(FlagFrom, "", "Name or address of private key with which to sign")
 ```
 
-この例では、flagの値は `String`、フラグの名前は` from`)、 `FlagFrom`定数の値)、flagのデフォルト値は` "" `です。ユーザーが「-」を追加することもあります。コマンド中に表示される説明。
+この例では、flagの値は `String`、フラグの名前は` from`)、 `FlagFrom`定数の値)、flagのデフォルト値は` "" `です。ユーザーが[-]を追加することもあります。コマンド中に表示される説明。
 
 これは、 `--from`フラグを_required_としてマークする例です。
 
@@ -111,7 +111,7 @@ cmd.MarkFlagRequired(FlagFrom)
 
 ABCIクエリパスを提供することに加えて、Cosmos SDKは、gRPCクエリリクエストをABCIクエリリクエストにルーティングするためのgRPCプロキシサーバーも提供します。
 
-このため、モジュールは「AppModuleBasic」に「RegisterGRPCGatewayRoutes(clientCtx client.Context、mux * runtime.ServeMux)」を実装して、クライアントgRPCリクエストをモジュール内の正しいハンドラーに接続する必要があります。
+このため、モジュールは[AppModuleBasic]に[RegisterGRPCGatewayRoutes(clientCtx client.Context、mux * runtime.ServeMux)]を実装して、クライアントgRPCリクエストをモジュール内の正しいハンドラーに接続する必要があります。
 
 `x/auth`モジュールの例を次に示します。
 

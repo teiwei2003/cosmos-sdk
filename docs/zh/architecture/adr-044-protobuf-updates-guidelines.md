@@ -55,7 +55,7 @@ Cosmos SDK 维护了一套[Protobuf 定义](https://github.com/cosmos/cosmos-sdk
 SDK 要求新字段的 Protobuf 注释包含一行，格式如下: 
 
 ```protobuf
-// Since: cosmos-sdk <version>{, <version>...}
+//Since: cosmos-sdk <version>{, <version>...}
 ```
 
 其中每个`version`表示该字段可用的次要(“0.45”)或补丁(“0.44.5”)版本。 这将极大地帮助客户端库，他们可以选择使用反射或自定义代码生成来根据目标节点版本显示/隐藏这些字段。
@@ -63,21 +63,21 @@ SDK 要求新字段的 Protobuf 注释包含一行，格式如下:
 例如，以下评论是有效的: 
 
 ```protobuf
-// Since: cosmos-sdk 0.44
+//Since: cosmos-sdk 0.44
 
-// Since: cosmos-sdk 0.42.11, 0.44.5
+//Since: cosmos-sdk 0.42.11, 0.44.5
 ```
 
 and the following ones are NOT valid:
 
 ```protobuf
-// Since cosmos-sdk v0.44
+//Since cosmos-sdk v0.44
 
-// since: cosmos-sdk 0.44
+//since: cosmos-sdk 0.44
 
-// Since: cosmos-sdk 0.42.11 0.44.5
+//Since: cosmos-sdk 0.42.11 0.44.5
 
-// Since: Cosmos SDK 0.42.11, 0.44.5
+//Since: Cosmos SDK 0.42.11, 0.44.5
 ```
 
 #### 3. 字段可以被标记为`deprecated`，并且节点可以实现协议破坏性的更改来处理这些字段

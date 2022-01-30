@@ -9,7 +9,7 @@
 
 ## タイプ定義
 
-特定のモジュールから定義されたジェネシス状態のサブセットは、通常、 `genesis.proto`ファイルで定義されます(protobufメッセージの定義方法に関する[詳細情報](../core/encoding.md#gogoproto))。モジュールのジェネシス状態のサブセットを定義する構造は、通常「GenesisState」と呼ばれ、作成プロセス中に初期化する必要があるすべてのモジュール関連の値が含まれています。
+特定のモジュールから定義されたジェネシス状態のサブセットは、通常、 `genesis.proto`ファイルで定義されます(protobufメッセージの定義方法に関する[詳細情報](../core/encoding.md#gogoproto))。モジュールのジェネシス状態のサブセットを定義する構造は、通常[GenesisState]と呼ばれ、作成プロセス中に初期化する必要があるすべてのモジュール関連の値が含まれています。
 
 `auth`モジュールからの` GenesisState`protobufメッセージの定義の例を表示します。
 
@@ -25,7 +25,7 @@
 
 ### `ValidateGenesis`
 
-`ValidateGenesis(genesisState GenesisState)`メソッドを呼び出して、提供された `genesisState`が正しいことを確認します。 「GenesisState」にリストされている各パラメーターの妥当性チェックを実行する必要があります。 `auth`モジュールの例を確認してください。
+`ValidateGenesis(genesisState GenesisState)`メソッドを呼び出して、提供された `genesisState`が正しいことを確認します。 [GenesisState]にリストされている各パラメーターの妥当性チェックを実行する必要があります。 `auth`モジュールの例を確認してください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/types/genesis.go#L57-L70
 
@@ -39,15 +39,15 @@
 
 アプリケーションの[modulemanager](./module-manager.md#manager)は、アプリケーションの各モジュールの `InitGenesis`メソッドを順番に呼び出す役割を果たします。この順序は、[アプリケーションのコンストラクター](../basics/app-anatomy.md#constructor-function)で呼び出されるマネージャーの `SetOrderGenesisMethod`を介してアプリケーション開発者によって設定されます。
 
-「auth」モジュールの「InitGenesis」の例を参照してください。
+[auth]モジュールの[InitGenesis]の例を参照してください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/genesis.go#L13-L28
 
 ### `ExportGenesis`
 
-状態がエクスポートされるたびに、「ExportGenesis」メソッドが実行されます。モジュールによって管理される状態サブセットの最新の既知のバージョンを取得し、そこから新しい「GenesisState」を作成します。これは主に、チェーンをハードフォークでアップグレードする必要がある場合に使用されます。
+状態がエクスポートされるたびに、[ExportGenesis]メソッドが実行されます。モジュールによって管理される状態サブセットの最新の既知のバージョンを取得し、そこから新しい[GenesisState]を作成します。これは主に、チェーンをハードフォークでアップグレードする必要がある場合に使用されます。
 
-「auth」モジュールの「ExportGenesis」の例を参照してください。
+[auth]モジュールの[ExportGenesis]の例を参照してください。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/64b6bb5270e1a3b688c2d98a8f481ae04bb713ca/x/auth/genesis.go#L31-L42
 

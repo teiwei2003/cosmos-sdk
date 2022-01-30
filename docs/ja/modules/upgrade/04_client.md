@@ -143,7 +143,7 @@ module_versions:
 
 #### plan
 
-`plan`コマンドは、現在スケジュールされているアップグレードプラン（存在する場合）を取得します。
+`plan`コマンドは、現在スケジュールされているアップグレードプラン(存在する場合)を取得します。
 
 ```bash
 regen query upgrade plan [flags]

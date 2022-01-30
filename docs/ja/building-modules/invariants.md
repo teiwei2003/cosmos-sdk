@@ -1,6 +1,6 @@
 # 常数
 
-不変条件はアプリケーションの属性であり、常に真である必要があります。 Cosmos SDKのコンテキストでは、「不変条件」は特定の不変条件をチェックする関数です。これらの関数を使用して、エラーを早期に検出し、それらに対してアクションを実行して、潜在的な結果を制限することができます(たとえば、チェーンを停止することによって)。また、アプリケーションの開発にも非常に役立ち、シミュレーションを通じてエラーを検出するために使用できます。 {まとめ}
+不変条件はアプリケーションの属性であり、常に真である必要があります。 Cosmos SDKのコンテキストでは、[不変条件]は特定の不変条件をチェックする関数です。これらの関数を使用して、エラーを早期に検出し、それらに対してアクションを実行して、潜在的な結果を制限することができます(たとえば、チェーンを停止することによって)。また、アプリケーションの開発にも非常に役立ち、シミュレーションを通じてエラーを検出するために使用できます。 {まとめ}
 
 ## 読むための前提条件
 
@@ -14,14 +14,14 @@
 
 `string`の戻り値は不変のメッセージであり、ログを出力するときに使用できます。`bool`の戻り値は、不変のチェックの実際の結果です。
 
-実際、各モジュールは、モジュールフォルダのファイル `。/keeper/invariants.go`に` Invariant`を実装しています。標準では、次のモデルを使用して、不変条件の論理グループごとに「不変条件」関数を実装します。 
+実際、各モジュールは、モジュールフォルダのファイル `。/keeper/invariants.go`に` Invariant`を実装しています。標準では、次のモデルを使用して、不変条件の論理グループごとに[不変条件]関数を実装します。 
 
 ```go
 //Example for an Invariant that checks balance-related invariants
 
 func BalanceInvariants(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) (string, bool) {
-       //Implement checks for balance-related invariants
+      //Implement checks for balance-related invariants
     }
 }
 ```
@@ -67,13 +67,13 @@ func RegisterInvariants(ir sdk.InvariantRegistry, k Keeper) {
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/types/invariant.go#L14-L17
 
-通常、このインターフェースは特定のモジュールの「キーパー」に実装されます。 `InvariantRegistry`の最も一般的に使用される実装は、` crisis`モジュールにあります。
+通常、このインターフェースは特定のモジュールの[キーパー]に実装されます。 `InvariantRegistry`の最も一般的に使用される実装は、` crisis`モジュールにあります。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/crisis/keeper/keeper.go#L50-L54
 
  したがって、 `InvariantRegistry`は通常、[アプリケーションコンストラクター](../basics/app-anatomy.md#constructor-function)の` crisis`モジュールの `keeper`をインスタンス化することによってインスタンス化されます。
 
-`Invariant`は、[` message`s](./messages-and-queries.md)を介して手動でチェックできますが、ほとんどの場合、各ブロックの最後で自動的にチェックされます。 「crisis」モジュールの例を次に示します。
+`Invariant`は、[` message`s](./messages-and-queries.md)を介して手動でチェックできますが、ほとんどの場合、各ブロックの最後で自動的にチェックされます。 [crisis]モジュールの例を次に示します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/7d7821b9af132b0f6131640195326aa02b6751db/x/crisis/abci.go#L7-L14
 

@@ -40,7 +40,7 @@ type AppModule interface {
 
 ### モジュール固有の移行機能
 
-モジュールによって導入されたコンセンサスを破る変更ごとに、新しく追加された `RegisterMigration`メソッドを使用して、ConsensusVersion`N`からバージョン` N + 1`への移行スクリプトを `Configurator`に登録する必要があります。 すべてのモジュールは、移行機能を登録する必要がある「AppModule」の「RegisterServices」メソッドでコンフィギュレーターへの参照を受け取ります。 移行機能は昇順で登録する必要があります。  
+モジュールによって導入されたコンセンサスを破る変更ごとに、新しく追加された `RegisterMigration`メソッドを使用して、ConsensusVersion`N`からバージョン` N + 1`への移行スクリプトを `Configurator`に登録する必要があります。 すべてのモジュールは、移行機能を登録する必要がある[AppModule]の[RegisterServices]メソッドでコンフィギュレーターへの参照を受け取ります。 移行機能は昇順で登録する必要があります。  
 
 ```go
 func (am AppModule) RegisterServices(cfg module.Configurator) {
@@ -94,7 +94,7 @@ UpgradeHandler署名を更新して、 `VersionMap`を取得し、アップグ�
 + type UpgradeHandler func(ctx sdk.Context, plan Plan, versionMap VersionMap) (VersionMap, error)
 ```
 
-アップグレードを適用するには、 `x .upgrade`ストアから` VersionMap`を照会し、それをハンドラーに渡します。 ハンドラーは実際の移行関数を実行し(次のセクションを参照)、成功すると、状態に格納される更新された「VersionMap」を返します。
+アップグレードを適用するには、 `x .upgrade`ストアから` VersionMap`を照会し、それをハンドラーに渡します。 ハンドラーは実際の移行関数を実行し(次のセクションを参照)、成功すると、状態に格納される更新された[VersionMap]を返します。
 
 ```diff
 func (k UpgradeKeeper) ApplyUpgrade(ctx sdk.Context, plan types.Plan) {
@@ -133,8 +133,8 @@ app.UpgradeKeeper.SetUpgradeHandler("my-plan", func(ctx sdk.Context, plan upgrad
 
 チェーンがブロックnでアップグレードされたとすると、プログラムは次のように実行されます。
 
--ブロック「N」を開始すると、古いバイナリファイルは「BeginBlock」で停止します。そのストレージには、古いバイナリモジュールのコンセンサスバージョンが保存されます。
--新しいバイナリファイルはブロック「N」から始まります。 UpgradeHandlerは新しいバイナリファイルに設定されているため、新しいバイナリファイルの「BeginBlock」で実行されます。 `x .upgrade`の` ApplyUpgrade`では、 `VersionMap`が(古いバイナリ)ストレージから取得され、` RunMigrations`関数に渡されて、モジュール自体の `BeginBlockの前にすべてのモジュールストレージ`が移行されます。
+-ブロック[N]を開始すると、古いバイナリファイルは[BeginBlock]で停止します。そのストレージには、古いバイナリモジュールのコンセンサスバージョンが保存されます。
+-新しいバイナリファイルはブロック[N]から始まります。 UpgradeHandlerは新しいバイナリファイルに設定されているため、新しいバイナリファイルの[BeginBlock]で実行されます。 `x .upgrade`の` ApplyUpgrade`では、 `VersionMap`が(古いバイナリ)ストレージから取得され、` RunMigrations`関数に渡されて、モジュール自体の `BeginBlockの前にすべてのモジュールストレージ`が移行されます。
 
 ## 結果
 

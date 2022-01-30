@@ -46,9 +46,9 @@ type Request struct {
 type Response struct {
 	GasWanted uint64
 	GasUsed   uint64
-	// MsgResponses is an array containing each Msg service handler's response
-	// type, packed in an Any. This will get proto-serialized into the `Data` field
-	// in the ABCI Check/DeliverTx responses.
+	//MsgResponses is an array containing each Msg service handler's response
+	//type, packed in an Any. This will get proto-serialized into the `Data` field
+	//in the ABCI Check/DeliverTx responses.
 	MsgResponses []*codectypes.Any
 	Log          string
 	Events       []abci.Event
@@ -69,7 +69,7 @@ BaseApp 持有对 `tx.Handler` 的引用:
 
 ```go
 type BaseApp  struct {
-    // other fields
+   //other fields
     txHandler tx.Handler
 }
 ```
@@ -94,7 +94,7 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 	return abciRes
 }
 
-// convertTxResponseToDeliverTx converts a tx.Response into a abci.ResponseDeliverTx.
+//convertTxResponseToDeliverTx converts a tx.Response into a abci.ResponseDeliverTx.
 func convertTxResponseToDeliverTx(txRes tx.Response) (abci.ResponseDeliverTx, error) {
 	data, err := makeABCIData(txRes)
 	if err != nil {
@@ -108,7 +108,7 @@ func convertTxResponseToDeliverTx(txRes tx.Response) (abci.ResponseDeliverTx, er
 	}, nil
 }
 
-// makeABCIData generates the Data field to be sent to ABCI Check/DeliverTx.
+//makeABCIData generates the Data field to be sent to ABCI Check/DeliverTx.
 func makeABCIData(txRes tx.Response) ([]byte, error) {
 	return proto.Marshal(&sdk.TxMsgData{MsgResponses: txRes.MsgResponses})
 }
@@ -125,56 +125,56 @@ func makeABCIData(txRes tx.Response) ([]byte, error) {
 例如，为了创建一个任意的`MyMiddleware`，我们可以实现: 
 
 ```go
-// myTxHandler is the tx.Handler of this middleware. Note that it holds a
-// reference to the next tx.Handler in the stack.
+//myTxHandler is the tx.Handler of this middleware. Note that it holds a
+//reference to the next tx.Handler in the stack.
 type myTxHandler struct {
-    // next is the next tx.Handler in the middleware stack.
+   //next is the next tx.Handler in the middleware stack.
     next tx.Handler
-    // some other fields that are relevant to the middleware can be added here
+   //some other fields that are relevant to the middleware can be added here
 }
 
-// NewMyMiddleware returns a middleware that does this and that.
+//NewMyMiddleware returns a middleware that does this and that.
 func NewMyMiddleware(arg1, arg2) tx.Middleware {
     return func (txh tx.Handler) tx.Handler {
         return myTxHandler{
             next: txh,
-            // optionally, set arg1, arg2... if they are needed in the middleware
+           //optionally, set arg1, arg2... if they are needed in the middleware
         }
     }
 }
 
-// Assert myTxHandler is a tx.Handler.
+//Assert myTxHandler is a tx.Handler.
 var _ tx.Handler = myTxHandler{}
 
 func (h myTxHandler) CheckTx(ctx context.Context, req Request, checkReq RequestcheckTx) (Response, ResponseCheckTx, error) {
-    // CheckTx specific pre-processing logic
+   //CheckTx specific pre-processing logic
 
-    // run the next middleware
+   //run the next middleware
     res, checkRes, err := txh.next.CheckTx(ctx, req, checkReq)
 
-    // CheckTx specific post-processing logic
+   //CheckTx specific post-processing logic
 
     return res, checkRes, err
 }
 
 func (h myTxHandler) DeliverTx(ctx context.Context, req Request) (Response, error) {
-    // DeliverTx specific pre-processing logic
+   //DeliverTx specific pre-processing logic
 
-    // run the next middleware
+   //run the next middleware
     res, err := txh.next.DeliverTx(ctx, tx, req)
 
-    // DeliverTx specific post-processing logic
+   //DeliverTx specific post-processing logic
 
     return res, err
 }
 
 func (h myTxHandler) SimulateTx(ctx context.Context, req Request) (Response, error) {
-    // SimulateTx specific pre-processing logic
+   //SimulateTx specific pre-processing logic
 
-    // run the next middleware
+   //run the next middleware
     res, err := txh.next.SimulateTx(ctx, tx, req)
 
-    // SimulateTx specific post-processing logic
+   //SimulateTx specific post-processing logic
 
     return res, err
 }
@@ -205,7 +205,7 @@ txHandler := middleware.ComposeMiddlewares(H, A, B, C)
 中间件通过其“SetTxHandler”设置器在 BaseApp 中设置: 
 
 ```go
-// simapp/app.go
+//simapp/app.go
 
 txHandler := middleware.ComposeMiddlewares(...)
 app.SetTxHandler(txHandler)
@@ -307,4 +307,4 @@ No neutral consequences.
 ## 参考
 
 - 初步讨论:https://github.com/cosmos/cosmos-sdk/issues/9585
-- 实现:[#9920 BaseApp 重构](https://github.com/cosmos/cosmos-sdk/pull/9920) 和 [#10028 Antehandlers 迁移](https://github.com/cosmos/cosmos-sdk/ 拉/10028) 
+- 实现:[#9920 BaseApp 重构](https://github.com/cosmos/cosmos-sdk/pull/9920) 和 [#10028 Antehandlers 迁移](https://github.com/cosmos/cosmos-sdk/拉/10028) 

@@ -4,9 +4,9 @@
 エビデンス状態は、`x/evidence`モジュールの`GenesisState`にも保存およびエクスポートされます。
 
 ```protobuf
-// GenesisState defines the evidence module's genesis state.
+//GenesisState defines the evidence module's genesis state.
 message GenesisState {
-  // evidence defines all the evidence at genesis.
+ //evidence defines all the evidence at genesis.
   repeated google.protobuf.Any evidence = 1;
 }
 

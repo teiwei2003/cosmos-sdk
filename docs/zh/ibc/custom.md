@@ -34,7 +34,7 @@ Cosmos SDK 期望所有 IBC 模块都实现 [`IBCModule`
 以下是模块预期实现的通道握手回调: 
 
 ```go
-// Called by IBC Handler on MsgOpenInit
+//Called by IBC Handler on MsgOpenInit
 func (k Keeper) OnChanOpenInit(ctx sdk.Context,
     order channeltypes.Order,
     connectionHops []string,
@@ -44,21 +44,21 @@ func (k Keeper) OnChanOpenInit(ctx sdk.Context,
     counterparty channeltypes.Counterparty,
     version string,
 ) error {
-    // OpenInit must claim the channelCapability that IBC passes into the callback
+   //OpenInit must claim the channelCapability that IBC passes into the callback
     if err := k.ClaimCapability(ctx, chanCap, host.ChannelCapabilityPath(portID, channelID)); err != nil {
 			return err
 	}
 
-    // ... do custom initialization logic
+   //... do custom initialization logic
 
-    // Use above arguments to determine if we want to abort handshake
-    // Examples: Abort if order == UNORDERED,
-    // Abort if version is unsupported
+   //Use above arguments to determine if we want to abort handshake
+   //Examples: Abort if order == UNORDERED,
+   //Abort if version is unsupported
     err := checkArguments(args)
     return err
 }
 
-// Called by IBC Handler on MsgOpenTry
+//Called by IBC Handler on MsgOpenTry
 OnChanOpenTry(
     ctx sdk.Context,
     order channeltypes.Order,
@@ -70,47 +70,47 @@ OnChanOpenTry(
     version,
     counterpartyVersion string,
 ) error {
-    // Module may have already claimed capability in OnChanOpenInit in the case of crossing hellos
-    // (ie chainA and chainB both call ChanOpenInit before one of them calls ChanOpenTry)
-    // If the module can already authenticate the capability then the module already owns it so we don't need to claim
-    // Otherwise, module does not have channel capability and we must claim it from IBC
+   //Module may have already claimed capability in OnChanOpenInit in the case of crossing hellos
+   //(ie chainA and chainB both call ChanOpenInit before one of them calls ChanOpenTry)
+   //If the module can already authenticate the capability then the module already owns it so we don't need to claim
+   //Otherwise, module does not have channel capability and we must claim it from IBC
     if !k.AuthenticateCapability(ctx, chanCap, host.ChannelCapabilityPath(portID, channelID)) {
-        // Only claim channel capability passed back by IBC module if we do not already own it
+       //Only claim channel capability passed back by IBC module if we do not already own it
         if err := k.scopedKeeper.ClaimCapability(ctx, chanCap, host.ChannelCapabilityPath(portID, channelID)); err != nil {
             return err
         }
     }
 
-    // ... do custom initialization logic
+   //... do custom initialization logic
 
-    // Use above arguments to determine if we want to abort handshake
+   //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
 
-// Called by IBC Handler on MsgOpenAck
+//Called by IBC Handler on MsgOpenAck
 OnChanOpenAck(
     ctx sdk.Context,
     portID,
     channelID string,
     counterpartyVersion string,
 ) error {
-    // ... do custom initialization logic
+   //... do custom initialization logic
 
-    // Use above arguments to determine if we want to abort handshake
+   //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
 
-// Called by IBC Handler on MsgOpenConfirm
+//Called by IBC Handler on MsgOpenConfirm
 OnChanOpenConfirm(
     ctx sdk.Context,
     portID,
     channelID string,
 ) error {
-    // ... do custom initialization logic
+   //... do custom initialization logic
 
-    // Use above arguments to determine if we want to abort handshake
+   //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
@@ -121,28 +121,28 @@ closing handshake. Closing a channel is a 2-step handshake, the initiating chain
 `ChanCloseInit` and the finalizing chain calls `ChanCloseConfirm`.
 
 ```go
-// Called by IBC Handler on MsgCloseInit
+//Called by IBC Handler on MsgCloseInit
 OnChanCloseInit(
     ctx sdk.Context,
     portID,
     channelID string,
 ) error {
-    // ... do custom finalization logic
+   //... do custom finalization logic
 
-    // Use above arguments to determine if we want to abort handshake
+   //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
 
-// Called by IBC Handler on MsgCloseConfirm
+//Called by IBC Handler on MsgCloseConfirm
 OnChanCloseConfirm(
     ctx sdk.Context,
     portID,
     channelID string,
 ) error {
-    // ... do custom finalization logic
+   //... do custom finalization logic
 
-    // Use above arguments to determine if we want to abort handshake
+   //Use above arguments to determine if we want to abort handshake
     err := checkArguments(args)
     return err
 }
@@ -177,24 +177,24 @@ ICS20 目前使用单个支持的版本实现基本字符串匹配。
 
 ```go
 func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, state types.GenesisState) {
-    // ... other initialization logic
+   //... other initialization logic
 
-    // Only try to bind to port if it is not already bound, since we may already own
-    // port capability from capability InitGenesis
+   //Only try to bind to port if it is not already bound, since we may already own
+   //port capability from capability InitGenesis
     if !isBound(ctx, state.PortID) {
-        // module binds to desired ports on InitChain
-        // and claims returned capabilities
+       //module binds to desired ports on InitChain
+       //and claims returned capabilities
         cap1 := keeper.IBCPortKeeper.BindPort(ctx, port1)
         cap2 := keeper.IBCPortKeeper.BindPort(ctx, port2)
         cap3 := keeper.IBCPortKeeper.BindPort(ctx, port3)
 
-        // NOTE: The module's scoped capability keeper must be private
+       //NOTE: The module's scoped capability keeper must be private
         keeper.scopedKeeper.ClaimCapability(cap1)
         keeper.scopedKeeper.ClaimCapability(cap2)
         keeper.scopedKeeper.ClaimCapability(cap3)
     }
 
-    // ... more initialization logic
+   //... more initialization logic
 }
 ```
 
@@ -211,24 +211,24 @@ func InitGenesis(ctx sdk.Context, keeper keeper.Keeper, state types.GenesisState
 将其编码和解码为`[]byte`。 
 
 ```go
-// Custom packet data defined in application module
+//Custom packet data defined in application module
 type CustomPacketData struct {
-    // Custom fields ...
+   //Custom fields ...
 }
 
 EncodePacketData(packetData CustomPacketData) []byte {
-    // encode packetData to bytes
+   //encode packetData to bytes
 }
 
 DecodePacketData(encoded []byte) (CustomPacketData) {
-    // decode from bytes to packet data
+   //decode from bytes to packet data
 }
 ```
 
 然后，模块必须在通过 IBC 发送数据包数据之前对其进行编码。 
 
 ```go
-// Sending custom application packet data
+//Sending custom application packet data
 data := EncodePacketData(customPacketData)
 packet.Data = data
 IBCChannelKeeper.SendPacket(ctx, packet)
@@ -238,9 +238,9 @@ IBCChannelKeeper.SendPacket(ctx, packet)
 采取行动。 
 
 ```go
-// Receiving custom application packet data (in OnRecvPacket)
+//Receiving custom application packet data (in OnRecvPacket)
 packetData := DecodePacketData(packet.Data)
-// handle received custom packet data
+//handle received custom packet data
 ```
 
 #### 数据包流处理
@@ -270,12 +270,12 @@ packetData := DecodePacketData(packet.Data)
 一个模块只需要在“IBCChannelKeeper”上调用“SendPacket”。 
 
 ```go
-// retrieve the dynamic capability for this channel
+//retrieve the dynamic capability for this channel
 channelCap := scopedKeeper.GetCapability(ctx, channelCapName)
-// Sending custom application packet data
+//Sending custom application packet data
 data := EncodePacketData(customPacketData)
 packet.Data = data
-// Send packet to IBC, authenticating with channelCap
+//Send packet to IBC, authenticating with channelCap
 IBCChannelKeeper.SendPacket(ctx, channelCap, packet)
 ```
 
@@ -300,22 +300,22 @@ OnRecvPacket(
     ctx sdk.Context,
     packet channeltypes.Packet,
 ) (res *sdk.Result, ack []byte, abort error) {
-    // Decode the packet data
+   //Decode the packet data
     packetData := DecodePacketData(packet.Data)
 
-    // do application state changes based on packet data
-    // and return result, acknowledgement and abortErr
-    // Note: abortErr is only not nil if we need to abort the entire receive packet, and allow a replay of the receive.
-    // If the application state change failed but we do not want to replay the packet,
-    // simply encode this failure with relevant information in ack and return nil error
+   //do application state changes based on packet data
+   //and return result, acknowledgement and abortErr
+   //Note: abortErr is only not nil if we need to abort the entire receive packet, and allow a replay of the receive.
+   //If the application state change failed but we do not want to replay the packet,
+   //simply encode this failure with relevant information in ack and return nil error
     res, ack, abortErr := processPacket(ctx, packet, packetData)
 
-    // if we need to abort the entire receive packet, return error
+   //if we need to abort the entire receive packet, return error
     if abortErr != nil {
         return nil, nil, abortErr
     }
 
-    // Encode the ack since IBC expects acknowledgement bytes
+   //Encode the ack since IBC expects acknowledgement bytes
     ackBytes := EncodeAcknowledgement(ack)
 
     return res, ackBytes, nil
@@ -359,15 +359,15 @@ OnRecvPacket(
 虽然模块可以选择任意确认结构，但 IBC [此处](https://github.com/cosmos/ibc-go/blob/main/proto/ibc/core/channel/v1/channel.原型):
 
 ```proto
-// Acknowledgement is the recommended acknowledgement format to be used by
-// app-specific protocols.
-// NOTE: The field numbers 21 and 22 were explicitly chosen to avoid accidental
-// conflicts with other protobuf message formats used for acknowledgements.
-// The first byte of any message with this format will be the non-ASCII values
-// `0xaa` (result) or `0xb2` (error). Implemented as defined by ICS:
-// https://github.com/cosmos/ics/tree/master/spec/ics-004-channel-and-packet-semantics#acknowledgement-envelope
+//Acknowledgement is the recommended acknowledgement format to be used by
+//app-specific protocols.
+//NOTE: The field numbers 21 and 22 were explicitly chosen to avoid accidental
+//conflicts with other protobuf message formats used for acknowledgements.
+//The first byte of any message with this format will be the non-ASCII values
+//`0xaa` (result) or `0xb2` (error). Implemented as defined by ICS:
+//https://github.com/cosmos/ics/tree/master/spec/ics-004-channel-and-packet-semantics#acknowledgement-envelope
 message Acknowledgement {
-  // response contains either a result or an error and must be non-empty
+ //response contains either a result or an error and must be non-empty
   oneof response {
     bytes  result = 21;
     string error  = 22;
@@ -393,10 +393,10 @@ OnAcknowledgementPacket(
     packet channeltypes.Packet,
     acknowledgement []byte,
 ) (*sdk.Result, error) {
-    // Decode acknowledgement
+   //Decode acknowledgement
     ack := DecodeAcknowledgement(acknowledgement)
 
-    // process ack
+   //process ack
     res, err := processAck(ack)
     return res, err
 }
@@ -416,7 +416,7 @@ OnTimeoutPacket(
     ctx sdk.Context,
     packet channeltypes.Packet,
 ) (*sdk.Result, error) {
-    // do custom timeout logic
+   //do custom timeout logic
 }
 ```
 
@@ -427,19 +427,19 @@ OnTimeoutPacket(
 必须使用模块名称注册为 IBC `Router` 上的路由。 
 
 ```go
-// app.go
+//app.go
 func NewApp(...args) *App {
-// ...
+//...
 
-// Create static IBC router, add module routes, then set and seal it
+//Create static IBC router, add module routes, then set and seal it
 ibcRouter := port.NewRouter()
 
 ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
-// Note: moduleCallbacks must implement IBCModule interface
+//Note: moduleCallbacks must implement IBCModule interface
 ibcRouter.AddRoute(moduleName, moduleCallbacks)
 
-// Setting Router will finalize all routes by sealing router
-// No more routes can be added
+//Setting Router will finalize all routes by sealing router
+//No more routes can be added
 app.IBCKeeper.SetRouter(ibcRouter)
 ```
 

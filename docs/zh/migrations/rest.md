@@ -78,4 +78,4 @@ Cosmos SDK 版本 v0.39 和更早版本使用名为“gorilla/mux”的包注册
 
 ## 迁移到 gRPC
 
-Cosmos SDK 并没有像上面描述的那样访问 REST 端点，而是公开了一个 gRPC 服务器。 任何客户端都可以使用 gRPC 而不是 REST 与节点进行交互。 可以在 [此处](../core/grpc_rest.md) 中找到与节点通信的不同方式的概述，可以在 [此处](../run-node /txs.md#programmatically-with-go)。
+Cosmos SDK 并没有像上面描述的那样访问 REST 端点，而是公开了一个 gRPC 服务器。 任何客户端都可以使用 gRPC 而不是 REST 与节点进行交互。 可以在 [此处](../core/grpc_rest.md) 中找到与节点通信的不同方式的概述，可以在 [此处](../run-node/txs.md#programmatically-with-go)。

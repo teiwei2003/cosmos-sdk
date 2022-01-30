@@ -37,7 +37,7 @@ simd init <moniker> --chain-id my-test-chain
 
 ## いくつかのデフォルト設定の更新
 
-構成ファイル(例：genesis.json)のフィールド値を変更する場合は、`jq`([installation](https://stedolan.github.io/jq/download/)＆[docs]( https://stedolan.github.io/jq/manual/#Assignment))＆`sed`コマンドでそれを行います。 ここにいくつかの例を示します。
+構成ファイル(例:genesis.json)のフィールド値を変更する場合は、`jq`([installation](https://stedolan.github.io/jq/download/)＆[docs]( https://stedolan.github.io/jq/manual/#Assignment))＆`sed`コマンドでそれを行います。 ここにいくつかの例を示します。
 
 ```bash
 # to change the chain-id
@@ -55,7 +55,7 @@ jq '.app_state.mint.minter.inflation = "0.300000000000000000"' genesis.json > te
 
 ## ジェネシスアカウントの追加
 
-チェーンを開始する前に、州に少なくとも1つのアカウントを設定する必要があります。 これを行うには、最初に[test`キーリングバックエンドの下にある`my_validator`という名前の[キーリングに新しいアカウントを作成](./keyring.md＃adding-keys-to-the-keyring)(別の名前を選択して、 別のバックエンド)。
+チェーンを開始する前に、州に少なくとも1つのアカウントを設定する必要があります。 これを行うには、最初に[test`キーリングバックエンドの下にある`my_validator`という名前の[キーリングに新しいアカウントを作成](./keyring.md#adding-keys-to-the-keyring)(別の名前を選択して、 別のバックエンド)。
 
 ローカルアカウントを作成したので、先に進んで、チェーンのジェネシスファイルにいくつかの`stake`トークンを付与します。 そうすることで、チェーンがこのアカウントの存在を認識していることも確認できます。
 
@@ -63,9 +63,9 @@ jq '.app_state.mint.minter.inflation = "0.300000000000000000"' genesis.json > te
 simd add-genesis-account $MY_VALIDATOR_ADDRESS 100000000000stake
 ```
 
-`$ MY_VALIDATOR_ADDRESS`は、[keyring](./keyring.md＃adding-keys-to-the-keyring)の`my_validator`キーのアドレスを保持する変数であることを思い出してください。また、CosmosSDKのトークンは`{amount} {denom}`形式であることに注意してください。`amount`は18桁の精度の10進数であり、`denom`は金種キーを持つ一意のトークン識別子です(例：`atom`または`uatom`)。ここでは、`stake`が[`simapp`](https://github.com/cosmos/cosmos-sdk/tree/v0.40.0-rc3/)でステーキングに使用されるトークン識別子であるため、`stake`トークンを付与しています。 simapp)。独自のステーキングデノムを持つ独自のチェーンの場合は、代わりにそのトークン識別子を使用する必要があります。
+`$ MY_VALIDATOR_ADDRESS`は、[keyring](./keyring.md#adding-keys-to-the-keyring)の`my_validator`キーのアドレスを保持する変数であることを思い出してください。また、CosmosSDKのトークンは`{amount} {denom}`形式であることに注意してください。`amount`は18桁の精度の10進数であり、`denom`は金種キーを持つ一意のトークン識別子です(例:`atom`または`uatom`)。ここでは、`stake`が[`simapp`](https://github.com/cosmos/cosmos-sdk/tree/v0.40.0-rc3/)でステーキングに使用されるトークン識別子であるため、`stake`トークンを付与しています。 simapp)。独自のステーキングデノムを持つ独自のチェーンの場合は、代わりにそのトークン識別子を使用する必要があります。
 
-アカウントにいくつかのトークンがあるので、チェーンにバリデーターを追加する必要があります。バリデーターは、チェーンに新しいブロックを追加するために、コンセンサスプロセス([基になるコンセンサスエンジン](../intro/sdk-app-architecture.md＃tendermint)で実装)に参加する特別なフルノードです。どのアカウントもバリデーターオペレーターになる意思を宣言できますが、十分な委任があるアカウントのみがアクティブセットに入ることができます(たとえば、委任が最も多い上位125のバリデーター候補のみがCosmos Hubのバリデーターになります)。このガイドでは、ローカルノード(上記の`init`コマンドで作成)をチェーンのバリデーターとして追加します。バリデーターは、`gentx`と呼ばれるジェネシスファイルに含まれる特別なトランザクションを介してチェーンが最初に開始される前に宣言できます。
+アカウントにいくつかのトークンがあるので、チェーンにバリデーターを追加する必要があります。バリデーターは、チェーンに新しいブロックを追加するために、コンセンサスプロセス([基になるコンセンサスエンジン](../intro/sdk-app-architecture.md#tendermint)で実装)に参加する特別なフルノードです。どのアカウントもバリデーターオペレーターになる意思を宣言できますが、十分な委任があるアカウントのみがアクティブセットに入ることができます(たとえば、委任が最も多い上位125のバリデーター候補のみがCosmos Hubのバリデーターになります)。このガイドでは、ローカルノード(上記の`init`コマンドで作成)をチェーンのバリデーターとして追加します。バリデーターは、`gentx`と呼ばれるジェネシスファイルに含まれる特別なトランザクションを介してチェーンが最初に開始される前に宣言できます。
 
 ```bash
 # Create a gentx.
@@ -75,10 +75,10 @@ simd gentx my_validator 100000000stake --chain-id my-test-chain --keyring-backen
 simd collect-gentxs
 ```
 
-`gentx`は3つのことを行います：
+`gentx`は3つのことを行います:
 
 1. 作成した`validator`アカウントをバリデーターオペレーターアカウント(つまり、バリデーターを制御するアカウント)として登録します。
-2. 提供されたステーキングトークンの「量」を自己委任します。
+2. 提供されたステーキングトークンの[量]を自己委任します。
 3. オペレーターアカウントを、ブロックの署名に使用されるTendermintノードのpubkeyにリンクします。`--pubkey`フラグが指定されていない場合、デフォルトで上記の`simdinit`コマンドを使用して作成されたローカルノードpubkeyになります。
 
 `gentx`の詳細については、次のコマンドを使用してください。
@@ -91,8 +91,8 @@ simd gentx --help
 
 Cosmos SDKは、`〜/.simapp/config`内に2つの構成ファイルを自動的に生成します。
 
--`config.toml`：Tendermintの設定に使用されます。詳細については、[Tendermintのドキュメント](https://docs.tendermint.com/master/nodes/configuration.html)をご覧ください。
--`app.toml`：Cosmos SDKによって生成され、状態プルーニング戦略、テレメトリ、gRPCおよびRESTサーバー構成、状態同期などのアプリの構成に使用されます。
+-`config.toml`:Tendermintの設定に使用されます。詳細については、[Tendermintのドキュメント](https://docs.tendermint.com/master/nodes/configuration.html)をご覧ください。
+-`app.toml`:Cosmos SDKによって生成され、状態プルーニング戦略、テレメトリ、gRPCおよびRESTサーバー構成、状態同期などのアプリの構成に使用されます。
 
 両方のファイルはコメントが多いので、ノードを微調整するために直接参照してください。
 
@@ -119,6 +119,6 @@ simd start
 
 単純な方法は、同じコマンドを別々のターミナルウィンドウで再度実行することです。 これは可能ですが、Cosmos SDKでは、[Docker Compose](https://docs.docker.com/compose/)の機能を利用してローカルネットを実行します。 Docker Composeを使用して独自のローカルネットを設定する方法についてのインスピレーションが必要な場合は、Cosmos SDKの[`docker-compose.yml`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/docker-compose.yml)。
 
-## 次へ{非表示}
+## 次へ{hide}
 
 [ノードとのやり取り](./interact-node.md){hide}について読む

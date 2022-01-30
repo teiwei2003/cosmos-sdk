@@ -68,7 +68,7 @@ end
 
 keeper -> validator : AddTokensFromDel
 validator -> validator : calculate number of shares to issue
-note left: If there are no shares (validator being created) then 1 token = 1 share.\nIf there are already shares, then\nadded shares =  (added tokens amount) * (current validator shares) / (current validator tokens)
+note left: If there are no shares (validator being created) then 1 token = 1 share.\nIf there are already shares, then\nadded shares =  (added tokens amount) * (current validator shares)/(current validator tokens)
 
 validator -> validator : add delegated tokens to validator
 keeper <-- validator : validator, addedShares

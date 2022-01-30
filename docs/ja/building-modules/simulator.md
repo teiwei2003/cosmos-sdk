@@ -7,7 +7,7 @@
 ## 概要
 
 このドキュメントでは、各モジュールのシミュレーション機能を定義する方法について詳しく説明します
-アプリケーション「SimulationManager」との統合。
+アプリケーション[SimulationManager]との統合。
 
 *[シミュレーションパッケージ](#simulation-package)
      *[ストレージデコーダー](#store-decoders)
@@ -48,7 +48,7 @@ Cosmos SDKシミュレーターを実装するすべてのモジュールには�
 
 ### パラメータのランダムな変更
 
-シミュレーターは、パラメーターの変更をランダムにテストできます。各モジュールのシミュレーターパッケージには、シミュレーションライフサイクル全体でモジュールのパラメーター変更をシミュレートする「RandomizedParams」関数が含まれている必要があります。
+シミュレーターは、パラメーターの変更をランダムにテストできます。各モジュールのシミュレーターパッケージには、シミュレーションライフサイクル全体でモジュールのパラメーター変更をシミュレートする[RandomizedParams]関数が含まれている必要があります。
 
 パラメータの変更を完全にテストするために必要な例は、[こちら](https://github.com/cosmos/cosmos-sdk/blob/v0.42.0/x/staking/simulation/params.go)で確認できます。
 
@@ -59,7 +59,7 @@ Cosmos SDKシミュレーターを実装するすべてのモジュールには�
 また、ランダムに割り当てられます。
 
 完全な[トランザクションサイクル](../core/transaction.md)を使用して、シミュレーション操作をシミュレートします
-「BaseApp」の「ABCI」アプリケーションを公開します。
+[BaseApp]の[ABCI]アプリケーションを公開します。
 
 以下に、重みを設定する方法を示します。
 
@@ -67,7 +67,7 @@ Cosmos SDKシミュレーターを実装するすべてのモジュールには�
 
 ご覧のとおり、この場合、重みは事前定義されています。さまざまな重みでこの動作をオーバーライドするオプションがあります。 1つのオプションは、 `* rand.Rand`を使用して操作のランダムな重みを定義するか、独自の事前定義された重みを注入することです。
 
-上記のパッケージ「simappparams」を上書きする方法は次のとおりです。
+上記のパッケージ[simappparams]を上書きする方法は次のとおりです。
 
 +++ https://github.com/cosmos/gaia/blob/master/sims.mk#L9-L22
 
@@ -76,7 +76,7 @@ Cosmos SDKシミュレーターを実装するすべてのモジュールには�
 ### ランダムな提案コンテンツ
 
 Cosmos SDKシミュレーターは、ランダムなガバナンス提案もサポートします。各
-モジュールは、公開および登録されたガバナンス提案の「コンテンツ」を定義する必要があります
+モジュールは、公開および登録されたガバナンス提案の[コンテンツ]を定義する必要があります
 それらはパラメータに使用されます。
 
 ##シミュレーション機能の登録
@@ -87,7 +87,7 @@ Cosmos SDKシミュレーターは、ランダムなガバナンス提案もサ�
 
 ## アプリケーションシミュレータマネージャー
 
-次の手順は、アプリケーションレベルで「SimulatorManager」を設定するためのものです。この
+次の手順は、アプリケーションレベルで[SimulatorManager]を設定するためのものです。この
 次のステップは、テストファイルをシミュレートすることです。  
 
 ```go
@@ -104,7 +104,7 @@ type CustomApp struct {
 
 ```go
 func NewCustomApp(...) {
- //create the simulation manager and define the order of the modules for deterministic simulations
+//create the simulation manager and define the order of the modules for deterministic simulations
   app.sm = module.NewSimulationManager(
     auth.NewAppModule(app.accountKeeper),
     bank.NewAppModule(app.bankKeeper, app.accountKeeper),
@@ -116,7 +116,7 @@ func NewCustomApp(...) {
     slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
   )
 
- //register the store decoders for simulation tests
+//register the store decoders for simulation tests
   app.sm.RegisterStoreDecoders()
   ...
 }

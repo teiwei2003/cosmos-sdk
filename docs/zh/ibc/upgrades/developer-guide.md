@@ -7,12 +7,12 @@
 IBC 协议允许客户端实现提供升级客户端的路径，给定升级的客户端状态、升级的共识状态和每个证明。 
 
 ```go
-// Upgrade functions
-// NOTE: proof heights are not included as upgrade to a new revision is expected to pass only on the last
-// height committed by the current revision. Clients are responsible for ensuring that the planned last
-// height of the current revision is somehow encoded in the proof verification process.
-// This is to ensure that no premature upgrades occur, since upgrade plans committed to by the counterparty
-// may be cancelled or modified before the last planned height.
+//Upgrade functions
+//NOTE: proof heights are not included as upgrade to a new revision is expected to pass only on the last
+//height committed by the current revision. Clients are responsible for ensuring that the planned last
+//height of the current revision is somehow encoded in the proof verification process.
+//This is to ensure that no premature upgrades occur, since upgrade plans committed to by the counterparty
+//may be cancelled or modified before the last planned height.
 VerifyUpgradeAndUpdateState(
     ctx sdk.Context,
     cdc codec.BinaryCodec,
@@ -37,9 +37,9 @@ VerifyUpgradeAndUpdateState(
 开发人员应区分链的每个有效轻客户端统一的客户端参数(链选择参数)和每个单独客户端可自定义的客户端参数(客户端选择参数)；因为这种区别对于在 `ClientState` 接口中实现 `ZeroCustomFields` 方法是必要的: 
 
 ```go
-// Utility function that zeroes out any client customizable fields in client state
-// Ledger enforced fields are maintained while all custom fields are zero values
-// Used to verify upgrades
+//Utility function that zeroes out any client customizable fields in client state
+//Ledger enforced fields are maintained while all custom fields are zero values
+//Used to verify upgrades
 ZeroCustomFields() ClientState
 ```
 

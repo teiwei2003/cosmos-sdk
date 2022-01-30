@@ -8,9 +8,9 @@
 可能重新加入绑定集，它必须发送`MsgUnjail`:
 
 ```protobuf
-// MsgUnjail is an sdk.Msg used for unjailing a jailed validator, thus returning
-// them into the bonded validator set, so they can begin receiving provisions
-// and rewards again.
+//MsgUnjail is an sdk.Msg used for unjailing a jailed validator, thus returning
+//them into the bonded validator set, so they can begin receiving provisions
+//and rewards again.
 message MsgUnjail {
   string validator_addr = 1;
 }

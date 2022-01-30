@@ -119,7 +119,7 @@ func (ck CapabilityKeeper) InitialiseAndSeal(ctx Context) {
   persistentStore := ctx.KVStore(ck.persistentKey)
   map := ctx.KVStore(ck.memKey)
   
-  // initialise memory store for all names in persistent store
+ //initialise memory store for all names in persistent store
   for index, value := range persistentStore.Iter() {
     capability = &CapabilityKey{index: index}
 
@@ -142,34 +142,34 @@ func (ck CapabilityKeeper) InitialiseAndSeal(ctx Context) {
 
 ```golang
 func (sck ScopedCapabilityKeeper) NewCapability(ctx Context, name string) (Capability, error) {
-  // check name not taken in memory store
+ //check name not taken in memory store
   if capStore.Get("rev/" + name) != nil {
     return nil, errors.New("name already taken")
   }
 
-  // fetch the current index
+ //fetch the current index
   index := persistentStore.Get("index")
   
-  // create a new capability
+ //create a new capability
   capability := &CapabilityKey{index: index}
   
-  // set persistent store
+ //set persistent store
   persistentStore.Set(index, Set.singleton(sck.moduleName + "/" + name))
   
-  // update the index
+ //update the index
   index++
   persistentStore.Set("index", index)
   
-  // set forward mapping in memory store from capability to name
+ //set forward mapping in memory store from capability to name
   memStore.Set(sck.moduleName + "/fwd/" + capability, name)
   
-  // set reverse mapping in memory store from name to index
+ //set reverse mapping in memory store from name to index
   memStore.Set(sck.moduleName + "/rev/" + name, index)
 
-  // set the in-memory mapping from index to capability pointer
+ //set the in-memory mapping from index to capability pointer
   capMap[index] = capability
   
-  // return the newly created capability
+ //return the newly created capability
   return capability
 }
 ```
@@ -180,7 +180,7 @@ func (sck ScopedCapabilityKeeper) NewCapability(ctx Context, name string) (Capab
 
 ```golang
 func (sck ScopedCapabilityKeeper) AuthenticateCapability(name string, capability Capability) bool {
-  // return whether forward mapping in memory store matches name
+ //return whether forward mapping in memory store matches name
   return memStore.Get(sck.moduleName + "/fwd/" + capability) === name
 }
 ```
@@ -196,13 +196,13 @@ func (sck ScopedCapabilityKeeper) AuthenticateCapability(name string, capability
 func (sck ScopedCapabilityKeeper) ClaimCapability(ctx Context, capability Capability, name string) error {
   persistentStore := ctx.KVStore(sck.persistentKey)
 
-  // set forward mapping in memory store from capability to name
+ //set forward mapping in memory store from capability to name
   memStore.Set(sck.moduleName + "/fwd/" + capability, name)
 
-  // set reverse mapping in memory store from name to capability
+ //set reverse mapping in memory store from name to capability
   memStore.Set(sck.moduleName + "/rev/" + name, capability)
 
-  // update owner set in persistent store
+ //update owner set in persistent store
   owners := persistentStore.Get(capability.Index())
   owners.add(sck.moduleName + "/" + name)
   persistentStore.Set(capability.Index(), owners)
@@ -214,13 +214,13 @@ func (sck ScopedCapabilityKeeper) ClaimCapability(ctx Context, capability Capabi
 
 ```golang
 func (sck ScopedCapabilityKeeper) GetCapability(ctx Context, name string) (Capability, error) {
-  // fetch the index of capability using reverse mapping in memstore
+ //fetch the index of capability using reverse mapping in memstore
   index := memStore.Get(sck.moduleName + "/rev/" + name)
 
-  // fetch capability from go-map using index
+ //fetch capability from go-map using index
   capability := capMap[index]
 
-  // return the capability
+ //return the capability
   return capability
 }
 ```
@@ -237,20 +237,20 @@ func (sck ScopedCapabilityKeeper) ReleaseCapability(ctx Context, capability Capa
     return error("capability not owned by module")
   }
 
-  // delete forward mapping in memory store
+ //delete forward mapping in memory store
   memoryStore.Delete(sck.moduleName + "/fwd/" + capability, name)
 
-  // delete reverse mapping in memory store
+ //delete reverse mapping in memory store
   memoryStore.Delete(sck.moduleName + "/rev/" + name, capability)
 
-  // update owner set in persistent store
+ //update owner set in persistent store
   owners := persistentStore.Get(capability.Index())
   owners.remove(sck.moduleName + "/" + name)
   if owners.size() > 0 {
-    // there are still other owners, keep the capability around
+   //there are still other owners, keep the capability around
     persistentStore.Set(capability.Index(), owners)
   } else {
-    // no more owners, delete the capability
+   //no more owners, delete the capability
     persistentStore.Delete(capability.Index())
     delete(capMap[capability.Index()])
   }
@@ -268,9 +268,9 @@ ck := NewCapabilityKeeper(persistentKey, memoryKey)
 mod1Keeper := NewMod1Keeper(ck.ScopeToModule("mod1"), ....)
 mod2Keeper := NewMod2Keeper(ck.ScopeToModule("mod2"), ....)
 
-// other initialisation logic ...
+//other initialisation logic ...
 
-// load initial state...
+//load initial state...
 
 ck.InitialiseAndSeal(initialContext)
 ```
@@ -291,7 +291,7 @@ mod2Keeper.SomeFunction(ctx, capability, args...)
 ```golang
 func (k Mod2Keeper) SomeFunction(ctx Context, capability Capability) {
   k.sck.ClaimCapability(ctx, capability, "resourceABC")
-  // other logic...
+ //other logic...
 }
 ```
 
@@ -311,7 +311,7 @@ func (k Mod1Keeper) UseResource(ctx Context, capability Capability, resource str
   if !k.sck.AuthenticateCapability(name, capability) {
     return errors.New("unauthenticated")
   }
-  // do something with the resource
+ //do something with the resource
 }
 ```
 

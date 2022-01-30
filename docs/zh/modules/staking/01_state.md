@@ -95,13 +95,13 @@ Tendermint 上报证据时，会提供验证人地址，所以这个
 动态汇率，根据委托给代币的代币总数计算如下
 验证器和迄今为止发行的股票数量:
 
-`每个令牌的份额 = validator.TotalShares() / validator.Tokens()`
+`每个令牌的份额 = validator.TotalShares()/validator.Tokens()`
 
 仅收到的股份数量存储在委托条目中。当委托人然后
 Undelegates，他们收到的代币数量是根据他们当前的股份数量计算的
 持有和反向汇率:
 
-`每股代币数 = validator.Tokens() / validatorShares()`
+`每股代币数 = validator.Tokens()/validatorShares()`
 
 这些“股份”只是一种会计机制。它们不是可替代的资产。的原因
 这种机制是为了简化围绕削减的核算。而不是反复削减

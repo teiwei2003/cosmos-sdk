@@ -18,7 +18,7 @@ bank 模块提供了这些导出的 keeper 接口，可以
 在状态机的预期规则之外，不变量很可能是
 损坏并可能导致网络停止。
 
-通过为“x/bank”模块提供一组被屏蔽的地址，如果用户或客户试图直接或间接地将资金发送到被屏蔽的账户，例如，通过使用 [IBC](http: //docs.cosmos.network/master/ibc/)。
+通过为“x/bank”模块提供一组被屏蔽的地址，如果用户或客户试图直接或间接地将资金发送到被屏蔽的账户，例如，通过使用 [IBC](http://docs.cosmos.network/master/ibc/)。
 
 ## 常见类型
 
@@ -27,7 +27,7 @@ bank 模块提供了这些导出的 keeper 接口，可以
 多方转移的输入 
 
 ```protobuf
-// Input models transaction input.
+//Input models transaction input.
 message Input {
   string   address                        = 1;
   repeated cosmos.base.v1beta1.Coin coins = 2;
@@ -39,7 +39,7 @@ message Input {
 An output of a multiparty transfer.
 
 ```protobuf
-// Output models transaction outputs.
+//Output models transaction outputs.
 message Output {
   string   address                        = 1;
   repeated cosmos.base.v1beta1.Coin coins = 2;
@@ -51,8 +51,8 @@ message Output {
 Base keeper 提供完全权限访问:能够任意修改任何帐户的余额并铸造或燃烧硬币。 
 
 ```go
-// Keeper defines a module interface that facilitates the transfer of coins
-// between accounts.
+//Keeper defines a module interface that facilitates the transfer of coins
+//between accounts.
 type Keeper interface {
     SendKeeper
 
@@ -87,8 +87,8 @@ type Keeper interface {
 帐户。 发送管理员不会改变总供应量(铸造或燃烧硬币)。 
 
 ```go
-// SendKeeper defines a module interface that facilitates the transfer of coins
-// between accounts without the possibility of creating coins.
+//SendKeeper defines a module interface that facilitates the transfer of coins
+//between accounts without the possibility of creating coins.
 type SendKeeper interface {
     ViewKeeper
 
@@ -110,8 +110,8 @@ type SendKeeper interface {
 视图管理器提供对帐户余额的只读访问。 视图保持器没有平衡更改功能。 所有余额查找都是“O(1)”。 
 
 ```go
-// ViewKeeper defines a module interface that facilitates read only access to
-// account balances.
+//ViewKeeper defines a module interface that facilitates read only access to
+//account balances.
 type ViewKeeper interface {
     ValidateBalance(ctx sdk.Context, addr sdk.AccAddress) error
     HasBalance(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coin) bool

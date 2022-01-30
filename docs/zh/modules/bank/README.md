@@ -46,10 +46,10 @@
 
 ```go
 type ModuleAccount interface {
-  auth.Account               // same methods as the Account interface
+  auth.Account              //same methods as the Account interface
 
-  GetName() string           // name of the module; used to obtain the address
-  GetPermissions() []string  // permissions of module account
+  GetName() string          //name of the module; used to obtain the address
+  GetPermissions() []string //permissions of module account
   HasPermission(string) bool
 }
 ```

@@ -5,28 +5,28 @@ description: Cosmos SDK is the world’s most popular framework for building app
 sections:
   - title: 介绍
     desc: 高级介绍 Cosmos SDK.
-    url: /zh/intro/overview.html
+    url:/zh/intro/overview.html
     icon: introduction
   - title: 基础
     desc: Anatomy of a blockchain, transaction lifecycle, accounts and more.
     icon: basics
-    url: /zh/basics/app-anatomy.html
+    url:/zh/basics/app-anatomy.html
   - title: 核心概念
     desc: Read about the core concepts like baseapp, the store, or the server.
     icon: core
-    url: /zh/core/baseapp.html
+    url:/zh/core/baseapp.html
   - title: 模块构筑
     desc: Discover how to build modules for the Cosmos SDK.
     icon: modules
-    url: /zh/building-modules/intro.html
+    url:/zh/building-modules/intro.html
   - title: 运行一个节点
     desc: Running and interacting with nodes using the CLI and API.
     icon: interfaces
-    url: /zh/run-node/
+    url:/zh/run-node/
   - title: 模块
     desc: Explore existing modules to build your application with.
     icon: specifications
-    url: /zh/modules/
+    url:/zh/modules/
 stack:
   - title: Cosmos Hub
     desc: The first of thousands of interconnected blockchains on the Cosmos Network.

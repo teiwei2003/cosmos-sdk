@@ -155,17 +155,17 @@ func processRecovery(recoveryObj interface{}, middleware recoveryMiddleware) err
 
 ```go
 type BaseApp struct {
-    // ...
+   //...
     runTxRecoveryMiddleware recoveryMiddleware
 }
 
 func NewBaseApp(...) {
-    // ...
+   //...
     app.runTxRecoveryMiddleware = newDefaultRecoveryMiddleware()
 }
 
 func (app *BaseApp) runTx(...) {
-    // ...
+   //...
     defer func() {
         if r := recover(); r != nil {
             recoveryMW := newOutOfGasRecoveryMiddleware(gasWanted, ctx, app.runTxRecoveryMiddleware)
@@ -174,7 +174,7 @@ func (app *BaseApp) runTx(...) {
 
         gInfo = sdk.GasInfo{GasWanted: gasWanted, GasUsed: ctx.GasMeter().GasConsumed()}
     }()
-    // ...
+   //...
 }
 ```
 

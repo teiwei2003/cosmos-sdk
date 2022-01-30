@@ -1,6 +1,6 @@
 # BeginBlock
 
-各「BeginBlock」では、前のブロックで受け取ったすべての料金がに転送されます
+各[BeginBlock]では、前のブロックで受け取ったすべての料金がに転送されます
 `ModuleAccount`アカウントを配布します。 プリンシパルまたはベリファイアとして
 報酬を引き出すと、 `ModuleAccount`から削除されます。 開始時間
 ブロック、請求される料金のさまざまな請求は次のように更新されます。
@@ -15,9 +15,9 @@
 
 パラメータの説明については、[params](07_params.md)を参照してください。
 
-「料金」を前のブロックで請求された合計料金とします。
+[料金]を前のブロックで請求された合計料金とします。
 公平性に対するインフレ報酬。 すべての料金は特定のモジュールで請求されます
-ブロック期間中のアカウント。 「BeginBlock」の間に、それらはに送られます
+ブロック期間中のアカウント。 [BeginBlock]の間に、それらはに送られます
 `` "Distribute" `` ModuleAccount`。 他のトークンは送信されません。 それどころか、
 各アカウントが受け取る資格のある報酬は保存され、引き出しをトリガーすることができます
 メッセージ `FundCommunityPool`、` WithdrawValidatorCommission`、および
@@ -31,10 +31,10 @@
 
 ### 報酬バリデーター
 
-提案者は、「料金*基本提案者報酬」の基本的な報酬とボーナスを受け取ります
+提案者は、[料金*基本提案者報酬]の基本的な報酬とボーナスを受け取ります
 `fees * Bonusproposerreward * P`、ここで` P =(バリデーターと
 事前コミット/総バインディングバリデーターパワーを含む) `。 より多くの事前コミット
-提案者には、大きい方の「P」が含まれます。 `P`は` 1.00`より大きくなることはありません(
+提案者には、大きい方の[P]が含まれます。 `P`は` 1.00`より大きくなることはありません(
 バインドされたバリデーターのみが有効な事前コミットを提供できます)、常により大きい
 `2/3`。
 
@@ -42,7 +42,7 @@
 コンセンサスパワーに比例した提案者。
 
 ```
-powFrac = validator power / total bonded validator power
+powFrac = validator power/total bonded validator power
 proposerMul = baseproposerreward + bonusproposerreward * P
 voteMul = 1 - communitytax - proposerMul
 ```
@@ -61,9 +61,9 @@ voteMul = 1 - communitytax - proposerMul
 
 オペレーターが受け取る資格のある未実現の報酬は、
 `ValidatorAccumulatedCommission`、およびクライアントが受け取った報酬
-「ValidatorCurrentRewards」に保存されます。 [F1経費配分
+[ValidatorCurrentRewards]に保存されます。 [F1経費配分
 スキーム](01_concepts.md)は、各プリンシパルの報酬を計算するために使用されます。
-注文を撤回または更新して、「BeginBlock」で処理されないようにします。
+注文を撤回または更新して、[BeginBlock]で処理されないようにします。
 
 ### サンプル配布
 
@@ -72,12 +72,12 @@ voteMul = 1 - communitytax - proposerMul
 
 すべてのバリデーターは、提案に事前コミットを含めることで同じように動作します
 ピース。 次に、 `(事前コミットを含む)/(バインディングバリデーターの合計パワー)`を保持します
-一定であるため、バリデーターの償却ブロック報酬は「(バリデーターパワー/総拘束力)*(1-コミュニティ税率)」です。
+一定であるため、バリデーターの償却ブロック報酬は[(バリデーターパワー/総拘束力)*(1-コミュニティ税率)]です。
 トータルリワード。 したがって、1人の委任者に対する報酬は次のとおりです。
 
 ```
-(delegator proportion of the validator power / validator power) * (validator power / total bonded power)
+(delegator proportion of the validator power/validator power) * (validator power/total bonded power)
   * (1 - community tax rate) * (1 - validator commision rate)
-= (delegator proportion of the validator power / total bonded power) * (1 -
+= (delegator proportion of the validator power/total bonded power) * (1 -
 community tax rate) * (1 - validator commision rate)
 ```

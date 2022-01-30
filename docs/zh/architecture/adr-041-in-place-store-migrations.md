@@ -19,7 +19,7 @@
 由于多种原因，此过程很麻烦:
 
 - 程序需要时间。运行 `export` 命令可能需要几个小时，使用迁移的 JSON 在新链上运行 `InitChain` 可能需要一些额外的时间。
-- 导出的 JSON 文件可能很重(~100MB-1GB)，难以查看、编辑和传输，这反过来又引入了额外的工作来解决这些问题(例如 [streaming genesis](https://github.com) /cosmos/cosmos-sdk/issues/6936))。
+- 导出的 JSON 文件可能很重(~100MB-1GB)，难以查看、编辑和传输，这反过来又引入了额外的工作来解决这些问题(例如 [streaming genesis](https://github.com)/cosmos/cosmos-sdk/issues/6936))。
 
 ## 决定
 
@@ -31,7 +31,7 @@
 
 ```go
 type AppModule interface {
-    // --snip--
+   //--snip--
     ConsensusVersion() uint64
 }
 ```
@@ -44,14 +44,14 @@ type AppModule interface {
 
 ```go
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-    // --snip--
+   //--snip--
     cfg.RegisterMigration(types.ModuleName, 1, func(ctx sdk.Context) error {
-        // Perform in-place store migrations from ConsensusVersion 1 to 2.
+       //Perform in-place store migrations from ConsensusVersion 1 to 2.
     })
      cfg.RegisterMigration(types.ModuleName, 2, func(ctx sdk.Context) error {
-        // Perform in-place store migrations from ConsensusVersion 2 to 3.
+       //Perform in-place store migrations from ConsensusVersion 2 to 3.
     })
-    // etc.
+   //etc.
 }
 ```
 
@@ -60,7 +60,7 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 在 Cosmos SDK 中，迁移功能由每个模块的 keeper 处理，因为 keeper 持有用于执行就地存储迁移的 `sdk.StoreKey`。 为了不让 keeper 过载，每个模块都使用一个 `Migrator` 包装器来处理迁移功能: 
 
 ```go
-// Migrator is a struct for handling in-place store migrations.
+//Migrator is a struct for handling in-place store migrations.
 type Migrator struct {
   BaseKeeper
 }
@@ -69,13 +69,13 @@ type Migrator struct {
 迁移函数应该位于每个模块的 `migrations/` 文件夹中，并由迁移器的方法调用。 我们建议方法名称的格式为`Migrate{M}to{N}`。 
 
 ```go
-// Migrate1to2 migrates from version 1 to 2.
+//Migrate1to2 migrates from version 1 to 2.
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-	return v043bank.MigrateStore(ctx, m.keeper.storeKey) // v043bank is package `x/bank/migrations/v043`.
+	return v043bank.MigrateStore(ctx, m.keeper.storeKey)//v043bank is package `x/bank/migrations/v043`.
 }
 ```
 
-每个模块的迁移功能都特定于模块的存储演变，在本 ADR 中没有描述。 引入ADR-028长度前缀地址后x/bank store key迁移的例子可以在这个[store.go代码](https://github.com/cosmos/cosmos-sdk/blob/36f68eb9e041e20a5bb47e216ac5eb8b91f95471/ x/bank/legacy/v043/store.go#L41-L62)。
+每个模块的迁移功能都特定于模块的存储演变，在本 ADR 中没有描述。 引入ADR-028长度前缀地址后x/bank store key迁移的例子可以在这个[store.go代码](https://github.com/cosmos/cosmos-sdk/blob/36f68eb9e041e20a5bb47e216ac5eb8b91f95471/x/bank/legacy/v043/store.go#L41-L62)。
 
 ### 跟踪 `x/upgrade` 中的模块版本
 
@@ -98,14 +98,14 @@ UpgradeHandler 签名需要更新以获取 `VersionMap`，并返回升级后的 
 
 ```diff
 func (k UpgradeKeeper) ApplyUpgrade(ctx sdk.Context, plan types.Plan) {
-    // --snip--
+   //--snip--
 -   handler(ctx, plan)
-+   updatedVM, err := handler(ctx, plan, k.GetModuleVersionMap(ctx)) // k.GetModuleVersionMap() fetches the VersionMap stored in state.
++   updatedVM, err := handler(ctx, plan, k.GetModuleVersionMap(ctx))//k.GetModuleVersionMap() fetches the VersionMap stored in state.
 +   if err != nil {
 +       return err
 +   }
 +
-+   // Set the updated consensus versions to state
++  //Set the updated consensus versions to state
 +   k.SetModuleVersionMap(ctx, updatedVM)
 }
 ```

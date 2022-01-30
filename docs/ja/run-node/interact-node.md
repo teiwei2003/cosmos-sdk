@@ -15,7 +15,7 @@
 simd query bank balances $MY_VALIDATOR_ADDRESS --chain-id my-test-chain
 ```
 
-作成したアカウントの現在の残高が表示されます。これは、付与した「ステーク」の元の残高から「gentx」を介して委任した金額を差し引いたものに等しくなります。 次に、2番目のアカウントを作成します。
+作成したアカウントの現在の残高が表示されます。これは、付与した[ステーク]の元の残高から[gentx]を介して委任した金額を差し引いたものに等しくなります。 次に、2番目のアカウントを作成します。
 
 ```bash
 simd keys add recipient --keyring-backend test
@@ -58,7 +58,7 @@ Protobufエコシステムは、`* .proto`ファイルからさまざまな言�
 
 [grpcurl](https://github.com/fullstorydev/grpcurl)は`curl`に似ていますが、gRPC用です。 Goライブラリとしても利用できますが、デバッグとテストの目的でCLIコマンドとしてのみ使用します。 前のリンクの指示に従ってインストールしてください。
 
-ローカルノードが実行されている(ローカルネットまたはライブネットワークに接続されている)と仮定すると、次のコマンドを実行して、使用可能なProtobufサービスを一覧表示できます(`localhost：9000`を別のgRPCサーバーエンドポイントに置き換えることができます) ノード。[`app.toml`](../run-node/run-node.md＃configuring-the-node-using-apptoml))内の`grpc.address`フィールドで構成されます。 
+ローカルノードが実行されている(ローカルネットまたはライブネットワークに接続されている)と仮定すると、次のコマンドを実行して、使用可能なProtobufサービスを一覧表示できます(`localhost:9000`を別のgRPCサーバーエンドポイントに置き換えることができます) ノード。[`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml))内の`grpc.address`フィールドで構成されます。 
 
 ```bash
 grpcurl -plaintext localhost:9090 list
@@ -88,7 +88,7 @@ grpcurl \
 
 #### grpcurlを使用して履歴状態を照会する
 
-[gRPCメタデータ](https://github.com/grpc/grpc-go/blob/master/Documentation/grpc-metadata.md)をクエリに渡すことで履歴データをクエリすることもできます：`x-cosmos -block-height`メタデータには、クエリするブロックが含まれている必要があります。 上記のようにgrpcurlを使用すると、コマンドは次のようになります。
+[gRPCメタデータ](https://github.com/grpc/grpc-go/blob/master/Documentation/grpc-metadata.md)をクエリに渡すことで履歴データをクエリすることもできます:`x-cosmos -block-height`メタデータには、クエリするブロックが含まれている必要があります。 上記のようにgrpcurlを使用すると、コマンドは次のようになります。
 
 ```bash
 grpcurl \
@@ -122,14 +122,14 @@ func queryState() error{
         return err
     }
 
-   //Create a connection to the gRPC server.
+  //Create a connection to the gRPC server.
     grpcConn := grpc.Dial(
         "127.0.0.1:9090",//your gRPC server address.
         grpc.WithInsecure(),//The Cosmos SDK doesn't support any transport security mechanism.
     )
     defer grpcConn.Close()
 
-   //This creates a gRPC client to query the x/bank service.
+  //This creates a gRPC client to query the x/bank service.
     bankClient := banktypes.NewQueryClient(grpcConn)
     bankRes, err := bankClient.Balance(
         context.Background(),
@@ -164,7 +164,7 @@ import (
 )
 
 func queryState() error{
-   //--snip--
+  //--snip--
 
     var header metadata.MD
     bankRes, err = bankClient.Balance(
@@ -189,7 +189,7 @@ CosmJSのドキュメントは、[https://cosmos.github.io/cosmjs](https://cosmo
 
 ## RESTエンドポイントの使用
 
-[gRPCガイド](../core/grpc_rest.md)で説明されているように、Cosmos SDKのすべてのgRPCサービスは、gRPCゲートウェイを介してより便利なRESTベースのクエリで利用できるようになっています。 URLパスの形式は、Protobufサービスメソッドの完全修飾名に基づいていますが、最終的なURLがより慣用的に見えるように、小さなカスタマイズが含まれている場合があります。 たとえば、`cosmos.bank.v1beta1.Query/AllBalances`メソッドのRESTエンドポイントは`GET/cosmos/bank/v1beta1/balances/{address}`です。 リクエスト引数はクエリパラメータとして渡されます。
+[gRPCガイド](../core/grpc_rest.md)で説明されているように、Cosmos SDKのすべてのgRPCサービスは、gRPCゲートウェイを介してより便利なRESTベースのクエリで利用できるようになっています。 URLパスの形式は、Protobufサービスメソッドの完全修飾名に基づいていますが、最終的なURLがより慣用的に見えるように、小さなカスタマイズが含まれている場合があります。 たとえば、`cosmos.bank.v1beta1.Query/AllBalances`メソッドのRESTエンドポイントは`GET /cosmos/bank/v1beta1/balances/{address}`です。 リクエスト引数はクエリパラメータとして渡されます。
 
 具体的な例として、残高要求を行うための`curl`コマンドは次のとおりです。
 
@@ -200,9 +200,9 @@ curl \
     http://localhost:1317/cosmos/bank/v1beta1/balances/$MY_VALIDATOR
 ```
 
-必ず`localhost：1317`を、`api.address`フィールドで設定されたノードのRESTエンドポイントに置き換えてください。
+必ず`localhost:1317`を、`api.address`フィールドで設定されたノードのRESTエンドポイントに置き換えてください。
 
-使用可能なすべてのRESTエンドポイントのリストは、Swagger仕様ファイルとして入手でき、`localhost：1317/swagger`で表示できます。 [`app.toml`](../run-node/run-node.md＃configuring-the-node-using-apptoml)ファイルで`api.swagger`フィールドがtrueに設定されていることを確認してください。
+使用可能なすべてのRESTエンドポイントのリストは、Swagger仕様ファイルとして入手でき、`localhost:1317/swagger`で表示できます。 [`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml)ファイルで`api.swagger`フィールドがtrueに設定されていることを確認してください。
 
 ### RESTを使用して履歴状態を照会する
 
@@ -220,8 +220,8 @@ curl \
 
 ### クロスオリジンリソースシェアリング(CORS)
 
-[CORSポリシー](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)は、セキュリティを支援するためにデフォルトで有効になっていません。 パブリック環境でrest-serverを使用する場合は、リバースプロキシを提供することをお勧めします。これは、[nginx](https://www.nginx.com/)を使用して実行できます。 テストと開発の目的で、[`app.toml`](../run-node/run-node.md＃configuring-the-node-using-apptoml)内に`enabled-unsafe-cors`フィールドがあります。
+[CORSポリシー](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)は、セキュリティを支援するためにデフォルトで有効になっていません。 パブリック環境でrest-serverを使用する場合は、リバースプロキシを提供することをお勧めします。これは、[nginx](https://www.nginx.com/)を使用して実行できます。 テストと開発の目的で、[`app.toml`](../run-node/run-node.md#configuring-the-node-using-apptoml)内に`enabled-unsafe-cors`フィールドがあります。
 
-## 次へ{非表示}
+## 次へ{hide}
 
-gRPCとRESTを使用してトランザクションを送信するには、トランザクションを生成し、署名し、最後にブロードキャストするという追加の手順が必要です。 [トランザクションの生成と署名](./txs.md)についてお読みください。{非表示} 
+gRPCとRESTを使用してトランザクションを送信するには、トランザクションを生成し、署名し、最後にブロードキャストするという追加の手順が必要です。 [トランザクションの生成と署名](./txs.md)についてお読みください。{hide} 

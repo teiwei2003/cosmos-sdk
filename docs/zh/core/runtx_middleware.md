@@ -36,7 +36,7 @@ BaseApp 方法将恢复中间件添加到默认恢复链中。
 ```go
 func (k FooKeeper) Do(obj interface{}) {
     if obj == nil {
-        // that shouldn't happen, we need to crash the app
+       //that shouldn't happen, we need to crash the app
         err := sdkErrors.Wrap(fooTypes.InternalError, "obj is nil")
         panic(err)
     }
@@ -46,7 +46,7 @@ func (k FooKeeper) Do(obj interface{}) {
 默认情况下，恐慌会被恢复，错误信息将被打印到日志中。 要覆盖该行为，我们应该注册一个自定义 RecoveryHandler: 
 
 ```go
-// Cosmos SDK application constructor
+//Cosmos SDK application constructor
 customHandler := func(recoveryObj interface{}) error {
     err, ok := recoveryObj.(error)
     if !ok {

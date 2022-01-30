@@ -6,7 +6,7 @@ Cosmovisorを使用したアップグレード前の処理はオプションで�
 
 たとえば、アップグレード前の処理中に、必要な新しいバージョンの変更を `app.toml`設定に加えます。 アップグレード前のプロセスは、アップグレード後にファイルを手動で更新する必要がないことを意味します。
 
-アプリケーションのバイナリファイルをアップグレードする前に、Cosmovisorはアプリケーションで実装できる「pre-upgrade」コマンドを呼び出します。
+アプリケーションのバイナリファイルをアップグレードする前に、Cosmovisorはアプリケーションで実装できる[pre-upgrade]コマンドを呼び出します。
 
 `pre-upgrade`コマンドはコマンドラインパラメータを受け入れず、次の終了コードで終了することが期待されています。
 
@@ -19,7 +19,7 @@ Cosmovisorを使用したアップグレード前の処理はオプションで�
 
 ## Sample
 
-次に、「pre-upgrade」コマンドの構造例を示します。
+次に、[pre-upgrade]コマンドの構造例を示します。
 
 ```go
 func preUpgradeCommand() *cobra.Command {
@@ -48,8 +48,8 @@ func preUpgradeCommand() *cobra.Command {
 
 ```go
 rootCmd.AddCommand(
-		// ..
+		//..
 		preUpgradeCommand(),
-		// ..
+		//..
 	)
 ```

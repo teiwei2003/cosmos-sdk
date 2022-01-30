@@ -8,7 +8,7 @@
 
 ## CosmosSDKストレージの紹介
 
-Cosmos SDKには、アプリケーションの状態を維持するための多くのストレージが付属しています。 デフォルトでは、Cosmos SDKアプリケーションのメインストレージは「マルチストア」、つまりストレージストレージです。 開発者は、アプリケーションの要件に応じて、任意の数のKey-Valueストアをマルチストアに追加できます。 マルチストアは、Cosmos SDKのモジュール性をサポートするために存在します。これは、各モジュールが独自の状態のサブセットを宣言および管理できるようにするためです。 マルチストアのKey-Valueストアには、特定の機能 `key`を介してのみアクセスできます。これは通常、モジュールの[` keeper`](../building-modules/keeper.md)に格納されています。ストレージが宣言されています。 
+Cosmos SDKには、アプリケーションの状態を維持するための多くのストレージが付属しています。 デフォルトでは、Cosmos SDKアプリケーションのメインストレージは[マルチストア]、つまりストレージストレージです。 開発者は、アプリケーションの要件に応じて、任意の数のKey-Valueストアをマルチストアに追加できます。 マルチストアは、Cosmos SDKのモジュール性をサポートするために存在します。これは、各モジュールが独自の状態のサブセットを宣言および管理できるようにするためです。 マルチストアのKey-Valueストアには、特定の機能 `key`を介してのみアクセスできます。これは通常、モジュールの[` keeper`](../building-modules/keeper.md)に格納されています。ストレージが宣言されています。 
 
 ```
 +-----------------------------------------------------+
@@ -60,7 +60,7 @@ Cosmos SDKには、アプリケーションの状態を維持するための多�
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L240-L264
 
-分岐とキャッシュはCosmosSDKに遍在しており、各ストレージタイプに実装する必要があります。 ストレージブランチは、基盤となるメインストレージに影響を与えることなく転送および更新できる、分離された一時ストレージブランチを作成します。 これは、一時的な状態遷移をトリガーするために使用されます。エラーが発生した場合は、後で復元できます。 詳細については、[context](./context.md＃Store-branching)をご覧ください。
+分岐とキャッシュはCosmosSDKに遍在しており、各ストレージタイプに実装する必要があります。 ストレージブランチは、基盤となるメインストレージに影響を与えることなく転送および更新できる、分離された一時ストレージブランチを作成します。 これは、一時的な状態遷移をトリガーするために使用されます。エラーが発生した場合は、後で復元できます。 詳細については、[context](./context.md#Store-branching)をご覧ください。
 
 ### ストレージを送信する
 
@@ -74,7 +74,7 @@ Cosmos SDKには、アプリケーションの状態を維持するための多�
 
 `CommitID`は、状態ツリーの決定論的コミットです。そのハッシュ値は、基になるコンセンサスエンジンに返され、ブロックヘッダーに格納されます。送信ストレージインターフェイスには多くの用途があることに注意してください。その1つは、すべてのオブジェクトをストレージに送信できるわけではないことを確認することです。 Cosmos SDKの[object-capabilitiesモデル](./ocap.md)の一部として、 `baseapp`のみがストレージを送信できる必要があります。たとえば、モジュールがストレージへのアクセスに通常使用する `ctx.KVStore()`メソッドが、 `CommitKVStore`ではなく` KVStore`を返すのはこのためです。
 
-Cosmos SDKはさまざまなストレージタイプを提供しますが、最も一般的に使用されるのは[`CommitMultiStore`](＃multistore)、[` KVStore`](＃kvstore)、[`GasKv`ストア](＃gaskv-store)です。 [Other-stores](＃other-stores)には、 `Transient`ストアと` TraceKV`ストアが含まれます。
+Cosmos SDKはさまざまなストレージタイプを提供しますが、最も一般的に使用されるのは[`CommitMultiStore`](#multistore)、[` KVStore`](#kvstore)、[`GasKv`ストア](#gaskv-store)です。 [Other-stores](#other-stores)には、 `Transient`ストアと` TraceKV`ストアが含まれます。
 
 ## 複数のストレージ
 
@@ -84,7 +84,7 @@ Cosmos SDKはさまざまなストレージタイプを提供しますが、最�
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L104-L133
 
-トレースが有効になっている場合、ブランチマルチストアは最初に[`TraceKv.Store`](＃tracekv-store)内の基礎となるすべての` KVStore`をラップします。
+トレースが有効になっている場合、ブランチマルチストアは最初に[`TraceKv.Store`](#tracekv-store)内の基礎となるすべての` KVStore`をラップします。
 
 ### CommitMultiStore
 
@@ -112,9 +112,9 @@ CosmosSDKで使用される `Multistore`の主なタイプは、` Multistore`イ
 
 `KVStore`は、データを保存および取得するための単純なKey-Valueストアです。 `CommitKVStore`は` Committer`も実装する `KVStore`です。デフォルトでは、 `baseapp`のメインの` CommitMultiStore`にインストールされているストアは `CommitKVStore`です。 `KVStore`インターフェースは、主にサブミッターへのモジュールアクセスを制限するために使用されます。
 
-モジュールは、単一の「KVStore」を使用して、グローバル状態のサブセットを管理します。 `KVStores`には、特定のキーを保持しているオブジェクトからアクセスできます。この `key`は、ストレージを定義するモジュールの[` keeper`](../building-modules/keeper.md)にのみ公開する必要があります。
+モジュールは、単一の[KVStore]を使用して、グローバル状態のサブセットを管理します。 `KVStores`には、特定のキーを保持しているオブジェクトからアクセスできます。この `key`は、ストレージを定義するモジュールの[` keeper`](../building-modules/keeper.md)にのみ公開する必要があります。
 
-`CommitKVStore`は、それぞれの` key`エージェントによって宣言され、アプリケーションの[multistore](＃multistore)ファイルの[メインアプリケーションファイル](../basics/app-anatomy.md＃core-application)にインストールされます。 )。同じファイルで、`key`はストアの管理を担当するモジュールの`keeper`にも渡されます。
+`CommitKVStore`は、それぞれの` key`エージェントによって宣言され、アプリケーションの[multistore](#multistore)ファイルの[メインアプリケーションファイル](../basics/app-anatomy.md#core-application)にインストールされます。 )。同じファイルで、`key`はストアの管理を担当するモジュールの`keeper`にも渡されます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/types/store.go#L189-L219
 
@@ -142,7 +142,7 @@ IAVLツリーのドキュメントは[ここ](https://github.com/cosmos/iavl/blo
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/dbadapter/store.go#L13-L16
 
-`dbadapter.Store`には` dbm.DB`が埋め込まれています。これは、 `KVStore`のほとんどのインターフェース機能が実装されていることを意味します。 その他の機能(主にその他)は手動で実装されます。 このストアは主に[一時的なストア](＃transient-stores)に使用されます
+`dbadapter.Store`には` dbm.DB`が埋め込まれています。これは、 `KVStore`のほとんどのインターフェース機能が実装されていることを意味します。 その他の機能(主にその他)は手動で実装されます。 このストアは主に[一時的なストア](#transient-stores)に使用されます
 
 ### `一時的な`ストレージ
 
@@ -152,7 +152,7 @@ IAVLツリーのドキュメントは[ここ](https://github.com/cosmos/iavl/blo
 
 `Transient.Store`は` dbm.NewMemDB() `を持つ` dbadapter.Store`です。 すべての `KVStore`メソッドが再利用されます。 `Store.Commit()`を呼び出すと、新しい `dbadapter.Store`が割り当てられ、以前の参照が破棄され、ガベージコレクションが行われます。
 
-このタイプのストレージは、各ブロックにのみ関連する情報を保持するのに役立ちます。 例として、パラメーターの変更を保存します(つまり、ブロック内のパラメーターが変更された場合は、boolを「true」に設定します)。
+このタイプのストレージは、各ブロックにのみ関連する情報を保持するのに役立ちます。 例として、パラメーターの変更を保存します(つまり、ブロック内のパラメーターが変更された場合は、boolを[true]に設定します)。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/x/params/types/subspace.go#L20-L30
 
@@ -202,7 +202,7 @@ Cosmos SDKアプリケーションは、[`gas`](../basics/gas-fees.md)を使用�
 
 ### `TraceKv`ストレージ
 
-`tracekv.Store`はラッパー` KVStore`であり、基礎となる `KVStore`で操作追跡機能を提供します。 親の「MultiStore」でトラッキングが有効になっている場合、CosmosSDKはそれをすべての「KVStore」に自動的に適用します。
+`tracekv.Store`はラッパー` KVStore`であり、基礎となる `KVStore`で操作追跡機能を提供します。 親の[MultiStore]でトラッキングが有効になっている場合、CosmosSDKはそれをすべての[KVStore]に自動的に適用します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc6/store/tracekv/store.go#L20-L43
 
@@ -221,7 +221,7 @@ Cosmos SDKアプリケーションは、[`gas`](../basics/gas-fees.md)を使用�
 ### `ListenKv`ストレージ
 
 `listenkv.Store`はラッパー` KVStore`であり、基盤となる `KVStore`のステータス監視機能を提供します。
-これは、Cosmos SDKによって、状態フローの構成中に「StoreKey」が指定されているすべての「KVStore」に自動的に適用されます。
+これは、Cosmos SDKによって、状態フローの構成中に[StoreKey]が指定されているすべての[KVStore]に自動的に適用されます。
 状態ストリームの構成に関する追加情報は、[store/streaming/README.md](../../store/streaming/README.md)にあります。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.44.1/store/listenkv/store.go#L11-L18
@@ -238,7 +238,7 @@ SDKは、状態ストレージのデフォルトのインターフェイスと�
 
 ### タイル張り
 
-`flat.Store`は、新しいデフォルトの永続ストレージであり、状態ストレージとコミットメントスキームの懸念を内部的に切り離します。 値はバッキングキー値データベース(「ストレージ」バケット)に直接格納され、値のハッシュは暗号化プロミスを生成できる別のストレージにマップされます(「状態プロミス」バケット、 `smt.storage`を使用) 。
+`flat.Store`は、新しいデフォルトの永続ストレージであり、状態ストレージとコミットメントスキームの懸念を内部的に切り離します。 値はバッキングキー値データベース([ストレージ]バケット)に直接格納され、値のハッシュは暗号化プロミスを生成できる別のストレージにマップされます([状態プロミス]バケット、 `smt.storage`を使用) 。
 
 これは、オプションで、バケットごとに異なるバックエンドデータベースを使用するように構築できます。
 
@@ -248,6 +248,6 @@ SDKは、状態ストレージのデフォルトのインターフェイスと�
 
 基盤となるストレージの機能を部分的に公開するために使用される `BasicKVStore`(たとえば、` flat.Store`の約束されたストアへのアクセスを許可する)。
 
-## 次へ{非表示}
+## 次へ{hide}
 
 [encoding](./encoding.md){hide}を理解する

@@ -42,7 +42,7 @@
 提议者，与他们的共识权力成比例。
 
 ```
-powFrac = validator power / total bonded validator power
+powFrac = validator power/total bonded validator power
 proposerMul = baseproposerreward + bonusproposerreward * P
 voteMul = 1 - communitytax - proposerMul
 ```
@@ -76,8 +76,8 @@ scheme](01_concepts.md) 用于计算每个委托人的奖励，因为他们
 总奖励。因此，单个委托人的奖励是: 
 
 ```
-(delegator proportion of the validator power / validator power) * (validator power / total bonded power)
+(delegator proportion of the validator power/validator power) * (validator power/total bonded power)
   * (1 - community tax rate) * (1 - validator commision rate)
-= (delegator proportion of the validator power / total bonded power) * (1 -
+= (delegator proportion of the validator power/total bonded power) * (1 -
 community tax rate) * (1 - validator commision rate)
 ```
