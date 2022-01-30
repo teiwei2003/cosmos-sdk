@@ -1,49 +1,49 @@
+# CosmosSDKドキュメント
 <!--
-レイアウト：ホームページ
-タイトル：CosmosSDKドキュメント
-説明：Cosmos SDKは、アプリケーション固有のブロックチェーンを構築するための世界で最も人気のあるフレームワークです。
-セクション：
-  -タイトル：はじめに
-    desc：CosmosSDKの概要。
-    url：/intro/overview.html
-    アイコン：はじめに
-  -タイトル：基本
-    desc：ブロックチェーン、トランザクションライフサイクル、アカウントなどの構造。
-    アイコン：基本
-    url：/basics/app-anatomy.html
-  -タイトル：コアコンセプト
-    desc：baseapp、ストア、サーバーなどのコアコンセプトについて読んでください。
-    アイコン：コア
-    url：/core/baseapp.html
-  -タイトル：モジュールの構築
-    desc：CosmosSDKのモジュールを構築する方法をご覧ください。
-    アイコン：モジュール
-    url：/building-modules/intro.html
-  -タイトル：ノードの実行
-    desc：CLIとAPIを使用してノードを実行および操作します。
-    アイコン：インターフェース
-    url：/ run-node /
-  -タイトル：モジュール
-    desc：アプリケーションを構築するための既存のモジュールを調べます。
-    アイコン：仕様
-    url：/ modules /
-スタック：
-  -タイトル：コスモスハブ
-    desc：CosmosNetwork上の数千の相互接続されたブロックチェーンの最初のもの。
-    色：「＃BA3FD9」
-    ラベル：ハブ
-    url：http：//hub.cosmos.network
-  -タイトル：テンダーミントコア
-    desc：Cosmos SDKを強化する、ブロックチェーンを構築するための主要なBFTエンジン。
-    色：「＃00BB00」
-    ラベル：コア
-    url：http：//docs.tendermint.com
-フッター：
-  ニュースレター：false
-余談：false
+レイアウト:ホームページ
+タイトル:CosmosSDKドキュメント
+説明:Cosmos SDKは、アプリケーション固有のブロックチェーンを構築するための世界で最も人気のあるフレームワークです。
+セクション:
+  -タイトル:はじめに
+    desc:CosmosSDKの概要。
+    url:/intro/overview.html
+    アイコン:はじめに
+  -タイトル:基本
+    desc:ブロックチェーン、トランザクションライフサイクル、アカウントなどの構造。
+    アイコン:基本
+    url:/basics/app-anatomy.html
+  -タイトル:コアコンセプト
+    desc:baseapp、ストア、サーバーなどのコアコンセプトについて読んでください。
+    アイコン:コア
+    url:/core/baseapp.html
+  -タイトル:モジュールの構築
+    desc:CosmosSDKのモジュールを構築する方法をご覧ください。
+    アイコン:モジュール
+    url:/building-modules/intro.html
+  -タイトル:ノードの実行
+    desc:CLIとAPIを使用してノードを実行および操作します。
+    アイコン:インターフェース
+    url:/run-node/
+  -タイトル:モジュール
+    desc:アプリケーションを構築するための既存のモジュールを調べます。
+    アイコン:仕様
+    url:/modules/
+スタック:
+  -タイトル:コスモスハブ
+    desc:CosmosNetwork上の数千の相互接続されたブロックチェーンの最初のもの。
+    色:[#BA3FD9]
+    ラベル:ハブ
+    url:http://hub.cosmos.network
+  -タイトル:テンダーミントコア
+    desc:Cosmos SDKを強化する、ブロックチェーンを構築するための主要なBFTエンジン。
+    色:[#00BB00]
+    ラベル:コア
+    url:http://docs.tendermint.com
+フッター:
+  ニュースレター:false
+余談:false
 -->
 
-# CosmosSDKドキュメント
 
 ## はじめに
 
@@ -70,12 +70,12 @@
 
 ## コスモスハブ
 
-Cosmos Hub（ `gaia`）のドキュメントは[github.com/cosmos/gaia]（https://github.com/cosmos/gaia/tree/master/docs）に移動しました。
+Cosmos Hub( `gaia`)のドキュメントは[github.com/cosmos/gaia](https://github.com/cosmos/gaia/tree/master/docs)に移動しました。
 
 ## 言語
 
-Cosmos SDKは[Golang]（https://golang.org/）で記述されていますが、フレームワークは他の言語でも同様に実装できます。 別の言語での実装への資金提供については、お問い合わせください。
+Cosmos SDKは[Golang](https://golang.org/)で記述されていますが、フレームワークは他の言語でも同様に実装できます。 別の言語での実装への資金提供については、お問い合わせください。
 
 ## 貢献する
 
-ビルドプロセスの詳細と変更を行う際の考慮事項については、[DOCS_README.md]（https://github.com/cosmos/cosmos-sdk/blob/master/docs/DOCS_README.md）を参照してください。
+ビルドプロセスの詳細と変更を行う際の考慮事項については、[DOCS_README.md](https://github.com/cosmos/cosmos-sdk/blob/master/docs/DOCS_README.md)を参照してください。

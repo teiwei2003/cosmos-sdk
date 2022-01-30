@@ -21,14 +21,14 @@ BaseApp 的目标是提供 Cosmos SDK 应用程序的基础层
 
 ```go
 type App struct {
-  // reference to a BaseApp
+ //reference to a BaseApp
   *baseapp.BaseApp
 
-  // list of application store keys
+ //list of application store keys
 
-  // list of application keepers
+ //list of application keepers
 
-  // module manager
+ //module manager
 }
 ```
 
@@ -103,7 +103,7 @@ func NewBaseApp(
   name string, logger log.Logger, db dbm.DB, txDecoder sdk.TxDecoder, options ...func(*BaseApp),
 ) *BaseApp {
 
-  // ...
+ //...
 }
 ```
 

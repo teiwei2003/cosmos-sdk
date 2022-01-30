@@ -62,19 +62,19 @@ The given configuration allows for two sinks -- in-memory and Prometheus. We cre
 type that performs all the bootstrapping for the operator, so capturing metrics becomes seamless.
 
 ```go
-// Metrics defines a wrapper around application telemetry functionality. It allows
-// metrics to be gathered at any point in time. When creating a Metrics object,
-// internally, a global metrics is registered with a set of sinks as configured
-// by the operator. In addition to the sinks, when a process gets a SIGUSR1, a
-// dump of formatted recent metrics will be sent to STDERR.
+//Metrics defines a wrapper around application telemetry functionality. It allows
+//metrics to be gathered at any point in time. When creating a Metrics object,
+//internally, a global metrics is registered with a set of sinks as configured
+//by the operator. In addition to the sinks, when a process gets a SIGUSR1, a
+//dump of formatted recent metrics will be sent to STDERR.
 type Metrics struct {
   memSink           *metrics.InmemSink
   prometheusEnabled bool
 }
 
-// Gather collects all registered metrics and returns a GatherResponse where the
-// metrics are encoded depending on the type. Metrics are either encoded via
-// Prometheus or JSON if in-memory.
+//Gather collects all registered metrics and returns a GatherResponse where the
+//metrics are encoded depending on the type. Metrics are either encoded via
+//Prometheus or JSON if in-memory.
 func (m *Metrics) Gather(format string) (GatherResponse, error) {
   switch format {
   case FormatPrometheus:
@@ -101,7 +101,7 @@ API 服务器将创建一个对`Metrics` 对象的引用实例，并将注册一
 
 ```go
 func (s *Server) Start(cfg config.Config) error {
-  // ...
+ //...
 
   if cfg.Telemetry.Enabled {
     m, err := telemetry.New(cfg.Telemetry)
@@ -113,7 +113,7 @@ func (s *Server) Start(cfg config.Config) error {
     s.registerMetrics()
   }
 
-  // ...
+ //...
 }
 
 func (s *Server) registerMetrics() {
@@ -140,7 +140,7 @@ additional lifting required by modules to leverage profiling metrics. To do so, 
 ```go
 func (k BaseKeeper) MintCoins(ctx sdk.Context, moduleName string, amt sdk.Coins) error {
   defer metrics.MeasureSince(time.Now(), "MintCoins")
-  // ...
+ //...
 }
 ```
 

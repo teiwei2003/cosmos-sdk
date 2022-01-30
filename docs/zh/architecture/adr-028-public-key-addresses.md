@@ -126,7 +126,7 @@ func Hash(typ string, key []byte) []byte {
 对于简单的组合账户(如新的朴素多重签名)，我们概括了“address.Hash”。地址是通过为子账户递归创建地址、对地址进行排序并将它们组合成单个地址来构建的。它确保键的顺序不会影响结果地址。 
 
 ```go
-// We don't need a PubKey interface - we need anything which is addressable.
+//We don't need a PubKey interface - we need anything which is addressable.
 type Addressable interface {
     Address() []byte
 }
@@ -161,16 +161,16 @@ message PubKey {
 
 ```go
 func (multisig PubKey) Address() {
-  // first gather all nested pub keys
-  var keys []address.Addressable  // cryptotypes.PubKey implements Addressable
+ //first gather all nested pub keys
+  var keys []address.Addressable //cryptotypes.PubKey implements Addressable
   for _, _key := range multisig.Pubkeys {
     keys = append(keys, key.GetCachedValue().(cryptotypes.PubKey))
   }
 
-  // form the type from the message name (cosmos.crypto.multisig.PubKey) and the threshold joined together
+ //form the type from the message name (cosmos.crypto.multisig.PubKey) and the threshold joined together
   prefix := fmt.Sprintf("%s/%d", proto.MessageName(multisig), multisig.Threshold)
 
-  // use the Composed function defined above
+ //use the Composed function defined above
   return address.Composed(prefix, keys)
 }
 ```
@@ -311,7 +311,7 @@ Alan 一般意见:
 
 ZKP算术哈希函数讨论
 
-+ 波塞冬 / 救援
++ 波塞冬/救援
 + 问题:风险要大得多，因为我们对算术结构的密码分析技术和历史知之甚少。这仍然是一个活跃研究的新领域和领域。
 
 后量子签名大小

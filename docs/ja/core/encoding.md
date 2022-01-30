@@ -24,7 +24,7 @@ Cosmos SDKのバイナリラインコードのタイプは、主に2つのタイ
 木。
 
 ストレージエンコーディングの場合、protobuf定義は任意のタイプで存在でき、通常は
-アミノ基に基づく「中間体」のタイプがあります。具体的には、protobufタイプに基づく
+アミノ基に基づく[中間体]のタイプがあります。具体的には、protobufタイプに基づく
 シリアル化と永続性、およびアミノベースのタイプ用に定義されています
 ステートマシンのビジネスロジックで使用され、前後に変換できます。
 アミノベースのタイプは将来段階的に廃止される可能性があるため、開発者は注意してください
@@ -103,31 +103,31 @@ Protobuf DSLは強く型付けされているため、可変型のフィール�
 
 ```proto
 message Profile {
- //account is the account associated to a profile.
+//account is the account associated to a profile.
   cosmos.auth.v1beta1.BaseAccount account = 1;
- //bio is a short description of the account.
+//bio is a short description of the account.
   string bio = 4;
 }
 ```
 
-この `Profile`の例では、`account`を `BaseAccount`としてハードコーディングしました。ただし、「BaseVestingAccount」や「ContinuousVestingAccount」など、他にもいくつかの種類の[アトリビューション関連のユーザーアカウント](../../x/auth/spec/05_vesting.md)があります。これらのアカウントはすべて異なりますが、すべて `AccountI`インターフェースを実装しています。これらすべてのタイプのアカウントを許可する「個人プロファイル」をどのように作成しますか。「アカウント」フィールドは「アカウントI」インターフェースを受け入れます。
+この `Profile`の例では、`account`を `BaseAccount`としてハードコーディングしました。ただし、[BaseVestingAccount]や[ContinuousVestingAccount]など、他にもいくつかの種類の[アトリビューション関連のユーザーアカウント](../../x/auth/spec/05_vesting.md)があります。これらのアカウントはすべて異なりますが、すべて `AccountI`インターフェースを実装しています。これらすべてのタイプのアカウントを許可する[個人プロファイル]をどのように作成しますか。[アカウント]フィールドは[アカウントI]インターフェースを受け入れます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/auth/types/account.go#L307-L330
 
-[ADR-019](../architecture/adr-019-protobuf-state-encoding.md)では、[`Any`](https://github.com/protocolbuffers/protobuf/blob)を使用することが決定されました。/master/src/google/protobuf/any.proto)sインターフェースをprotobufでエンコードします。`Any`には、任意にシリアル化されたバイトメッセージと、グローバル一意識別子として機能し、メッセージのタイプに解決されるURLが含まれます。この戦略により、protobufメッセージに任意のGoタイプをパックできます。新しい「プロファイル」は次のようになります。
+[ADR-019](../architecture/adr-019-protobuf-state-encoding.md)では、[`Any`](https://github.com/protocolbuffers/protobuf/blob)を使用することが決定されました。/master/src/google/protobuf/any.proto)sインターフェースをprotobufでエンコードします。`Any`には、任意にシリアル化されたバイトメッセージと、グローバル一意識別子として機能し、メッセージのタイプに解決されるURLが含まれます。この戦略により、protobufメッセージに任意のGoタイプをパックできます。新しい[プロファイル]は次のようになります。
 
 ```protobuf
 message Profile {
- //account is the account associated to a profile.
+//account is the account associated to a profile.
   google.protobuf.Any account = 1 [
     (cosmos_proto.accepts_interface) = "AccountI";//Asserts that this field only accepts Go types implementing `AccountI`. It is purely informational for now.
   ];
- //bio is a short description of the account.
+//bio is a short description of the account.
   string bio = 4;
 }
 ```
 
-構成ファイルにアカウントを追加するには、まず「codectypes.NewAnyWithValue」を使用して、アカウントを「Any」に「パッケージ化」する必要があります。
+構成ファイルにアカウントを追加するには、まず[codectypes.NewAnyWithValue]を使用して、アカウントを[Any]に[パッケージ化]する必要があります。
 
 ```go
 var myAccount AccountI
@@ -152,7 +152,7 @@ jsonBz, err := cdc.MarshalJSON(profile)
 
 全体として、インターフェースをエンコードするには、1/インターフェースを `Any`にパックし、2/` Any`をマーシャリングする必要があります。 便宜上、Cosmos SDKには、これら2つのステップをバンドルするための `MarshalInterface`メソッドが用意されています。 [x/authモジュールの実際の例](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/auth/keeper/keeper.go#L218-L221)をご覧ください。 。
 
-`Any`の内部から特定のGoタイプを取得する逆の操作は「アンパック」と呼ばれ、` Any`の `GetCachedValue()`によって実行されます。 
+`Any`の内部から特定のGoタイプを取得する逆の操作は[アンパック]と呼ばれ、` Any`の `GetCachedValue()`によって実行されます。 
 
 ```go
 profileBz := ...//The proto-encoded bytes of a Profile, e.g. retrieved through gRPC.
@@ -161,7 +161,7 @@ var myProfile Profile
 err := cdc.Unmarshal(profilebz, &myProfile)
 
 //Let's see the types of the Account field.
-fmt.Printf("%T\n", myProfile.Account)                 //Prints "Any"
+fmt.Printf("%T\n", myProfile.Account)                //Prints "Any"
 fmt.Printf("%T\n", myProfile.Account.GetCachedValue())//Prints "BaseAccount", "ContinuousVestingAccount" or whatever was initially packed in the Any.
 
 //Get the address of the accountt.
@@ -187,7 +187,7 @@ func (p *Profile) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 
 #### CosmosSDKでの `Any`エンコーディング
 
-上記の「プロファイル」の例は、教育目的の架空の例です。 Cosmos SDKでは、いくつかの場所で `Any`エンコーディングを使用しています(網羅的ではないリスト)。
+上記の[プロファイル]の例は、教育目的の架空の例です。 Cosmos SDKでは、いくつかの場所で `Any`エンコーディングを使用しています(網羅的ではないリスト)。
 
 -さまざまなタイプの公開鍵をエンコードするための `cryptotypes.PubKey`インターフェース、
 -トランザクションでさまざまな `Msg`をエンコードするために使用される` sdk.Msg`インターフェース
@@ -196,7 +196,7 @@ func (p *Profile) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 -さまざまなタイプのx/authz認証をエンコードするための `AuthorizationI`インターフェース、
 -[`Validator`](https://github.com/cosmos/cosmos-sdk/blob/v0.42.5/x/staking/types/staking.pb.go#L306-L337)構造には関連するバリデーターが含まれています。
 
-次の例は、x/stakeingのValidator構造で公開鍵を「Any」としてエンコードする実際の例を示しています。
+次の例は、x/stakeingのValidator構造で公開鍵を[Any]としてエンコードする実際の例を示しています。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/staking/types/validator.go#L40-L61
 
@@ -208,7 +208,7 @@ func (p *Profile) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 
 エンコードするProtobufタイプを定義できます。
 
-- 州
+- state
 -[`Msg`s](../building-modules/messages-and-queries.md#messages)
 -[クエリサービス](../building-modules/query-services.md)
 -[创世](../building-modules/genesis.md)
@@ -222,7 +222,7 @@ func (p *Profile) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 
 モジュールにインターフェース( `Account`や` Content`など)が含まれていない場合、それらは
 既存のタイプを簡単に移行できます
-特定のAminoコーデックを介してProtobufにエンコードして永続化し(詳細なガイダンスについては、1を参照)、「ProtoCodec」を介して実装されたコーデックとして「Marshaler」を受け入れます。
+特定のAminoコーデックを介してProtobufにエンコードして永続化し(詳細なガイダンスについては、1を参照)、[ProtoCodec]を介して実装されたコーデックとして[Marshaler]を受け入れます。
 これ以上のカスタマイズは必要ありません。
 
 ただし、モジュールタイプがインターフェイスを構成する場合は、タイプ `skd.Any`(`/types`パッケージから)でラップする必要があります。このため、モジュールレベルの.protoファイルはそれぞれのメッセージタイプ[`google.protobuf.Any`](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/any .proto)インターフェイスタイプ。
@@ -244,7 +244,7 @@ Cosmos SDKの `codec.Codec`インターフェイスは、状態を` Any`とし�
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc4/codec/types/interface_registry.go#L25-L66
 
-さらに、インターフェイスが必要になる前にアンパックするために、逆シリアル化に「UnpackInterfaces」フェーズを導入する必要があります。 protobuf `Any`を直接またはそのメンバーの1つを介して含むProtobufタイプは、` UnpackInterfacesMessage`インターフェースを実装する必要があります。
+さらに、インターフェイスが必要になる前にアンパックするために、逆シリアル化に[UnpackInterfaces]フェーズを導入する必要があります。 protobuf `Any`を直接またはそのメンバーの1つを介して含むProtobufタイプは、` UnpackInterfacesMessage`インターフェースを実装する必要があります。
 
 ```go
 type UnpackInterfacesMessage interface {
@@ -252,6 +252,6 @@ type UnpackInterfacesMessage interface {
 }
 ```
 
-## 次へ{非表示}
+## 次へ{hide}
 
 [gRPC、REST、その他のエンドポイント](./grpc_rest.md){hide}を理解する

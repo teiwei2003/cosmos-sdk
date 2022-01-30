@@ -16,24 +16,24 @@
 type Msg interface {
   proto.Message
 
-  // Return the message type.
-  // Must be alphanumeric or empty.
+ //Return the message type.
+ //Must be alphanumeric or empty.
   Route() string
 
-  // Returns a human-readable string for the message, intended for utilization
-  // within tags
+ //Returns a human-readable string for the message, intended for utilization
+ //within tags
   Type() string
 
-  // ValidateBasic does a simple validation check that
-  // doesn't require access to any other information.
+ //ValidateBasic does a simple validation check that
+ //doesn't require access to any other information.
   ValidateBasic() error
 
-  // Get the canonical byte representation of the Msg.
+ //Get the canonical byte representation of the Msg.
   GetSignBytes() []byte
 
-  // Signers returns the addrs of signers that must sign.
-  // CONTRACT: All signatures must be present to be valid.
-  // CONTRACT: Returns addrs in some deterministic order.
+ //Signers returns the addrs of signers that must sign.
+ //CONTRACT: All signatures must be present to be valid.
+ //CONTRACT: Returns addrs in some deterministic order.
   GetSigners() []AccAddress
  }
 ```
@@ -50,5 +50,5 @@ type Msg interface {
 
 - エポックメッセージを実行してみてください
 - 成功した場合は、そのまま変更します
-- 失敗した場合は、ハンドラーで追加のリカバリ操作を実行してみてください(例：EpochDelegationPoolデポジット)
+- 失敗した場合は、ハンドラーで追加のリカバリ操作を実行してみてください(例:EpochDelegationPoolデポジット)
 - 回復に失敗した場合、パニック

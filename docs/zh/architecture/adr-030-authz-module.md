@@ -54,29 +54,29 @@
 type Authorization interface {
 	proto.Message
 
-	// MsgTypeURL returns the fully-qualified Msg TypeURL (as described in ADR 020),
-	// which will process and accept or reject a request.
+	//MsgTypeURL returns the fully-qualified Msg TypeURL (as described in ADR 020),
+	//which will process and accept or reject a request.
 	MsgTypeURL() string
 
-	// Accept determines whether this grant permits the provided sdk.Msg to be performed, and if
-	// so provides an upgraded authorization instance.
+	//Accept determines whether this grant permits the provided sdk.Msg to be performed, and if
+	//so provides an upgraded authorization instance.
 	Accept(ctx sdk.Context, msg sdk.Msg) (AcceptResponse, error)
 
-	// ValidateBasic does a simple validation check that
-	// doesn't require access to any other information.
+	//ValidateBasic does a simple validation check that
+	//doesn't require access to any other information.
 	ValidateBasic() error
 }
 
-// AcceptResponse instruments the controller of an authz message if the request is accepted
-// and if it should be updated or deleted.
+//AcceptResponse instruments the controller of an authz message if the request is accepted
+//and if it should be updated or deleted.
 type AcceptResponse struct {
-	// If Accept=true, the controller can accept and authorization and handle the update.
+	//If Accept=true, the controller can accept and authorization and handle the update.
 	Accept bool
-	// If Delete=true, the controller must delete the authorization object and release
-	// storage resources.
+	//If Delete=true, the controller must delete the authorization object and release
+	//storage resources.
 	Delete bool
-	// Controller, who is calling Authorization.Accept must check if `Updated != nil`. If yes,
-	// it must use the updated version and handle the update on the storage level.
+	//Controller, who is calling Authorization.Accept must check if `Updated != nil`. If yes,
+	//it must use the updated version and handle the update on the storage level.
 	Updated Authorization
 }
 ```
@@ -86,9 +86,9 @@ a `SpendLimit` and updates it down to zero:
 
 ```go
 type SendAuthorization struct {
-	// SpendLimit specifies the maximum amount of tokens that can be spent
-	// by this authorization and will be updated as tokens are spent. If it is
-	// empty, there is no spend limit and any amount of coins can be spent.
+	//SpendLimit specifies the maximum amount of tokens that can be spent
+	//by this authorization and will be updated as tokens are spent. If it is
+	//empty, there is no spend limit and any amount of coins can be spent.
 	SpendLimit sdk.Coins
 }
 
@@ -121,22 +121,22 @@ using the `Authorization` interface with no need to change the underlying
 
 ```proto
 service Msg {
-  // Grant grants the provided authorization to the grantee on the granter's
-  // account with the provided expiration time.
+ //Grant grants the provided authorization to the grantee on the granter's
+ //account with the provided expiration time.
   rpc Grant(MsgGrant) returns (MsgGrantResponse);
 
-  // Exec attempts to execute the provided messages using
-  // authorizations granted to the grantee. Each message should have only
-  // one signer corresponding to the granter of the authorization.
+ //Exec attempts to execute the provided messages using
+ //authorizations granted to the grantee. Each message should have only
+ //one signer corresponding to the granter of the authorization.
   rpc Exec(MsgExec) returns (MsgExecResponse);
 
-  // Revoke revokes any authorization corresponding to the provided method name on the
-  // granter's account that has been granted to the grantee.
+ //Revoke revokes any authorization corresponding to the provided method name on the
+ //granter's account that has been granted to the grantee.
   rpc Revoke(MsgRevoke) returns (MsgRevokeResponse);
 }
 
-// Grant gives permissions to execute
-// the provided method with expiration time.
+//Grant gives permissions to execute
+//the provided method with expiration time.
 message Grant {
   google.protobuf.Any       authorization = 1 [(cosmos_proto.accepts_interface) = "Authorization"];
   google.protobuf.Timestamp expiration    = 2 [(gogoproto.stdtime) = true, (gogoproto.nullable) = false];
@@ -155,7 +155,7 @@ message MsgExecResponse {
 
 message MsgExec {
   string   grantee                  = 1;
-  // Authorization Msg requests to execute. Each msg must implement Authorization interface
+ //Authorization Msg requests to execute. Each msg must implement Authorization interface
   repeated google.protobuf.Any msgs = 2 [(cosmos_proto.accepts_interface) = "sdk.Msg"];;
 }
 ```
@@ -167,8 +167,8 @@ message MsgExec {
 
 ```go
 type Keeper interface {
-	// DispatchActions routes the provided msgs to their respective handlers if the grantee was granted an authorization
-	// to send those messages by the first (and only) signer of each msg.
+	//DispatchActions routes the provided msgs to their respective handlers if the grantee was granted an authorization
+	//to send those messages by the first (and only) signer of each msg.
     DispatchActions(ctx sdk.Context, grantee sdk.AccAddress, msgs []sdk.Msg) sdk.Result`
 }
 ```
@@ -208,8 +208,8 @@ CLI 上的 JSON。
 #### `SendAuthorization`
 
 ```proto
-// SendAuthorization allows the grantee to spend up to spend_limit coins from
-// the granter's account.
+//SendAuthorization allows the grantee to spend up to spend_limit coins from
+//the granter's account.
 message SendAuthorization {
   repeated cosmos.base.v1beta1.Coin spend_limit = 1;
 }
@@ -218,12 +218,12 @@ message SendAuthorization {
 #### `GenericAuthorization`
 
 ```proto
-// GenericAuthorization gives the grantee unrestricted permissions to execute
-// the provided method on behalf of the granter's account.
+//GenericAuthorization gives the grantee unrestricted permissions to execute
+//the provided method on behalf of the granter's account.
 message GenericAuthorization {
   option (cosmos_proto.implements_interface) = "Authorization";
 
-  // Msg, identified by it's type URL, to grant unrestricted permissions to execute
+ //Msg, identified by it's type URL, to grant unrestricted permissions to execute
   string msg = 1;
 }
 ```

@@ -1,6 +1,6 @@
 # 客户
 
-##命令行界面
+## 命令行界面
 
 用户可以使用 CLI 查询“feegrant”模块并与之交互。
 
@@ -30,7 +30,7 @@ Example Output:
 
 ```
 allowance:
-  '@type': /cosmos.feegrant.v1beta1.BasicAllowance
+  '@type':/cosmos.feegrant.v1beta1.BasicAllowance
   expiration: null
   spend_limit:
   - amount: "100"
@@ -58,7 +58,7 @@ Example Output:
 ```
 allowances:
 - allowance:
-    '@type': /cosmos.feegrant.v1beta1.BasicAllowance
+    '@type':/cosmos.feegrant.v1beta1.BasicAllowance
     expiration: null
     spend_limit:
     - amount: "100"

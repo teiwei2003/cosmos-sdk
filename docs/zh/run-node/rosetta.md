@@ -76,15 +76,15 @@ import (
 "github.com/cosmos/cosmos-sdk/server/rosetta/lib"
 )
 
-// CustomClient embeds the standard cosmos client
-// which means that it implements the cosmos-rosetta-gateway Client
-// interface while at the same time allowing to customize certain methods
+//CustomClient embeds the standard cosmos client
+//which means that it implements the cosmos-rosetta-gateway Client
+//interface while at the same time allowing to customize certain methods
 type CustomClient struct {
     *rosetta.Client
 }
 
 func (c *CustomClient) ConstructionPayload(_ context.Context, request *types.ConstructionPayloadsRequest) (resp *types.ConstructionPayloadsResponse, err error) {
-    // provide custom signature bytes
+   //provide custom signature bytes
     panic("implement me")
 }
 ```

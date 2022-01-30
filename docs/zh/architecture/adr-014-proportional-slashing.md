@@ -17,13 +17,13 @@
 为了解决这个问题，我们将实施一个称为比例削减的程序。我们希望验证器越大，他们应该被削减的越多。第一个天真的尝试是使验证者的斜线百分比与其共识投票权的份额成正比。 
 
 ```
-slash_amount = k * power // power is the faulting validator's voting power and k is some on-chain constant
+slash_amount = k * power//power is the faulting validator's voting power and k is some on-chain constant
 ```
 
 然而，这将激励拥有大量权益的验证者在账户之间分配他们的投票权(女巫攻击)，这样如果他们出错，他们都会被削减到较低的百分比。 对此的解决方案是不仅要考虑验证者自己的投票百分比，还要考虑在指定时间范围内被削减的所有其他验证者的投票百分比。 
 
 ```
-slash_amount = k * (power_1 + power_2 + ... + power_n) // where power_i is the voting power of the ith validator faulting in the specified time frame and k is some on-chain constant
+slash_amount = k * (power_1 + power_2 + ... + power_n)//where power_i is the voting power of the ith validator faulting in the specified time frame and k is some on-chain constant
 ```
 
 现在，如果有人将一个 10% 的验证器分成两个 5% 的验证器，每个验证器都出错，那么他们都在同一时间范围内出错，他们都将被削减 10% 的金额。

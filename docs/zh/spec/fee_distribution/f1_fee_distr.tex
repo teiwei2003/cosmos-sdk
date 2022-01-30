@@ -193,21 +193,21 @@ Updating your delegation amount is equivalent to withdrawing earned rewards and 
 The same applies for redelegation.
 From the view of fee distribution, partial redelegation is the same as a delegation update + a new delegation.
 
-\subsection{Jailing / being kicked out of the validator set}
+\subsection{Jailing/being kicked out of the validator set}
 This basically requires no change.
 In each block you only iterate over the currently bonded validators.
-So you simply don't update the "total accrued fees this period" variable for jailed / non-bonded validators.
+So you simply don't update the "total accrued fees this period" variable for jailed/non-bonded validators.
 Withdrawing requires \textit{no} special casing here!
 
 \section{State Requirements}
 State entries can be pruned quite effectively.
-Suppose for the sake of exposition that there is at most one delegation / withdrawal to a particular validator in any given block.
+Suppose for the sake of exposition that there is at most one delegation/withdrawal to a particular validator in any given block.
 Then each delegation is responsible for one addition to state.
 Only the next period, and this delegator's withdrawal could depend on this entry. Thus once this delegator withdraws, this state entry can be pruned.
 For the entry created by the delegator's withdrawal, that is only required by the creation of the next period.
 Thus once the next period is created, that withdrawal's period can be deleted.
 
-This can be easily adapted to the case where there are multiple delegations / withdrawals per block, by maintaining a reference count in each period starting state entry.
+This can be easily adapted to the case where there are multiple delegations/withdrawals per block, by maintaining a reference count in each period starting state entry.
 
 The slash entries for a validator can only be pruned when all of that validator's delegators have their bonding period starting after the slash.
 This seems ineffective to keep track of, thus it is not worth it.
@@ -238,7 +238,7 @@ Thus this scheme has efficiency improvements, simplicity improvements, and expre
 	\item Add equation numbers
 	\item perhaps re-organize so that the no iteration
  	\item Section on decimal precision considerations (would unums help?), and mitigating errors in calculation with floats and decimals. -- This probably belongs in a corrollary markdown file in the implementation
- 	\item Consider indicating that the withdraw action need not be a tx type and could instead happen 'transparently' when more coins are needed, if a chain desired this for UX / p2p efficiency.
+ 	\item Consider indicating that the withdraw action need not be a tx type and could instead happen 'transparently' when more coins are needed, if a chain desired this for UX/p2p efficiency.
 \end{itemize}
 
 

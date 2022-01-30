@@ -89,7 +89,7 @@ Cosmos SDK 中的少数地方仍然使用 Amino JSON 硬编码，例如 Legacy A
 ```go
   ts, err := gogotypes.TimestampProto(completionTime)
   if err != nil {
-    // ...
+   //...
   }
 
   bz := cdc.MustMarshal(ts)
@@ -103,7 +103,7 @@ Cosmos SDK 中的少数地方仍然使用 Amino JSON 硬编码，例如 Legacy A
 例子: 
 
 ```go
-// x/auth/types/codec.go
+//x/auth/types/codec.go
 
 type Codec interface {
   codec.Codec
@@ -163,16 +163,16 @@ type Codec interface {
 
 ```go
 type InterfaceRegistry interface {
-    // RegisterInterface associates protoName as the public name for the
-    // interface passed in as iface
-    // Ex:
-    //   registry.RegisterInterface("cosmos_sdk.Msg", (*sdk.Msg)(nil))
+   //RegisterInterface associates protoName as the public name for the
+   //interface passed in as iface
+   //Ex:
+   //  registry.RegisterInterface("cosmos_sdk.Msg", (*sdk.Msg)(nil))
     RegisterInterface(protoName string, iface interface{})
 
-    // RegisterImplementations registers impls as a concrete implementations of
-    // the interface iface
-    // Ex:
-    //  registry.RegisterImplementations((*sdk.Msg)(nil), &MsgSend{}, &MsgMultiSend{})
+   //RegisterImplementations registers impls as a concrete implementations of
+   //the interface iface
+   //Ex:
+   // registry.RegisterImplementations((*sdk.Msg)(nil), &MsgSend{}, &MsgMultiSend{})
     RegisterImplementations(iface interface{}, impls ...proto.Message)
 
 }
@@ -196,13 +196,13 @@ type InterfaceRegistry interface {
 
 ```go
 type InterfaceUnpacker interface {
-    // UnpackAny unpacks the value in any to the interface pointer passed in as
-    // iface. Note that the type in any must have been registered with
-    // RegisterImplementations as a concrete type for that interface
-    // Ex:
-    //    var msg sdk.Msg
-    //    err := ctx.UnpackAny(any, &msg)
-    //    ...
+   //UnpackAny unpacks the value in any to the interface pointer passed in as
+   //iface. Note that the type in any must have been registered with
+   //RegisterImplementations as a concrete type for that interface
+   //Ex:
+   //   var msg sdk.Msg
+   //   err := ctx.UnpackAny(any, &msg)
+   //   ...
     UnpackAny(any *Any, iface interface{}) error
 }
 ```
@@ -231,7 +231,7 @@ Cosmos SDK 将提供支持方法 `MarshalInterface` 和 `UnmarshalInterface` 以
 ```go
 import "github.com/cosmos/cosmos-sdk/codec"
 
-// note: eviexported.Evidence is an interface type
+//note: eviexported.Evidence is an interface type
 func MarshalEvidence(cdc codec.BinaryCodec, e eviexported.Evidence) ([]byte, error) {
 	return cdc.MarshalInterface(e)
 }
@@ -250,7 +250,7 @@ func UnmarshalEvidence(cdc codec.BinaryCodec, bz []byte) (eviexported.Evidence, 
 一个界面: 
 
 ```protobuf
-// x/evidence/types/types.proto
+//x/evidence/types/types.proto
 
 message MsgSubmitEvidence {
   bytes submitter = 1

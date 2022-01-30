@@ -18,7 +18,7 @@ Cosmos SDK 使运营商和开发人员能够深入了解
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
   defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 
-  // ...
+ //...
 }
 ```
 

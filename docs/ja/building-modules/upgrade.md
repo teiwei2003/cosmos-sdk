@@ -19,23 +19,23 @@
 
 モジュールのアップグレード中に発生する機能を登録するには、発生する移行を登録する必要があります。
 
-移行登録は、 `RegisterMigration`メソッドを使用して` Configurator`で実行されます。 configuratorへの「AppModule」参照は「RegisterServices」メソッドにあります。
+移行登録は、 `RegisterMigration`メソッドを使用して` Configurator`で実行されます。 configuratorへの[AppModule]参照は[RegisterServices]メソッドにあります。
 
 1つ以上の移行を登録できます。複数の移行スクリプトを登録している場合は、移行を昇順でリストし、必要なコンセンサスバージョンを生成するのに十分な移行があることを確認してください。たとえば、モジュールのバージョン3に移行するには、次の例に示すように、バージョン1とバージョン2に別々の移行を登録します。 
 
 ```golang
 func (am AppModule) RegisterServices(cfg module.Configurator) {
-   //--snip--
+  //--snip--
     cfg.RegisterMigration(types.ModuleName, 1, func(ctx sdk.Context) error {
-       //Perform in-place store migrations from ConsensusVersion 1 to 2.
+      //Perform in-place store migrations from ConsensusVersion 1 to 2.
     })
      cfg.RegisterMigration(types.ModuleName, 2, func(ctx sdk.Context) error {
-       //Perform in-place store migrations from ConsensusVersion 2 to 3.
+      //Perform in-place store migrations from ConsensusVersion 2 to 3.
     })
 }
 ```
 
-これらの移行はKeeperストレージへのアクセスを必要とする関数であるため、次の例に示すように、「Migrator」と呼ばれるKeeperラッパーを使用します。
+これらの移行はKeeperストレージへのアクセスを必要とする関数であるため、次の例に示すように、[Migrator]と呼ばれるKeeperラッパーを使用します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/6ac8898fec9bd7ea2c1e5c79e0ed0c3f827beb55/x/bank/keeper/migrations.go#L8-L21
 

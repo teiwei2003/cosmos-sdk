@@ -14,7 +14,7 @@ Keeperは、永続メモリと短命メモリの2つの状態を維持します�
 フォワードインデックスは、モジュール名と機能タプルを機能名にマップします。この
 モジュール名と関数名、および関数自体の間の逆インデックスマッピング。
 
-Keeperを使用すると、特定のサブマネージャーに関連付けられた「スコープ」サブマネージャーを作成できます。
+Keeperを使用すると、特定のサブマネージャーに関連付けられた[スコープ]サブマネージャーを作成できます。
 モジュール名。アプリケーションで初期化する必要があり、
 モジュールに渡されると、モジュールはそれらを使用して、受信し、
 新しい機能を作成するだけでなく、名前で機能を取得することもできます
@@ -31,13 +31,13 @@ Keeperは、他のモジュールにある他のコア機能を提供しませ�
 
 ```go
 type App struct {
-  // ...
+ //...
 
   capabilityKeeper *capability.Keeper
 }
 
 func NewApp(...) *App {
-  // ...
+ //...
 
   app.capabilityKeeper = capability.NewKeeper(codec, persistentStoreKey, memStoreKey)
 }
@@ -51,11 +51,11 @@ Keeperが作成された後、それを使用してスコープ付きサブKeepe
 
 ```go
 func NewApp(...) *App {
-  // ...
+ //...
 
-  // Initialize and seal the capability keeper so all persistent capabilities
-  // are loaded in-memory and prevent any further modules from creating scoped
-  // sub-keepers.
+ //Initialize and seal the capability keeper so all persistent capabilities
+ //are loaded in-memory and prevent any further modules from creating scoped
+ //sub-keepers.
   ctx := app.BaseApp.NewContext(true, tmproto.Header{})
   app.capabilityKeeper.InitializeAndSeal(ctx)
 

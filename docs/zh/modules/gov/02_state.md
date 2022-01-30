@@ -25,8 +25,8 @@
 {
   "title": "...",
   "description": "...",
-  "forum": "...", // a link to the discussion platform (i.e. Discord)
-  "other": "..." // any extra data that doesn't correspond to the other fields
+  "forum": "...",//a link to the discussion platform (i.e. Discord)
+  "other": "..."//any extra data that doesn't correspond to the other fields
 }
 ```
 
@@ -87,11 +87,11 @@ type ProposalStatus byte
 
 const (
 	StatusNil           ProposalStatus = 0x00
-    StatusDepositPeriod ProposalStatus = 0x01  // Proposal is submitted. Participants can deposit on it but not vote
-    StatusVotingPeriod  ProposalStatus = 0x02  // MinDeposit is reached, participants can vote
-    StatusPassed        ProposalStatus = 0x03  // Proposal passed and successfully executed
-    StatusRejected      ProposalStatus = 0x04  // Proposal has been rejected
-    StatusFailed        ProposalStatus = 0x05  // Proposal passed but failed execution
+    StatusDepositPeriod ProposalStatus = 0x01 //Proposal is submitted. Participants can deposit on it but not vote
+    StatusVotingPeriod  ProposalStatus = 0x02 //MinDeposit is reached, participants can vote
+    StatusPassed        ProposalStatus = 0x03 //Proposal passed and successfully executed
+    StatusRejected      ProposalStatus = 0x04 //Proposal has been rejected
+    StatusFailed        ProposalStatus = 0x05 //Proposal passed but failed execution
 )
 ```
 
@@ -145,22 +145,22 @@ _Stores 是 multi-store 中的 KVStores。找存储的关键是第一
   in EndBlock do
 
     for finishedProposalID in GetAllFinishedProposalIDs(block.Time)
-      proposal = load(Governance, <proposalID|'proposal'>) // proposal is a const key
+      proposal = load(Governance, <proposalID|'proposal'>)//proposal is a const key
 
       validators = Keeper.getAllValidators()
       tmpValMap := map(sdk.AccAddress)ValidatorGovInfo
 
-      // Initiate mapping at 0. This is the amount of shares of the validator's vote that will be overridden by their delegator's votes
+     //Initiate mapping at 0. This is the amount of shares of the validator's vote that will be overridden by their delegator's votes
       for each validator in validators
         tmpValMap(validator.OperatorAddr).Minus = 0
 
-      // Tally
-      voterIterator = rangeQuery(Governance, <proposalID|'addresses'>) //return all the addresses that voted on the proposal
+     //Tally
+      voterIterator = rangeQuery(Governance, <proposalID|'addresses'>)//return all the addresses that voted on the proposal
       for each (voterAddress, vote) in voterIterator
-        delegations = stakingKeeper.getDelegations(voterAddress) // get all delegations for current voter
+        delegations = stakingKeeper.getDelegations(voterAddress)//get all delegations for current voter
 
         for each delegation in delegations
-          // make sure delegation.Shares does NOT include shares being unbonded
+         //make sure delegation.Shares does NOT include shares being unbonded
           tmpValMap(delegation.ValidatorAddr).Minus += delegation.Shares
           proposal.updateTally(vote, delegation.Shares)
 
@@ -170,31 +170,31 @@ _Stores 是 multi-store 中的 KVStores。找存储的关键是第一
 
       tallyingParam = load(GlobalParams, 'TallyingParam')
 
-      // Update tally if validator voted they voted
+     //Update tally if validator voted they voted
       for each validator in validators
         if tmpValMap(validator).HasVoted
           proposal.updateTally(tmpValMap(validator).Vote, (validator.TotalShares - tmpValMap(validator).Minus))
 
 
 
-      // Check if proposal is accepted or rejected
+     //Check if proposal is accepted or rejected
       totalNonAbstain := proposal.YesVotes + proposal.NoVotes + proposal.NoWithVetoVotes
       if (proposal.Votes.YesVotes/totalNonAbstain > tallyingParam.Threshold AND proposal.Votes.NoWithVetoVotes/totalNonAbstain  < tallyingParam.Veto)
-        //  proposal was accepted at the end of the voting period
-        //  refund deposits (non-voters already punished)
+       // proposal was accepted at the end of the voting period
+       // refund deposits (non-voters already punished)
         for each (amount, depositor) in proposal.Deposits
           depositor.AtomBalance += amount
 
         stateWriter, err := proposal.Handler()
         if err != nil
-            // proposal passed but failed during state execution
+           //proposal passed but failed during state execution
             proposal.CurrentStatus = ProposalStatusFailed
          else
-            // proposal pass and state is persisted
+           //proposal pass and state is persisted
             proposal.CurrentStatus = ProposalStatusAccepted
             stateWriter.save()
       else
-        // proposal was rejected
+       //proposal was rejected
         proposal.CurrentStatus = ProposalStatusRejected
 
       store(Governance, <proposalID|'proposal'>, proposal)

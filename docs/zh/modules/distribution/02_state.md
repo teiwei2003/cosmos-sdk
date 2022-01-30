@@ -14,7 +14,7 @@
 - 费用池:`0x00 -> ProtocolBuffer(FeePool)` 
 
 ```go
-// coins with decimal
+//coins with decimal
 type DecCoins []DecCoin
 
 type DecCoin struct {
@@ -56,6 +56,6 @@ type ValidatorDistInfo struct {
 
 ```go
 type DelegationDistInfo struct {
-    WithdrawalHeight int64    // last time this delegation withdrew rewards
+    WithdrawalHeight int64   //last time this delegation withdrew rewards
 }
 ```

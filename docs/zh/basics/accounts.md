@@ -63,7 +63,7 @@ Cosmos SDK 支持以下用于创建数字签名的数字密钥方案:
 
 - `secp256k1`，在 [Cosmos SDK 的 `crypto/keys/secp256k1` 包中实现](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/crypto/keys/secp256k1/secp256k1。去)。
 - `secp256r1`，在 [Cosmos SDK 的 `crypto/keys/secp256r1` 包中实现](https://github.com/cosmos/cosmos-sdk/blob/master/crypto/keys/secp256r1/pubkey.go) ,
-- `tm-ed25519`，在 [Cosmos SDK `crypto/keys/ed25519` 包中实现](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/crypto/keys/ed25519/ ed25519.go)。该方案仅支持共识验证。 
+- `tm-ed25519`，在 [Cosmos SDK `crypto/keys/ed25519` 包中实现](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/crypto/keys/ed25519/ed25519.go)。该方案仅支持共识验证。 
 
 |              | Address length in bytes | Public key length in bytes | Used for transaction authentication | Used for consensus (tendermint) |
 |:------------:|:-----------------------:|:--------------------------:|:-----------------------------------:|:-------------------------------:|

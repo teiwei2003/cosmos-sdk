@@ -32,7 +32,7 @@ GRPC 协议。但是，协议缓冲区规范表明
 每个带有自定义查询的模块都应该定义一个规范命名为 `Query` 的服务: 
 
 ```proto
-// x/bank/types/types.proto
+//x/bank/types/types.proto
 
 service Query {
   rpc QueryBalance(QueryBalanceParams) returns (cosmos_sdk.v1.Coin) { }
@@ -55,7 +55,7 @@ service Query {
 `gov` 模块的假设示例如下所示: 
 
 ```proto
-// x/gov/types/types.proto
+//x/gov/types/types.proto
 
 import "google/protobuf/any.proto";
 
@@ -112,7 +112,7 @@ func (q Querier) QueryBalance(ctx context.Context, params *types.QueryBalancePar
 如下: 
 
 ```go
-// x/bank/module.go
+//x/bank/module.go
 func (am AppModule) RegisterQueryService(server grpc.Server) {
 	types.RegisterQueryServer(server, keeper.Querier{am.keeper})
 }
@@ -160,7 +160,7 @@ GRPC `Server` 类型上的 `RegisterServer` 方法，其中 `handler` 是自定�
 对他们的 `rpc` 方法进行注释，如下面的示例所示。 
 
 ```proto
-// x/bank/types/types.proto
+//x/bank/types/types.proto
 
 service Query {
   rpc QueryBalance(QueryBalanceParams) returns (cosmos_sdk.v1.Coin) {

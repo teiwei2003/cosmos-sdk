@@ -43,22 +43,22 @@ group 模块的概念证明可以在 https://github.com/regen-network/regen-ledg
 ```proto
 message GroupInfo {
 
-    // group_id is the unique ID of this group.
+   //group_id is the unique ID of this group.
     uint64 group_id = 1;
 
-    // admin is the account address of the group's admin.
+   //admin is the account address of the group's admin.
     string admin = 2;
 
-    // metadata is any arbitrary metadata to attached to the group.
+   //metadata is any arbitrary metadata to attached to the group.
     bytes metadata = 3;
 
-    // version is used to track changes to a group's membership structure that
-    // would break existing proposals. Whenever a member weight has changed,
-    // or any member is added or removed, the version is incremented and will
-    // invalidate all proposals from older versions.
+   //version is used to track changes to a group's membership structure that
+   //would break existing proposals. Whenever a member weight has changed,
+   //or any member is added or removed, the version is incremented and will
+   //invalidate all proposals from older versions.
     uint64 version = 4;
 
-    // total_weight is the sum of the group members' weights.
+   //total_weight is the sum of the group members' weights.
     string total_weight = 5;
 }
 ```
@@ -66,24 +66,24 @@ message GroupInfo {
 ```proto
 message GroupMember {
 
-    // group_id is the unique ID of the group.
+   //group_id is the unique ID of the group.
     uint64 group_id = 1;
 
-    // member is the member data.
+   //member is the member data.
     Member member = 2;
 }
 
-// Member represents a group member with an account address,
-// non-zero weight and metadata.
+//Member represents a group member with an account address,
+//non-zero weight and metadata.
 message Member {
 
-    // address is the member's account address.
+   //address is the member's account address.
     string address = 1;
 
-    // weight is the member's voting weight that should be greater than 0.
+   //weight is the member's voting weight that should be greater than 0.
     string weight = 2;
 
-    // metadata is any arbitrary metadata to attached to the member.
+   //metadata is any arbitrary metadata to attached to the member.
     bytes metadata = 3;
 }
 ```
@@ -105,23 +105,23 @@ message Member {
 ```proto
 message GroupAccountInfo {
 
-    // address is the group account address.
+   //address is the group account address.
     string address = 1;
 
-    // group_id is the ID of the Group the GroupAccount belongs to.
+   //group_id is the ID of the Group the GroupAccount belongs to.
     uint64 group_id = 2;
 
-    // admin is the account address of the group admin.
+   //admin is the account address of the group admin.
     string admin = 3;
 
-    // metadata is any arbitrary metadata of this group account.
+   //metadata is any arbitrary metadata of this group account.
     bytes metadata = 4;
 
-    // version is used to track changes to a group's GroupAccountInfo structure that
-    // invalidates active proposal from old versions.
+   //version is used to track changes to a group's GroupAccountInfo structure that
+   //invalidates active proposal from old versions.
     uint64 version = 5;
 
-    // decision_policy specifies the group account's decision policy.
+   //decision_policy specifies the group account's decision policy.
     google.protobuf.Any decision_policy = 6 [(cosmos_proto.accepts_interface) = "DecisionPolicy"];
 }
 ```
@@ -170,11 +170,11 @@ type DecisionPolicyResult struct {
 ```proto
 message ThresholdDecisionPolicy {
 
-    // threshold is the minimum weighted sum of support votes for a proposal to succeed.
+   //threshold is the minimum weighted sum of support votes for a proposal to succeed.
     string threshold = 1;
 
-    // voting_period is the duration from submission of a proposal to the end of voting period
-    // Within this period, votes and exec messages can be submitted.
+   //voting_period is the duration from submission of a proposal to the end of voting period
+   //Within this period, votes and exec messages can be submitted.
     google.protobuf.Duration voting_period = 2 [(gogoproto.nullable) = false];
 }
 ```
@@ -192,20 +192,20 @@ message ThresholdDecisionPolicy {
 - 它的“VoteState”以“Tally”的形式，根据新投票和执行提案时计算。 
 
 ```proto
-// Tally represents the sum of weighted votes.
+//Tally represents the sum of weighted votes.
 message Tally {
     option (gogoproto.goproto_getters) = false;
 
-    // yes_count is the weighted sum of yes votes.
+   //yes_count is the weighted sum of yes votes.
     string yes_count = 1;
 
-    // no_count is the weighted sum of no votes.
+   //no_count is the weighted sum of no votes.
     string no_count = 2;
 
-    // abstain_count is the weighted sum of abstainers.
+   //abstain_count is the weighted sum of abstainers.
     string abstain_count = 3;
 
-    // veto_count is the weighted sum of vetoes.
+   //veto_count is the weighted sum of vetoes.
     string veto_count = 4;
 }
 ```

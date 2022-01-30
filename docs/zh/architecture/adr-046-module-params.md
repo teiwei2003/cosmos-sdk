@@ -99,9 +99,9 @@ type MsgUpdateParamsResponse struct {}
 func (ms msgServer) UpdateParams(goCtx context.Context, msg *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
   ctx := sdk.UnwrapSDKContext(goCtx)
 
-  // verification logic...
+ //verification logic...
 
-  // persist params
+ //persist params
   params := ParamsFromMsg(msg)
   ms.SaveParams(ctx, params)
 
@@ -109,7 +109,7 @@ func (ms msgServer) UpdateParams(goCtx context.Context, msg *types.MsgUpdatePara
 }
 
 func ParamsFromMsg(msg *types.MsgUpdateParams) Params {
-  // ...
+ //...
 }
 ```
 
@@ -117,7 +117,7 @@ func ParamsFromMsg(msg *types.MsgUpdateParams) Params {
 
 ```protobuf
 service Query {
-  // ...
+ //...
   
   rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (google.api.http).get = "/cosmos/<module>/v1beta1/params";

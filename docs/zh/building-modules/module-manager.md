@@ -79,7 +79,7 @@ Cosmos SDK 模块需要实现[`AppModule` 接口](#application-module-interfaces
 几乎每个模块都需要实现`AppModuleBasic` 和`AppModule` 接口。如果模块仅用于创世，它将实现`AppModuleGenesis`而不是`AppModule`。实现接口的具体类型可以添加实现接口的各种方法所需的参数。例如，`Route()`函数经常调用`keeper/msg_server.go`中定义的`NewMsgServerImpl(k keeper)`函数，因此需要将模块的[`keeper`](./keeper.md)作为一个参数。 
 
 ```go
-// example
+//example
 type AppModule struct {
 	AppModuleBasic
 	keeper       Keeper

@@ -119,7 +119,7 @@ root 命令(称为“rootCmd”)是用户首先在命令行中键入以指示他
 每个标志都绑定到它各自命名的环境变量。然后环境变量的名称由两部分组成 - 大写的“basename”后跟标志的标志名称。 `-` 必须替换为 `_`。例如，基本名称为“GAIA”的应用程序的标志“--home”绑定到“GAIA_HOME”。它允许减少为常规操作键入的标志数量。例如，而不是: 
 
 ```sh
-gaia --home=./ --node=<node address> --chain-id="testchain-1" --keyring-backend=test tx ... --from=<key name>
+gaia --home=./--node=<node address> --chain-id="testchain-1" --keyring-backend=test tx ... --from=<key name>
 ```
 
 这会更方便: 

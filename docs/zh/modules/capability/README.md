@@ -31,13 +31,13 @@ Keeper 不提供其他模块中可以找到的其他核心功能
 
 ```go
 type App struct {
-  // ...
+ //...
 
   capabilityKeeper *capability.Keeper
 }
 
 func NewApp(...) *App {
-  // ...
+ //...
 
   app.capabilityKeeper = capability.NewKeeper(codec, persistentStoreKey, memStoreKey)
 }
@@ -51,11 +51,11 @@ state and to prevent further scoped keepers from being created.
 
 ```go
 func NewApp(...) *App {
-  // ...
+ //...
 
-  // Initialize and seal the capability keeper so all persistent capabilities
-  // are loaded in-memory and prevent any further modules from creating scoped
-  // sub-keepers.
+ //Initialize and seal the capability keeper so all persistent capabilities
+ //are loaded in-memory and prevent any further modules from creating scoped
+ //sub-keepers.
   ctx := app.BaseApp.NewContext(true, tmproto.Header{})
   app.capabilityKeeper.InitializeAndSeal(ctx)
 

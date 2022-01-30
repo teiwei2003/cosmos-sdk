@@ -98,20 +98,20 @@ func (k Keeper) FundCommunityPool(ctx sdk.Context, amount sdk.Coins, sender sdk.
 初始化委托会增加验证器周期并跟踪委托的开始周期。 
 
 ```go
-// initialize starting info for a new delegation
+//initialize starting info for a new delegation
 func (k Keeper) initializeDelegation(ctx sdk.Context, val sdk.ValAddress, del sdk.AccAddress) {
-    // period has already been incremented - we want to store the period ended by this delegation action
+   //period has already been incremented - we want to store the period ended by this delegation action
     previousPeriod := k.GetValidatorCurrentRewards(ctx, val).Period - 1
 
-	// increment reference count for the period we're going to track
+	//increment reference count for the period we're going to track
 	k.incrementReferenceCount(ctx, val, previousPeriod)
 
 	validator := k.stakingKeeper.Validator(ctx, val)
 	delegation := k.stakingKeeper.Delegation(ctx, del, val)
 
-	// calculate delegation stake in tokens
-	// we don't store directly, so multiply delegation shares * (tokens per share)
-	// note: necessary to truncate so we don't allow withdrawing more rewards than owed
+	//calculate delegation stake in tokens
+	//we don't store directly, so multiply delegation shares * (tokens per share)
+	//note: necessary to truncate so we don't allow withdrawing more rewards than owed
 	stake := validator.TokensFromSharesTruncated(delegation.GetShares())
 	k.SetDelegatorStartingInfo(ctx, val, del, types.NewDelegatorStartingInfo(previousPeriod, stake, uint64(ctx.BlockHeight())))
 }

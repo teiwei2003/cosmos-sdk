@@ -16,7 +16,7 @@ IBCモジュールをCosmosSDKに基づくアプリケーションに統合す�
 - `ibc`および `evidence`モジュールに対応するルーターとルートを設定します
 - モジュールをモジュール `Manager`に追加します
 - モジュールを `Begin/EndBlockers`と` InitGenesis`に追加します
-- モジュール「SimulationManager」を更新してシミュレーションを有効にします
+- モジュール[SimulationManager]を更新してシミュレーションを有効にします
 
 ### モジュール `BasicManager`および` ModuleAccount`権限
 
@@ -29,17 +29,17 @@ IBCモジュールをCosmosSDKに基づくアプリケーションに統合す�
 var (
 
   ModuleBasics = module.NewBasicManager(
-   //...
+  //...
     capability.AppModuleBasic{},
     ibc.AppModuleBasic{},
     evidence.AppModuleBasic{},
     transfer.AppModuleBasic{},//i.e ibc-transfer module
   )
 
- //module account permissions
+//module account permissions
   maccPerms = map[string][]string{
-   //other module accounts permissions
-   //...
+  //other module accounts permissions
+  //...
     ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 )
 ```
@@ -51,20 +51,20 @@ var (
 ```go
 //app.go
 type App struct {
- //baseapp, keys and subspaces definitions
+//baseapp, keys and subspaces definitions
 
- //other keepers
- //...
+//other keepers
+//...
   IBCKeeper        *ibckeeper.Keeper//IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
   EvidenceKeeper   evidencekeeper.Keeper//required to set up the client misbehaviour route
   TransferKeeper   ibctransferkeeper.Keeper//for cross-chain fungible token transfers
 
- //make scoped keepers public for test purposes
+//make scoped keepers public for test purposes
   ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
   ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
- ///...
- ///module and simulation manager definitions
+///...
+///module and simulation manager definitions
 }
 ```
 
@@ -77,23 +77,23 @@ type App struct {
 
 ```go
 func NewApp(...args) *App {
- //define codecs and baseapp
+//define codecs and baseapp
 
- //add capability keeper and ScopeToModule for ibc module
+//add capability keeper and ScopeToModule for ibc module
   app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 
- //grant capabilities for the ibc and ibc-transfer modules
+//grant capabilities for the ibc and ibc-transfer modules
   scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
   scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 
- //... other modules keepers
+//... other modules keepers
 
- //Create IBC Keeper
+//Create IBC Keeper
   app.IBCKeeper = ibckeeper.NewKeeper(
   appCodec, keys[ibchost.StoreKey], app.StakingKeeper, scopedIBCKeeper,
   )
 
- //Create Transfer Keepers
+//Create Transfer Keepers
   app.TransferKeeper = ibctransferkeeper.NewKeeper(
     appCodec, keys[ibctransfertypes.StoreKey],
     app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
@@ -101,12 +101,12 @@ func NewApp(...args) *App {
   )
   transferModule := transfer.NewAppModule(app.TransferKeeper)
 
- //Create evidence Keeper for to register the IBC light client misbehaviour evidence route
+//Create evidence Keeper for to register the IBC light client misbehaviour evidence route
   evidenceKeeper := evidencekeeper.NewKeeper(
     appCodec, keys[evidencetypes.StoreKey], &app.StakingKeeper, app.SlashingKeeper,
   )
 
- //.. continues
+//.. continues
 }
 ```
 
@@ -114,7 +114,7 @@ func NewApp(...args) *App {
 
 IBCは、パケットをにルーティングできるように、どのモジュールがどのポートにバインドされているかを知る必要があります。
 適切なモジュールを作成し、適切なコールバックを呼び出します。ポートのモジュール名へのマッピングは、次のように決定されます。
-IBCのポート「Keeper」。ただし、関連するコールバックへのモジュール名のマッピングは完了しています
+IBCのポート[Keeper]。ただし、関連するコールバックへのモジュール名のマッピングは完了しています
 港で
 [`ルーター`](https://github.com/cosmos/ibc-go/blob/main/modules/core/05-port/types/router.go)
 IBCモジュール。
@@ -122,7 +122,7 @@ IBCモジュール。
 モジュールルーティングを追加すると、IBCハンドラーが
 チャネルハンドシェイクまたはデータパケット。
 
-必要な2番目の「ルーター」は証拠モジュールルーターです。このルーターは平凡なものを処理します
+必要な2番目の[ルーター]は証拠モジュールルーターです。このルーターは平凡なものを処理します
 証拠の提出とビジネスロジックは、登録された各証拠処理プログラムにルーティングされます。このような状況下で
 IBC、提出する必要がある[ライトクライアントの証拠
 不正行為](https://github.com/cosmos/ics/tree/master/spec/ics-002-client-semantics#misbehaviour)
@@ -134,29 +134,29 @@ IBC、提出する必要がある[ライトクライアントの証拠
 ```go
 //app.go
 func NewApp(...args) *App {
- //.. continuation from above
+//.. continuation from above
 
- //Create static IBC router, add ibc-tranfer module route, then set and seal it
+//Create static IBC router, add ibc-tranfer module route, then set and seal it
   ibcRouter := port.NewRouter()
   ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
- //Setting Router will finalize all routes by sealing router
- //No more routes can be added
+//Setting Router will finalize all routes by sealing router
+//No more routes can be added
   app.IBCKeeper.SetRouter(ibcRouter)
 
- //create static Evidence routers
+//create static Evidence routers
 
   evidenceRouter := evidencetypes.NewRouter().
-   //add IBC ClientMisbehaviour evidence handler
+  //add IBC ClientMisbehaviour evidence handler
     AddRoute(ibcclient.RouterKey, ibcclient.HandlerClientMisbehaviour(app.IBCKeeper.ClientKeeper))
 
- //Setting Router will finalize all routes by sealing router
- //No more routes can be added
+//Setting Router will finalize all routes by sealing router
+//No more routes can be added
   evidenceKeeper.SetRouter(evidenceRouter)
 
- //set the evidence keeper from the section above
+//set the evidence keeper from the section above
   app.EvidenceKeeper = *evidenceKeeper
 
- //.. continues
+//.. continues
 ```
 
 ### Module Managers
@@ -166,37 +166,37 @@ IBCを使用するには、アプリケーションが[simulations](./../buildin
 ```go
 //app.go
 func NewApp(...args) *App {
- //.. continuation from above
+//.. continuation from above
 
   app.mm = module.NewManager(
-   //other modules
-   //...
+  //other modules
+  //...
     capability.NewAppModule(appCodec, *app.CapabilityKeeper),
     evidence.NewAppModule(app.EvidenceKeeper),
     ibc.NewAppModule(app.IBCKeeper),
     transferModule,
   )
 
- //...
+//...
 
   app.sm = module.NewSimulationManager(
-   //other modules
-   //...
+  //other modules
+  //...
     capability.NewAppModule(appCodec, *app.CapabilityKeeper),
     evidence.NewAppModule(app.EvidenceKeeper),
     ibc.NewAppModule(app.IBCKeeper),
     transferModule,
   )
 
- //.. continues
+//.. continues
 ```
 
 ### ABCI注文を適用する
 
-IBCの新機能は、ステーキングモジュールに格納されている「HistoricalEntries」の概念です。
-各エントリには、このチェーンの「Header」と「ValidatorSet」の履歴情報が含まれています。これらは保存されています。
-「BeginBlock」呼び出し中の各高さ。 反映するために履歴情報が必要
-この期間中のライトクライアント「ConsensusState」を検証するための過去の任意の高さでの履歴情報
+IBCの新機能は、ステーキングモジュールに格納されている[HistoricalEntries]の概念です。
+各エントリには、このチェーンの[Header]と[ValidatorSet]の履歴情報が含まれています。これらは保存されています。
+[BeginBlock]呼び出し中の各高さ。 反映するために履歴情報が必要
+この期間中のライトクライアント[ConsensusState]を検証するための過去の任意の高さでの履歴情報
 接続ハンドシェイク。
 
 IBCモジュールには
@@ -213,36 +213,36 @@ IBCモジュールには
 ```go
 //app.go
 func NewApp(...args) *App {
- //.. continuation from above
+//.. continuation from above
 
- //add evidence, staking and ibc modules to BeginBlockers
+//add evidence, staking and ibc modules to BeginBlockers
   app.mm.SetOrderBeginBlockers(
-   //other modules ...
+  //other modules ...
     evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
   )
 
- //...
+//...
 
- //NOTE: Capability module must occur first so that it can initialize any capabilities
- //so that other modules that want to create or claim capabilities afterwards in InitChain
- //can do so safely.
+//NOTE: Capability module must occur first so that it can initialize any capabilities
+//so that other modules that want to create or claim capabilities afterwards in InitChain
+//can do so safely.
   app.mm.SetOrderInitGenesis(
     capabilitytypes.ModuleName,
-   //other modules ...
+  //other modules ...
     ibchost.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
   )
 
- //.. continues
+//.. continues
 ```
 
 ::: 警告
-**重要**：汎用モジュール**は `SetOrderInitGenesis`で最初に宣言する必要があります
+**重要**:汎用モジュール**は `SetOrderInitGenesis`で最初に宣言する必要があります
 :::
 
 それでおしまい！ これで、IBCモジュールが配線され、代替可能なトークンを送信できるようになりました。
 異なるチェーン。 変更の全体像を知りたい場合は、CosmosSDKを調べてください。
 [`SimApp`](https://github.com/cosmos/ibc-go/blob/main/testing/simapp/app.go)。
 
-## 次へ{非表示}
+## 次へ{hide}
 
 アプリケーション用の[カスタムIBCモジュール](./custom.md){hide}を作成する方法を学ぶ

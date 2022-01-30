@@ -20,7 +20,7 @@
 
 `EndBlocker`の特徴の1つは、[`[] abci.ValidatorUpdates`](https://tendermint.com/docs/app-dev/abci-spec.html#validatorupdate)として使用できることです。これは、カスタムバリデーターの変更を実装するための推奨される方法です。
 
-開発者は、モジュールマネージャーの「SetOrderBeginBlocker」/「SetOrderEndBlocker」メソッドを使用して、各アプリケーションモジュールの「BeginBlocker」/「EndBlocker」関数間の実行順序を定義できます。モジュールマネージャの詳細については、[ここ](./module-manager.md#manager)をクリックしてください。
+開発者は、モジュールマネージャーの[SetOrderBeginBlocker]/[SetOrderEndBlocker]メソッドを使用して、各アプリケーションモジュールの[BeginBlocker]/[EndBlocker]関数間の実行順序を定義できます。モジュールマネージャの詳細については、[ここ](./module-manager.md#manager)をクリックしてください。
 
 `disr`モジュールからの` BeginBlocker`の実装例をご覧ください。
 
@@ -30,6 +30,6 @@
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/f33749263f4ecc796115ad6e789cb0f7cddf9148/x/staking/abci.go#L22-L27
 
-##次へ{hide}
+## 次へ{hide}
 
 [`keeper`s](./keeper.md){hide}を理解する 

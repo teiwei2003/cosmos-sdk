@@ -1,14 +1,14 @@
-# ICS 030：コスモス署名メッセージ
+# ICS 030:コスモス署名メッセージ
 
-> TODO：有効なICS番号に置き換えて、新しい場所に移動する可能性があります。
+> TODO:有効なICS番号に置き換えて、新しい場所に移動する可能性があります。
 
-* [変更ログ](＃changelog)
-* [要約](＃abstract)
-* [暫定版](＃preliminary)
-* [仕様](＃specification)
-* [将来の適応](＃future-adaptations)
-* [API](＃api)
-* [参照](＃references)
+* [変更ログ](#changelog)
+* [要約](#abstract)
+* [暫定版](#preliminary)
+* [仕様](#specification)
+* [将来の適応](#future-adaptations)
+* [API](#api)
+* [参照](#references)
 
 ## 状態
 
@@ -78,7 +78,7 @@ type CanonicalJSONVote struct {
 ```
 
 このような正規のJSON構造では、仕様に次のものが含まれている必要があります
-メタフィールド： `@ chain_id`と` @ type`。これらのメタフィールドは予約されており、
+メタフィールド: `@ chain_id`と` @ type`。これらのメタフィールドは予約されており、
 含まれています。どちらも `string`型です。さらに、フィールドは順序付けする必要があります
 辞書式順序で昇順。
 
@@ -89,10 +89,10 @@ Cosmosメッセージに署名するには、 `@ chain_id`フィールドが対�
 ユーザーがアプリケーションにサインインする構造。今のところ、ユーザーは
 有効なASCIIテキストのバイトに署名できます([ここを参照](https://github.com/tendermint/tendermint/blob/master/libs/common/string.go#L61-L74))。
 ただし、これは変更され、追加のアプリケーション固有をサポートするように進化します
-人間が読み取れ、機械が検証できる構造([Future Adaptations](＃futureadaptations)を参照)。
+人間が読み取れ、機械が検証できる構造([Future Adaptations](#futureadaptations)を参照)。
 
 したがって、を使用してCosmosメッセージに署名するための正規のJSON構造を持つことができます
-[JSONスキーマ](http://json-schema.org/)仕様自体：
+[JSONスキーマ](http://json-schema.org/)仕様自体:
 
 ```json
 {
@@ -163,20 +163,20 @@ e.g.
 
 ### ** cosmosSignBytes **
 
-パラメータ：
+パラメータ:
 
-* `data`：Cosmos署名付きメッセージの正規JSON構造
-* `address`：データに署名するためのBech32Cosmosアカウントアドレス
+* `data`:Cosmos署名付きメッセージの正規JSON構造
+* `address`:データに署名するためのBech32Cosmosアカウントアドレス
 
-戻り値：
+戻り値:
 
-* `signature`：署名アルゴリズム` S`を使用して導出されたCosmos署名
+* `signature`:署名アルゴリズム` S`を使用して導出されたCosmos署名
 
 -----
 
 ### 例
 
-`secp256k1`をDSAとして使用すると、` S`：
+`secp256k1`をDSAとして使用すると、` S`:
 
 ```javascript
 data = {

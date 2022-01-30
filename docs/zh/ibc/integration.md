@@ -25,21 +25,21 @@
 `ibc-transfer``ModuleAccount` 用于铸造和销毁中继代币。 
 
 ```go
-// app.go
+//app.go
 var (
 
   ModuleBasics = module.NewBasicManager(
-    // ...
+   //...
     capability.AppModuleBasic{},
     ibc.AppModuleBasic{},
     evidence.AppModuleBasic{},
-    transfer.AppModuleBasic{}, // i.e ibc-transfer module
+    transfer.AppModuleBasic{},//i.e ibc-transfer module
   )
 
-  // module account permissions
+ //module account permissions
   maccPerms = map[string][]string{
-    // other module accounts permissions
-    // ...
+   //other module accounts permissions
+   //...
     ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 )
 ```
@@ -49,22 +49,22 @@ var (
 然后，我们需要按如下方式注册`Keepers`: 
 
 ```go
-// app.go
+//app.go
 type App struct {
-  // baseapp, keys and subspaces definitions
+ //baseapp, keys and subspaces definitions
 
-  // other keepers
-  // ...
-  IBCKeeper        *ibckeeper.Keeper // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
-  EvidenceKeeper   evidencekeeper.Keeper // required to set up the client misbehaviour route
-  TransferKeeper   ibctransferkeeper.Keeper // for cross-chain fungible token transfers
+ //other keepers
+ //...
+  IBCKeeper        *ibckeeper.Keeper//IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+  EvidenceKeeper   evidencekeeper.Keeper//required to set up the client misbehaviour route
+  TransferKeeper   ibctransferkeeper.Keeper//for cross-chain fungible token transfers
 
-  // make scoped keepers public for test purposes
+ //make scoped keepers public for test purposes
   ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
   ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
-  /// ...
-  /// module and simulation manager definitions
+ ///...
+ ///module and simulation manager definitions
 }
 ```
 
@@ -77,23 +77,23 @@ type App struct {
 
 ```go
 func NewApp(...args) *App {
-  // define codecs and baseapp
+ //define codecs and baseapp
 
-  // add capability keeper and ScopeToModule for ibc module
+ //add capability keeper and ScopeToModule for ibc module
   app.CapabilityKeeper = capabilitykeeper.NewKeeper(appCodec, keys[capabilitytypes.StoreKey], memKeys[capabilitytypes.MemStoreKey])
 
-  // grant capabilities for the ibc and ibc-transfer modules
+ //grant capabilities for the ibc and ibc-transfer modules
   scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
   scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 
-  // ... other modules keepers
+ //... other modules keepers
 
-  // Create IBC Keeper
+ //Create IBC Keeper
   app.IBCKeeper = ibckeeper.NewKeeper(
   appCodec, keys[ibchost.StoreKey], app.StakingKeeper, scopedIBCKeeper,
   )
 
-  // Create Transfer Keepers
+ //Create Transfer Keepers
   app.TransferKeeper = ibctransferkeeper.NewKeeper(
     appCodec, keys[ibctransfertypes.StoreKey],
     app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
@@ -101,12 +101,12 @@ func NewApp(...args) *App {
   )
   transferModule := transfer.NewAppModule(app.TransferKeeper)
 
-  // Create evidence Keeper for to register the IBC light client misbehaviour evidence route
+ //Create evidence Keeper for to register the IBC light client misbehaviour evidence route
   evidenceKeeper := evidencekeeper.NewKeeper(
     appCodec, keys[evidencetypes.StoreKey], &app.StakingKeeper, app.SlashingKeeper,
   )
 
-  // .. continues
+ //.. continues
 }
 ```
 
@@ -132,31 +132,31 @@ IBC的，需要提交[轻客户端的证据
 一旦设置了`Router`，就不能添加新的路由。 
 
 ```go
-// app.go
+//app.go
 func NewApp(...args) *App {
-  // .. continuation from above
+ //.. continuation from above
 
-  // Create static IBC router, add ibc-tranfer module route, then set and seal it
+ //Create static IBC router, add ibc-tranfer module route, then set and seal it
   ibcRouter := port.NewRouter()
   ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
-  // Setting Router will finalize all routes by sealing router
-  // No more routes can be added
+ //Setting Router will finalize all routes by sealing router
+ //No more routes can be added
   app.IBCKeeper.SetRouter(ibcRouter)
 
-  // create static Evidence routers
+ //create static Evidence routers
 
   evidenceRouter := evidencetypes.NewRouter().
-    // add IBC ClientMisbehaviour evidence handler
+   //add IBC ClientMisbehaviour evidence handler
     AddRoute(ibcclient.RouterKey, ibcclient.HandlerClientMisbehaviour(app.IBCKeeper.ClientKeeper))
 
-  // Setting Router will finalize all routes by sealing router
-  // No more routes can be added
+ //Setting Router will finalize all routes by sealing router
+ //No more routes can be added
   evidenceKeeper.SetRouter(evidenceRouter)
 
-  // set the evidence keeper from the section above
+ //set the evidence keeper from the section above
   app.EvidenceKeeper = *evidenceKeeper
 
-  // .. continues
+ //.. continues
 ```
 
 ### Module Managers
@@ -164,31 +164,31 @@ func NewApp(...args) *App {
 为了使用 IBC，我们需要将新模块添加到模块 `Manager` 和 `SimulationManager`，以防您的应用程序支持 [simulations](./../building-modules/simulator.md)。 
 
 ```go
-// app.go
+//app.go
 func NewApp(...args) *App {
-  // .. continuation from above
+ //.. continuation from above
 
   app.mm = module.NewManager(
-    // other modules
-    // ...
+   //other modules
+   //...
     capability.NewAppModule(appCodec, *app.CapabilityKeeper),
     evidence.NewAppModule(app.EvidenceKeeper),
     ibc.NewAppModule(app.IBCKeeper),
     transferModule,
   )
 
-  // ...
+ //...
 
   app.sm = module.NewSimulationManager(
-    // other modules
-    // ...
+   //other modules
+   //...
     capability.NewAppModule(appCodec, *app.CapabilityKeeper),
     evidence.NewAppModule(app.EvidenceKeeper),
     ibc.NewAppModule(app.IBCKeeper),
     transferModule,
   )
 
-  // .. continues
+ //.. continues
 ```
 
 ### 应用 ABCI 订购
@@ -211,28 +211,28 @@ IBC 模块还具有
 ::: 
 
 ```go
-// app.go
+//app.go
 func NewApp(...args) *App {
-  // .. continuation from above
+ //.. continuation from above
 
-  // add evidence, staking and ibc modules to BeginBlockers
+ //add evidence, staking and ibc modules to BeginBlockers
   app.mm.SetOrderBeginBlockers(
-    // other modules ...
+   //other modules ...
     evidencetypes.ModuleName, stakingtypes.ModuleName, ibchost.ModuleName,
   )
 
-  // ...
+ //...
 
-  // NOTE: Capability module must occur first so that it can initialize any capabilities
-  // so that other modules that want to create or claim capabilities afterwards in InitChain
-  // can do so safely.
+ //NOTE: Capability module must occur first so that it can initialize any capabilities
+ //so that other modules that want to create or claim capabilities afterwards in InitChain
+ //can do so safely.
   app.mm.SetOrderInitGenesis(
     capabilitytypes.ModuleName,
-    // other modules ...
+   //other modules ...
     ibchost.ModuleName, evidencetypes.ModuleName, ibctransfertypes.ModuleName,
   )
 
-  // .. continues
+ //.. continues
 ```
 
 ::: 警告

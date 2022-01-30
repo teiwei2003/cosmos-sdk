@@ -1,6 +1,6 @@
 # CosmosSDKアプリケーション分析
 
-このドキュメントでは、CosmosSDKアプリケーションのコア部分について説明します。 このドキュメント全体を通して、「app」という名前のプレースホルダーアプリケーションが使用されます。 {まとめ}
+このドキュメントでは、CosmosSDKアプリケーションのコア部分について説明します。 このドキュメント全体を通して、[app]という名前のプレースホルダーアプリケーションが使用されます。 {まとめ}
 
 ## ノードクライアント
 
@@ -24,29 +24,29 @@ Blockchain Node |  |           Consensus           |  |
                 v  +-------------------------------+  v
 ```
 
-ブロックチェーンのフルノードは、通常、「デーモン」の接尾辞「-d」が付いたバイナリファイルとして表示されます(たとえば、「app」の場合は「appd」、「gaia」の場合は「gaiad」)。このバイナリファイルは、 `。/cmd/appd/`に配置されている単純な[`main.go`](../core/node.md#main-function)関数を実行して作成されます。この操作は通常、[Makefile](#dependencies-and-makefile)を介して行われます。
+ブロックチェーンのフルノードは、通常、[デーモン]の接尾辞[-d]が付いたバイナリファイルとして表示されます(たとえば、[app]の場合は[appd]、[gaia]の場合は[gaiad])。このバイナリファイルは、 `。/cmd/appd/`に配置されている単純な[`main.go`](../core/node.md#main-function)関数を実行して作成されます。この操作は通常、[Makefile](#dependencies-and-makefile)を介して行われます。
 
 メインのバイナリファイルを作成した後、[`start`コマンド](../core/node.md#start-command)を実行してノードを起動できます。このコマンド関数は主に次の3つのことを行います。
 
 1.[`app.go`](#core-application-file)で定義されたステートマシンインスタンスを作成します。
-2. `〜/.app/data`フォルダに保存されている` db`から抽出された最新の既知の状態でステートマシンを初期化します。この時点で、ステートマシンは「appBlockHeight」の高さにあります。
+2. `〜/.app/data`フォルダに保存されている` db`から抽出された最新の既知の状態でステートマシンを初期化します。この時点で、ステートマシンは[appBlockHeight]の高さにあります。
 3.新しいTendermintインスタンスを作成して開始します。特に、ノードはピアとのハンドシェイクを実行します。それらから最新の `blockHeight`を取得し、ローカルの` appBlockHeight`よりも大きい場合は、ブロックを再生してこの高さに同期します。 `appBlockHeight`が` 0`の場合、ノードは作成から開始し、TendermintはABCIを介して `App`に` InitChain`メッセージを送信し、[`InitChainer`](#initchainer)をトリガーします。 
-##コアアプリケーションファイル
+## コアアプリケーションファイル
 
-通常、ステートマシンのコアは、「app.go」という名前のファイルで定義されます。これには主に、**アプリケーションタイプの定義**と**アプリケーションを作成および初期化するための関数**が含まれています。
+通常、ステートマシンのコアは、[app.go]という名前のファイルで定義されます。これには主に、**アプリケーションタイプの定義**と**アプリケーションを作成および初期化するための関数**が含まれています。
 
-###アプリケーションタイプの定義
+### アプリケーションタイプの定義
 
 `app.go`で最初に定義されるのは、アプリケーションの` type`です。通常、次の部分で構成されます。
 
 -**[`baseapp`](../core/baseapp.md)への参照。 ** `app.go`で定義されているカスタムアプリケーションは` baseapp`の拡張です。 Tendermintがトランザクションをアプリケーションに中継するとき、 `app`は` baseapp`のメソッドを使用してそれらを適切なモジュールにルーティングします。 `baseapp`は、すべての[ABCIメソッド](https://tendermint.com/docs/spec/abci/abci.html#overview)と[ルーティングロジック](../core)を含む、アプリケーションのコアロジックのほとんどを実装します。 )/baseapp.md#routing)。
--**ストレージキーリスト**。状態全体を含む[store](../core/store.md)は、CosmosSDKにあります。各モジュールは、マルチストア内の1つ以上のストアを使用して、状態部分を永続化します。これらのストアには、「アプリ」タイプで宣言された特定のキーを使用してアクセスできます。これらのキーと `キーパー`は、Cosmos SDK[オブジェクト関数モデル](../core/ocap.md)のコアです。
+-**ストレージキーリスト**。状態全体を含む[store](../core/store.md)は、CosmosSDKにあります。各モジュールは、マルチストア内の1つ以上のストアを使用して、状態部分を永続化します。これらのストアには、[アプリ]タイプで宣言された特定のキーを使用してアクセスできます。これらのキーと `キーパー`は、Cosmos SDK[オブジェクト関数モデル](../core/ocap.md)のコアです。
 -**モジュールの `キーパー`リスト。 **各モジュールは、このモジュールに格納されている読み取りと書き込みを処理する[`keeper`](../building-modules/keeper.md)という名前の抽象化を定義します。モジュールの` keeper`メソッドは、他のモジュールからのものにすることができます(許可されている場合)が呼び出されます。これが、アプリケーションタイプで宣言され、他のモジュールが許可された機能にのみアクセスできるように、インターフェイスとして他のモジュールにエクスポートされる理由です。
 -**[`appCodec`](../core/encoding.md)への参照。 **アプリケーションの `appCodec`は、データ構造をシリアル化および逆シリアル化して保存するために使用されます。これは、ストレージが永続化できるのは`[] bytes`のみであるためです。デフォルトのコーデックは[ProtocolBuffers](../core/encoding.md)です。
 -**[`legacyAmino`](../core/encoding.md)コーデックへの参照。 ** Cosmos SDKの一部は、上記の `appCodec`を使用するようにまだ移行されておらず、アミノを使用するようにハードコードされています。他の部分は、下位互換性のために明示的にAminoを使用しています。これらの理由により、アプリケーションは引き続き古いAminoコーデックへの参照を保持します。今後のリリースでは、AminoコーデックがSDKから削除されることに注意してください。
 -**[Module Manager](../building-modules/module-manager.md#manager)**および[Basic Module Manager](../building-modules/module-manager.md#Basic Manager)への参照。モジュールマネージャは、アプリケーションモジュールのリストを含むオブジェクトです。[`Msg`サービス](../core/baseapp.md#msg-services)や[gRPC`クエリ`サービス](../core/baseapp.md#)の登録など、これらのモジュールに関連する操作が容易になります。 grpc -query-services)、または[`InitChainer`](#initchainer)、[` BeginBlocker`および `EndBlocker`](#beginblocker-and-endblocker)などのさまざまな関数のモジュール間の実行順序を設定します。
 
-「simapp」のアプリケーションタイプ定義の例を参照してください。CosmosSDK独自のアプリケーションは、デモンストレーションとテストの目的で使用されます。
+[simapp]のアプリケーションタイプ定義の例を参照してください。CosmosSDK独自のアプリケーションは、デモンストレーションとテストの目的で使用されます。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/app.go#L145-L187
 
@@ -59,7 +59,7 @@ Blockchain Node |  |           Consensus           |  |
 この関数によって実行される主な操作は次のとおりです。
 
 -新しい[`codec`](../core/encoding.md)をインスタンス化し、[basic manager](../building-modules/module-manager.md)を使用して各アプリケーションモジュールの`コーデックを初期化します `# basicmanager)
--「baseapp」インスタンス、コーデック、およびすべての適切なストレージキーへの参照を使用して、新しいアプリケーションをインスタンス化します。
+-[baseapp]インスタンス、コーデック、およびすべての適切なストレージキーへの参照を使用して、新しいアプリケーションをインスタンス化します。
 -各アプリケーションモジュールの `NewKeeper`関数を使用して、アプリケーションの` type`で定義されているすべての[`keeper`s](#keeper)をインスタンス化します。あるモジュールの `NewKeeper`が別のモジュールの` keeper`を参照する必要がある場合があるため、 `keepers`は正しい順序でインスタンス化する必要があることに注意してください。
 -各アプリケーションモジュールの[`AppModule`](#application-module-interface)オブジェクトを使用して、アプリケーションの[Module Manager](../building-modules/module-manager.md#manager)をインスタンス化します。
 -モジュールマネージャーを使用して、アプリケーションの[`Msg`サービス](../core/baseapp.md#msg-services)、[gRPC`クエリ`サービス](../core/baseapp.md#grpc-queryを初期化します-services)、[古いバージョンの `Msg`ルーティング](../core/baseapp.md#routing)および[古いバージョンのクエリルーティング](../core/baseapp.md#query-routing)。 TendermintがABCIを介してトランザクションをアプリケーションに中継する場合、ここで定義されたルートを使用して、対応するモジュールの[`Msg`サービス](#msg-services)にルーティングします。同様に、アプリケーションがgRPCクエリリクエストを受信すると、ここで定義されたgRPCルートを使用して、対応するモジュールの[`gRPCクエリサービス`](#grpc-query-services)にルーティングします。 Cosmos SDKは、古いバージョンの `Msg`と古いバージョンのTendermintクエリを引き続きサポートします。これらは、古いバージョンの` Msg`ルートと古いバージョンのクエリルートをそれぞれルーティングに使用します。
@@ -74,7 +74,7 @@ Blockchain Node |  |           Consensus           |  |
 
 この関数はアプリケーションのインスタンスのみを作成し、実際の状態はノードの再起動時に `〜/.app/data`フォルダーから転送されるか、ノードの起動時にジェネシスファイルから生成されることに注意してください。初めて。
 
-「simapp」のアプリケーションコンストラクターの例を参照してください。 
+[simapp]のアプリケーションコンストラクターの例を参照してください。 
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/app.go#L198-L441
 
@@ -82,21 +82,21 @@ Blockchain Node |  |           Consensus           |  |
 
 `InitChainer`は、ジェネシスファイル(つまり、ジェネシスアカウントのトークンバランス)からアプリケーションの状態を初期化する関数です。これは、アプリケーションがTendermintエンジンから `InitChain`メッセージを受信したときに呼び出されます。これは、ノードが` appBlockHeight == 0`で開始されたとき(つまり、作成時)に発生します。アプリケーションは、[`SetInitChainer`](https://godoc.org/github.com/cosmos/cosmos-sdk/baseapp#BaseApp.SetInitChainer)を渡して、その[コンストラクター](#constructor-function)`に `InitChainerを設定する必要があります。 ) 方法。
 
-一般的に、 `InitChainer`は、主にアプリケーションの各モジュールの[` InitGenesis`](../building-modules/genesis.md#initgenesis)関数で構成されています。これは、モジュールマネージャーの `InitGenesis`関数を呼び出すことによって行われます。この関数は、モジュールマネージャーに含まれる各モジュールの` InitGenesis`関数を呼び出します。モジュールマネージャーでモジュールの `InitGenesis`関数を呼び出す順序を設定するには、[Module Manager's](../building-modules/module-manager.md)` SetOrderInitGenesis`メソッドを使用する必要があることに注意してください。これは[application-constructor](#application-constructor)で行われ、「SetOrderInitGenesis」は「SetInitChainer」の前に呼び出す必要があります。
+一般的に、 `InitChainer`は、主にアプリケーションの各モジュールの[` InitGenesis`](../building-modules/genesis.md#initgenesis)関数で構成されています。これは、モジュールマネージャーの `InitGenesis`関数を呼び出すことによって行われます。この関数は、モジュールマネージャーに含まれる各モジュールの` InitGenesis`関数を呼び出します。モジュールマネージャーでモジュールの `InitGenesis`関数を呼び出す順序を設定するには、[Module Manager's](../building-modules/module-manager.md)` SetOrderInitGenesis`メソッドを使用する必要があることに注意してください。これは[application-constructor](#application-constructor)で行われ、[SetOrderInitGenesis]は[SetInitChainer]の前に呼び出す必要があります。
 
-「simapp」の「InitChainer」の例を参照してください。 
+[simapp]の[InitChainer]の例を参照してください。 
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/app.go#L464-L471
 
 ### BeginBlocker and EndBlocker
 
-Cosmos SDKは、開発者にアプリケーションの一部としてコード実行を自動化する可能性を提供します。これは、「BeginBlocker」と「EndBlocker」という名前の2つの関数によって実現されます。これらは、アプリケーションがTendermintエンジンからそれぞれ `BeginBlock`メッセージと` EndBlock`メッセージを受信したときに呼び出されます。これは、各ブロックの最初と最後に発生します。アプリケーションは、[`SetBeginBlocker`](https://godoc.org/github.com/cosmos/cosmos-sdk/baseapp)`#を介して[コンストラクター](#constructor-function)に `BeginBlocker`と` EndBlockerを設定する必要があります。 BaseApp.SetBeginBlocker)および[`SetEndBlocker`](https://godoc.org/github.com/cosmos/cosmos-sdk/baseapp#BaseApp.SetEndBlocker)メソッド。
+Cosmos SDKは、開発者にアプリケーションの一部としてコード実行を自動化する可能性を提供します。これは、[BeginBlocker]と[EndBlocker]という名前の2つの関数によって実現されます。これらは、アプリケーションがTendermintエンジンからそれぞれ `BeginBlock`メッセージと` EndBlock`メッセージを受信したときに呼び出されます。これは、各ブロックの最初と最後に発生します。アプリケーションは、[`SetBeginBlocker`](https://godoc.org/github.com/cosmos/cosmos-sdk/baseapp)`#を介して[コンストラクター](#constructor-function)に `BeginBlocker`と` EndBlockerを設定する必要があります。 BaseApp.SetBeginBlocker)および[`SetEndBlocker`](https://godoc.org/github.com/cosmos/cosmos-sdk/baseapp#BaseApp.SetEndBlocker)メソッド。
 
-一般的に、 `BeginBlocker`関数と` EndBlocker`関数は、主に各アプリケーションモジュールの[`BeginBlock`と` EndBlock`](../building-modules/beginblock-endblock.md)関数で構成されています。これは、モジュールマネージャの `BeginBlock`および` EndBlock`関数を呼び出すことによって行われます。次に、モジュールマネージャは、それに含まれる各モジュールの `BeginBlock`および` EndBlock`関数を呼び出します。モジュールマネージャでモジュール「BeginBlock」および「EndBlock」関数を呼び出す順序を設定するには、それぞれ「SetOrderBeginBlock」メソッドと「SetOrderEndBlock」メソッドを使用する必要があることに注意してください。これは、[Application Constructor](#application-constructor)の[Module Manager](../building-modules/module-manager.md)を介して行われ、 `SetOrderBeginBlock`と` SetOrderEndBlock`を呼び出す必要があります。メソッドは `の前にあります。 SetBeginBlocker`および `SetEndBlocker`関数。
+一般的に、 `BeginBlocker`関数と` EndBlocker`関数は、主に各アプリケーションモジュールの[`BeginBlock`と` EndBlock`](../building-modules/beginblock-endblock.md)関数で構成されています。これは、モジュールマネージャの `BeginBlock`および` EndBlock`関数を呼び出すことによって行われます。次に、モジュールマネージャは、それに含まれる各モジュールの `BeginBlock`および` EndBlock`関数を呼び出します。モジュールマネージャでモジュール[BeginBlock]および[EndBlock]関数を呼び出す順序を設定するには、それぞれ[SetOrderBeginBlock]メソッドと[SetOrderEndBlock]メソッドを使用する必要があることに注意してください。これは、[Application Constructor](#application-constructor)の[Module Manager](../building-modules/module-manager.md)を介して行われ、 `SetOrderBeginBlock`と` SetOrderEndBlock`を呼び出す必要があります。メソッドは `の前にあります。 SetBeginBlocker`および `SetEndBlocker`関数。
 
-補足として、アプリケーション固有のブロックチェーンは決定論的であることを覚えておくことが重要です。開発者は、「BeginBlocker」または「EndBlocker」に不確実性を導入しないように注意する必要があります。また、[gas](./gas-fees.md)はコストを制限しないため、計算コストを高くしすぎないように注意する必要があります。 BeginBlocker`と `EndBlocker`が実行されます。
+補足として、アプリケーション固有のブロックチェーンは決定論的であることを覚えておくことが重要です。開発者は、[BeginBlocker]または[EndBlocker]に不確実性を導入しないように注意する必要があります。また、[gas](./gas-fees.md)はコストを制限しないため、計算コストを高くしすぎないように注意する必要があります。 BeginBlocker`と `EndBlocker`が実行されます。
 
-「simapp」の「BeginBlocker」および「EndBlocker」関数の例を参照してください。  
+[simapp]の[BeginBlocker]および[EndBlocker]関数の例を参照してください。  
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/simapp/app.go#L454-L462
 
@@ -112,13 +112,13 @@ Cosmos SDKは、開発者にアプリケーションの一部としてコード�
     -Anyの詳細については、[ADR-19](../architecture/adr-019-protobuf-state-encoding.md#usage-of-any-to-encode-interfaces)を参照してください。
     -より詳細な理解のために、Cosmos SDKは[`gogoprotobuf`](https://github.com/gogo/protobuf)という名前のProtobuf仕様の実装を使用します。デフォルトでは、[`Any`のgogoprotobuf実装](https://godoc.org/github.com/gogo/protobuf/types)は[Global Type Registration](https://github.com/gogo/protobuf/blob/master/proto/properties.go#L540) `Any`にカプセル化された値を特定のGoタイプにデコードします。これにより、依存関係ツリー内の悪意のあるモジュールがグローバルprotobufレジストリにタイプを登録し、 `type_url`フィールドでそれを参照するトランザクションによってロードおよびグループ解除される可能性があるという脆弱性が導入されます。詳細については、[ADR-019](../architecture/adr-019-protobuf-state-encoding.md)を参照してください。
 -`Marshaler`:CosmosSDK全体で使用されるデフォルトのコーデック。これは、ステータスをエンコードおよびデコードするための `BinaryCodec`と、ユーザーにデータを出力するための` JSONCodec`で構成されます(たとえば、[CLI](#cli))。デフォルトでは、SDKはProtobufを `Marshaler`として使用します。
--`TxConfig`: `TxConfig`は、クライアントがアプリケーションによって定義された特定のトランザクションタイプを生成するために使用できるインターフェースを定義します。現在、SDKは「SIGN_MODE_DIRECT」(オンラインコードとしてProtobufバイナリを使用)と「SIGN_MODE_LEGACY_AMINO_JSON」(Aminoに依存)の2つのトランザクションタイプを処理します。トランザクションの詳細については、[こちら](../core/transaction.md)をご覧ください。
+-`TxConfig`: `TxConfig`は、クライアントがアプリケーションによって定義された特定のトランザクションタイプを生成するために使用できるインターフェースを定義します。現在、SDKは[SIGN_MODE_DIRECT](オンラインコードとしてProtobufバイナリを使用)と[SIGN_MODE_LEGACY_AMINO_JSON](Aminoに依存)の2つのトランザクションタイプを処理します。トランザクションの詳細については、[こちら](../core/transaction.md)をご覧ください。
 -`Amino`:Cosmos SDKの一部のレガシー部分は、下位互換性のために引き続きAminoを使用しています。各モジュールは `RegisterLegacyAmino`メソッドを公開して、特定のタイプのモジュールをAminoに登録します。アプリケーション開発者は、この `Amino`コーデックを使用しないようにする必要があり、将来のバージョンで削除される予定です。
 
-Cosmos SDKは、アプリケーションコンストラクター( `NewApp`)の` EncodingConfig`を作成するために使用される `MakeTestEncodingConfig`関数を公開します。デフォルトの「Marshaler」としてProtobufを使用します。
+Cosmos SDKは、アプリケーションコンストラクター( `NewApp`)の` EncodingConfig`を作成するために使用される `MakeTestEncodingConfig`関数を公開します。デフォルトの[Marshaler]としてProtobufを使用します。
 注:この機能は非推奨としてマークされており、アプリケーションの作成またはテストでの使用にのみ使用できます。 Stargateのリリース後、コーデック管理のリファクタリングに取り組んでいます。
 
-「simapp」の「MakeTestEncodingConfig」の例を参照してください。 
+[simapp]の[MakeTestEncodingConfig]の例を参照してください。 
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/590358652cc1cbc13872ea1659187e073ea38e75/simapp/encoding.go#L8-L19
 
@@ -134,7 +134,7 @@ Cosmos SDKは、アプリケーションコンストラクター( `NewApp`)の` 
 
 ### `Msg`サービス
 
-各モジュールは、2つの[Protobufサービス](https://developers.google.com/protocol-buffers/docs/proto#services)を定義します。1つはメッセージを処理するための `Msg`サービスで、もう1つはクエリを処理するためのGRPC`Query`サービスです。モジュールをステートマシンと見なす場合、「Msg」サービスは状態遷移RPCメソッドのセットです。
+各モジュールは、2つの[Protobufサービス](https://developers.google.com/protocol-buffers/docs/proto#services)を定義します。1つはメッセージを処理するための `Msg`サービスで、もう1つはクエリを処理するためのGRPC`Query`サービスです。モジュールをステートマシンと見なす場合、[Msg]サービスは状態遷移RPCメソッドのセットです。
 各Protobuf`Msg`サービスメソッドはProtobufリクエストタイプ1:1に関連付けられており、 `sdk.Msg`インターフェイスを実装する必要があります。
 `sdk.Msg`は[transactions](../core/transactions.md)にバンドルされており、各トランザクションには1つ以上のメッセージが含まれていることに注意してください。
 
@@ -167,17 +167,17 @@ Protobufは、すべてのサービスメソッドを含むモジュールごと
 
 ### ゴールキーパー
 
-[`Keepers`](../building-modules/keeper.md)は、モジュールストレージのゲートキーパーです。モジュールのストレージで読み取りまたは書き込みを行うには、その `keeper`メソッドの1つを使用する必要があります。これは、Cosmos SDKの[object-capabilities](../core/ocap.md)モデルによって保証されます。ストレージキーを保持しているオブジェクトのみがアクセスでき、モジュールの「キーパー」のみがモジュールによって保存されているキーを保持する必要があります。
+[`Keepers`](../building-modules/keeper.md)は、モジュールストレージのゲートキーパーです。モジュールのストレージで読み取りまたは書き込みを行うには、その `keeper`メソッドの1つを使用する必要があります。これは、Cosmos SDKの[object-capabilities](../core/ocap.md)モデルによって保証されます。ストレージキーを保持しているオブジェクトのみがアクセスでき、モジュールの[キーパー]のみがモジュールによって保存されているキーを保持する必要があります。
 
 `Keepers`は通常、` keeper.go`という名前のファイルで定義されます。これには、 `keeper`の型定義とメソッドが含まれています。
 
 `keeper`タイプの定義には、通常、次のものが含まれます。
 
 -**マルチストア内のモジュールのストアへのキー**。
--**その他のモジュール**の「キーパー」を参照してください。 `keeper`が他のモジュールのストレージにアクセスする必要がある場合にのみ必要です(それらの読み取りまたは書き込み)。
+-**その他のモジュール**の[キーパー]を参照してください。 `keeper`が他のモジュールのストレージにアクセスする必要がある場合にのみ必要です(それらの読み取りまたは書き込み)。
 -アプリケーションの**コーデック**への参照。ストレージは値として `[] bytes`のみを受け入れるため、` keeper`は、構造を保存する前に構造をマーシャリングするか、構造を取得するときに構造をアンマーシャルする必要があります。
 
-タイプ定義とともに、 `keeper.go`ファイルの次の重要なコンポーネントは` keeper`のコンストラクターである `NewKeeper`です。この関数は、上記で定義されたタイプの新しい「キーパー」を「コーデック」でインスタンス化し、「キー」と他のモジュール「キーパー」への潜在的な参照をパラメーターとして格納します。 `NewKeeper`関数は、[アプリケーションコンストラクター](#constructor-function)から呼び出されます。ファイルの残りの部分は、主にゲッターとセッターである `keeper`のメソッドを定義します。
+タイプ定義とともに、 `keeper.go`ファイルの次の重要なコンポーネントは` keeper`のコンストラクターである `NewKeeper`です。この関数は、上記で定義されたタイプの新しい[キーパー]を[コーデック]でインスタンス化し、[キー]と他のモジュール[キーパー]への潜在的な参照をパラメーターとして格納します。 `NewKeeper`関数は、[アプリケーションコンストラクター](#constructor-function)から呼び出されます。ファイルの残りの部分は、主にゲッターとセッターである `keeper`のメソッドを定義します。
 
 ###コマンドライン、gRPCサービスおよびRESTインターフェース
 

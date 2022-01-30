@@ -3,7 +3,7 @@
 カスタムメトリックとテレメトリを使用して、アプリケーションとモジュールに関する関連する洞察を収集します。 {まとめ}
 
 Cosmos SDKを使用すると、オペレーターと開発者は理解できます
-それらのアプリケーションは、「テレメトリ」パッケージを使用して行われます。 CosmosSDKは現在サポートしています
+それらのアプリケーションは、[テレメトリ]パッケージを使用して行われます。 CosmosSDKは現在サポートしています
 テレメトリ受信機としてメモリとPrometheusを有効にします。 これにより、クエリとクロールが可能になります
 単一のパブリックAPIエンドポイントからのメトリック-`/metrics？format = {text | prometheus} `、デフォルト値は
 `テキスト`。
@@ -12,21 +12,21 @@ Cosmos SDKを使用すると、オペレーターと開発者は理解できま�
 [go-metrics](https://github.com/armon/go-metrics)ライブラリ。 これにより、起動と収集が可能になります
 インジケーターは単純なAPIを介して呼び出されます。
 
-例： 
+例: 
 
 ```go
 func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
   defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyEndBlocker)
 
- //...
+//...
 }
 ```
 
 開発者は、インジケーターAPIのラッパーを提供する `telemetry`パッケージを直接使用できます。
 有用なタグの追加を含む、またはそれらはgo-metricsライブラリを直接使用する必要があります。 多くの
-可能な限り多くのコンテキストと十分なディメンションをメジャーに追加して、「テレメトリ」パッケージを作成します
+可能な限り多くのコンテキストと十分なディメンションをメジャーに追加して、[テレメトリ]パッケージを作成します
 提案。 使用するパッケージや方法に関係なく、CosmosSDKは次のインジケーターをサポートします
-タイプ：
+タイプ:
 
 *  メーター
 *  要約する
@@ -34,12 +34,12 @@ func EndBlocker(ctx sdk.Context, k keeper.Keeper) {
 
 ## ラベル
 
-モジュールの特定のコンポーネントは、それらの名前をタグとして自動的に追加します(たとえば、「BeginBlock」)。
+モジュールの特定のコンポーネントは、それらの名前をタグとして自動的に追加します(たとえば、[BeginBlock])。
 オペレーターは、アプリケーションに一連のグローバルタグを提供することもできます。これは、すべてのユーザーに適用されます。
 `telemetry`パッケージを使用して送信されたメトリック(chain-idなど)。 グローバルタグはリストとして提供されます
 [名前、値]タプル。
 
-例： 
+例: 
 
 ```toml
 global-labels = [
@@ -128,6 +128,6 @@ global-labels = [
 | `store_iavl_commit`             | Duration of an IAVL `Store#Commit` call                                                   | ms              | summary |
 | `store_iavl_query`              | Duration of an IAVL `Store#Query` call                                                    | ms              | summary |
 
-## 次へ{非表示}
+## 次へ{hide}
 
 [object-capability](./ocap.md)モデルについて学ぶ{hide}

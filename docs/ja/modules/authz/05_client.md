@@ -2,7 +2,7 @@
 
 ## コマンドラインインターフェイス
 
-ユーザーはCLIを使用して、「authz」モジュールを照会および操作できます。
+ユーザーはCLIを使用して、[authz]モジュールを照会および操作できます。
 
 ### query
 
@@ -23,7 +23,7 @@ simd query authz grants [granter-addr] [grantee-addr] [msg-type-url]? [flags]
 例:
 
 ```bash
-simd query authz grants cosmos1.. cosmos1.. /cosmos.bank.v1beta1.MsgSend
+simd query authz grants cosmos1.. cosmos1../cosmos.bank.v1beta1.MsgSend
 ```
 
 出力例:
@@ -31,7 +31,7 @@ simd query authz grants cosmos1.. cosmos1.. /cosmos.bank.v1beta1.MsgSend
 ```bash
 grants:
 - authorization:
-    '@type': /cosmos.bank.v1beta1.SendAuthorization
+    '@type':/cosmos.bank.v1beta1.SendAuthorization
     spend_limit:
     - amount: "100"
       denom: stake
@@ -86,7 +86,7 @@ simd tx authz revoke [grantee] [msg-type-url] --from=[granter] [flags]
 例:
 
 ```bash
-simd tx authz revoke cosmos1.. /cosmos.bank.v1beta1.MsgSend --from=cosmos1..
+simd tx authz revoke cosmos1../cosmos.bank.v1beta1.MsgSend --from=cosmos1..
 ```
 
 ## gRPC

@@ -36,7 +36,7 @@ Cosmos SDK 客户端的协议缓冲区迁移路径。
 
 基于详细讨论 ([\#6030](https://github.com/cosmos/cosmos-sdk/issues/6030)
 和 [\#6078](https://github.com/cosmos/cosmos-sdk/issues/6078))，原始
-交易的设计从`oneof` / JSON-signing 发生了很大变化
+交易的设计从`oneof`/JSON-signing 发生了很大变化
 下面描述的方法的方法。
 
 ## 决定
@@ -59,38 +59,38 @@ Cosmos SDK 客户端的协议缓冲区迁移路径。
 
 
 ```proto
-// types/types.proto
+//types/types.proto
 package cosmos_sdk.v1;
 
 message Tx {
     TxBody body = 1;
     AuthInfo auth_info = 2;
-    // A list of signatures that matches the length and order of AuthInfo's signer_infos to
-    // allow connecting signature meta information like public key and signing mode by position.
+   //A list of signatures that matches the length and order of AuthInfo's signer_infos to
+   //allow connecting signature meta information like public key and signing mode by position.
     repeated bytes signatures = 3;
 }
 
-// A variant of Tx that pins the signer's exact binary represenation of body and
-// auth_info. This is used for signing, broadcasting and verification. The binary
-// `serialize(tx: TxRaw)` is stored in Tendermint and the hash `sha256(serialize(tx: TxRaw))`
-// becomes the "txhash", commonly used as the transaction ID.
+//A variant of Tx that pins the signer's exact binary represenation of body and
+//auth_info. This is used for signing, broadcasting and verification. The binary
+//`serialize(tx: TxRaw)` is stored in Tendermint and the hash `sha256(serialize(tx: TxRaw))`
+//becomes the "txhash", commonly used as the transaction ID.
 message TxRaw {
-    // A protobuf serialization of a TxBody that matches the representation in SignDoc.
+   //A protobuf serialization of a TxBody that matches the representation in SignDoc.
     bytes body = 1;
-    // A protobuf serialization of an AuthInfo that matches the representation in SignDoc.
+   //A protobuf serialization of an AuthInfo that matches the representation in SignDoc.
     bytes auth_info = 2;
-    // A list of signatures that matches the length and order of AuthInfo's signer_infos to
-    // allow connecting signature meta information like public key and signing mode by position.
+   //A list of signatures that matches the length and order of AuthInfo's signer_infos to
+   //allow connecting signature meta information like public key and signing mode by position.
     repeated bytes signatures = 3;
 }
 
 message TxBody {
-    // A list of messages to be executed. The required signers of those messages define
-    // the number and order of elements in AuthInfo's signer_infos and Tx's signatures.
-    // Each required signer address is added to the list only the first time it occurs.
-    //
-    // By convention, the first required signer (usually from the first message) is referred
-    // to as the primary signer and pays the fee for the whole transaction.
+   //A list of messages to be executed. The required signers of those messages define
+   //the number and order of elements in AuthInfo's signer_infos and Tx's signatures.
+   //Each required signer address is added to the list only the first time it occurs.
+   //
+   //By convention, the first required signer (usually from the first message) is referred
+   //to as the primary signer and pays the fee for the whole transaction.
     repeated google.protobuf.Any messages = 1;
     string memo = 2;
     int64 timeout_height = 3;
@@ -98,24 +98,24 @@ message TxBody {
 }
 
 message AuthInfo {
-    // This list defines the signing modes for the required signers. The number
-    // and order of elements must match the required signers from TxBody's messages.
-    // The first element is the primary signer and the one which pays the fee.
+   //This list defines the signing modes for the required signers. The number
+   //and order of elements must match the required signers from TxBody's messages.
+   //The first element is the primary signer and the one which pays the fee.
     repeated SignerInfo signer_infos = 1;
-    // The fee can be calculated based on the cost of evaluating the body and doing signature verification of the signers. This can be estimated via simulation.
+   //The fee can be calculated based on the cost of evaluating the body and doing signature verification of the signers. This can be estimated via simulation.
     Fee fee = 2;
 }
 
 message SignerInfo {
-    // The public key is optional for accounts that already exist in state. If unset, the
-    // verifier can use the required signer address for this position and lookup the public key.
+   //The public key is optional for accounts that already exist in state. If unset, the
+   //verifier can use the required signer address for this position and lookup the public key.
     google.protobuf.Any public_key = 1;
-    // ModeInfo describes the signing mode of the signer and is a nested
-    // structure to support nested multisig pubkey's
+   //ModeInfo describes the signing mode of the signer and is a nested
+   //structure to support nested multisig pubkey's
     ModeInfo mode_info = 2;
-    // sequence is the sequence of the account, which describes the
-    // number of committed transactions signed by a given address. It is used to prevent
-    // replay attacks.
+   //sequence is the sequence of the account, which describes the
+   //number of committed transactions signed by a given address. It is used to prevent
+   //replay attacks.
     uint64 sequence = 3;
 }
 
@@ -125,18 +125,18 @@ message ModeInfo {
         Multi multi = 2;
     }
 
-    // Single is the mode info for a single signer. It is structured as a message
-    // to allow for additional fields such as locale for SIGN_MODE_TEXTUAL in the future
+   //Single is the mode info for a single signer. It is structured as a message
+   //to allow for additional fields such as locale for SIGN_MODE_TEXTUAL in the future
     message Single {
         SignMode mode = 1;
     }
 
-    // Multi is the mode info for a multisig public key
+   //Multi is the mode info for a multisig public key
     message Multi {
-        // bitarray specifies which keys within the multisig are signing
+       //bitarray specifies which keys within the multisig are signing
         CompactBitArray bitarray = 1;
-        // mode_infos is the corresponding modes of the signers of the multisig
-        // which could include nested multisig public keys
+       //mode_infos is the corresponding modes of the signers of the multisig
+       //which could include nested multisig public keys
         repeated ModeInfo mode_infos = 2;
     }
 }
@@ -192,11 +192,11 @@ enum SignMode {
 `TxBody` 和 `AuthInfo`，只添加签名所需的字段: 
 
 ```proto
-// types/types.proto
+//types/types.proto
 message SignDoc {
-    // A protobuf serialization of a TxBody that matches the representation in TxRaw.
+   //A protobuf serialization of a TxBody that matches the representation in TxRaw.
     bytes body = 1;
-    // A protobuf serialization of an AuthInfo that matches the representation in TxRaw.
+   //A protobuf serialization of an AuthInfo that matches the representation in TxRaw.
     bytes auth_info = 2;
     string chain_id = 3;
     uint64 account_number = 4;
@@ -410,21 +410,21 @@ AuthInfo 中的签名者将被延迟，直到收集到签名。
    为了): 
 
 ```proto
-// types/types.proto
+//types/types.proto
 message SignDocAux {
     bytes body_bytes = 1;
-    // PublicKey is included in SignDocAux :
-    // 1. as a special case for multisig public keys. For multisig public keys,
-    // the signer should use the top-level multisig public key they are signing
-    // against, not their own public key. This is to prevent against a form
-    // of malleability where a signature could be taken out of context of the
-    // multisig key that was intended to be signed for
-    // 2. to guard against scenario where configuration information is encoded
-    // in public keys (it has been proposed) such that two keys can generate
-    // the same signature but have different security properties
-    //
-    // By including it here, the composer of AuthInfo cannot reference the
-    // a public key variant the signer did not intend to use
+   //PublicKey is included in SignDocAux :
+   //1. as a special case for multisig public keys. For multisig public keys,
+   //the signer should use the top-level multisig public key they are signing
+   //against, not their own public key. This is to prevent against a form
+   //of malleability where a signature could be taken out of context of the
+   //multisig key that was intended to be signed for
+   //2. to guard against scenario where configuration information is encoded
+   //in public keys (it has been proposed) such that two keys can generate
+   //the same signature but have different security properties
+   //
+   //By including it here, the composer of AuthInfo cannot reference the
+   //a public key variant the signer did not intend to use
     PublicKey public_key = 2;
     string chain_id = 3;
     uint64 account_number = 4;

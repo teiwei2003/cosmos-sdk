@@ -19,12 +19,12 @@
 func BeginBlock(ctx sdk.Context, keeper HistoricalHeaderKeeper, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
   info := HistoricalInfo{
     Header: ctx.BlockHeader(),
-    ValSet: keeper.StakingKeeper.GetAllValidators(ctx), // note that this must be stored in a canonical order
+    ValSet: keeper.StakingKeeper.GetAllValidators(ctx),//note that this must be stored in a canonical order
   }
   keeper.SetHistoricalInfo(ctx, ctx.BlockHeight(), info)
   n := keeper.GetParamRecentHeadersToStore()
   keeper.PruneHistoricalInfo(ctx, ctx.BlockHeight() - n)
-  // continue handling request
+ //continue handling request
 }
 ```
 

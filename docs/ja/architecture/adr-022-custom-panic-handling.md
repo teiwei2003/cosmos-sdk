@@ -15,7 +15,7 @@ BaseAppの現在の実装では、開発者はパニックリカバリ中にカ�
 [runTx()](https://github.com/cosmos/cosmos-sdk/blob/bad4ca75f58b182f600396ca350ad844c18fc80b/baseapp/baseapp.go#L539)
 方法。この方法はより柔軟で、CosmosSDKユーザーにカスタマイズオプションを提供できると考えています。
 BaseApp全体を書き直す必要があります。 `sdk.ErrorOutOfGas`エラー処理の特殊なケースがあります。これはケースです。
-他の方法と一緒に「標準」の方法(ミドルウェア)で処理される場合があります。
+他の方法と一緒に[標準]の方法(ミドルウェア)で処理される場合があります。
 
 開発者が次のケースを実装するのに役立つミドルウェアソリューションを提案しました。
 
@@ -44,7 +44,7 @@ BaseApp全体を書き直す必要があります。 `sdk.ErrorOutOfGas`エラ�
 
 #####リカバリハンドラ
 
-新しい「RecoveryHandler」タイプが追加されました。 `recoveryObj`入力パラメータは、標準のGo関数によって返されるオブジェクトです。
+新しい[RecoveryHandler]タイプが追加されました。 `recoveryObj`入力パラメータは、標準のGo関数によって返されるオブジェクトです。
 `builtin`パッケージから` recover() `。 
 
 ```go
@@ -53,7 +53,7 @@ type RecoveryHandler func(recoveryObj interface{}) error
 
 ハンドラーは、オブジェクトにアサーション(または他のメソッド)を入力して、オブジェクトを処理する必要があるかどうかを定義する必要があります。
 入力オブジェクトがその `RecoveryHandler`(ハンドラーのターゲットタイプではない)で処理できない場合は、` nil`を返す必要があります。
-入力オブジェクトが処理され、ミドルウェアチェーンの実行を停止する必要がある場合、「nil」エラーは返されません。
+入力オブジェクトが処理され、ミドルウェアチェーンの実行を停止する必要がある場合、[nil]エラーは返されません。
 
 一例: 
 
@@ -75,7 +75,7 @@ func exampleErrHandler(recoveryObj interface{}) error {
 ##### リカバリミドルウェア
 
 ミドルウェアタイプ(デコレータ)も追加しました。 この関数型は `RecoveryHandler`をラップし、次のミドルウェアを返します
-実行チェーンとハンドラーの「エラー」。 タイプは、 `recovery()`オブジェクトの実際の処理をミドルウェアから分離するために使用されます
+実行チェーンとハンドラーの[エラー]。 タイプは、 `recovery()`オブジェクトの実際の処理をミドルウェアから分離するために使用されます
 チェーン処理。 
 ```go
 type recoveryMiddleware func(recoveryObj interface{}) (recoveryMiddleware, error)
@@ -95,7 +95,7 @@ func newRecoveryMiddleware(handler RecoveryHandler, next recoveryMiddleware) rec
 ##### リカバリミドルウェア
 
 ミドルウェアタイプ(デコレータ)も追加しました。 この関数型は `RecoveryHandler`をラップし、次のミドルウェアを返します
-実行チェーンとハンドラーの「エラー」。 タイプは、 `recovery()`オブジェクトの実際の処理をミドルウェアから分離するために使用されます
+実行チェーンとハンドラーの[エラー]。 タイプは、 `recovery()`オブジェクトの実際の処理をミドルウェアから分離するために使用されます
 チェーン処理。 
 
 ```go
@@ -198,7 +198,7 @@ func (app *BaseApp) AddRunTxRecoveryHandler(handlers ...RecoveryHandler) {
       * `panic()`を発行します:リカバリオブジェクトをTendermintコアに渡します。
       *その他の必要な処理。
 -開発者は、プロジェクトで書き直す代わりに、標準のCosmos SDK`BaseApp`実装を使用できます。
--提案されたソリューションは、現在の「標準」の `runTx()`プロセスを中断しません。
+-提案されたソリューションは、現在の[標準]の `runTx()`プロセスを中断しません。
 
 ### ネガティブ
 

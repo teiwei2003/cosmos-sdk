@@ -15,7 +15,7 @@ type Keeper struct {
   epochKeeper        epochkeeper.Keeper
 }
 
-// NewKeeper creates a new staking Keeper instance
+//NewKeeper creates a new staking Keeper instance
 func NewKeeper(cdc codec.BinaryMarshaler, key sdk.StoreKey) Keeper {
  return Keeper{
   storeKey:           key,

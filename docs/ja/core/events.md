@@ -16,7 +16,7 @@
 
 イベントには次のものが含まれます。
 
--イベントを高レベルで分類するために使用される「タイプ」。たとえば、CosmosSDKは「メッセージ」タイプを使用してイベントを「メッセージ」でフィルタリングします。
+-イベントを高レベルで分類するために使用される[タイプ]。たとえば、CosmosSDKは[メッセージ]タイプを使用してイベントを[メッセージ]でフィルタリングします。
 -`attributes`リストは、分類されたイベントに関する詳細情報を提供するキーと値のペアです。たとえば、 `" message "`タイプの場合、 `message.action = {some_action}`、 `message.module = {some_module}`、または `message.sender = {some_sender}を使用して、Key-Valueでイベントをフィルタリングできます。ペア `。
 
 ::: ヒント
@@ -49,14 +49,14 @@
 
 ## イベントマネージャ
 
-Cosmos SDKアプリケーションでは、イベントは「EventManager」と呼ばれる抽象化によって管理されます。
-内部的には、「EventManager」はイベントの実行フロー全体のリストを追跡します
+Cosmos SDKアプリケーションでは、イベントは[EventManager]と呼ばれる抽象化によって管理されます。
+内部的には、[EventManager]はイベントの実行フロー全体のリストを追跡します
 トランザクションまたは `BeginBlock`/` EndBlock`。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/types/events.go#L17-L25
 
 `EventManager`には、イベントを管理するための便利なメソッドのセットが付属しています。 方法
-モジュールおよびアプリケーション開発者が最もよく使用するのは、追跡する「EmitEvent」です。
+モジュールおよびアプリケーション開発者が最もよく使用するのは、追跡する[EmitEvent]です。
 `EventManager`のイベント。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/types/events.go#L33-L37
@@ -128,6 +128,6 @@ Tendermintの[Websocket](https://docs.tendermint.com/master/tendermint-core/subs
 
 タイプされたイベントの提案はまだ完全には実装されていません。 ドキュメントはまだ利用できません。
 
-## 次へ{非表示}
+## 次へ{hide}
 
-Cosmos SDKを理解する[テレメトリ](./telemetry.md){非表示}
+Cosmos SDKを理解する[テレメトリ](./telemetry.md){hide}

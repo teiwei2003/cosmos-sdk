@@ -20,7 +20,7 @@ Cosmos SDKは、2つの方法を使用してアップグレードを実行しま
 
 ## 作成状態
 
-新しいチェーンを開始するときは、各モジュールのコンセンサスバージョンをアプリケーションの作成中の状態に保存する必要があります。 コンセンサスバージョンを保存するには、「app.go」の「InitChainer」メソッドに次の行を追加します。
+新しいチェーンを開始するときは、各モジュールのコンセンサスバージョンをアプリケーションの作成中の状態に保存する必要があります。 コンセンサスバージョンを保存するには、[app.go]の[InitChainer]メソッドに次の行を追加します。
 
 ```diff
 func (app *MyApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
@@ -34,7 +34,7 @@ Cosmos SDKはこの情報を使用して、新しいバージョンのモジュ�
 
 ### コンセンサスバージョン
 
-コンセンサスバージョンは、モジュールの画期的な変更バージョンとして、各アプリケーションモジュールのモジュール開発者によって定義されます。 コンセンサスバージョンは、どのモジュールをアップグレードする必要があるかをCosmosSDKに通知します。 たとえば、バンクモジュールがバージョン2で、アップグレードによってバンクモジュール3が導入された場合、Cosmos SDKはバンクモジュールをアップグレードし、「バージョン2から3」の移行スクリプトを実行します。
+コンセンサスバージョンは、モジュールの画期的な変更バージョンとして、各アプリケーションモジュールのモジュール開発者によって定義されます。 コンセンサスバージョンは、どのモジュールをアップグレードする必要があるかをCosmosSDKに通知します。 たとえば、バンクモジュールがバージョン2で、アップグレードによってバンクモジュール3が導入された場合、Cosmos SDKはバンクモジュールをアップグレードし、[バージョン2から3]の移行スクリプトを実行します。
 
 ### バージョンマッピング
 
@@ -48,7 +48,7 @@ Cosmos SDKはこの情報を使用して、新しいバージョンのモジュ�
 type UpgradeHandler func(ctx sdk.Context, plan Plan, fromVM VersionMap) (VersionMap, error)
 ```
 
-これらの機能では、提供される「計画」に含まれるアップグレードロジックを実行する必要があります。 すべてのアップグレードハンドラー関数は、次のコード行で終了する必要があります。
+これらの機能では、提供される[計画]に含まれるアップグレードロジックを実行する必要があります。 すべてのアップグレードハンドラー関数は、次のコード行で終了する必要があります。
 
 ```go
   return app.mm.RunMigrations(ctx, cfg, fromVM)
@@ -56,18 +56,18 @@ type UpgradeHandler func(ctx sdk.Context, plan Plan, fromVM VersionMap) (Version
 
 ## 移行を実行する
 
-`app.mm.RunMigrations(ctx、cfg、vm)`を使用して、 `UpgradeHandler`内で移行を実行します。 `UpgradeHandler`関数は、アップグレードプロセス中に発生する関数を記述します。 `RunMigration`関数は` VersionMap`パラメータをループし、新しいバイナリアプリケーションモジュールバージョンより前のすべてのバージョンに対して移行スクリプトを実行します。 移行が完了すると、新しい「VersionMap」が返され、アップグレードされたモジュールのバージョンが状態に保存されます。
+`app.mm.RunMigrations(ctx、cfg、vm)`を使用して、 `UpgradeHandler`内で移行を実行します。 `UpgradeHandler`関数は、アップグレードプロセス中に発生する関数を記述します。 `RunMigration`関数は` VersionMap`パラメータをループし、新しいバイナリアプリケーションモジュールバージョンより前のすべてのバージョンに対して移行スクリプトを実行します。 移行が完了すると、新しい[VersionMap]が返され、アップグレードされたモジュールのバージョンが状態に保存されます。
 
 ```go
 cfg := module.NewConfigurator(...)
 app.UpgradeKeeper.SetUpgradeHandler("my-plan", func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
 
-   //...
-   //do upgrade logic
-   //...
+  //...
+  //do upgrade logic
+  //...
 
-   //RunMigrations returns the VersionMap
-   //with the updated module ConsensusVersions
+  //RunMigrations returns the VersionMap
+  //with the updated module ConsensusVersions
     return app.mm.RunMigrations(ctx, vm)
 })
 ```
@@ -92,7 +92,7 @@ if upgradeInfo.Name == "my-plan" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.
 	storeUpgrades := storetypes.StoreUpgrades{
 		//add store upgrades for new modules
 		//Example:
-		//   Added: []string{"foo", "bar"},
+		//  Added: []string{"foo", "bar"},
 		//...
 	}
 
@@ -116,27 +116,27 @@ import foo "github.com/my/module/foo"
 
 app.UpgradeKeeper.SetUpgradeHandler("my-plan", func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap)  (module.VersionMap, error) {
 
-   //Register the consensus version in the version map
-   //to avoid the SDK from triggering the default
-   //InitGenesis function.
+  //Register the consensus version in the version map
+  //to avoid the SDK from triggering the default
+  //InitGenesis function.
     vm["foo"] = foo.AppModule{}.ConsensusVersion()
 
-   //Run custom InitGenesis for foo
+  //Run custom InitGenesis for foo
     app.mm["foo"].InitGenesis(ctx, app.appCodec, myCustomGenesisState)
 
     return app.mm.RunMigrations(ctx, cfg, vm)
 })
 ```
 
-カスタム作成関数がなく、モジュールのデフォルトの作成関数をスキップしたい場合は、例に示すように、「UpgradeHandler」でバージョンマッピングを使用してモジュールを登録するだけです。
+カスタム作成関数がなく、モジュールのデフォルトの作成関数をスキップしたい場合は、例に示すように、[UpgradeHandler]でバージョンマッピングを使用してモジュールを登録するだけです。
 
 ```go
 import foo "github.com/my/module/foo"
 
 app.UpgradeKeeper.SetUpgradeHandler("my-plan", func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap)  (module.VersionMap, error) {
 
-   //Set foo's version to the latest ConsensusVersion in the VersionMap.
-   //This will skip running InitGenesis on Foo
+  //Set foo's version to the latest ConsensusVersion in the VersionMap.
+  //This will skip running InitGenesis on Foo
     vm["foo"] = foo.AppModule{}.ConsensusVersion()
 
     return app.mm.RunMigrations(ctx, cfg, vm)

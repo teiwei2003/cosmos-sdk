@@ -6,7 +6,7 @@
 
 Rosetta APIサーバーは、CosmosSDKで開発されたチェーンのノードに接続するスタンドアロンサーバーです。
 
-Rosetta APIサポートを有効にするには、アプリケーションのルートコマンドファイル(例：`appd/cmd/root.go`)に`RosettaCommand`を追加する必要があります。
+Rosetta APIサポートを有効にするには、アプリケーションのルートコマンドファイル(例:`appd/cmd/root.go`)に`RosettaCommand`を追加する必要があります。
 
 `server`パッケージをインポートします。 
 
@@ -84,16 +84,16 @@ type CustomClient struct {
 }
 
 func (c *CustomClient) ConstructionPayload(_ context.Context, request *types.ConstructionPayloadsRequest) (resp *types.ConstructionPayloadsResponse, err error) {
-   //provide custom signature bytes
+  //provide custom signature bytes
     panic("implement me")
 }
 ```
 
-注：カスタマイズされたクライアントを使用する場合、必要なコンストラクターは**異なる**可能性があるため、コマンドは使用できません。そのため、新しいコンストラクターを作成する必要があります。 将来的には、余分なコードを記述せずに、カスタマイズされたクライアントを初期化する方法を提供する予定です。
+注:カスタマイズされたクライアントを使用する場合、必要なコンストラクターは**異なる**可能性があるため、コマンドは使用できません。そのため、新しいコンストラクターを作成する必要があります。 将来的には、余分なコードを記述せずに、カスタマイズされたクライアントを初期化する方法を提供する予定です。
 
 ### エラー拡張
 
-ロゼッタはネットワークオプションに「返された」エラーを提供する必要があるため。 新しいロゼッタエラーを宣言するために、cosmos-rosetta-gatewayの`errors`パッケージを使用します。 
+ロゼッタはネットワークオプションに[返された]エラーを提供する必要があるため。 新しいロゼッタエラーを宣言するために、cosmos-rosetta-gatewayの`errors`パッケージを使用します。 
 
 例:
 
@@ -105,4 +105,4 @@ var customErrRetriable = true
 var CustomError = crgerrs.RegisterError(100, "custom message", customErrRetriable, "description")
 ```
 
-注：cosmos-rosetta-gatewayの`Server`.`Start`メソッドを呼び出す前に、エラーを登録する必要があります。 それ以外の場合、登録は無視されます。 同じコードのエラーも無視されます。
+注:cosmos-rosetta-gatewayの`Server`.`Start`メソッドを呼び出す前に、エラーを登録する必要があります。 それ以外の場合、登録は無視されます。 同じコードのエラーも無視されます。

@@ -20,11 +20,11 @@ Cosmos SDK 采用[基于对象能力的方法](../core/ocap.md) 来帮助开发�
 
 ```go
 type Keeper struct {
-    // External keepers, if any
+   //External keepers, if any
 
-    // Store key(s)
+   //Store key(s)
 
-    // codec
+   //codec
 }
 ```
 

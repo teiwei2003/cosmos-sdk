@@ -9,8 +9,8 @@
 还创建了一个合同，用于针对恶意验证者的证据。 
 
 ```go
-// Evidence defines the contract which concrete evidence types of misbehavior
-// must implement.
+//Evidence defines the contract which concrete evidence types of misbehavior
+//must implement.
 type Evidence interface {
 	proto.Message
 
@@ -20,22 +20,22 @@ type Evidence interface {
 	Hash() tmbytes.HexBytes
 	ValidateBasic() error
 
-	// Height at which the infraction occurred
+	//Height at which the infraction occurred
 	GetHeight() int64
 }
 
-// ValidatorEvidence extends Evidence interface to define contract
-// for evidence against malicious validators
+//ValidatorEvidence extends Evidence interface to define contract
+//for evidence against malicious validators
 type ValidatorEvidence interface {
 	Evidence
 
-	// The consensus address of the malicious validator at time of infraction
+	//The consensus address of the malicious validator at time of infraction
 	GetConsensusAddress() sdk.ConsAddress
 
-	// The total power of the malicious validator at time of infraction
+	//The total power of the malicious validator at time of infraction
 	GetValidatorPower() int64
 
-	// The total validator set power at time of infraction
+	//The total validator set power at time of infraction
 	GetTotalPower() int64
 }
 ```
@@ -66,9 +66,9 @@ type Router interface {
 由`Handler` 应该被持久化。 
 
 ```go
-// Handler defines an agnostic Evidence handler. The handler is responsible
-// for executing all corresponding business logic necessary for verifying the
-// evidence as valid. In addition, the Handler may execute any necessary
-// slashing and potential jailing.
+//Handler defines an agnostic Evidence handler. The handler is responsible
+//for executing all corresponding business logic necessary for verifying the
+//evidence as valid. In addition, the Handler may execute any necessary
+//slashing and potential jailing.
 type Handler func(sdk.Context, Evidence) error
 ```

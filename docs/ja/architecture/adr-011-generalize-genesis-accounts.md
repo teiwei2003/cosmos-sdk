@@ -8,11 +8,11 @@
 
 現在、Cosmos SDKはカスタムアカウントタイプを許可しています。`auth`キーパーは、その `Account`インターフェイスを満たすすべてのタイプを保存します。ただし、 `auth`はジェネシスファイルからのアカウントのエクスポートまたはロードを処理しません。これは、4つの特定のアカウントタイプ(` BaseAccount`、 `ContinuousVestingAccount`、` DelayedVestingAccount`、および `ModuleAccount)のみを処理する` genaccounts`によって行われます。 `)。
 
-カスタムアカウント(カスタムアトリビューションアカウントなど)を使用するプロジェクトは、「genaccounts」をフォークして変更する必要があります。
+カスタムアカウント(カスタムアトリビューションアカウントなど)を使用するプロジェクトは、[genaccounts]をフォークして変更する必要があります。
 
 ## 決定
 
-全体として、「genaccounts」の「GenesisAccount」タイプに変換する代わりに、アミノを使用してすべてのアカウント(インターフェースタイプ)を直接グループ化します(キャンセル)。そうすることで `genaccounts`のコードのほとんどが削除されるので、` genaccounts`を `auth`にマージします。グループ化されたアカウントは、「auth」の作成状態で保存されます。
+全体として、[genaccounts]の[GenesisAccount]タイプに変換する代わりに、アミノを使用してすべてのアカウント(インターフェースタイプ)を直接グループ化します(キャンセル)。そうすることで `genaccounts`のコードのほとんどが削除されるので、` genaccounts`を `auth`にマージします。グループ化されたアカウントは、[auth]の作成状態で保存されます。
 
 詳細な変更:
 
@@ -58,7 +58,7 @@ func ExportGenesis(ctx sdk.Context, ak AccountKeeper) GenesisState {
 
 ### 2) `auth`コーデックにカスタムアカウントタイプを登録します
 
-`auth`コーデックは、それらをグループ化するためにすべてのカスタムアカウントタイプを登録する必要があります。 「政府」で確立された提案モデルに従います。
+`auth`コーデックは、それらをグループ化するためにすべてのカスタムアカウントタイプを登録する必要があります。 [政府]で確立された提案モデルに従います。
 
 カスタムアカウント定義の例: 
 
@@ -94,7 +94,7 @@ func RegisterAccountTypeCodec(o interface{}, name string) {
 
 ### 3)カスタムアカウントタイプの作成検証
 
-モジュールは `ValidateGenesis`メソッドを実装します。 「auth」はアカウントの実現を知らないため、アカウントを自己確認する必要があります。
+モジュールは `ValidateGenesis`メソッドを実装します。 [auth]はアカウントの実現を知らないため、アカウントを自己確認する必要があります。
 
 アカウントを、Validateメソッドを含むGenesisAccountインターフェースにグループ解除します。 
 
@@ -146,7 +146,7 @@ func ValidateGenesis(data GenesisState) error {
 新しいスキームでは、モジュールとアトリビューションアカウントタイプにいくつかのマイナーアップデートが必要です。
 
 -`auth`のコーデックでのタイプ登録(上記のように)
--「アカウント」の特定のタイプごとに「検証」メソッド
+-[アカウント]の特定のタイプごとに[検証]メソッド
 
 ## 状態
 
@@ -164,7 +164,7 @@ func ValidateGenesis(data GenesisState) error {
 ### ニュートラル
 
 -`genaccounts`モジュールはもう存在しません
--ジェネシスファイルのアカウントは、「genaccounts」モジュールではなく、「auth」の「accounts」の下に保存されます。
+-ジェネシスファイルのアカウントは、[genaccounts]モジュールではなく、[auth]の[accounts]の下に保存されます。
 -`add-genesis-account`cliコマンドが `auth`になりました
 
 ## 参照 

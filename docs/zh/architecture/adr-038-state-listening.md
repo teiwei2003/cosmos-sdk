@@ -28,11 +28,11 @@
 在一个新文件 `store/types/listening.go` 中，我们将创建一个 `WriteListener` 接口，用于从 KVStore 流出状态更改。
 
 ```go
-// WriteListener interface for streaming data out from a listenkv.Store
+//WriteListener interface for streaming data out from a listenkv.Store
 type WriteListener interface {
-	// if value is nil then it was deleted
-	// storeKey indicates the source KVStore, to facilitate using the same WriteListener across separate KVStores
-	// delete bool indicates if it was a delete; true: delete, false: set
+	//if value is nil then it was deleted
+	//storeKey indicates the source KVStore, to facilitate using the same WriteListener across separate KVStores
+	//delete bool indicates if it was a delete; true: delete, false: set
 	OnWrite(storeKey StoreKey, key []byte, value []byte, delete bool) error
 }
 ```
@@ -48,22 +48,22 @@ type WriteListener interface {
 
 ```protobuf
 message StoreKVPair {
-  optional string store_key = 1; // the store key for the KVStore this pair originates from
-  required bool set = 2; // true indicates a set operation, false indicates a delete operation
+  optional string store_key = 1;//the store key for the KVStore this pair originates from
+  required bool set = 2;//true indicates a set operation, false indicates a delete operation
   required bytes key = 3;
   required bytes value = 4;
 }
 ```
 
 ```go
-// StoreKVPairWriteListener is used to configure listening to a KVStore by writing out length-prefixed
-// protobuf encoded StoreKVPairs to an underlying io.Writer
+//StoreKVPairWriteListener is used to configure listening to a KVStore by writing out length-prefixed
+//protobuf encoded StoreKVPairs to an underlying io.Writer
 type StoreKVPairWriteListener struct {
 	writer io.Writer
 	marshaller codec.BinaryCodec
 }
 
-// NewStoreKVPairWriteListener wraps creates a StoreKVPairWriteListener with a provdied io.Writer and codec.BinaryCodec
+//NewStoreKVPairWriteListener wraps creates a StoreKVPairWriteListener with a provdied io.Writer and codec.BinaryCodec
 func NewStoreKVPairWriteListener(w io.Writer, m codec.BinaryCodec) *StoreKVPairWriteListener {
 	return &StoreKVPairWriteListener{
 		writer: w,
@@ -71,7 +71,7 @@ func NewStoreKVPairWriteListener(w io.Writer, m codec.BinaryCodec) *StoreKVPairW
 	}
 }
 
-// OnWrite satisfies the WriteListener interface by writing length-prefixed protobuf encoded StoreKVPairs
+//OnWrite satisfies the WriteListener interface by writing length-prefixed protobuf encoded StoreKVPairs
 func (wl *StoreKVPairWriteListener) OnWrite(storeKey types.StoreKey, key []byte, value []byte, delete bool) error error {
 	kvPair := new(types.StoreKVPair)
 	kvPair.StoreKey = storeKey.Name()
@@ -95,41 +95,41 @@ func (wl *StoreKVPairWriteListener) OnWrite(storeKey types.StoreKey, key []byte,
 我们可以使用一组 `WriteListener` 配置 `Store`，将输出流式传输到特定目的地。 
 
 ```go
-// Store implements the KVStore interface with listening enabled.
-// Operations are traced on each core KVStore call and written to any of the
-// underlying listeners with the proper key and operation permissions
+//Store implements the KVStore interface with listening enabled.
+//Operations are traced on each core KVStore call and written to any of the
+//underlying listeners with the proper key and operation permissions
 type Store struct {
 	parent    types.KVStore
 	listeners []types.WriteListener
 	parentStoreKey types.StoreKey
 }
 
-// NewStore returns a reference to a new traceKVStore given a parent
-// KVStore implementation and a buffered writer.
+//NewStore returns a reference to a new traceKVStore given a parent
+//KVStore implementation and a buffered writer.
 func NewStore(parent types.KVStore, psk types.StoreKey, listeners []types.WriteListener) *Store {
 	return &Store{parent: parent, listeners: listeners, parentStoreKey: psk}
 }
 
-// Set implements the KVStore interface. It traces a write operation and
-// delegates the Set call to the parent KVStore.
+//Set implements the KVStore interface. It traces a write operation and
+//delegates the Set call to the parent KVStore.
 func (s *Store) Set(key []byte, value []byte) {
 	types.AssertValidKey(key)
 	s.parent.Set(key, value)
 	s.onWrite(false, key, value)
 }
 
-// Delete implements the KVStore interface. It traces a write operation and
-// delegates the Delete call to the parent KVStore.
+//Delete implements the KVStore interface. It traces a write operation and
+//delegates the Delete call to the parent KVStore.
 func (s *Store) Delete(key []byte) {
 	s.parent.Delete(key)
 	s.onWrite(true, key, nil)
 }
 
-// onWrite writes a KVStore operation to all the WriteListeners
+//onWrite writes a KVStore operation to all the WriteListeners
 func (s *Store) onWrite(delete bool, key, value []byte) {
 	for _, l := range s.listeners {
 		if err := l.OnWrite(s.parentStoreKey, key, value, delete); err != nil {
-                    // log error
+                   //log error
                 }
 	}
 }
@@ -144,11 +144,11 @@ func (s *Store) onWrite(delete bool, key, value []byte) {
 type MultiStore interface {
 	...
 
-	// ListeningEnabled returns if listening is enabled for the KVStore belonging the provided StoreKey
+	//ListeningEnabled returns if listening is enabled for the KVStore belonging the provided StoreKey
 	ListeningEnabled(key StoreKey) bool
 
-	// AddListeners adds WriteListeners for the KVStore belonging to the provided StoreKey
-	// It appends the listeners to a current set, if one already exists
+	//AddListeners adds WriteListeners for the KVStore belonging to the provided StoreKey
+	//It appends the listeners to a current set, if one already exists
 	AddListeners(key StoreKey, listeners []WriteListener)
 }
 ```
@@ -157,14 +157,14 @@ type MultiStore interface {
 type CacheWrap interface {
 	...
 
-	// CacheWrapWithListeners recursively wraps again with listening enabled
+	//CacheWrapWithListeners recursively wraps again with listening enabled
 	CacheWrapWithListeners(storeKey types.StoreKey, listeners []WriteListener) CacheWrap
 }
 
 type CacheWrapper interface {
 	...
 
-	// CacheWrapWithListeners recursively wraps again with listening enabled
+	//CacheWrapWithListeners recursively wraps again with listening enabled
 	CacheWrapWithListeners(storeKey types.StoreKey, listeners []WriteListener) CacheWrap
 }
 ```
@@ -214,28 +214,28 @@ func (rs *Store) CacheMultiStore() types.CacheMultiStore {
 来自“StreamingService”的收据。 
 
 ```go
-// ABCIListener interface used to hook into the ABCI message processing of the BaseApp
+//ABCIListener interface used to hook into the ABCI message processing of the BaseApp
 type ABCIListener interface {
-	// ListenBeginBlock updates the streaming service with the latest BeginBlock messages
+	//ListenBeginBlock updates the streaming service with the latest BeginBlock messages
 	ListenBeginBlock(ctx types.Context, req abci.RequestBeginBlock, res abci.ResponseBeginBlock) error
-	// ListenEndBlock updates the steaming service with the latest EndBlock messages
+	//ListenEndBlock updates the steaming service with the latest EndBlock messages
 	ListenEndBlock(ctx types.Context, req abci.RequestEndBlock, res abci.ResponseEndBlock) error
-	// ListenDeliverTx updates the steaming service with the latest DeliverTx messages
+	//ListenDeliverTx updates the steaming service with the latest DeliverTx messages
 	ListenDeliverTx(ctx types.Context, req abci.RequestDeliverTx, res abci.ResponseDeliverTx) error
-	// ListenSuccess returns a chan that is used to acknowledge successful receipt of messages by the external service
-	// after some configurable delay, `false` is sent to this channel from the service to signify failure of receipt
+	//ListenSuccess returns a chan that is used to acknowledge successful receipt of messages by the external service
+	//after some configurable delay, `false` is sent to this channel from the service to signify failure of receipt
 	ListenSuccess() <-chan bool
 }
 
-// StreamingService interface for registering WriteListeners with the BaseApp and updating the service with the ABCI messages using the hooks
+//StreamingService interface for registering WriteListeners with the BaseApp and updating the service with the ABCI messages using the hooks
 type StreamingService interface {
-	// Stream is the streaming service loop, awaits kv pairs and writes them to a destination stream or file
+	//Stream is the streaming service loop, awaits kv pairs and writes them to a destination stream or file
 	Stream(wg *sync.WaitGroup) error
-	// Listeners returns the streaming service's listeners for the BaseApp to register
+	//Listeners returns the streaming service's listeners for the BaseApp to register
 	Listeners() map[types.StoreKey][]store.WriteListener
-	// ABCIListener interface for hooking into the ABCI messages from inside the BaseApp
+	//ABCIListener interface for hooking into the ABCI messages from inside the BaseApp
 	ABCIListener
-	// Closer interface
+	//Closer interface
 	io.Closer
 }
 ```
@@ -245,14 +245,14 @@ type StreamingService interface {
 我们将向`BaseApp` 添加一个新方法以启用`StreamingService`s 的注册:
 
 ```go
-// SetStreamingService is used to set a streaming service into the BaseApp hooks and load the listeners into the multistore
+//SetStreamingService is used to set a streaming service into the BaseApp hooks and load the listeners into the multistore
 func (app *BaseApp) SetStreamingService(s StreamingService) {
-	// add the listeners for each StoreKey
+	//add the listeners for each StoreKey
 	for key, lis := range s.Listeners() {
 		app.cms.AddListeners(key, lis)
 	}
-	// register the StreamingService within the BaseApp
-	// BaseApp will pass BeginBlock, DeliverTx, and EndBlock requests and responses to the streaming services to update their ABCI context
+	//register the StreamingService within the BaseApp
+	//BaseApp will pass BeginBlock, DeliverTx, and EndBlock requests and responses to the streaming services to update their ABCI context
 	app.abciListeners = append(app.abciListeners, s)
 }
 ```
@@ -274,7 +274,7 @@ func (app *BaseApp) BeginBlock(req abci.RequestBeginBlock) (res abci.ResponseBeg
 
 	...
 
-	// Call the streaming service hooks with the BeginBlock messages
+	//Call the streaming service hooks with the BeginBlock messages
 	for _, listener := range app.abciListeners {
 		listener.ListenBeginBlock(app.deliverState.ctx, req, res)
 	}
@@ -288,7 +288,7 @@ func (app *BaseApp) EndBlock(req abci.RequestEndBlock) (res abci.ResponseEndBloc
 
 	...
 
-	// Call the streaming service hooks with the EndBlock messages
+	//Call the streaming service hooks with the EndBlock messages
 	for _, listener := range app.abciListeners {
 		listener.ListenEndBlock(app.deliverState.ctx, req, res)
 	}
@@ -306,7 +306,7 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 	if err != nil {
 		resultStr = "failed"
 		res := sdkerrors.ResponseDeliverTx(err, gInfo.GasWanted, gInfo.GasUsed, app.trace)
-		// If we throw an error, be sure to still call the streaming service's hook
+		//If we throw an error, be sure to still call the streaming service's hook
 		for _, listener := range app.abciListeners {
 			listener.ListenDeliverTx(app.deliverState.ctx, req, res)
 		}
@@ -314,14 +314,14 @@ func (app *BaseApp) DeliverTx(req abci.RequestDeliverTx) abci.ResponseDeliverTx 
 	}
 
 	res := abci.ResponseDeliverTx{
-		GasWanted: int64(gInfo.GasWanted), // TODO: Should type accept unsigned ints?
-		GasUsed:   int64(gInfo.GasUsed),   // TODO: Should type accept unsigned ints?
+		GasWanted: int64(gInfo.GasWanted),//TODO: Should type accept unsigned ints?
+		GasUsed:   int64(gInfo.GasUsed),  //TODO: Should type accept unsigned ints?
 		Log:       result.Log,
 		Data:      result.Data,
 		Events:    sdk.MarkEventsToIndex(result.Events, app.indexEvents),
 	}
 
-	// Call the streaming service hooks with the DeliverTx messages
+	//Call the streaming service hooks with the DeliverTx messages
 	for _, listener := range app.abciListeners {
 		listener.ListenDeliverTx(app.deliverState.ctx, req, res)
 	}
@@ -351,8 +351,8 @@ func (app *BaseApp) Commit() (res abci.ResponseCommit) {
 		halt = true
 	}
 
-	// each listener has an internal wait threshold after which it sends `false` to the ListenSuccess() channel
-	// but the BaseApp also imposes a global wait limit
+	//each listener has an internal wait threshold after which it sends `false` to the ListenSuccess() channel
+	//but the BaseApp also imposes a global wait limit
 	maxWait := time.NewTicker(app.globalWaitLimit)
 	for _, lis := range app.abciListeners {
 		select {
@@ -368,10 +368,10 @@ func (app *BaseApp) Commit() (res abci.ResponseCommit) {
 	}
 
 	if halt {
-		// Halt the binary and allow Tendermint to receive the ResponseCommit
-		// response with the commit ID hash. This will allow the node to successfully
-		// restart and process blocks assuming the halt configuration has been
-		// reset or moved to a more distant value.
+		//Halt the binary and allow Tendermint to receive the ResponseCommit
+		//response with the commit ID hash. This will allow the node to successfully
+		//restart and process blocks assuming the halt configuration has been
+		//reset or moved to a more distant value.
 		app.halt()
 	}
 
@@ -387,21 +387,21 @@ func (app *BaseApp) Commit() (res abci.ResponseCommit) {
 必须实现以下接口: 
 
 ```go
-// Plugin is the base interface for all kinds of cosmos-sdk plugins
-// It will be included in interfaces of different Plugins
+//Plugin is the base interface for all kinds of cosmos-sdk plugins
+//It will be included in interfaces of different Plugins
 type Plugin interface {
-	// Name should return unique name of the plugin
+	//Name should return unique name of the plugin
 	Name() string
 
-	// Version returns current version of the plugin
+	//Version returns current version of the plugin
 	Version() string
 
-	// Init is called once when the Plugin is being loaded
-	// The plugin is passed the AppOptions for configuration
-	// A plugin will not necessarily have a functional Init
+	//Init is called once when the Plugin is being loaded
+	//The plugin is passed the AppOptions for configuration
+	//A plugin will not necessarily have a functional Init
 	Init(env serverTypes.AppOptions) error
 
-	// Closer interface for shutting down the plugin process
+	//Closer interface for shutting down the plugin process
 	io.Closer
 }
 ```
@@ -415,15 +415,15 @@ io.Closer 用于关闭插件服务。
 我们将定义一个 `StateStreamingPlugin` 接口，它扩展了上面的 `Plugin` 接口以支持状态流服务。 
 
 ```go
-// StateStreamingPlugin interface for plugins that load a baseapp.StreamingService onto a baseapp.BaseApp
+//StateStreamingPlugin interface for plugins that load a baseapp.StreamingService onto a baseapp.BaseApp
 type StateStreamingPlugin interface {
-	// Register configures and registers the plugin streaming service with the BaseApp
+	//Register configures and registers the plugin streaming service with the BaseApp
 	Register(bApp *baseapp.BaseApp, marshaller codec.BinaryCodec, keys map[string]*types.KVStoreKey) error
 
-	// Start starts the background streaming process of the plugin streaming service
+	//Start starts the background streaming process of the plugin streaming service
 	Start(wg *sync.WaitGroup)
 
-	// Plugin is the base Plugin interface
+	//Plugin is the base Plugin interface
 	Plugin
 }
 ```
@@ -442,15 +442,15 @@ func NewSimApp(
 
 	...
 
-	// this loads the preloaded and any plugins found in `plugins.dir`
+	//this loads the preloaded and any plugins found in `plugins.dir`
 	pluginLoader, err := loader.NewPluginLoader(appOpts, logger)
 	if err != nil {
-        // handle error
+       //handle error
     }
 
-	// initialize the loaded plugins
+	//initialize the loaded plugins
 	if err := pluginLoader.Initialize(); err != nil {
-		// hanlde error
+		//hanlde error
     }
 
 	keys := sdk.NewKVStoreKeys(
@@ -460,15 +460,15 @@ func NewSimApp(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 	)
 
-	// register the plugin(s) with the BaseApp
+	//register the plugin(s) with the BaseApp
 	if err := pluginLoader.Inject(bApp, appCodec, keys); err != nil {
-		// handle error
+		//handle error
     }
 
-	// start the plugin services, optionally use wg to synchronize shutdown using io.Closer
+	//start the plugin services, optionally use wg to synchronize shutdown using io.Closer
 	wg := new(sync.WaitGroup)
 	if err := pluginLoader.Start(wg); err != nil {
-		// handler error
+		//handler error
     }
 
 	...

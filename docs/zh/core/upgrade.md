@@ -62,12 +62,12 @@ type UpgradeHandler func(ctx sdk.Context, plan Plan, fromVM VersionMap) (Version
 cfg := module.NewConfigurator(...)
 app.UpgradeKeeper.SetUpgradeHandler("my-plan", func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
 
-    // ...
-    // do upgrade logic
-    // ...
+   //...
+   //do upgrade logic
+   //...
 
-    // RunMigrations returns the VersionMap
-    // with the updated module ConsensusVersions
+   //RunMigrations returns the VersionMap
+   //with the updated module ConsensusVersions
     return app.mm.RunMigrations(ctx, vm)
 })
 ```
@@ -90,13 +90,13 @@ if err != nil {
 
 if upgradeInfo.Name == "my-plan" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 	storeUpgrades := storetypes.StoreUpgrades{
-		// add store upgrades for new modules
-		// Example:
-		//    Added: []string{"foo", "bar"},
-		// ...
+		//add store upgrades for new modules
+		//Example:
+		//   Added: []string{"foo", "bar"},
+		//...
 	}
 
-	// configure store loader that checks if version == upgradeHeight and applies store upgrades
+	//configure store loader that checks if version == upgradeHeight and applies store upgrades
 	app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 }
 ```
@@ -116,12 +116,12 @@ import foo "github.com/my/module/foo"
 
 app.UpgradeKeeper.SetUpgradeHandler("my-plan", func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap)  (module.VersionMap, error) {
 
-    // Register the consensus version in the version map
-    // to avoid the SDK from triggering the default
-    // InitGenesis function.
+   //Register the consensus version in the version map
+   //to avoid the SDK from triggering the default
+   //InitGenesis function.
     vm["foo"] = foo.AppModule{}.ConsensusVersion()
 
-    // Run custom InitGenesis for foo
+   //Run custom InitGenesis for foo
     app.mm["foo"].InitGenesis(ctx, app.appCodec, myCustomGenesisState)
 
     return app.mm.RunMigrations(ctx, cfg, vm)
@@ -135,8 +135,8 @@ import foo "github.com/my/module/foo"
 
 app.UpgradeKeeper.SetUpgradeHandler("my-plan", func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap)  (module.VersionMap, error) {
 
-    // Set foo's version to the latest ConsensusVersion in the VersionMap.
-    // This will skip running InitGenesis on Foo
+   //Set foo's version to the latest ConsensusVersion in the VersionMap.
+   //This will skip running InitGenesis on Foo
     vm["foo"] = foo.AppModule{}.ConsensusVersion()
 
     return app.mm.RunMigrations(ctx, cfg, vm)

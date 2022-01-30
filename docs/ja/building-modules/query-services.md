@@ -1,6 +1,6 @@
 # クエリサービス
 
-Protobufクエリサービス処理[`queries`](./messages-and-queries.md#queries)。クエリサービスは、それらが定義されているモジュールに固有であり、モジュールで定義されている「クエリ」のみを処理します。これらは、 `BaseApp`の[` Query`メソッド](../core/baseapp.md#query)から呼び出されます。 {まとめ}
+Protobufクエリサービス処理[`queries`](./messages-and-queries.md#queries)。クエリサービスは、それらが定義されているモジュールに固有であり、モジュールで定義されている[クエリ]のみを処理します。これらは、 `BaseApp`の[` Query`メソッド](../core/baseapp.md#query)から呼び出されます。 {まとめ}
 
 ## 読むための前提条件
 
@@ -16,7 +16,7 @@ Cosmos SDKで定義されている `querier`タイプは、[gRPC Services](#grpc
 それを分解しましょう:
 
 -`path`はクエリタイプを含む `string`配列であり、` query`パラメータを含めることもできます。詳細については、[`queries`](./messages-and-queries.md#queries)を参照してください。
--`req`自体は主に、 `path`に入れるには大きすぎるパラメータを取得するために使用されます。これは、「req」の「Data」フィールドを使用して行われます。
+-`req`自体は主に、 `path`に入れるには大きすぎるパラメータを取得するために使用されます。これは、[req]の[Data]フィールドを使用して行われます。
 -[`Context`](../core/context.md)には、` query`と最新の状態のブランチを処理するために必要なすべての情報が含まれています。これは主に[`keeper`](./keeper.md)が状態にアクセスするために使用します。
 -`res`の結果は `BaseApp`に返され、アプリケーションの[` codec`](../core/encoding.md)がグループ化に使用されます。
 
@@ -43,7 +43,7 @@ type QueryServer interface {
 
 ###従来のクエリツール
 
-モジュールによって残された「クエリア」は、通常、モジュールフォルダの「./keeper/querier.go」ファイルに実装されます。[Module Manager](./module-manager.md)は、モジュールの `querier`を[application's`queryRouter`](../core/baseapp.md#query-routing)に` NewQuerier()を介して追加するために使用されます。 `メソッド。 通常、マネージャの `NewQuerier()`メソッドは、 `keeper/querier.go`で定義されている` NewQuerier() `メソッドを次のように呼び出すだけです。  
+モジュールによって残された[クエリア]は、通常、モジュールフォルダの[./keeper/querier.go]ファイルに実装されます。[Module Manager](./module-manager.md)は、モジュールの `querier`を[application's`queryRouter`](../core/baseapp.md#query-routing)に` NewQuerier()を介して追加するために使用されます。 `メソッド。 通常、マネージャの `NewQuerier()`メソッドは、 `keeper/querier.go`で定義されている` NewQuerier() `メソッドを次のように呼び出すだけです。  
 
 ```go
 func NewQuerier(keeper Keeper) sdk.Querier {

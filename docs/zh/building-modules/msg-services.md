@@ -35,7 +35,7 @@ Protobuf 根据 `Msg` 服务的定义生成一个 `MsgServer` 接口。模块开
 ```go
 ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
-			eventType, //e.g. sdk.EventTypeMessage for a message, types.CustomEventType for a custom event defined in the module
+			eventType,//e.g. sdk.EventTypeMessage for a message, types.CustomEventType for a custom event defined in the module
 			sdk.NewAttribute(attributeKey, attributeValue),
 		),
     )

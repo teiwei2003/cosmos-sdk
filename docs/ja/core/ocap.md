@@ -33,7 +33,7 @@ CosmosSDKは
 >オブジェクトAがCへの参照を含むメッセージを受信した場合。として
 >これらの2つのルールの結果として、オブジェクトは参照を取得できます
 >別のオブジェクトへの既存の参照チェーンを介してのみ。
->要するに、「接続のみが接続を生成します。」
+>要するに、[接続のみが接続を生成します。]
 
 オブジェクト機能の概要については、この[Wikipediaの記事](https://en.wikipedia.org/wiki/Object-capability_model)を参照してください。
 
@@ -70,6 +70,6 @@ Gaiaアプリ。
 
 ！[キーパーの依存関係](../uml/svg/keeper_dependencies.svg)
 
-## 次へ{非表示}
+## 次へ{hide}
 
 [`runTx`ミドルウェア](./runtx_middleware.md){hide}を理解する

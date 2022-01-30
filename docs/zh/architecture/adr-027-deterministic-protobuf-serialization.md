@@ -138,11 +138,11 @@ protobuf 模式的较新版本产生与用户相同的序列化
 
   ```js
   const bytes = SignDoc.encode({
-    bodyBytes: body.length > 0 ? body : null, // normalize empty bytes to unset
-    authInfoBytes: authInfo.length > 0 ? authInfo : null, // normalize empty bytes to unset
-    chainId: chainId || null, // normalize "" to unset
-    accountNumber: accountNumber || null, // normalize 0 to unset
-    accountSequence: accountSequence || null, // normalize 0 to unset
+    bodyBytes: body.length > 0 ? body : null,//normalize empty bytes to unset
+    authInfoBytes: authInfo.length > 0 ? authInfo : null,//normalize empty bytes to unset
+    chainId: chainId || null,//normalize "" to unset
+    accountNumber: accountNumber || null,//normalize 0 to unset
+    accountSequence: accountSequence || null,//normalize 0 to unset
   }).finish();
   ```
 
@@ -152,30 +152,30 @@ protobuf 模式的较新版本产生与用户相同的序列化
 
   ```go
   if !signDoc.body_bytes.empty() {
-      buf.WriteUVarInt64(0xA) // wire type and field number for body_bytes
+      buf.WriteUVarInt64(0xA)//wire type and field number for body_bytes
       buf.WriteUVarInt64(signDoc.body_bytes.length())
       buf.WriteBytes(signDoc.body_bytes)
   }
 
   if !signDoc.auth_info.empty() {
-      buf.WriteUVarInt64(0x12) // wire type and field number for auth_info
+      buf.WriteUVarInt64(0x12)//wire type and field number for auth_info
       buf.WriteUVarInt64(signDoc.auth_info.length())
       buf.WriteBytes(signDoc.auth_info)
   }
 
   if !signDoc.chain_id.empty() {
-      buf.WriteUVarInt64(0x1a) // wire type and field number for chain_id
+      buf.WriteUVarInt64(0x1a)//wire type and field number for chain_id
       buf.WriteUVarInt64(signDoc.chain_id.length())
       buf.WriteBytes(signDoc.chain_id)
   }
 
   if signDoc.account_number != 0 {
-      buf.WriteUVarInt64(0x20) // wire type and field number for account_number
+      buf.WriteUVarInt64(0x20)//wire type and field number for account_number
       buf.WriteUVarInt(signDoc.account_number)
   }
 
   if signDoc.account_sequence != 0 {
-      buf.WriteUVarInt64(0x28) // wire type and field number for account_sequence
+      buf.WriteUVarInt64(0x28)//wire type and field number for account_sequence
       buf.WriteUVarInt(signDoc.account_sequence)
   }
   ```

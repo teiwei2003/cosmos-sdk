@@ -58,11 +58,11 @@ Cosmos SDK 0.40 还引入了“auth_info”的概念，可以指定SIGN_MODES。
 原型定义: 
 
 ```proto
-// MsgSignData defines an arbitrary, general-purpose, off-chain message
+//MsgSignData defines an arbitrary, general-purpose, off-chain message
 message MsgSignData {
-    // Signer is the sdk.AccAddress of the message signer
+   //Signer is the sdk.AccAddress of the message signer
     bytes Signer = 1 [(gogoproto.jsontag) = "signer", (gogoproto.casttype) = "github.com/cosmos/cosmos-sdk/types.AccAddress"];
-    // Data represents the raw bytes of the content that is signed (text, json, etc)
+   //Data represents the raw bytes of the content that is signed (text, json, etc)
     bytes Data = 2 [(gogoproto.jsontag) = "data"];
 }
 ```

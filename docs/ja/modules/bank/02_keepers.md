@@ -5,20 +5,20 @@ bankモジュールは、これらのエクスポートされたkeeperインタ�
 それらの機能を提供する最も許可されていないインターフェースを使用する必要があります
 必須。
 
-ベストプラクティスでは、「バンク」モジュールコードを注意深く確認して、
+ベストプラクティスでは、[バンク]モジュールコードを注意深く確認して、
 権限は、期待する方法で制限されます。
 
 ## ブロックリストアドレス
 
 `x/bank`モジュールは、ブロックされたリストと見なされるアドレスマッピングを受け入れます
-「MsgSend」などの方法で直接かつ明示的に資金を受け取ります。
+[MsgSend]などの方法で直接かつ明示的に資金を受け取ります。
 `MsgMultiSend`および` SendCoinsFromModuleToAccount`などの直接API呼び出し。
 
 通常、これらのアドレスはモジュールアカウントです。 これらの住所が資金を受け取った場合
 ステートマシンの予想されるルールの外では、不変条件は
 損傷し、ネットワークが停止する可能性があります。
 
-ユーザーまたは顧客がブロックされたアカウントに直接または間接的に資金を送金しようとした場合、たとえば[IBC]（http：//docs.cosmos）を使用して、「x/bank」モジュールにブロックされたアドレスのセットを提供する。 network/master/ibc/）。
+ユーザーまたは顧客がブロックされたアカウントに直接または間接的に資金を送金しようとした場合、たとえば[IBC](http://docs.cosmos)を使用して、[x/bank]モジュールにブロックされたアドレスのセットを提供する。 network/master/ibc/)。
 
 ## 一般的なタイプ
 
@@ -27,7 +27,7 @@ bankモジュールは、これらのエクスポートされたkeeperインタ�
 マルチパーティ転送入力
 
 ```protobuf
-// Input models transaction input.
+//Input models transaction input.
 message Input {
   string   address                        = 1;
   repeated cosmos.base.v1beta1.Coin coins = 2;
@@ -39,7 +39,7 @@ message Input {
 マルチパーティ転送の出力。
 
 ```protobuf
-// Output models transaction outputs.
+//Output models transaction outputs.
 message Output {
   string   address                        = 1;
   repeated cosmos.base.v1beta1.Coin coins = 2;
@@ -48,11 +48,11 @@ message Output {
 
 ## BaseKeeper
 
-Base keeper はフルアクセスを提供します：あなたは任意のアカウントの残高を変更し、自由にコインをミントまたは燃やすことができます。
+Base keeper はフルアクセスを提供します:あなたは任意のアカウントの残高を変更し、自由にコインをミントまたは燃やすことができます。
 
 ```go
-// Keeper defines a module interface that facilitates the transfer of coins
-// between accounts.
+//Keeper defines a module interface that facilitates the transfer of coins
+//between accounts.
 type Keeper interface {
     SendKeeper
 
@@ -84,11 +84,11 @@ type Keeper interface {
 ## SendKeeper
 
 SendKeeperは、口座残高へのアクセスと、間でコインを転送する機能を提供します
-アカウント。 送信マネージャーは、総供給量（コインの鋳造または燃焼）を変更しません。
+アカウント。 送信マネージャーは、総供給量(コインの鋳造または燃焼)を変更しません。
 
 ```go
-// SendKeeper defines a module interface that facilitates the transfer of coins
-// between accounts without the possibility of creating coins.
+//SendKeeper defines a module interface that facilitates the transfer of coins
+//between accounts without the possibility of creating coins.
 type SendKeeper interface {
     ViewKeeper
 
@@ -107,11 +107,11 @@ type SendKeeper interface {
 
 ## ViewKeeper
 
-ViewKeeperは、アカウント残高への読み取り専用アクセスを提供します。 ビューホルダーにはバランス変更機能はありません。 すべてのバランスルックアップは「O（1）」です。
+ViewKeeperは、アカウント残高への読み取り専用アクセスを提供します。 ビューホルダーにはバランス変更機能はありません。 すべてのバランスルックアップは[O(1)]です。
 
 ```go
-// ViewKeeper defines a module interface that facilitates read only access to
-// account balances.
+//ViewKeeper defines a module interface that facilitates read only access to
+//account balances.
 type ViewKeeper interface {
     ValidateBalance(ctx sdk.Context, addr sdk.AccAddress) error
     HasBalance(ctx sdk.Context, addr sdk.AccAddress, amt sdk.Coin) bool

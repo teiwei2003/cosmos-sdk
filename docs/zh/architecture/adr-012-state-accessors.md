@@ -52,47 +52,47 @@ IAVL(子)树和`Mapping.prefix` 定义了可选的子空间前缀。
 我们将为 `Value` 类型定义以下核心方法: 
 
 ```go
-// Get and unmarshal stored data, noop if not exists, panic if cannot unmarshal
+//Get and unmarshal stored data, noop if not exists, panic if cannot unmarshal
 func (Value) Get(ctx Context, ptr interface{}) {}
 
-// Get and unmarshal stored data, return error if not exists or cannot unmarshal
+//Get and unmarshal stored data, return error if not exists or cannot unmarshal
 func (Value) GetSafe(ctx Context, ptr interface{}) {}
 
-// Get stored data as raw byte slice
+//Get stored data as raw byte slice
 func (Value) GetRaw(ctx Context) []byte {}
 
-// Marshal and set a raw value
+//Marshal and set a raw value
 func (Value) Set(ctx Context, o interface{}) {}
 
-// Check if a raw value exists
+//Check if a raw value exists
 func (Value) Exists(ctx Context) bool {}
 
-// Delete a raw value value
+//Delete a raw value value
 func (Value) Delete(ctx Context) {}
 ```
 
 We will define the following core methods for the `Mapping` type:
 
 ```go
-// Constructs key-value pair reference corresponding to the key argument in the Mapping space
+//Constructs key-value pair reference corresponding to the key argument in the Mapping space
 func (Mapping) Value(key []byte) Value {}
 
-// Get and unmarshal stored data, noop if not exists, panic if cannot unmarshal
+//Get and unmarshal stored data, noop if not exists, panic if cannot unmarshal
 func (Mapping) Get(ctx Context, key []byte, ptr interface{}) {}
 
-// Get and unmarshal stored data, return error if not exists or cannot unmarshal
+//Get and unmarshal stored data, return error if not exists or cannot unmarshal
 func (Mapping) GetSafe(ctx Context, key []byte, ptr interface{})
 
-// Get stored data as raw byte slice
+//Get stored data as raw byte slice
 func (Mapping) GetRaw(ctx Context, key []byte) []byte {}
 
-// Marshal and set a raw value
+//Marshal and set a raw value
 func (Mapping) Set(ctx Context, key []byte, o interface{}) {}
 
-// Check if a raw value exists
+//Check if a raw value exists
 func (Mapping) Has(ctx Context, key []byte) bool {}
 
-// Delete a raw value value
+//Delete a raw value value
 func (Mapping) Delete(ctx Context, key []byte) {}
 ```
 
@@ -106,7 +106,7 @@ type Boolean struct { Value }
 type Enum struct { Value }
 type Integer struct { Value; enc IntEncoding }
 type String struct { Value }
-// ...
+//...
 ```
 
 在编码方案可以不同的地方，核心方法中的 `o` 参数是类型化的，而 `ptr` 参数

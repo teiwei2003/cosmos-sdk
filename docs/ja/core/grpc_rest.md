@@ -25,27 +25,27 @@ gRPCが正しく機能するようにするには、アプリケーションの 
 replace google.golang.org/grpc => google.golang.org/grpc v1.33.2
 ```
 
-詳細については、[issue＃8392](https://github.com/cosmos/cosmos-sdk/issues/8392)を参照してください。
+詳細については、[issue#8392](https://github.com/cosmos/cosmos-sdk/issues/8392)を参照してください。
 :::
 
 Cosmos SDK v0.40は、メインの[encoding](./encoding)ライブラリとしてProtobufを導入しました。これにより、CosmosSDKにプラグインできるさまざまなProtobufベースのツールが提供されます。これらのツールの1つは[gRPC](https://grpc.io)です。これは、複数の言語で優れたクライアントサポートを備えた最新のオープンソースの高性能RPCフレームワークです。
 
-各モジュールは、ステータスクエリを定義する[Protobuf `Query`サービス](../building-modules/messages-and-queries.md＃queries)を公開します。トランザクションをブロードキャストするための `Query`サービスとトランザクションサービスは、アプリケーションの次の機能を介してgRPCサーバーに接続します。
+各モジュールは、ステータスクエリを定義する[Protobuf `Query`サービス](../building-modules/messages-and-queries.md#queries)を公開します。トランザクションをブロードキャストするための `Query`サービスとトランザクションサービスは、アプリケーションの次の機能を介してgRPCサーバーに接続します。
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.43.0-rc0/server/types/app.go#L39-L41
 
-注:[Protobuf `Msg` service](../building-modules/messages-and-queries.md＃messages)エンドポイントをgRPC経由で公開することはできません。トランザクションは、gRPCを使用してブロードキャストする前に、CLIを使用して、またはプログラムで生成および署名する必要があります。詳細については、[トランザクションの生成、署名、およびブロードキャスト](../run-node/txs.html)を参照してください。
+注:[Protobuf `Msg` service](../building-modules/messages-and-queries.md#messages)エンドポイントをgRPC経由で公開することはできません。トランザクションは、gRPCを使用してブロードキャストする前に、CLIを使用して、またはプログラムで生成および署名する必要があります。詳細については、[トランザクションの生成、署名、およびブロードキャスト](../run-node/txs.html)を参照してください。
 
 `grpc.Server`は特定のgRPCサーバーであり、すべてのgRPCクエリリクエストとブロードキャストトランザクションリクエストを生成して処理します。このサーバーは `〜/.simapp/config/app.toml`で設定できます。
 
--`grpc.enable = true | false`フィールドは、gRPCサーバーを有効にするかどうかを定義します。デフォルトは「true」です。
+-`grpc.enable = true | false`フィールドは、gRPCサーバーを有効にするかどうかを定義します。デフォルトは[true]です。
 -`grpc.address = {string} `フィールドは、サーバーがバインドされるアドレスを定義します(ホストは、` 0.0.0.0`に維持される必要があるため、実際にはポートです)。デフォルトは `0.0.0.0:9090`です。
 
 :::ヒント
 `〜/.simapp`は、ノード構成とデータベースが保存されるディレクトリです。デフォルトでは、 `〜/。{app_name}`に設定されています。
 :::
 
-gRPCサーバーが起動すると、gRPCクライアントを使用してサーバーにリクエストを送信できます。いくつかの例は、[ノードとの対話](../run-node/interact-node.md＃using-grpc)チュートリアルに記載されています。
+gRPCサーバーが起動すると、gRPCクライアントを使用してサーバーにリクエストを送信できます。いくつかの例は、[ノードとの対話](../run-node/interact-node.md#using-grpc)チュートリアルに記載されています。
 
 Cosmos SDKに含まれている利用可能なすべてのgRPCエンドポイントの概要は、[Protobuf Documentation](./proto-docs.md)です。
 
@@ -55,7 +55,7 @@ Cosmos SDKは、gRPCゲートウェイを介したRESTルーティングをサ�
 
 すべてのルートは、 `〜/.simapp/config/app.toml`の次のフィールドで設定されます。
 
--`api.enable = true | false`フィールドは、RESTサーバーを有効にするかどうかを定義します。デフォルトは「false」です。
+-`api.enable = true | false`フィールドは、RESTサーバーを有効にするかどうかを定義します。デフォルトは[false]です。
 -`api.address = {string} `フィールドは、サーバーがバインドするアドレスを定義します(ホストは` 0.0.0.0`に維持する必要があるため、実際にはポート)。デフォルトは `tcp://0.0.0.0:1317`です。
 -いくつかの追加のAPI構成オプションとコメントは `〜/.simapp/config/app.toml`で定義されています。このファイルを直接参照してください。
 
@@ -90,7 +90,7 @@ Cosmos SDKとは別に、TendermintはRPCサーバーも公開します。この
     -`/store/{path} `:これはストアに直接クエリを実行します。
     -`/p2p/filter/addr/{port} `:これは、アドレスポートを介してノードのP2Pピアのフィルターされたリストを返します。
     -`/p2p/filter/id/{id} `:これは、IDに基づいてノードのP2Pピアのフィルターされたリストを返します。
--`/broadcast_tx_ {aync、async、commit} `:これらの3つのエンドポイントは、トランザクションを他のピアにブロードキャストします。 CLI、gRPC、およびRESTは、[トランザクションをブロードキャストする方法](./transactions.md＃broadcasting-the-transaction)を公開しますが、これら3つのTendermintRPCをバックグラウンドで使用します。
+-`/broadcast_tx_ {aync、async、commit} `:これらの3つのエンドポイントは、トランザクションを他のピアにブロードキャストします。 CLI、gRPC、およびRESTは、[トランザクションをブロードキャストする方法](./transactions.md#broadcasting-the-transaction)を公開しますが、これら3つのTendermintRPCをバックグラウンドで使用します。
 
 ## 比較表
 
@@ -100,6 +100,6 @@ Cosmos SDKとは別に、TendermintはRPCサーバーも公開します。この
 | REST           | - ubiquitous<br>- client libraries in all languages, faster implementation<br>                                                                                        | - only supports unary request-response communication (HTTP1.1)<br>- bigger over-the-wire message sizes (JSON) |
 | Tendermint RPC | - easy to use                                                                                                                                                         | - bigger over-the-wire message sizes (JSON)                                                                   |
 
-## 次へ{非表示}
+## 次へ{hide}
 
 [CLI](./cli.md){hide}を理解する

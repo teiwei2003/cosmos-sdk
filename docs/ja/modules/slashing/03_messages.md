@@ -7,9 +7,9 @@
 ダウンタイムのためにバリデーターが自動的に結合解除され、オンラインに戻って結合されたセットに再度参加したい場合は、 `MsgUnjail`を送信する必要があります。
 
 ```protobuf
-// MsgUnjail is an sdk.Msg used for unjailing a jailed validator, thus returning
-// them into the bonded validator set, so they can begin receiving provisions
-// and rewards again.
+//MsgUnjail is an sdk.Msg used for unjailing a jailed validator, thus returning
+//them into the bonded validator set, so they can begin receiving provisions
+//and rewards again.
 message MsgUnjail {
   string validator_addr = 1;
 }

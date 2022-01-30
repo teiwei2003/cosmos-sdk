@@ -21,7 +21,7 @@
 它包含以下方法:
 
 - **GetMsgs:** 解包交易并返回包含的 `sdk.Msg` 列表 - 一个交易可能有一个或多个消息，由模块开发人员定义。
-- **ValidateBasic:** 包括 ABCI 消息使用的轻量级 [_stateless_](../basics/tx-lifecycle.md#types-of-checks) 检查 [`CheckTx`](./baseapp.md#checktx)和 [`DeliverTx`](./baseapp.md#delivertx) 以确保交易不是无效的。例如，[`auth`](https://github.com/cosmos/cosmos-sdk/tree/master/x/auth) 模块的 `StdTx` `ValidateBasic` 函数检查其交易是否由正确的数字签名签名者的数量，并且费用不超过用户的最高限额。请注意，此函数与用于 sdk.Msg 的 ValidateBasic 函数不同，后者仅对消息执行基本的有效性检查。例如，当 [`runTx`](./baseapp.md#runtx) 正在检查从 [`auth`](https://github.com/cosmos/cosmos-sdk/tree/master/x /auth/spec) 模块，它首先在每条消息上运行 `ValidateBasic`，然后运行 ​​`auth` 模块 AnteHandler，它为交易本身调用 `ValidateBasic`。
+- **ValidateBasic:** 包括 ABCI 消息使用的轻量级 [_stateless_](../basics/tx-lifecycle.md#types-of-checks) 检查 [`CheckTx`](./baseapp.md#checktx)和 [`DeliverTx`](./baseapp.md#delivertx) 以确保交易不是无效的。例如，[`auth`](https://github.com/cosmos/cosmos-sdk/tree/master/x/auth) 模块的 `StdTx` `ValidateBasic` 函数检查其交易是否由正确的数字签名签名者的数量，并且费用不超过用户的最高限额。请注意，此函数与用于 sdk.Msg 的 ValidateBasic 函数不同，后者仅对消息执行基本的有效性检查。例如，当 [`runTx`](./baseapp.md#runtx) 正在检查从 [`auth`](https://github.com/cosmos/cosmos-sdk/tree/master/x/auth/spec) 模块，它首先在每条消息上运行 `ValidateBasic`，然后运行 ​​`auth` 模块 AnteHandler，它为交易本身调用 `ValidateBasic`。
 
 作为开发人员，您应该很少直接操作“Tx”，因为“Tx”实际上是用于生成交易的中间类型。相反，开发人员应该更喜欢 `TxBuilder` 接口，您可以在 [下文](#transaction-generation) 中了解更多信息。
 
@@ -110,17 +110,17 @@
 
 ```go
 txBuilder := txConfig.NewTxBuilder()
-txBuilder.SetMsgs(...) // and other setters on txBuilder
+txBuilder.SetMsgs(...)//and other setters on txBuilder
 
 bz, err := txConfig.TxEncoder()(txBuilder.GetTx())
-// bz are bytes to be broadcasted over the network
+//bz are bytes to be broadcasted over the network
 ```
 
 ### 广播交易
 
 一旦产生交易字节，目前有三种广播方式。
 
-####命令行界面
+#### 命令行界面
 
 应用程序开发人员通过创建 [命令行接口](../core/cli.md)、[gRPC 和/或 REST 接口](../core/grpc_rest.md) 来创建应用程序的入口点，通常在 应用程序的`./cmd` 文件夹。 这些接口允许用户通过命令行与应用程序交互。
 

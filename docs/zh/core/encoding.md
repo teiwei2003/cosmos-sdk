@@ -8,7 +8,7 @@
 
 ## 编码
 
-Cosmos SDK 使用两个二进制线编码协议，[Amino](https://github.com/tendermint/go-amino/) 是一个对象编码规范和 [Protocol Buffers](https://developers.google.com /protocol-buffers)，Proto3 的一个子集，扩展为
+Cosmos SDK 使用两个二进制线编码协议，[Amino](https://github.com/tendermint/go-amino/) 是一个对象编码规范和 [Protocol Buffers](https://developers.google.com/protocol-buffers)，Proto3 的一个子集，扩展为
 接口支持。请参阅 [Proto3 规范](https://developers.google.com/protocol-buffers/docs/proto3)
 有关 Proto3 的更多信息，Amino 在很大程度上兼容(但不兼容 Proto2)。
 
@@ -65,7 +65,7 @@ keeper.cdc.MustUnmarshal(bz, &typeOrInterface)
 
 ### Gogoproto
 
-鼓励模块对其各自的类型使用 Protobuf 编码。在 Cosmos SDK 中，我们使用 Protobuf 规范的 [Gogoproto](https://github.com/gogo/protobuf) 特定实现，与官方 [Google protobuf 实现](https:// github.com/protocolbuffers/protobuf)。
+鼓励模块对其各自的类型使用 Protobuf 编码。在 Cosmos SDK 中，我们使用 Protobuf 规范的 [Gogoproto](https://github.com/gogo/protobuf) 特定实现，与官方 [Google protobuf 实现](https://github.com/protocolbuffers/protobuf)。
 
 ### protobuf 消息定义指南
 
@@ -103,9 +103,9 @@ Protobuf DSL 是强类型的，这会使插入变量类型的字段变得困难�
 
 ```proto
 message Profile {
-  // account is the account associated to a profile.
+ //account is the account associated to a profile.
   cosmos.auth.v1beta1.BaseAccount account = 1;
-  // bio is a short description of the account.
+ //bio is a short description of the account.
   string bio = 4;
 }
 ```
@@ -114,15 +114,15 @@ message Profile {
 
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/auth/types/account.go#L307-L330
 
-在 [ADR-019](../architecture/adr-019-protobuf-state-encoding.md) 中，已决定使用 [`Any`](https://github.com/protocolbuffers/protobuf/blob /master/src/google/protobuf/any.proto)s 在 protobuf 中编码接口。 `Any` 包含一个任意序列化的字节消息，以及一个 URL，该 URL 充当全局唯一标识符并解析为该消息的类型。这种策略允许我们在 protobuf 消息中打包任意 Go 类型。我们的新“配置文件”看起来像:
+在 [ADR-019](../architecture/adr-019-protobuf-state-encoding.md) 中，已决定使用 [`Any`](https://github.com/protocolbuffers/protobuf/blob/master/src/google/protobuf/any.proto)s 在 protobuf 中编码接口。 `Any` 包含一个任意序列化的字节消息，以及一个 URL，该 URL 充当全局唯一标识符并解析为该消息的类型。这种策略允许我们在 protobuf 消息中打包任意 Go 类型。我们的新“配置文件”看起来像:
 
 ```protobuf
 message Profile {
-  // account is the account associated to a profile.
+ //account is the account associated to a profile.
   google.protobuf.Any account = 1 [
-    (cosmos_proto.accepts_interface) = "AccountI"; // Asserts that this field only accepts Go types implementing `AccountI`. It is purely informational for now.
+    (cosmos_proto.accepts_interface) = "AccountI";//Asserts that this field only accepts Go types implementing `AccountI`. It is purely informational for now.
   ];
-  // bio is a short description of the account.
+ //bio is a short description of the account.
   string bio = 4;
 }
 ```
@@ -131,40 +131,40 @@ message Profile {
 
 ```go
 var myAccount AccountI
-myAccount = ... // Can be a BaseAccount, a ContinuousVestingAccount or any struct implementing `AccountI`
+myAccount = ...//Can be a BaseAccount, a ContinuousVestingAccount or any struct implementing `AccountI`
 
-// Pack the account into an Any
+//Pack the account into an Any
 accAny, err := codectypes.NewAnyWithValue(myAccount)
 if err != nil {
   return nil, err
 }
 
-// Create a new Profile with the any.
+//Create a new Profile with the any.
 profile := Profile {
   Account: accAny,
   Bio: "some bio",
 }
 
-// We can then marshal the profile as usual.
+//We can then marshal the profile as usual.
 bz, err := cdc.Marshal(profile)
 jsonBz, err := cdc.MarshalJSON(profile)
 ```
 
-总而言之，要对接口进行编码，您必须 1/ 将接口打包到 `Any` 中，并且 2/ 封送 `Any`。 为方便起见，Cosmos SDK 提供了一个 `MarshalInterface` 方法来捆绑这两个步骤。 看看 [x/auth 模块中的一个真实例子](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/auth/keeper/keeper.go#L218- L221)。
+总而言之，要对接口进行编码，您必须 1/将接口打包到 `Any` 中，并且 2/封送 `Any`。 为方便起见，Cosmos SDK 提供了一个 `MarshalInterface` 方法来捆绑这两个步骤。 看看 [x/auth 模块中的一个真实例子](https://github.com/cosmos/cosmos-sdk/blob/v0.42.1/x/auth/keeper/keeper.go#L218- L221)。
 
 从 `Any` 内部检索具体 Go 类型的反向操作称为“解包”，是通过 `Any` 上的 `GetCachedValue()` 完成的。 
 
 ```go
-profileBz := ... // The proto-encoded bytes of a Profile, e.g. retrieved through gRPC.
+profileBz := ...//The proto-encoded bytes of a Profile, e.g. retrieved through gRPC.
 var myProfile Profile
-// Unmarshal the bytes into the myProfile struct.
+//Unmarshal the bytes into the myProfile struct.
 err := cdc.Unmarshal(profilebz, &myProfile)
 
-// Let's see the types of the Account field.
-fmt.Printf("%T\n", myProfile.Account)                  // Prints "Any"
-fmt.Printf("%T\n", myProfile.Account.GetCachedValue()) // Prints "BaseAccount", "ContinuousVestingAccount" or whatever was initially packed in the Any.
+//Let's see the types of the Account field.
+fmt.Printf("%T\n", myProfile.Account)                 //Prints "Any"
+fmt.Printf("%T\n", myProfile.Account.GetCachedValue())//Prints "BaseAccount", "ContinuousVestingAccount" or whatever was initially packed in the Any.
 
-// Get the address of the accountt.
+//Get the address of the accountt.
 accAddr := myProfile.Account.GetCachedValue().(AccountI).GetAddress()
 ```
 
@@ -230,7 +230,7 @@ func (p *Profile) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 例如，在`x/evidence` 模块中定义了一个`Evidence` 接口，由`MsgSubmitEvidence` 使用。结构定义必须使用`sdk.Any`来包装证据文件。在proto文件中我们定义如下:
 
 ```protobuf
-// proto/cosmos/evidence/v1beta1/tx.proto
+//proto/cosmos/evidence/v1beta1/tx.proto
 
 message MsgSubmitEvidence {
   string              submitter = 1;

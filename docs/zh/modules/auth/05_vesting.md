@@ -65,22 +65,22 @@
 ## 归属账户类型 
 
 ```go
-// VestingAccount defines an interface that any vesting account type must
-// implement.
+//VestingAccount defines an interface that any vesting account type must
+//implement.
 type VestingAccount interface {
   Account
 
   GetVestedCoins(Time)  Coins
   GetVestingCoins(Time) Coins
 
-  // TrackDelegation performs internal vesting accounting necessary when
-  // delegating from a vesting account. It accepts the current block time, the
-  // delegation amount and balance of all coins whose denomination exists in
-  // the account's original vesting balance.
+ //TrackDelegation performs internal vesting accounting necessary when
+ //delegating from a vesting account. It accepts the current block time, the
+ //delegation amount and balance of all coins whose denomination exists in
+ //the account's original vesting balance.
   TrackDelegation(Time, Coins, Coins)
 
-  // TrackUndelegation performs internal vesting accounting necessary when a
-  // vesting account performs an undelegation.
+ //TrackUndelegation performs internal vesting accounting necessary when a
+ //vesting account performs an undelegation.
   TrackUndelegation(Coins)
 
   GetStartTime() int64
@@ -105,7 +105,7 @@ type VestingAccount interface {
 +++ https://github.com/cosmos/cosmos-sdk/blob/v0.40.0/proto/cosmos/vesting/v1beta1/vesting.proto#L56-L62
 
 ```go
-// Stores all vesting periods passed as part of a PeriodicVestingAccount
+//Stores all vesting periods passed as part of a PeriodicVestingAccount
 type Periods []Period
 
 ```
@@ -120,12 +120,12 @@ type Periods []Period
 
 ```go
 type ViewKeeper interface {
-  // ...
+ //...
 
-  // Calculates the total locked account balance.
+ //Calculates the total locked account balance.
   LockedCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 
-  // Calculates the total spendable balance that can be sent to other accounts.
+ //Calculates the total spendable balance that can be sent to other accounts.
   SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
 ```
@@ -163,7 +163,7 @@ type ViewKeeper interface {
 
 1. Compute `X := T - StartTime`
 2. Compute `Y := EndTime - StartTime`
-3. Compute `V' := OV * (X / Y)`
+3. Compute `V' := OV * (X/Y)`
 4. Compute `V := OV - V'`
 
 Thus, the total amount of _vested_ coins is `V'` and the remaining amount, `V`,
@@ -172,9 +172,9 @@ is _vesting_.
 ```go
 func (cva ContinuousVestingAccount) GetVestedCoins(t Time) Coins {
     if t <= cva.StartTime {
-        // We must handle the case where the start time for a vesting account has
-        // been set into the future or when the start of the chain is not exactly
-        // known.
+       //We must handle the case where the start time for a vesting account has
+       //been set into the future or when the start of the chain is not exactly
+       //known.
         return ZeroCoins
     } else if t >= cva.EndTime {
         return cva.OriginalVesting
@@ -183,7 +183,7 @@ func (cva ContinuousVestingAccount) GetVestedCoins(t Time) Coins {
     x := t - cva.StartTime
     y := cva.EndTime - cva.StartTime
 
-    return cva.OriginalVesting * (x / y)
+    return cva.OriginalVesting * (x/y)
 }
 
 func (cva ContinuousVestingAccount) GetVestingCoins(t Time) Coins {
@@ -215,7 +215,7 @@ func (pva PeriodicVestingAccount) GetVestedCoins(t Time) Coins {
   if t < pva.StartTime {
     return ZeroCoins
   }
-  ct := pva.StartTime // The start of the vesting schedule
+  ct := pva.StartTime//The start of the vesting schedule
   vested := 0
   periods = pva.GetPeriods()
   for _, period  := range periods {
@@ -223,7 +223,7 @@ func (pva PeriodicVestingAccount) GetVestedCoins(t Time) Coins {
       break
     }
     vested += period.Amount
-    ct += period.Length // increment ct to the start of the next vesting period
+    ct += period.Length//increment ct to the start of the next vesting period
   }
   return vested
 }
@@ -284,7 +284,7 @@ func (k Keeper) LockedCoins(ctx Context, addr AccAddress) Coins {
         }
     }
 
-    // non-vesting accounts do not have any locked coins
+   //non-vesting accounts do not have any locked coins
     return NewCoins()
 }
 ```
@@ -306,7 +306,7 @@ func (k Keeper) SendCoins(ctx Context, from Account, to Account, amount Coins) {
     from.SetBalance(newCoins)
     to.AddBalance(amount)
 
-    // save balances...
+   //save balances...
 }
 ```
 
@@ -344,7 +344,7 @@ func DelegateCoins(t Time, from Account, amount Coins) {
         from.SetBalance(sc - amount)
     }
 
-    // save account...
+   //save account...
 }
 ```
 
@@ -388,11 +388,11 @@ func UndelegateCoins(to Account, amount Coins) {
     if isVesting(to) {
         if to.DelegatedFree + to.DelegatedVesting >= amount {
             to.TrackUndelegation(amount)
-            // save account ...
+           //save account ...
         }
     } else {
         AddBalance(to, amount)
-        // save account...
+       //save account...
     }
 }
 ```
@@ -420,9 +420,9 @@ func UndelegateCoins(to Account, amount Coins) {
 
 ```go
 type GenesisAccount struct {
-    // ...
+   //...
 
-    // vesting account fields
+   //vesting account fields
     OriginalVesting  sdk.Coins `json:"original_vesting"`
     DelegatedFree    sdk.Coins `json:"delegated_free"`
     DelegatedVesting sdk.Coins `json:"delegated_vesting"`
@@ -435,11 +435,11 @@ func ToAccount(gacc GenesisAccount) Account {
 
     if gacc.OriginalVesting > 0 {
         if ga.StartTime != 0 && ga.EndTime != 0 {
-            // return a continuous vesting account
+           //return a continuous vesting account
         } else if ga.EndTime != 0 {
-            // return a delayed vesting account
+           //return a delayed vesting account
         } else {
-            // invalid genesis vesting account provided
+           //invalid genesis vesting account provided
             panic()
         }
     }

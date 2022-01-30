@@ -31,7 +31,7 @@ Cosmos SDK 的 IBC 模块已移至 v0.42 及更高版本的[自己的存储库](
 我们建议验证器使用 [Cosmovisor](../run-node/cosmovisor.html)，这是一个用于运行应用程序二进制文件的进程管理器。出于安全原因，我们建议验证器构建自己的升级二进制文件，而不是启用自动下载选项。如果必要的安全保证到位(即，可下载升级二进制文件的升级建议中提供的 URL 包括正确的校验和)，验证者仍然可以选择使用自动下载选项。
 
 ::: 提示
-如果验证者想要启用自动下载选项，并且他们当前正在使用 Cosmos SDK `v0.42` 运行应用程序，他们将需要使用 Cosmovisor [`v0.1`](https://github.com/ cosmos/cosmos-sdk/releases/tag/cosmovisor%2Fv0.1.0)。如果启用了自动下载选项，更高版本的 Cosmovisor 不支持 Cosmos SDK `v0.42` 或更早版本。 
+如果验证者想要启用自动下载选项，并且他们当前正在使用 Cosmos SDK `v0.42` 运行应用程序，他们将需要使用 Cosmovisor [`v0.1`](https://github.com/cosmos/cosmos-sdk/releases/tag/cosmovisor%2Fv0.1.0)。如果启用了自动下载选项，更高版本的 Cosmovisor 不支持 Cosmos SDK `v0.42` 或更早版本。 
 :::
 
 验证者可以使用自动重启选项来防止升级过程中出现不必要的停机。一旦链在建议的升级高度停止，自动重启选项将使用升级二进制文件自动重启链。使用自动重启选项，验证者可以提前准备升级二进制文件，然后在升级时放松。
@@ -165,8 +165,8 @@ Add the following to `simapp/app.go` inside `NewSimApp` and after `app.UpgradeKe
 ```go
 func (app *SimApp) registerUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler("v0.44", func(ctx sdk.Context, plan upgradetypes.Plan, _ module.VersionMap) (module.VersionMap, error) {
-		// 1st-time running in-store migrations, using 1 as fromVersion to
-		// avoid running InitGenesis.
+		//1st-time running in-store migrations, using 1 as fromVersion to
+		//avoid running InitGenesis.
 		fromVM := map[string]uint64{
 			"auth":         1,
 			"bank":         1,
@@ -199,7 +199,7 @@ func (app *SimApp) registerUpgradeHandlers() {
 			Added: []string{"authz", "feegrant"},
 		}
 
-		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		//configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
 	}
 }

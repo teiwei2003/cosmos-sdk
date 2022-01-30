@@ -1,6 +1,6 @@
 # 客户
 
-##命令行界面
+## 命令行界面
 
 用户可以使用 CLI 查询“staking”模块并与之交互。
 
@@ -165,7 +165,7 @@ valset:
       rate: "0.100000000000000000"
     update_time: "2021-10-01T05:52:50.380144238Z"
   consensus_pubkey:
-    '@type': /cosmos.crypto.ed25519.PubKey
+    '@type':/cosmos.crypto.ed25519.PubKey
     key: Auxs3865HpB/EfssYOzfqNhEJjzys2Fo6jD5B8tPgC8=
   delegator_shares: "10000000.000000000000000000"
   description:
@@ -509,7 +509,7 @@ commission:
     rate: "0.050000000000000000"
   update_time: "2021-10-01T19:24:52.663191049Z"
 consensus_pubkey:
-  '@type': /cosmos.crypto.ed25519.PubKey
+  '@type':/cosmos.crypto.ed25519.PubKey
   key: sIiexdJdYWn27+7iUHQJDnkp63gq/rzUq1Y+fxoGjXc=
 delegator_shares: "32948270000.000000000000000000"
 description:
@@ -560,7 +560,7 @@ commission:
     rate: "0.050000000000000000"
   update_time: "2021-10-01T19:24:52.663191049Z"
 consensus_pubkey:
-  '@type': /cosmos.crypto.ed25519.PubKey
+  '@type':/cosmos.crypto.ed25519.PubKey
   key: sIiexdJdYWn27+7iUHQJDnkp63gq/rzUq1Y+fxoGjXc=
 delegator_shares: "32948270000.000000000000000000"
 description:
@@ -586,7 +586,7 @@ description:
       rate: "0.050000000000000000"
     update_time: "2021-10-04T18:02:21.446645619Z"
   consensus_pubkey:
-    '@type': /cosmos.crypto.ed25519.PubKey
+    '@type':/cosmos.crypto.ed25519.PubKey
     key: GDNpuKDmCg9GnhnsiU4fCWktuGUemjNfvpCZiqoRIYA=
   delegator_shares: "559343421.000000000000000000"
   description:

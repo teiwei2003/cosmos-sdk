@@ -19,7 +19,7 @@ If you want to open a PR in Cosmos SDK to update the documentation, please follo
 
 ## Docs Build Workflow
 
-The documentation for Cosmos SDK is hosted at https://docs.cosmos.network/ and built from the files in the `/docs` directory.
+The documentation for Cosmos SDK is hosted at https://docs.cosmos.network/and built from the files in the `/docs` directory.
 
 ### How It Works
 
@@ -48,7 +48,7 @@ Relative links should be used nearly everywhere, having discovered and weighed t
 Where is the other file, relative to the current one?
 
 - works both on GitHub and for the VuePress build
-- confusing / annoying to have things like: `../../../../myfile.md`
+- confusing/annoying to have things like: `../../../../myfile.md`
 - requires more updates when files are re-shuffled
 
 ### Absolute

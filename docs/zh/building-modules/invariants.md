@@ -17,11 +17,11 @@
 实际上，每个模块在模块文件夹内的`./keeper/invariants.go` 文件中实现`Invariant`。标准是使用以下模型为每个不变量的逻辑分组实现一个“不变量”函数: 
 
 ```go
-// Example for an Invariant that checks balance-related invariants
+//Example for an Invariant that checks balance-related invariants
 
 func BalanceInvariants(k Keeper) sdk.Invariant {
 	return func(ctx sdk.Context) (string, bool) {
-        // Implement checks for balance-related invariants
+       //Implement checks for balance-related invariants
     }
 }
 ```
@@ -29,8 +29,8 @@ func BalanceInvariants(k Keeper) sdk.Invariant {
 此外，模块开发人员通常应该实现一个 `AllInvariants` 函数来运行模块的所有 `Invariant` 函数:
 
 ```go
-// AllInvariants runs all invariants of the module.
-// In this example, the module implements two Invariants: BalanceInvariants and DepositsInvariants
+//AllInvariants runs all invariants of the module.
+//In this example, the module implements two Invariants: BalanceInvariants and DepositsInvariants
 
 func AllInvariants(k Keeper) sdk.Invariant {
 
@@ -48,7 +48,7 @@ func AllInvariants(k Keeper) sdk.Invariant {
 最后，模块开发者需要实现 `RegisterInvariants` 方法作为 [`AppModule` 接口](./module-manager.md#appmodule) 的一部分。 实际上，在`module/module.go` 文件中实现的模块的`RegisterInvariants` 方法通常只将调用延迟到在`keeper/invariants.go` 文件中实现的`RegisterInvariants` 方法。 `RegisterInvariants` 方法为 [`InvariantRegistry`](#invariant-registry) 中的每个 `Invariant` 函数注册一个路由: 
 
 ```go
-// RegisterInvariants registers all staking invariants
+//RegisterInvariants registers all staking invariants
 func RegisterInvariants(ir sdk.InvariantRegistry, k Keeper) {
 	ir.RegisterRoute(types.ModuleName, "module-accounts",
 		BalanceInvariants(k))

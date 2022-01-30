@@ -63,7 +63,7 @@ jq '.app_state.mint.minter.inflation = "0.300000000000000000"' genesis.json > te
 simd add-genesis-account $MY_VALIDATOR_ADDRESS 100000000000stake
 ```
 
-回想一下，`$MY_VALIDATOR_ADDRESS` 是一个变量，它保存了 [keyring](./keyring.md#adding-keys-to-the-keyring) 中 `my_validator` 密钥的地址。另请注意，Cosmos SDK 中的代币具有 `{amount}{denom}` 格式:`amount` 是一个 18 位精度的十进制数，而 `denom` 是唯一的代币标识符及其面额密钥(例如`atom` 或 `uatom`)。在这里，我们授予 `stake` 代币，因为 `stake` 是用于在 [`simapp`](https://github.com/cosmos/cosmos-sdk/tree/v0.40.0-rc3/ simapp)。对于您自己的拥有自己权益的链，应该使用该代币标识符。
+回想一下，`$MY_VALIDATOR_ADDRESS` 是一个变量，它保存了 [keyring](./keyring.md#adding-keys-to-the-keyring) 中 `my_validator` 密钥的地址。另请注意，Cosmos SDK 中的代币具有 `{amount}{denom}` 格式:`amount` 是一个 18 位精度的十进制数，而 `denom` 是唯一的代币标识符及其面额密钥(例如`atom` 或 `uatom`)。在这里，我们授予 `stake` 代币，因为 `stake` 是用于在 [`simapp`](https://github.com/cosmos/cosmos-sdk/tree/v0.40.0-rc3/simapp)。对于您自己的拥有自己权益的链，应该使用该代币标识符。
 
 现在您的帐户有一些代币，您需要向链中添加一个验证器。验证者是参与共识过程的特殊全节点(在 [底层共识引擎](../intro/sdk-app-architecture.md#tendermint) 中实现)，以便向链中添加新块。任何账户都可以声明其成为验证者运营商的意图，但只有那些拥有足够委托的人才能进入活跃集(例如，只有拥有最多委托的前 125 名验证者候选人才能成为 Cosmos Hub 中的验证者)。对于本指南，您将添加本地节点(通过上面的 `init` 命令创建)作为链的验证器。验证器可以在链首次启动之前通过创世文件中包含的特殊交易声明，称为“gentx”: 
 
@@ -117,7 +117,7 @@ simd start
 
 前面的命令允许您运行单个节点。 这对于下一节关于与此节点交互的内容已经足够了，但您可能希望同时运行多个节点，并查看它们之间如何达成共识。
 
-天真的方法是在单独的终端窗口中再次运行相同的命令。 这是可能的，但是在 Cosmos SDK 中，我们利用 [Docker Compose](https://docs.docker.com/compose/) 的强大功能来运行本地网络。 如果您需要有关如何使用 Docker Compose 设置自己的本地网络的灵感，可以查看 Cosmos SDK 的 [`docker-compose.yml`](https://github.com/cosmos/cosmos-sdk/blob /v0.40.0-rc3/docker-compose.yml)。
+天真的方法是在单独的终端窗口中再次运行相同的命令。 这是可能的，但是在 Cosmos SDK 中，我们利用 [Docker Compose](https://docs.docker.com/compose/) 的强大功能来运行本地网络。 如果您需要有关如何使用 Docker Compose 设置自己的本地网络的灵感，可以查看 Cosmos SDK 的 [`docker-compose.yml`](https://github.com/cosmos/cosmos-sdk/blob/v0.40.0-rc3/docker-compose.yml)。
 
 ## 下一个 {hide}
 

@@ -21,7 +21,7 @@
 `auth` 模块的 `GenesisState` 获得了一个新的字段 `Accounts`。请注意，由于第 3 节中概述的原因，这些不是 `exported.Account` 类型。
 
 ```go
-// GenesisState - all auth state that must be provided at genesis
+//GenesisState - all auth state that must be provided at genesis
 type GenesisState struct {
     Params   Params           `json:"params" yaml:"params"`
     Accounts []GenesisAccount `json:"accounts" yaml:"accounts"`
@@ -31,17 +31,17 @@ type GenesisState struct {
 现在`auth` 的`InitGenesis` 和`ExportGenesis` (un)marshal 帐户以及定义的参数。 
 
 ```go
-// InitGenesis - Init store state from genesis data
+//InitGenesis - Init store state from genesis data
 func InitGenesis(ctx sdk.Context, ak AccountKeeper, data GenesisState) {
     ak.SetParams(ctx, data.Params)
-    // load the accounts
+   //load the accounts
     for _, a := range data.Accounts {
-        acc := ak.NewAccount(ctx, a) // set account number
+        acc := ak.NewAccount(ctx, a)//set account number
         ak.SetAccount(ctx, acc)
     }
 }
 
-// ExportGenesis returns a GenesisState for a given context and keeper
+//ExportGenesis returns a GenesisState for a given context and keeper
 func ExportGenesis(ctx sdk.Context, ak AccountKeeper) GenesisState {
     params := ak.GetParams(ctx)
 
@@ -65,7 +65,7 @@ func ExportGenesis(ctx sdk.Context, ak AccountKeeper) GenesisState {
 ```go
 import authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-// Register the module account type with the auth module codec so it can decode module accounts stored in a genesis file
+//Register the module account type with the auth module codec so it can decode module accounts stored in a genesis file
 func init() {
     authtypes.RegisterAccountTypeCodec(ModuleAccount{}, "cosmos-sdk/ModuleAccount")
 }
@@ -81,12 +81,12 @@ var ModuleCdc *codec.LegacyAmino
 
 func init() {
     ModuleCdc = codec.NewLegacyAmino()
-    // register module msg's and Account interface
+   //register module msg's and Account interface
     ...
-    // leave the codec unsealed
+   //leave the codec unsealed
 }
 
-// RegisterAccountTypeCodec registers an external account type defined in another module for the internal ModuleCdc.
+//RegisterAccountTypeCodec registers an external account type defined in another module for the internal ModuleCdc.
 func RegisterAccountTypeCodec(o interface{}, name string) {
     ModuleCdc.RegisterConcrete(o, name, nil)
 }
@@ -108,24 +108,24 @@ type GenesisAccount interface {
 然后`auth``ValidateGenesis`函数变成:
 
 ```go
-// ValidateGenesis performs basic validation of auth genesis data returning an
-// error for any failed validation criteria.
+//ValidateGenesis performs basic validation of auth genesis data returning an
+//error for any failed validation criteria.
 func ValidateGenesis(data GenesisState) error {
-    // Validate params
+   //Validate params
     ...
 
-    // Validate accounts
+   //Validate accounts
     addrMap := make(map[string]bool, len(data.Accounts))
     for _, acc := range data.Accounts {
 
-        // check for duplicated accounts
+       //check for duplicated accounts
         addrStr := acc.GetAddress().String()
         if _, ok := addrMap[addrStr]; ok {
             return fmt.Errorf("duplicate account found in genesis state; address: %s", addrStr)
         }
         addrMap[addrStr] = true
 
-        // check account specific validation
+       //check account specific validation
         if err := acc.Validate(); err != nil {
             return fmt.Errorf("invalid account found in genesis state; address: %s, error: %s", addrStr, err.Error())
         }

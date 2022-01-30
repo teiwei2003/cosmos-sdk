@@ -37,9 +37,9 @@
 __Step-1__:在 `types` 包中实现附加功能:`EmitTypedEvent` 和 `ParseTypedEvent` 函数 
 
 ```go
-// types/events.go
+//types/events.go
 
-// EmitTypedEvent takes typed event and emits converting it into sdk.Event
+//EmitTypedEvent takes typed event and emits converting it into sdk.Event
 func (em *EventManager) EmitTypedEvent(event proto.Message) error {
 	evtType := proto.MessageName(event)
 	evtJSON, err := codec.ProtoMarshalJSON(event)
@@ -69,7 +69,7 @@ func (em *EventManager) EmitTypedEvent(event proto.Message) error {
 	return nil
 }
 
-// ParseTypedEvent converts abci.Event back to typed event
+//ParseTypedEvent converts abci.Event back to typed event
 func ParseTypedEvent(event abci.Event) (proto.Message, error) {
 	concreteGoType := proto.MessageType(event.Type)
 	if concreteGoType == nil {
@@ -116,8 +116,8 @@ __Step-2__:在每个模块中为 msgs 的类型化事件添加原型定义:
 例如，让我们以 `gov` 模块的 `MsgSubmitProposal` 来实现这个事件的类型。 
 
 ```protobuf
-// proto/cosmos/gov/v1beta1/gov.proto
-// Add typed event definition
+//proto/cosmos/gov/v1beta1/gov.proto
+//Add typed event definition
 
 package cosmos.gov.v1beta1;
 
@@ -131,7 +131,7 @@ message EventSubmitProposal {
 __Step-3__:重构事件发射以使用使用`sdk.EmitTypedEvent`创建和发射的类型化事件:
 
 ```go
-// x/gov/handler.go
+//x/gov/handler.go
 func handleMsgSubmitProposal(ctx sdk.Context, keeper keeper.Keeper, msg types.MsgSubmitProposalI) (*sdk.Result, error) {
     ...
     types.Context.EventManager().EmitTypedEvent(
@@ -171,15 +171,15 @@ Akash Network 构建了一个简单的 [`pubsub`](https://github.com/ovrclk/akas
 `EventHandler`s 定义了他们想要采取的行动。 
 
 ```go
-// EventEmitter is a type that describes event emitter functions
-// This should be defined in `types/events.go`
+//EventEmitter is a type that describes event emitter functions
+//This should be defined in `types/events.go`
 type EventEmitter func(context.Context, client.Context, ...EventHandler) error
 
-// EventHandler is a type of function that handles events coming out of the event bus
-// This should be defined in `types/events.go`
+//EventHandler is a type of function that handles events coming out of the event bus
+//This should be defined in `types/events.go`
 type EventHandler func(proto.Message) error
 
-// Sample use of the functions below
+//Sample use of the functions below
 func main() {
     ctx, cancel := context.WithCancel(context.Background())
 
@@ -191,13 +191,13 @@ func main() {
     return
 }
 
-// SubmitProposalEventHandler is an example of an event handler that prints proposal details
-// when any EventSubmitProposal is emitted.
+//SubmitProposalEventHandler is an example of an event handler that prints proposal details
+//when any EventSubmitProposal is emitted.
 func SubmitProposalEventHandler(ev proto.Message) (err error) {
     switch event := ev.(type) {
-    // Handle governance proposal events creation events
+   //Handle governance proposal events creation events
     case govtypes.EventSubmitProposal:
-        // Users define business logic here e.g.
+       //Users define business logic here e.g.
         fmt.Println(ev.FromAddress, ev.ProposalId, ev.Proposal)
         return nil
     default:
@@ -205,11 +205,11 @@ func SubmitProposalEventHandler(ev proto.Message) (err error) {
     }
 }
 
-// TxEmitter is an example of an event emitter that emits just transaction events. This can and
-// should be implemented somewhere in the Cosmos SDK. The Cosmos SDK can include an EventEmitters for tm.event='Tx'
-// and/or tm.event='NewBlock' (the new block events may contain typed events)
+//TxEmitter is an example of an event emitter that emits just transaction events. This can and
+//should be implemented somewhere in the Cosmos SDK. The Cosmos SDK can include an EventEmitters for tm.event='Tx'
+//and/or tm.event='NewBlock' (the new block events may contain typed events)
 func TxEmitter(ctx context.Context, cliCtx client.Context, ehs ...EventHandler) (err error) {
-    // Instantiate and start tendermint RPC client
+   //Instantiate and start tendermint RPC client
     client, err := cliCtx.GetNode()
     if err != nil {
         return err
@@ -219,25 +219,25 @@ func TxEmitter(ctx context.Context, cliCtx client.Context, ehs ...EventHandler) 
         return err
     }
 
-    // Start the pubsub bus
+   //Start the pubsub bus
     bus := pubsub.NewBus()
     defer bus.Close()
 
-    // Initialize a new error group
+   //Initialize a new error group
     eg, ctx := errgroup.WithContext(ctx)
 
-    // Publish chain events to the pubsub bus
+   //Publish chain events to the pubsub bus
     eg.Go(func() error {
         return PublishChainTxEvents(ctx, client, bus, simapp.ModuleBasics)
     })
 
-    // Subscribe to the bus events
+   //Subscribe to the bus events
     subscriber, err := bus.Subscribe()
     if err != nil {
         return err
     }
 
-	// Handle all the events coming out of the bus
+	//Handle all the events coming out of the bus
 	eg.Go(func() error {
         var err error
         for {
@@ -260,23 +260,23 @@ func TxEmitter(ctx context.Context, cliCtx client.Context, ehs ...EventHandler) 
 	return group.Wait()
 }
 
-// PublishChainTxEvents events using tmclient. Waits on context shutdown signals to exit.
+//PublishChainTxEvents events using tmclient. Waits on context shutdown signals to exit.
 func PublishChainTxEvents(ctx context.Context, client tmclient.EventsClient, bus pubsub.Bus, mb module.BasicManager) (err error) {
-    // Subscribe to transaction events
+   //Subscribe to transaction events
     txch, err := client.Subscribe(ctx, "txevents", "tm.event='Tx'", 100)
     if err != nil {
         return err
     }
 
-    // Unsubscribe from transaction events on function exit
+   //Unsubscribe from transaction events on function exit
     defer func() {
         err = client.UnsubscribeAll(ctx, "txevents")
     }()
 
-    // Use errgroup to manage concurrency
+   //Use errgroup to manage concurrency
     g, ctx := errgroup.WithContext(ctx)
 
-    // Publish transaction events in a goroutine
+   //Publish transaction events in a goroutine
     g.Go(func() error {
         var err error
         for {
@@ -289,8 +289,8 @@ func PublishChainTxEvents(ctx context.Context, client tmclient.EventsClient, bus
                     if !evt.Result.IsOK() {
                         continue
                     }
-                    // range over events, parse them using the basic manager and
-                    // send them to the pubsub bus
+                   //range over events, parse them using the basic manager and
+                   //send them to the pubsub bus
                     for _, abciEv := range events {
                         typedEvent, err := sdk.ParseTypedEvent(abciEv)
                         if err != nil {
@@ -308,7 +308,7 @@ func PublishChainTxEvents(ctx context.Context, client tmclient.EventsClient, bus
         return err
 	})
 
-    // Exit on error or context cancelation
+   //Exit on error or context cancelation
     return g.Wait()
 }
 ```

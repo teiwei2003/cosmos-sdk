@@ -21,7 +21,7 @@
 
 ## 決定
 
-Cosmos SDKには、新しい「CapabilityKeeper」抽象化が含まれます。
+Cosmos SDKには、新しい[CapabilityKeeper]抽象化が含まれます。
 実行時に機能を追跡および検証します。 app.goでのアプリケーションの初期化中に、
 `CapabilityKeeper`は、一意の関数リファレンスを介してモジュールに接続します
 ( `ScopeToModule`を呼び出すことにより、次のように定義されます)後で呼び出し元のモジュールを識別するため
@@ -33,7 +33,7 @@ Cosmos SDKには、新しい「CapabilityKeeper」抽象化が含まれます。
 チェーンが実行されています。
 
 `CapabilityKeeper`には、永続的な` KVStore`、 `MemoryStore`、およびメモリマップが含まれます。
-永続性「KVStore」は、どの機能がどのモジュールによって所有されているかを追跡します。
+永続性[KVStore]は、どの機能がどのモジュールによって所有されているかを追跡します。
 `MemoryStore`は、モジュール名、機能タプルから機能名、および
 モジュール名と関数名から関数インデックスへの逆マッピング。
 機能のメモリ位置を変更せずに機能を `KVStore`にグループ化およびグループ解除することはできないため、
@@ -53,7 +53,7 @@ type Capability struct {
 }
 ```
 
-「CapabilityKeeper」には、永続ストレージキー、メモリストレージキー、および割り当てられたモジュール名のマッピングが含まれています。
+[CapabilityKeeper]には、永続ストレージキー、メモリストレージキー、および割り当てられたモジュール名のマッピングが含まれています。
 
 ```golang
 type CapabilityKeeper struct {
@@ -106,9 +106,9 @@ func (ck CapabilityKeeper) ScopeToModule(moduleName string) ScopedCapabilityKeep
 ```
 
 `InitialiseAndSeal`は初期状態をロードし、すべてを作成する必要があります
-新しく作成されたメモリで埋めるために必要な「ScopedCapabilityKeeper」
+新しく作成されたメモリで埋めるために必要な[ScopedCapabilityKeeper]
 特定のモジュールによって以前に宣言されたキーの機能キーに従って、
-新しい「ScopedCapabilityKeeper」を作成します。
+新しい[ScopedCapabilityKeeper]を作成します。
 
 ```golang
 func (ck CapabilityKeeper) InitialiseAndSeal(ctx Context) {
@@ -136,7 +136,7 @@ func (ck CapabilityKeeper) InitialiseAndSeal(ctx Context) {
 }
 ```
 
-どのモジュールも「NewCapability」を呼び出して、新しい独自の偽造不可能なオブジェクト機能を作成できます
+どのモジュールも[NewCapability]を呼び出して、新しい独自の偽造不可能なオブジェクト機能を作成できます
 参照する。 新しく作成された機能は自動的に保持されます。モジュールを呼び出す必要はありません
 `ClaimCapability`を呼び出します。 
 
@@ -189,7 +189,7 @@ func (sck ScopedCapabilityKeeper) AuthenticateCapability(name string, capability
 その後、将来の `GetCapability`呼び出しは成功します。
 
 受信機能モジュールが名前でアクセスする場合は、 `ClaimCapability`を呼び出す必要があります
-将来。 機能は複数所有者であるため、複数のモジュールに単一の「機能」参照がある場合、
+将来。 機能は複数所有者であるため、複数のモジュールに単一の[機能]参照がある場合、
 彼らは皆それを持っているでしょう。 
 
 ```golang
@@ -277,7 +277,7 @@ ck.InitialiseAndSeal(initialContext)
 
 #### 機能の作成、転送、宣言、使用
 
-「mod1」が能力を作成し、それを名前でリソース(IBCチャネルなど)に関連付けてから、それを「mod2」に渡し、後でそれを使用する状況を考えてみます。
+[mod1]が能力を作成し、それを名前でリソース(IBCチャネルなど)に関連付けてから、それを[mod2]に渡し、後でそれを使用する状況を考えてみます。
 
 モジュール1には次のコードが含まれます。 
 
@@ -327,12 +327,12 @@ func (k Mod1Keeper) UseResource(ctx Context, capability Capability, resource str
 ### 目的
 
 -動的機能のサポート。
--txが失敗したときに、メモリ内の永続的な「KVStore」および「MemoryStore」への書き込みを回復しながら、CapabilityKeeperがgo-mapから同じ機能ポインタを返すことを許可します。
+-txが失敗したときに、メモリ内の永続的な[KVStore]および[MemoryStore]への書き込みを回復しながら、CapabilityKeeperがgo-mapから同じ機能ポインタを返すことを許可します。
 
 ### ネガティブ
 
 -追加のゴールキーパーが必要です。
--既存の「StoreKey」システムとの重複があります(これはスーパーセット関数であるため、将来的にマージできます)。
+-既存の[StoreKey]システムとの重複があります(これはスーパーセット関数であるため、将来的にマージできます)。
 -メモリストアはインデックスにマップする必要があり、実際の関数を取得するためにgoマップのキーとして使用する必要があるため、リバースマッピングでは追加レベルの間接参照が必要です。
 
 ### ニュートラル
